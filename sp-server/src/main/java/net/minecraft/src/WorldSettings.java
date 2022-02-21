@@ -45,6 +45,11 @@ public final class WorldSettings {
 		this.bonusChestEnabled = true;
 		return this;
 	}
+	
+	public WorldSettings enableCheats() {
+		this.commandsAllowed = true;
+		return this;
+	}
 
 	public WorldSettings func_82750_a(String par1Str) {
 		this.field_82751_h = par1Str;

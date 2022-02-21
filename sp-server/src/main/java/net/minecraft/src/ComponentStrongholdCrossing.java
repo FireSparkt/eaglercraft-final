@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentStrongholdCrossing extends ComponentStronghold {
 	protected final EnumDoor doorType;
@@ -10,7 +11,7 @@ public class ComponentStrongholdCrossing extends ComponentStronghold {
 	private boolean field_74995_d;
 	private boolean field_74999_h;
 
-	public ComponentStrongholdCrossing(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentStrongholdCrossing(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -26,7 +27,7 @@ public class ComponentStrongholdCrossing extends ComponentStronghold {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		int var4 = 3;
 		int var5 = 5;
 
@@ -54,7 +55,7 @@ public class ComponentStrongholdCrossing extends ComponentStronghold {
 		}
 	}
 
-	public static ComponentStrongholdCrossing findValidPlacement(List par0List, Random par1Random, int par2, int par3,
+	public static ComponentStrongholdCrossing findValidPlacement(List par0List, EaglercraftRandom par1Random, int par2, int par3,
 			int par4, int par5, int par6) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -4, -3, 0, 10,
 				9, 11, par5);
@@ -67,7 +68,7 @@ public class ComponentStrongholdCrossing extends ComponentStronghold {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

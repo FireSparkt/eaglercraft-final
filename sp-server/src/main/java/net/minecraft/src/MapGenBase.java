@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenBase {
 	/** The number of Chunks to gen-check in any given direction. */
 	protected int range = 8;
 
 	/** The RNG used by the MapGen classes. */
-	protected Random rand = new Random();
+	protected EaglercraftRandom rand = new EaglercraftRandom();
 
 	/** This world object. */
 	protected World worldObj;

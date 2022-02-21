@@ -56,18 +56,21 @@ public class CommandDebug extends CommandBase {
 	}
 
 	private void saveProfilerResults(long par1, int par3) {
-		File var4 = new File(MinecraftServer.getServer().getFile("debug"),
-				"profile-results-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + ".txt");
-		var4.getParentFile().mkdirs();
-
-		try {
-			FileWriter var5 = new FileWriter(var4);
-			var5.write(this.getProfilerResults(par1, par3));
-			var5.close();
-		} catch (Throwable var6) {
-			MinecraftServer.getServer().getLogAgent().logSevereException("Could not save profiler results to " + var4,
-					var6);
-		}
+		
+		// no
+		
+//		File var4 = new File(MinecraftServer.getServer().getFile("debug"),
+//				"profile-results-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + ".txt");
+//		var4.getParentFile().mkdirs();
+//
+//		try {
+//			FileWriter var5 = new FileWriter(var4);
+//			var5.write(this.getProfilerResults(par1, par3));
+//			var5.close();
+//		} catch (Throwable var6) {
+//			MinecraftServer.getServer().getLogAgent().logSevereException("Could not save profiler results to " + var4,
+//					var6);
+//		}
 	}
 
 	private String getProfilerResults(long par1, int par3) {

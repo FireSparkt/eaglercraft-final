@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenCaves extends MapGenBase {
 	/**
@@ -21,7 +21,7 @@ public class MapGenCaves extends MapGenBase {
 		double var21 = (double) (par4 * 16 + 8);
 		float var23 = 0.0F;
 		float var24 = 0.0F;
-		Random var25 = new Random(par1);
+		EaglercraftRandom var25 = new EaglercraftRandom(par1);
 
 		if (par16 <= 0) {
 			int var26 = this.range * 16 - 16;

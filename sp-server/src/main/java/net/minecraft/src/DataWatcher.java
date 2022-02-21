@@ -19,7 +19,6 @@ public class DataWatcher {
 
 	/** true if one or more object was changed */
 	private boolean objectChanged;
-	private ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	/**
 	 * adds a new object to dataWatcher to watch, to update an already existing
@@ -36,9 +35,7 @@ public class DataWatcher {
 			throw new IllegalArgumentException("Duplicate id value for " + par1 + "!");
 		} else {
 			WatchableObject var4 = new WatchableObject(var3.intValue(), par1, par2Obj);
-			this.lock.writeLock().lock();
 			this.watchedObjects.put(Integer.valueOf(par1), var4);
-			this.lock.writeLock().unlock();
 			this.isBlank = false;
 		}
 	}
@@ -48,9 +45,7 @@ public class DataWatcher {
 	 */
 	public void addObjectByDataType(int par1, int par2) {
 		WatchableObject var3 = new WatchableObject(par2, par1, (Object) null);
-		this.lock.writeLock().lock();
 		this.watchedObjects.put(Integer.valueOf(par1), var3);
-		this.lock.writeLock().unlock();
 		this.isBlank = false;
 	}
 
@@ -90,19 +85,7 @@ public class DataWatcher {
 	 * is threadsafe, unless it throws an exception, then
 	 */
 	private WatchableObject getWatchedObject(int par1) {
-		this.lock.readLock().lock();
-		WatchableObject var2;
-
-		try {
-			var2 = (WatchableObject) this.watchedObjects.get(Integer.valueOf(par1));
-		} catch (Throwable var6) {
-			CrashReport var4 = CrashReport.makeCrashReport(var6, "Getting synched entity data");
-			CrashReportCategory var5 = var4.makeCategory("Synched entity data");
-			var5.addCrashSection("Data ID", Integer.valueOf(par1));
-			throw new ReportedException(var4);
-		}
-
-		this.lock.readLock().unlock();
+		WatchableObject var2 = (WatchableObject) this.watchedObjects.get(Integer.valueOf(par1));
 		return var2;
 	}
 
@@ -152,7 +135,6 @@ public class DataWatcher {
 		ArrayList var1 = null;
 
 		if (this.objectChanged) {
-			this.lock.readLock().lock();
 			Iterator var2 = this.watchedObjects.values().iterator();
 
 			while (var2.hasNext()) {
@@ -168,8 +150,6 @@ public class DataWatcher {
 					var1.add(var3);
 				}
 			}
-
-			this.lock.readLock().unlock();
 		}
 
 		this.objectChanged = false;
@@ -177,21 +157,18 @@ public class DataWatcher {
 	}
 
 	public void writeWatchableObjects(DataOutputStream par1DataOutputStream) throws IOException {
-		this.lock.readLock().lock();
 		Iterator var2 = this.watchedObjects.values().iterator();
 
 		while (var2.hasNext()) {
 			WatchableObject var3 = (WatchableObject) var2.next();
 			writeWatchableObject(par1DataOutputStream, var3);
 		}
-
-		this.lock.readLock().unlock();
+		
 		par1DataOutputStream.writeByte(127);
 	}
 
 	public List getAllWatched() {
 		ArrayList var1 = null;
-		this.lock.readLock().lock();
 		WatchableObject var3;
 
 		for (Iterator var2 = this.watchedObjects.values().iterator(); var2.hasNext(); var1.add(var3)) {
@@ -201,8 +178,7 @@ public class DataWatcher {
 				var1 = new ArrayList();
 			}
 		}
-
-		this.lock.readLock().unlock();
+		
 		return var1;
 	}
 

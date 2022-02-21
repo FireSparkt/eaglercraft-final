@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockTNT extends Block {
 	public BlockTNT(int par1) {
@@ -35,7 +35,7 @@ public class BlockTNT extends Block {
 	/**
 	 * Returns the quantity of items to drop on block destruction.
 	 */
-	public int quantityDropped(Random par1Random) {
+	public int quantityDropped(EaglercraftRandom par1Random) {
 		return 1;
 	}
 

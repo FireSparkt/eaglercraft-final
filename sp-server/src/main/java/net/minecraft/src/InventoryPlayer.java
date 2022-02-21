@@ -223,43 +223,34 @@ public class InventoryPlayer implements IInventory {
 		if (par1ItemStack == null) {
 			return false;
 		} else {
-			try {
-				int var2;
+			int var2;
 
-				if (par1ItemStack.isItemDamaged()) {
-					var2 = this.getFirstEmptyStack();
+			if (par1ItemStack.isItemDamaged()) {
+				var2 = this.getFirstEmptyStack();
 
-					if (var2 >= 0) {
-						this.mainInventory[var2] = ItemStack.copyItemStack(par1ItemStack);
-						this.mainInventory[var2].animationsToGo = 5;
-						par1ItemStack.stackSize = 0;
-						return true;
-					} else if (this.player.capabilities.isCreativeMode) {
-						par1ItemStack.stackSize = 0;
-						return true;
-					} else {
-						return false;
-					}
+				if (var2 >= 0) {
+					this.mainInventory[var2] = ItemStack.copyItemStack(par1ItemStack);
+					this.mainInventory[var2].animationsToGo = 5;
+					par1ItemStack.stackSize = 0;
+					return true;
+				} else if (this.player.capabilities.isCreativeMode) {
+					par1ItemStack.stackSize = 0;
+					return true;
 				} else {
-					do {
-						var2 = par1ItemStack.stackSize;
-						par1ItemStack.stackSize = this.storePartialItemStack(par1ItemStack);
-					} while (par1ItemStack.stackSize > 0 && par1ItemStack.stackSize < var2);
-
-					if (par1ItemStack.stackSize == var2 && this.player.capabilities.isCreativeMode) {
-						par1ItemStack.stackSize = 0;
-						return true;
-					} else {
-						return par1ItemStack.stackSize < var2;
-					}
+					return false;
 				}
-			} catch (Throwable var5) {
-				CrashReport var3 = CrashReport.makeCrashReport(var5, "Adding item to inventory");
-				CrashReportCategory var4 = var3.makeCategory("Item being added");
-				var4.addCrashSection("Item ID", Integer.valueOf(par1ItemStack.itemID));
-				var4.addCrashSection("Item data", Integer.valueOf(par1ItemStack.getItemDamage()));
-				var4.addCrashSectionCallable("Item name", new CallableItemName(this, par1ItemStack));
-				throw new ReportedException(var3);
+			} else {
+				do {
+					var2 = par1ItemStack.stackSize;
+					par1ItemStack.stackSize = this.storePartialItemStack(par1ItemStack);
+				} while (par1ItemStack.stackSize > 0 && par1ItemStack.stackSize < var2);
+
+				if (par1ItemStack.stackSize == var2 && this.player.capabilities.isCreativeMode) {
+					par1ItemStack.stackSize = 0;
+					return true;
+				} else {
+					return par1ItemStack.stackSize < var2;
+				}
 			}
 		}
 	}

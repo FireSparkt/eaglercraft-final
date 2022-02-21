@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class EntityAIMate extends EntityAIBase {
 	private EntityAnimal theAnimal;
@@ -104,7 +105,7 @@ public class EntityAIMate extends EntityAIBase {
 			var1.setGrowingAge(-24000);
 			var1.setLocationAndAngles(this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, 0.0F, 0.0F);
 			this.theWorld.spawnEntityInWorld(var1);
-			Random var2 = this.theAnimal.getRNG();
+			EaglercraftRandom var2 = this.theAnimal.getRNG();
 
 			for (int var3 = 0; var3 < 7; ++var3) {
 				double var4 = var2.nextGaussian() * 0.02D;

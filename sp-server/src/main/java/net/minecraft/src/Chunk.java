@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class Chunk {
 	/**
@@ -658,7 +659,7 @@ public class Chunk {
 
 		if (var2 != this.xPosition || var3 != this.zPosition) {
 			this.worldObj.getWorldLogAgent().logSevere("Wrong location! " + par1Entity);
-			Thread.dumpStack();
+			//Thread.dumpStack();
 		}
 
 		int var4 = MathHelper.floor_double(par1Entity.posY / 16.0D);
@@ -919,8 +920,8 @@ public class Chunk {
 		return this.isModified;
 	}
 
-	public Random getRandomWithSeed(long par1) {
-		return new Random(this.worldObj.getSeed() + (long) (this.xPosition * this.xPosition * 4987142)
+	public EaglercraftRandom getRandomWithSeed(long par1) {
+		return new EaglercraftRandom(this.worldObj.getSeed() + (long) (this.xPosition * this.xPosition * 4987142)
 				+ (long) (this.xPosition * 5947611) + (long) (this.zPosition * this.zPosition) * 4392871L
 				+ (long) (this.zPosition * 389711) ^ par1);
 	}

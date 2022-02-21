@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockSapling extends BlockFlower {
 	public static final String[] WOOD_TYPES = new String[] { "oak", "spruce", "birch", "jungle" };
@@ -17,7 +17,7 @@ public class BlockSapling extends BlockFlower {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			super.updateTick(par1World, par2, par3, par4, par5Random);
 
@@ -27,7 +27,7 @@ public class BlockSapling extends BlockFlower {
 		}
 	}
 
-	public void markOrGrowMarked(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void markOrGrowMarked(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		int var6 = par1World.getBlockMetadata(par2, par3, par4);
 
 		if ((var6 & 8) == 0) {
@@ -40,7 +40,7 @@ public class BlockSapling extends BlockFlower {
 	/**
 	 * Attempts to grow a sapling into a tree
 	 */
-	public void growTree(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void growTree(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		int var6 = par1World.getBlockMetadata(par2, par3, par4) & 3;
 		Object var7 = null;
 		int var8 = 0;

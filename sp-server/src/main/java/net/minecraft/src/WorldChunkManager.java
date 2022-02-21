@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldChunkManager {
 	private GenLayer genBiomes;
@@ -190,7 +191,7 @@ public class WorldChunkManager {
 	/**
 	 * Finds a valid position within a range, that is once of the listed biomes.
 	 */
-	public ChunkPosition findBiomePosition(int par1, int par2, int par3, List par4List, Random par5Random) {
+	public ChunkPosition findBiomePosition(int par1, int par2, int par3, List par4List, EaglercraftRandom par5Random) {
 		IntCache.resetIntCache();
 		int var6 = par1 - par3 >> 2;
 		int var7 = par2 - par3 >> 2;

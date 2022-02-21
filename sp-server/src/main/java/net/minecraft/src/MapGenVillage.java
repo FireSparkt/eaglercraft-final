@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenVillage extends MapGenStructure {
 	/** A list of all the biomes villages can spawn in. */
@@ -53,7 +54,7 @@ public class MapGenVillage extends MapGenStructure {
 
 		int var5 = par1 / this.field_82665_g;
 		int var6 = par2 / this.field_82665_g;
-		Random var7 = this.worldObj.setRandomSeed(var5, var6, 10387312);
+		EaglercraftRandom var7 = this.worldObj.setRandomSeed(var5, var6, 10387312);
 		var5 *= this.field_82665_g;
 		var6 *= this.field_82665_g;
 		var5 += var7.nextInt(this.field_82665_g - this.field_82666_h);

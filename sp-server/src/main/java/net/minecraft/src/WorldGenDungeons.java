@@ -1,9 +1,9 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenDungeons extends WorldGenerator {
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		byte var6 = 3;
 		int var7 = par2Random.nextInt(2) + 2;
 		int var8 = par2Random.nextInt(2) + 2;
@@ -132,7 +132,7 @@ public class WorldGenDungeons extends WorldGenerator {
 	/**
 	 * Picks potentially a random item to add to a dungeon chest.
 	 */
-	private ItemStack pickCheckLootItem(Random par1Random) {
+	private ItemStack pickCheckLootItem(EaglercraftRandom par1Random) {
 		int var2 = par1Random.nextInt(12);
 		return var2 == 0 ? new ItemStack(Item.saddle)
 				: (var2 == 1 ? new ItemStack(Item.ingotIron, par1Random.nextInt(4) + 1)
@@ -166,7 +166,7 @@ public class WorldGenDungeons extends WorldGenerator {
 	/**
 	 * Randomly decides which spawner to use in a dungeon
 	 */
-	private String pickMobSpawner(Random par1Random) {
+	private String pickMobSpawner(EaglercraftRandom par1Random) {
 		int var2 = par1Random.nextInt(4);
 		return var2 == 0 ? "Skeleton" : (var2 == 1 ? "Zombie" : (var2 == 2 ? "Zombie" : (var2 == 3 ? "Spider" : "")));
 	}

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BiomeGenDesert extends BiomeGenBase {
 	public BiomeGenDesert(int par1) {
@@ -14,7 +14,7 @@ public class BiomeGenDesert extends BiomeGenBase {
 		this.theBiomeDecorator.cactiPerChunk = 10;
 	}
 
-	public void decorate(World par1World, Random par2Random, int par3, int par4) {
+	public void decorate(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		super.decorate(par1World, par2Random, par3, par4);
 
 		if (par2Random.nextInt(1000) == 0) {

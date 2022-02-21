@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenClay extends WorldGenerator {
 	/** The block ID for clay. */
@@ -14,7 +14,7 @@ public class WorldGenClay extends WorldGenerator {
 		this.numberOfBlocks = par1;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		if (par1World.getBlockMaterial(par3, par4, par5) != Material.water) {
 			return false;
 		} else {

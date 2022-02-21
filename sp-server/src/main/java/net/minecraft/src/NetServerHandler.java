@@ -5,7 +5,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 import net.minecraft.server.MinecraftServer;
 
 public class NetServerHandler extends NetHandler {
@@ -31,7 +32,7 @@ public class NetServerHandler extends NetHandler {
 	private long keepAliveTimeSent;
 
 	/** The Java Random object. */
-	private static Random rndmObj = new Random();
+	private static EaglercraftRandom rndmObj = new EaglercraftRandom();
 	private long ticksOfLastKeepAlive;
 	private int chatSpamThresholdCount = 0;
 	private int creativeItemCreationSpamThresholdTally = 0;
@@ -522,16 +523,8 @@ public class NetServerHandler extends NetHandler {
 				return;
 			}
 		}
-
-		try {
-			this.netManager.addToSendQueue(par1Packet);
-		} catch (Throwable var5) {
-			CrashReport var6 = CrashReport.makeCrashReport(var5, "Sending packet");
-			CrashReportCategory var4 = var6.makeCategory("Packet being sent");
-			var4.addCrashSectionCallable("Packet ID", new CallablePacketID(this, par1Packet));
-			var4.addCrashSectionCallable("Packet class", new CallablePacketClass(this, par1Packet));
-			throw new ReportedException(var6);
-		}
+		
+		this.netManager.addToSendQueue(par1Packet);
 	}
 
 	public void handleBlockItemSwitch(Packet16BlockItemSwitch par1Packet16BlockItemSwitch) {
@@ -659,12 +652,6 @@ public class NetServerHandler extends NetHandler {
 					this.playerEntity.playerNetServerHandler
 							.kickPlayer("You have died. Game over, man, it\'s game over!");
 					this.mcServer.deleteWorldAndStopServer();
-				} else {
-					BanEntry var2 = new BanEntry(this.playerEntity.username);
-					var2.setBanReason("Death in Hardcore");
-					this.mcServer.getConfigurationManager().getBannedPlayers().put(var2);
-					this.playerEntity.playerNetServerHandler
-							.kickPlayer("You have died. Game over, man, it\'s game over!");
 				}
 			} else {
 				if (this.playerEntity.getHealth() > 0) {

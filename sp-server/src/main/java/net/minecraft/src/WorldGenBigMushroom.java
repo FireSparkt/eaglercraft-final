@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenBigMushroom extends WorldGenerator {
 	/** The mushroom type. 0 for brown, 1 for red. */
@@ -15,7 +15,7 @@ public class WorldGenBigMushroom extends WorldGenerator {
 		super(false);
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		int var6 = par2Random.nextInt(2);
 
 		if (this.mushroomType >= 0) {

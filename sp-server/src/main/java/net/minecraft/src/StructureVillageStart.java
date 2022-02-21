@@ -2,13 +2,14 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 class StructureVillageStart extends StructureStart {
 	/** well ... thats what it does */
 	private boolean hasMoreThanTwoComponents = false;
 
-	public StructureVillageStart(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public StructureVillageStart(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		ArrayList var6 = StructureVillagePieces.getStructureVillageWeightedPieceList(par2Random, par5);
 		ComponentVillageStartPiece var7 = new ComponentVillageStartPiece(par1World.getWorldChunkManager(), 0,
 				par2Random, (par3 << 4) + 2, (par4 << 4) + 2, var6, par5);

@@ -129,8 +129,9 @@ public class AchievementList {
 	 * A stub functions called to make the static initializer for this class run.
 	 */
 	public static void init() {
+		System.out.println("yee");
 	}
-
+	
 	static {
 		System.out.println(achievementList.size() + " achievements");
 	}

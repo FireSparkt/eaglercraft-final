@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 abstract class ComponentScatteredFeature extends StructureComponent {
 	/** The size of the bounding box for this feature in the X axis */
@@ -13,7 +13,7 @@ abstract class ComponentScatteredFeature extends StructureComponent {
 	protected final int scatteredFeatureSizeZ;
 	protected int field_74936_d = -1;
 
-	protected ComponentScatteredFeature(Random par1Random, int par2, int par3, int par4, int par5, int par6, int par7) {
+	protected ComponentScatteredFeature(EaglercraftRandom par1Random, int par2, int par3, int par4, int par5, int par6, int par7) {
 		super(0);
 		this.scatteredFeatureSizeX = par5;
 		this.scatteredFeatureSizeY = par6;

@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class StructureNetherBridgePieces {
 	private static final StructureNetherBridgePieceWeight[] primaryComponents = new StructureNetherBridgePieceWeight[] {
@@ -21,7 +22,7 @@ public class StructureNetherBridgePieces {
 			new StructureNetherBridgePieceWeight(ComponentNetherBridgeNetherStalkRoom.class, 5, 2) };
 
 	private static ComponentNetherBridgePiece createNextComponentRandom(
-			StructureNetherBridgePieceWeight par0StructureNetherBridgePieceWeight, List par1List, Random par2Random,
+			StructureNetherBridgePieceWeight par0StructureNetherBridgePieceWeight, List par1List, EaglercraftRandom par2Random,
 			int par3, int par4, int par5, int par6, int par7) {
 		Class var8 = par0StructureNetherBridgePieceWeight.weightClass;
 		Object var9 = null;
@@ -69,7 +70,7 @@ public class StructureNetherBridgePieces {
 	}
 
 	static ComponentNetherBridgePiece createNextComponent(
-			StructureNetherBridgePieceWeight par0StructureNetherBridgePieceWeight, List par1List, Random par2Random,
+			StructureNetherBridgePieceWeight par0StructureNetherBridgePieceWeight, List par1List, EaglercraftRandom par2Random,
 			int par3, int par4, int par5, int par6, int par7) {
 		return createNextComponentRandom(par0StructureNetherBridgePieceWeight, par1List, par2Random, par3, par4, par5,
 				par6, par7);

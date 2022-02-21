@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WeightedRandom {
 	/**
@@ -22,7 +23,7 @@ public class WeightedRandom {
 	/**
 	 * Returns a random choice from the input items, with a total weight value.
 	 */
-	public static WeightedRandomItem getRandomItem(Random par0Random, Collection par1Collection, int par2) {
+	public static WeightedRandomItem getRandomItem(EaglercraftRandom par0Random, Collection par1Collection, int par2) {
 		if (par2 <= 0) {
 			throw new IllegalArgumentException();
 		} else {
@@ -46,7 +47,7 @@ public class WeightedRandom {
 	/**
 	 * Returns a random choice from the input items.
 	 */
-	public static WeightedRandomItem getRandomItem(Random par0Random, Collection par1Collection) {
+	public static WeightedRandomItem getRandomItem(EaglercraftRandom par0Random, Collection par1Collection) {
 		return getRandomItem(par0Random, par1Collection, getTotalWeight(par1Collection));
 	}
 
@@ -70,7 +71,7 @@ public class WeightedRandom {
 	 * Returns a random choice from the input array of items, with a total weight
 	 * value.
 	 */
-	public static WeightedRandomItem getRandomItem(Random par0Random,
+	public static WeightedRandomItem getRandomItem(EaglercraftRandom par0Random,
 			WeightedRandomItem[] par1ArrayOfWeightedRandomItem, int par2) {
 		if (par2 <= 0) {
 			throw new IllegalArgumentException();
@@ -95,7 +96,7 @@ public class WeightedRandom {
 	/**
 	 * Returns a random choice from the input items.
 	 */
-	public static WeightedRandomItem getRandomItem(Random par0Random,
+	public static WeightedRandomItem getRandomItem(EaglercraftRandom par0Random,
 			WeightedRandomItem[] par1ArrayOfWeightedRandomItem) {
 		return getRandomItem(par0Random, par1ArrayOfWeightedRandomItem, getTotalWeight(par1ArrayOfWeightedRandomItem));
 	}

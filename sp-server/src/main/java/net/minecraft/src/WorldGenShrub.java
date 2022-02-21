@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenShrub extends WorldGenerator {
 	private int field_76527_a;
@@ -11,7 +11,7 @@ public class WorldGenShrub extends WorldGenerator {
 		this.field_76527_a = par2;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		int var15;
 
 		for (boolean var6 = false; ((var15 = par1World.getBlockId(par3, par4, par5)) == 0

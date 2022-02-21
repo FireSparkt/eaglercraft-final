@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 final class DispenserBehaviorFireball extends BehaviorDefaultDispenseItem {
 	/**
@@ -13,7 +13,7 @@ final class DispenserBehaviorFireball extends BehaviorDefaultDispenseItem {
 		double var7 = var4.getY() + (double) ((float) var3.getFrontOffsetX() * 0.3F);
 		double var9 = var4.getZ() + (double) ((float) var3.getFrontOffsetZ() * 0.3F);
 		World var11 = par1IBlockSource.getWorld();
-		Random var12 = var11.rand;
+		EaglercraftRandom var12 = var11.rand;
 		double var13 = var12.nextGaussian() * 0.05D + (double) var3.getFrontOffsetX();
 		double var15 = var12.nextGaussian() * 0.05D + (double) var3.getFrontOffsetY();
 		double var17 = var12.nextGaussian() * 0.05D + (double) var3.getFrontOffsetZ();

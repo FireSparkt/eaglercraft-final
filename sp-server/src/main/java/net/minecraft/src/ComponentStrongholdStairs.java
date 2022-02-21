@@ -1,13 +1,14 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentStrongholdStairs extends ComponentStronghold {
 	private final boolean field_75024_a;
 	private final EnumDoor doorType;
 
-	public ComponentStrongholdStairs(int par1, Random par2Random, int par3, int par4) {
+	public ComponentStrongholdStairs(int par1, EaglercraftRandom par2Random, int par3, int par4) {
 		super(par1);
 		this.field_75024_a = true;
 		this.coordBaseMode = par2Random.nextInt(4);
@@ -24,7 +25,7 @@ public class ComponentStrongholdStairs extends ComponentStronghold {
 		}
 	}
 
-	public ComponentStrongholdStairs(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentStrongholdStairs(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.field_75024_a = false;
@@ -37,7 +38,7 @@ public class ComponentStrongholdStairs extends ComponentStronghold {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		if (this.field_75024_a) {
 			StructureStrongholdPieces.setComponentType(ComponentStrongholdCrossing.class);
 		}
@@ -48,7 +49,7 @@ public class ComponentStrongholdStairs extends ComponentStronghold {
 	/**
 	 * performs some checks, then gives out a fresh Stairs component
 	 */
-	public static ComponentStrongholdStairs getStrongholdStairsComponent(List par0List, Random par1Random, int par2,
+	public static ComponentStrongholdStairs getStrongholdStairsComponent(List par0List, EaglercraftRandom par1Random, int par2,
 			int par3, int par4, int par5, int par6) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -1, -7, 0, 5,
 				11, 5, par5);
@@ -61,7 +62,7 @@ public class ComponentStrongholdStairs extends ComponentStronghold {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

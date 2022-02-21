@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class BlockBasePressurePlate extends Block {
 	private String pressurePlateIconName;
@@ -98,7 +98,7 @@ public abstract class BlockBasePressurePlate extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			int var6 = this.getPowerSupply(par1World.getBlockMetadata(par2, par3, par4));
 

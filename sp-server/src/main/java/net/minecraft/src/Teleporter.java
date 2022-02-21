@@ -3,13 +3,14 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class Teleporter {
 	private final WorldServer worldServerInstance;
 
 	/** A private Random() function in Teleporter */
-	private final Random random;
+	private final EaglercraftRandom random;
 
 	/** Stores successful portal placement locations for rapid lookup. */
 	private final LongHashMap destinationCoordinateCache = new LongHashMap();
@@ -22,7 +23,7 @@ public class Teleporter {
 
 	public Teleporter(WorldServer par1WorldServer) {
 		this.worldServerInstance = par1WorldServer;
-		this.random = new Random(par1WorldServer.getSeed());
+		this.random = new EaglercraftRandom(par1WorldServer.getSeed());
 	}
 
 	/**

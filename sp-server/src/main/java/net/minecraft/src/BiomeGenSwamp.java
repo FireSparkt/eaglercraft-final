@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BiomeGenSwamp extends BiomeGenBase {
 	protected BiomeGenSwamp(int par1) {
@@ -13,13 +13,13 @@ public class BiomeGenSwamp extends BiomeGenBase {
 		this.theBiomeDecorator.clayPerChunk = 1;
 		this.theBiomeDecorator.waterlilyPerChunk = 4;
 		this.waterColorMultiplier = 14745518;
-		this.spawnableMonsterList.add(new SpawnListEntry(EntitySlime.class, 1, 1, 1));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntitySlime(w), 1, 1, 1));
 	}
 
 	/**
 	 * Gets a WorldGen appropriate for this biome.
 	 */
-	public WorldGenerator getRandomWorldGenForTrees(Random par1Random) {
+	public WorldGenerator getRandomWorldGenForTrees(EaglercraftRandom par1Random) {
 		return this.worldGeneratorSwamp;
 	}
 }

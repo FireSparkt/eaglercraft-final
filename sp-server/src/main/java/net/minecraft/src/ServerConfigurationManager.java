@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import java.io.File;
-import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +11,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import net.minecraft.server.MinecraftServer;
 
-public abstract class ServerConfigurationManager {
+public class ServerConfigurationManager {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd \'at\' HH:mm:ss z");
 
 	/** Reference to the MinecraftServer object. */
@@ -21,8 +19,6 @@ public abstract class ServerConfigurationManager {
 
 	/** A list of player entities that exist on this server. */
 	public final List playerEntityList = new ArrayList();
-	private final BanList bannedPlayers = new BanList(new File("banned-players.txt"));
-	private final BanList bannedIPs = new BanList(new File("banned-ips.txt"));
 
 	/** A set containing the OPs. */
 	private Set ops = new HashSet();
@@ -54,9 +50,7 @@ public abstract class ServerConfigurationManager {
 
 	public ServerConfigurationManager(MinecraftServer par1MinecraftServer) {
 		this.mcServer = par1MinecraftServer;
-		this.bannedPlayers.setListActive(false);
-		this.bannedIPs.setListActive(false);
-		this.maxPlayers = 8;
+		this.maxPlayers = 50;
 	}
 
 	public void initializeConnectionToPlayer(INetworkManager par1INetworkManager, EntityPlayerMP par2EntityPlayerMP) {
@@ -64,10 +58,6 @@ public abstract class ServerConfigurationManager {
 		par2EntityPlayerMP.setWorld(this.mcServer.worldServerForDimension(par2EntityPlayerMP.dimension));
 		par2EntityPlayerMP.theItemInWorldManager.setWorld((WorldServer) par2EntityPlayerMP.worldObj);
 		String var4 = "local";
-
-		if (par1INetworkManager.getRemoteAddress() != null) {
-			var4 = par1INetworkManager.getRemoteAddress().toString();
-		}
 
 		this.mcServer.getLogAgent()
 				.func_98233_a(par2EntityPlayerMP.username + "[" + var4 + "] logged in with entity id "
@@ -240,36 +230,8 @@ public abstract class ServerConfigurationManager {
 	 * checks ban-lists, then white-lists, then space for the server. Returns null
 	 * on success, or an error message
 	 */
-	public String allowUserToConnect(SocketAddress par1SocketAddress, String par2Str) {
-		if (this.bannedPlayers.isBanned(par2Str)) {
-			BanEntry var6 = (BanEntry) this.bannedPlayers.getBannedList().get(par2Str);
-			String var7 = "You are banned from this server!\nReason: " + var6.getBanReason();
-
-			if (var6.getBanEndDate() != null) {
-				var7 = var7 + "\nYour ban will be removed on " + dateFormat.format(var6.getBanEndDate());
-			}
-
-			return var7;
-		} else if (!this.isAllowedToLogin(par2Str)) {
-			return "You are not white-listed on this server!";
-		} else {
-			String var3 = par1SocketAddress.toString();
-			var3 = var3.substring(var3.indexOf("/") + 1);
-			var3 = var3.substring(0, var3.indexOf(":"));
-
-			if (this.bannedIPs.isBanned(var3)) {
-				BanEntry var4 = (BanEntry) this.bannedIPs.getBannedList().get(var3);
-				String var5 = "Your IP address is banned from this server!\nReason: " + var4.getBanReason();
-
-				if (var4.getBanEndDate() != null) {
-					var5 = var5 + "\nYour ban will be removed on " + dateFormat.format(var4.getBanEndDate());
-				}
-
-				return var5;
-			} else {
-				return this.playerEntityList.size() >= this.maxPlayers ? "The server is full!" : null;
-			}
-		}
+	public String allowUserToConnect(String par2Str) {
+		return this.playerEntityList.size() >= this.maxPlayers ? "The server is full!" : null;
 	}
 
 	/**
@@ -294,16 +256,9 @@ public abstract class ServerConfigurationManager {
 			var4.playerNetServerHandler.kickPlayer("You logged in from another location");
 		}
 
-		Object var6;
+		Object var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(0));
 
-		if (this.mcServer.isDemo()) {
-			var6 = new DemoWorldManager(this.mcServer.worldServerForDimension(0));
-		} else {
-			var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(0));
-		}
-
-		return new EntityPlayerMP(this.mcServer, this.mcServer.worldServerForDimension(0), par1Str,
-				(ItemInWorldManager) var6);
+		return new EntityPlayerMP(this.mcServer, this.mcServer.worldServerForDimension(0), par1Str, (ItemInWorldManager) var6);
 	}
 
 	/**
@@ -319,13 +274,7 @@ public abstract class ServerConfigurationManager {
 		ChunkCoordinates var4 = par1EntityPlayerMP.getBedLocation();
 		boolean var5 = par1EntityPlayerMP.isSpawnForced();
 		par1EntityPlayerMP.dimension = par2;
-		Object var6;
-
-		if (this.mcServer.isDemo()) {
-			var6 = new DemoWorldManager(this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension));
-		} else {
-			var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension));
-		}
+		Object var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension));
 
 		EntityPlayerMP var7 = new EntityPlayerMP(this.mcServer,
 				this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension), par1EntityPlayerMP.username,
@@ -539,14 +488,6 @@ public abstract class ServerConfigurationManager {
 		}
 
 		return var1;
-	}
-
-	public BanList getBannedPlayers() {
-		return this.bannedPlayers;
-	}
-
-	public BanList getBannedIPs() {
-		return this.bannedIPs;
 	}
 
 	/**

@@ -1,12 +1,12 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentScatteredFeatureSwampHut extends ComponentScatteredFeature {
 	/** Whether this swamp hut has a witch. */
 	private boolean hasWitch;
 
-	public ComponentScatteredFeatureSwampHut(Random par1Random, int par2, int par3) {
+	public ComponentScatteredFeatureSwampHut(EaglercraftRandom par1Random, int par2, int par3) {
 		super(par1Random, par2, 64, par3, 7, 5, 9);
 	}
 
@@ -14,7 +14,7 @@ public class ComponentScatteredFeatureSwampHut extends ComponentScatteredFeature
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (!this.func_74935_a(par1World, par3StructureBoundingBox, 0)) {
 			return false;

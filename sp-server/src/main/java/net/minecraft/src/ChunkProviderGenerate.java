@@ -1,11 +1,12 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ChunkProviderGenerate implements IChunkProvider {
 	/** RNG. */
-	private Random rand;
+	private EaglercraftRandom rand;
 
 	/** A NoiseGeneratorOctaves used in generating terrain */
 	private NoiseGeneratorOctaves noiseGen1;
@@ -77,7 +78,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	public ChunkProviderGenerate(World par1World, long par2, boolean par4) {
 		this.worldObj = par1World;
 		this.mapFeaturesEnabled = par4;
-		this.rand = new Random(par2);
+		this.rand = new EaglercraftRandom(par2);
 		this.noiseGen1 = new NoiseGeneratorOctaves(this.rand, 16);
 		this.noiseGen2 = new NoiseGeneratorOctaves(this.rand, 16);
 		this.noiseGen3 = new NoiseGeneratorOctaves(this.rand, 8);

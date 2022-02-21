@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ChunkProviderEnd implements IChunkProvider {
-	private Random endRNG;
+	private EaglercraftRandom endRNG;
 	private NoiseGeneratorOctaves noiseGen1;
 	private NoiseGeneratorOctaves noiseGen2;
 	private NoiseGeneratorOctaves noiseGen3;
@@ -24,7 +25,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 
 	public ChunkProviderEnd(World par1World, long par2) {
 		this.endWorld = par1World;
-		this.endRNG = new Random(par2);
+		this.endRNG = new EaglercraftRandom(par2);
 		this.noiseGen1 = new NoiseGeneratorOctaves(this.endRNG, 16);
 		this.noiseGen2 = new NoiseGeneratorOctaves(this.endRNG, 16);
 		this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 8);

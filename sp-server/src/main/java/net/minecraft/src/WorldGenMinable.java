@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenMinable extends WorldGenerator {
 	/** The block ID of the ore to be placed using this generator. */
@@ -20,7 +20,7 @@ public class WorldGenMinable extends WorldGenerator {
 		this.field_94523_c = par3;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		float var6 = par2Random.nextFloat() * (float) Math.PI;
 		double var7 = (double) ((float) (par3 + 8) + MathHelper.sin(var6) * (float) this.numberOfBlocks / 8.0F);
 		double var9 = (double) ((float) (par3 + 8) - MathHelper.sin(var6) * (float) this.numberOfBlocks / 8.0F);

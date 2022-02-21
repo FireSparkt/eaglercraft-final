@@ -3,7 +3,8 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class StructureStrongholdPieces {
 	private static final StructureStrongholdPieceWeight[] pieceWeightArray = new StructureStrongholdPieceWeight[] {
@@ -61,7 +62,7 @@ public class StructureStrongholdPieces {
 	 * translates the PieceWeight class to the Component class
 	 */
 	private static ComponentStronghold getStrongholdComponentFromWeightedPiece(Class par0Class, List par1List,
-			Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		Object var8 = null;
 
 		if (par0Class == ComponentStrongholdStraight.class) {
@@ -96,7 +97,7 @@ public class StructureStrongholdPieces {
 	}
 
 	private static ComponentStronghold getNextComponent(ComponentStrongholdStairs2 par0ComponentStrongholdStairs2,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		if (!canAddStructurePieces()) {
 			return null;
 		} else {
@@ -156,7 +157,7 @@ public class StructureStrongholdPieces {
 	}
 
 	private static StructureComponent getNextValidComponent(ComponentStrongholdStairs2 par0ComponentStrongholdStairs2,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		if (par7 > 50) {
 			return null;
 		} else if (Math.abs(par3 - par0ComponentStrongholdStairs2.getBoundingBox().minX) <= 112
@@ -176,7 +177,7 @@ public class StructureStrongholdPieces {
 	}
 
 	static StructureComponent getNextValidComponentAccess(ComponentStrongholdStairs2 par0ComponentStrongholdStairs2,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		return getNextValidComponent(par0ComponentStrongholdStairs2, par1List, par2Random, par3, par4, par5, par6,
 				par7);
 	}

@@ -1,9 +1,9 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class StructureScatteredFeatureStart extends StructureStart {
-	public StructureScatteredFeatureStart(World par1World, Random par2Random, int par3, int par4) {
+	public StructureScatteredFeatureStart(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		BiomeGenBase var5 = par1World.getBiomeGenForCoords(par3 * 16 + 8, par4 * 16 + 8);
 
 		if (var5 != BiomeGenBase.jungle && var5 != BiomeGenBase.jungleHills) {

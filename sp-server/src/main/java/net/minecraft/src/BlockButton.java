@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class BlockButton extends Block {
 	/** Whether this button is sensible to arrows, used by wooden buttons. */
@@ -262,7 +263,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			int var6 = par1World.getBlockMetadata(par2, par3, par4);
 

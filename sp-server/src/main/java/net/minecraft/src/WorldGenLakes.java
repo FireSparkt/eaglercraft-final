@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenLakes extends WorldGenerator {
 	private int blockIndex;
@@ -9,7 +9,7 @@ public class WorldGenLakes extends WorldGenerator {
 		this.blockIndex = par1;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		par3 -= 8;
 
 		for (par5 -= 8; par4 > 5 && par1World.isAirBlock(par3, par4, par5); --par4) {

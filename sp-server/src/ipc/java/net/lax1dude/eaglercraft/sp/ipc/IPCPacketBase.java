@@ -12,21 +12,22 @@ public interface IPCPacketBase {
 	public int size();
 	
 	public static int strLen(String s) {
-		int count = 0;
-		for (int i = 0, len = s.length(); i < len; i++) {
-			char ch = s.charAt(i);
-			if (ch <= 0x7F) {
-				count++;
-			} else if (ch <= 0x7FF) {
-				count += 2;
-			} else if (Character.isHighSurrogate(ch)) {
-				count += 4;
-				++i;
+		int strlen = s.length();
+		int utflen = 2;
+		int c;
+		
+		for (int i = 0; i < strlen; ++i) {
+			c = s.charAt(i);
+			if ((c >= 0x0001) && (c <= 0x007F)) {
+				++utflen;
+			} else if (c > 0x07FF) {
+				utflen += 3;
 			} else {
-				count += 3;
+				utflen += 2;
 			}
 		}
-		return count + 2;
+		
+		return utflen;
 	}
 	
 }

@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
@@ -17,9 +19,12 @@ import org.teavm.jso.dom.events.Event;
 import org.teavm.jso.dom.events.EventListener;
 import org.teavm.jso.indexeddb.EventHandler;
 import org.teavm.jso.indexeddb.IDBCountRequest;
+import org.teavm.jso.indexeddb.IDBCursor;
+import org.teavm.jso.indexeddb.IDBCursorRequest;
 import org.teavm.jso.indexeddb.IDBDatabase;
 import org.teavm.jso.indexeddb.IDBFactory;
 import org.teavm.jso.indexeddb.IDBGetRequest;
+import org.teavm.jso.indexeddb.IDBObjectStore;
 import org.teavm.jso.indexeddb.IDBObjectStoreParameters;
 import org.teavm.jso.indexeddb.IDBOpenDBRequest;
 import org.teavm.jso.indexeddb.IDBRequest;
@@ -265,7 +270,7 @@ public class VirtualFilesystem {
 			return false;
 		}
 		
-		public boolean rename(String newName) {
+		public boolean rename(String newName, boolean copy) {
 			if(!hasBeenDeleted && !(hasBeenAccessed && !exists)) {
 				cacheHit = System.currentTimeMillis();
 				ArrayBuffer arr = AsyncHandlers.readWholeFile(virtualFilesystem.indexeddb, filePath);
@@ -377,8 +382,8 @@ public class VirtualFilesystem {
 		return f;
 	}
 	
-	public boolean renameFile(String oldName, String newName) {
-		return getFile(oldName).rename(newName);
+	public boolean renameFile(String oldName, String newName, boolean copy) {
+		return getFile(oldName).rename(newName, copy);
 	}
 	
 	public boolean deleteFile(String path) {
@@ -387,6 +392,36 @@ public class VirtualFilesystem {
 	
 	public boolean fileExists(String path) {
 		return getFile(path).exists();
+	}
+	
+	public List<String> listFiles(String prefix) {
+		final ArrayList<String> list = new ArrayList();
+		AsyncHandlers.iterateFiles(indexeddb, this, prefix, false, (v) -> {
+			list.add(v.getPath());
+		});
+		return list;
+	}
+	
+	public int deleteFiles(String prefix) {
+		return AsyncHandlers.deleteFiles(indexeddb, prefix);
+	}
+	
+	public int iterateFiles(String prefix, boolean rw, VFSIterator itr) {
+		return AsyncHandlers.iterateFiles(indexeddb, this, prefix, rw, itr);
+	}
+	
+	public int renameFiles(String oldPrefix, String newPrefix, boolean copy) {
+		List<String> filesToCopy = listFiles(oldPrefix);
+		int i = 0;
+		for(String str : filesToCopy) {
+			String f = VFile.createPath(newPrefix, str.substring(oldPrefix.length()));
+			if(!renameFile(str, f, copy)) {
+				System.err.println("Could not " + (copy ? "copy" : "rename") + " file \"" + str + "\" to \"" + f + "\" for some reason");
+			}else {
+				++i;
+			}
+		}
+		return i;
 	}
 	
 	public void flushCache(long age) {
@@ -416,17 +451,19 @@ public class VirtualFilesystem {
 		
 	}
 	
+	@JSBody(script = "return ((typeof indexedDB) !== 'undefined') ? indexedDB : null;")
+	protected static native IDBFactory createIDBFactory();
+	
 	protected static class AsyncHandlers {
 		
 		@Async
 		protected static native DatabaseOpen openDB(String name);
 		
 		private static void openDB(String name, final AsyncCallback<DatabaseOpen> cb) {
-			IDBFactory i = null;
-			try {
-				i = IDBFactory.getInstance();
-			}catch(Throwable t) {
-				cb.complete(new DatabaseOpen(true, false, t.toString(), null));
+			IDBFactory i = createIDBFactory();
+			if(i == null) {
+				cb.complete(new DatabaseOpen(false, false, "window.indexedDB was null or undefined", null));
+				return;
 			}
 			final IDBOpenDBRequest f = i.open(name, 1);
 			f.setOnBlocked(new EventHandler() {
@@ -462,15 +499,15 @@ public class VirtualFilesystem {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
 			final IDBRequest r = tx.objectStore("filesystem").delete(makeTheFuckingKeyWork(name));
 			
-			r.addEventListener("success", new EventListener<Event>() {
+			r.setOnSuccess(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(true));
 				}
 			});
-			r.addEventListener("error", new EventListener<Event>() {
+			r.setOnError(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(false));
 				}
 			});
@@ -488,19 +525,93 @@ public class VirtualFilesystem {
 		private static void readWholeFile(IDBDatabase db, String name, final AsyncCallback<ArrayBuffer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
 			final IDBGetRequest r = tx.objectStore("filesystem").get(makeTheFuckingKeyWork(name));
-			r.addEventListener("success", new EventListener<Event>() {
+			r.setOnSuccess(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(readRow(r.getResult()));
 				}
 			});
-			r.addEventListener("error", new EventListener<Event>() {
+			r.setOnError(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(null);
 				}
 			});
 			
+		}
+		
+		@JSBody(params = { "k" }, script = "return ((typeof k) === \"string\") ? k : (((typeof k) === \"undefined\") ? null : (((typeof k[0]) === \"string\") ? k[0] : null));")
+		private static native String readKey(JSObject k);
+		
+		@JSBody(params = { "k" }, script = "return ((typeof k) === \"undefined\") ? null : (((typeof k.path) === \"undefined\") ? null : (((typeof k.path) === \"string\") ? k[0] : null));")
+		private static native String readRowKey(JSObject r);
+		
+		@Async
+		protected static native Integer iterateFiles(IDBDatabase db, final VirtualFilesystem vfs, final String prefix, boolean rw, final VFSIterator itr);
+		
+		private static void iterateFiles(IDBDatabase db, final VirtualFilesystem vfs, final String prefix, boolean rw, final VFSIterator itr, final AsyncCallback<Integer> cb) {
+			IDBTransaction tx = db.transaction("filesystem", rw ? "readwrite" : "readonly");
+			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
+			final int[] res = new int[1];
+			r.setOnSuccess(new EventHandler() {
+				@Override
+				public void handleEvent() {
+					IDBCursor c = r.getResult();
+					if(c == null) {
+						cb.complete(res[0]);
+					}
+					String k = readKey(c.getKey());
+					if(k != null) {
+						if(k.startsWith(prefix)) {
+							int ci = res[0]++;
+							try {
+								itr.next(VIteratorFile.create(ci, vfs, c));
+							}catch(VFSIterator.BreakLoop ex) {
+								cb.complete(res[0]);
+							}
+						}
+					}
+					c.doContinue();
+				}
+			});
+			r.setOnError(new EventHandler() {
+				@Override
+				public void handleEvent() {
+					cb.complete(res[0] > 0 ? res[0] : -1);
+				}
+			});
+		}
+		
+		@Async
+		protected static native Integer deleteFiles(IDBDatabase db, final String prefix);
+		
+		private static void deleteFiles(IDBDatabase db, final String prefix, final AsyncCallback<Integer> cb) {
+			IDBTransaction tx = db.transaction("filesystem", "readwrite");
+			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
+			final int[] res = new int[1];
+			r.setOnSuccess(new EventHandler() {
+				@Override
+				public void handleEvent() {
+					IDBCursor c = r.getResult();
+					if(c == null) {
+						cb.complete(res[0]);
+					}
+					String k = readKey(c.getKey());
+					if(k != null) {
+						if(k.startsWith(prefix)) {
+							c.delete();
+							++res[0];
+						}
+					}
+					c.doContinue();
+				}
+			});
+			r.setOnError(new EventHandler() {
+				@Override
+				public void handleEvent() {
+					cb.complete(res[0] > 0 ? res[0] : -1);
+				}
+			});
 		}
 		
 		@Async
@@ -509,15 +620,15 @@ public class VirtualFilesystem {
 		private static void fileExists(IDBDatabase db, String name, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
 			final IDBCountRequest r = tx.objectStore("filesystem").count(makeTheFuckingKeyWork(name));
-			r.addEventListener("success", new EventListener<Event>() {
+			r.setOnSuccess(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(r.getResult() > 0));
 				}
 			});
-			r.addEventListener("error", new EventListener<Event>() {
+			r.setOnError(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(false));
 				}
 			});
@@ -533,15 +644,15 @@ public class VirtualFilesystem {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
 			final IDBRequest r = tx.objectStore("filesystem").put(writeRow(name, data));
 			
-			r.addEventListener("success", new EventListener<Event>() {
+			r.setOnSuccess(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(true));
 				}
 			});
-			r.addEventListener("error", new EventListener<Event>() {
+			r.setOnError(new EventHandler() {
 				@Override
-				public void handleEvent(Event evt) {
+				public void handleEvent() {
 					cb.complete(BooleanResult._new(false));
 				}
 			});
@@ -561,7 +672,15 @@ public class VirtualFilesystem {
 	
 	public static String CRLFtoLF(String str) {
 		if(str == null) return null;
-		return str.indexOf('\r') != -1 ? str.replace("\r", "") : str;
+		str = str.indexOf('\r') != -1 ? str.replace("\r", "") : str;
+		str = str.trim();
+		if(str.endsWith("\n")) {
+			str = str.substring(0, str.length() - 1);
+		}
+		if(str.startsWith("\n")) {
+			str = str.substring(1);
+		}
+		return str;
 	}
 	
 	public static String[] lines(String str) {

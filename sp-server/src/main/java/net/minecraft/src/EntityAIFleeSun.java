@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class EntityAIFleeSun extends EntityAIBase {
 	private EntityCreature theCreature;
@@ -57,7 +57,7 @@ public class EntityAIFleeSun extends EntityAIBase {
 	}
 
 	private Vec3 findPossibleShelter() {
-		Random var1 = this.theCreature.getRNG();
+		EaglercraftRandom var1 = this.theCreature.getRNG();
 
 		for (int var2 = 0; var2 < 10; ++var2) {
 			int var3 = MathHelper.floor_double(this.theCreature.posX + (double) var1.nextInt(20) - 10.0D);

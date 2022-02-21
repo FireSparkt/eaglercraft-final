@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class StructurePieceBlockSelector {
 	protected int selectedBlockId;
@@ -9,7 +9,7 @@ public abstract class StructurePieceBlockSelector {
 	/**
 	 * picks Block Ids and Metadata (Silverfish)
 	 */
-	public abstract void selectBlocks(Random var1, int var2, int var3, int var4, boolean var5);
+	public abstract void selectBlocks(EaglercraftRandom var1, int var2, int var3, int var4, boolean var5);
 
 	public int getSelectedBlockId() {
 		return this.selectedBlockId;

@@ -461,22 +461,6 @@ public class WorldInfo {
 	}
 
 	/**
-	 * Adds this WorldInfo instance to the crash report.
-	 */
-	public void addToCrashReport(CrashReportCategory par1CrashReportCategory) {
-		par1CrashReportCategory.addCrashSectionCallable("Level seed", new CallableLevelSeed(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level generator", new CallableLevelGenerator(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level generator options",
-				new CallableLevelGeneratorOptions(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level spawn location", new CallableLevelSpawnLocation(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level time", new CallableLevelTime(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level dimension", new CallableLevelDimension(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level storage version", new CallableLevelStorageVersion(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level weather", new CallableLevelWeather(this));
-		par1CrashReportCategory.addCrashSectionCallable("Level game mode", new CallableLevelGamemode(this));
-	}
-
-	/**
 	 * Return the terrain type of a world
 	 */
 	static WorldType getTerrainTypeOfWorld(WorldInfo par0WorldInfo) {

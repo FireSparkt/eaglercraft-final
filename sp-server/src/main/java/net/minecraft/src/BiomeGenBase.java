@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class BiomeGenBase {
 	/** An array of all the biomes, indexed by biome id. */
@@ -162,18 +163,18 @@ public abstract class BiomeGenBase {
 		this.biomeID = par1;
 		biomeList[par1] = this;
 		this.theBiomeDecorator = this.createBiomeDecorator();
-		this.spawnableCreatureList.add(new SpawnListEntry(EntitySheep.class, 12, 4, 4));
-		this.spawnableCreatureList.add(new SpawnListEntry(EntityPig.class, 10, 4, 4));
-		this.spawnableCreatureList.add(new SpawnListEntry(EntityChicken.class, 10, 4, 4));
-		this.spawnableCreatureList.add(new SpawnListEntry(EntityCow.class, 8, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntitySpider.class, 10, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntityZombie.class, 10, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntitySkeleton.class, 10, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntityCreeper.class, 10, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntitySlime.class, 10, 4, 4));
-		this.spawnableMonsterList.add(new SpawnListEntry(EntityEnderman.class, 1, 1, 4));
-		this.spawnableWaterCreatureList.add(new SpawnListEntry(EntitySquid.class, 10, 4, 4));
-		this.spawnableCaveCreatureList.add(new SpawnListEntry(EntityBat.class, 10, 8, 8));
+		this.spawnableCreatureList.add(new SpawnListEntry((w) -> new EntitySheep(w), 12, 4, 4));
+		this.spawnableCreatureList.add(new SpawnListEntry((w) -> new EntityPig(w), 10, 4, 4));
+		this.spawnableCreatureList.add(new SpawnListEntry((w) -> new EntityChicken(w), 10, 4, 4));
+		this.spawnableCreatureList.add(new SpawnListEntry((w) -> new EntityCow(w), 8, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntitySpider(w), 10, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntityZombie(w), 10, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntitySkeleton(w), 10, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntityCreeper(w), 10, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntitySlime(w), 10, 4, 4));
+		this.spawnableMonsterList.add(new SpawnListEntry((w) -> new EntityEnderman(w), 1, 1, 4));
+		this.spawnableWaterCreatureList.add(new SpawnListEntry((w) -> new EntitySquid(w), 10, 4, 4));
+		this.spawnableCaveCreatureList.add(new SpawnListEntry((w) -> new EntityBat(w), 10, 8, 8));
 	}
 
 	/**
@@ -217,14 +218,14 @@ public abstract class BiomeGenBase {
 	/**
 	 * Gets a WorldGen appropriate for this biome.
 	 */
-	public WorldGenerator getRandomWorldGenForTrees(Random par1Random) {
+	public WorldGenerator getRandomWorldGenForTrees(EaglercraftRandom par1Random) {
 		return (WorldGenerator) (par1Random.nextInt(10) == 0 ? this.worldGeneratorBigTree : this.worldGeneratorTrees);
 	}
 
 	/**
 	 * Gets a WorldGen appropriate for this biome.
 	 */
-	public WorldGenerator getRandomWorldGenForGrass(Random par1Random) {
+	public WorldGenerator getRandomWorldGenForGrass(EaglercraftRandom par1Random) {
 		return new WorldGenTallGrass(Block.tallGrass.blockID, 1);
 	}
 
@@ -312,7 +313,7 @@ public abstract class BiomeGenBase {
 		return this.temperature;
 	}
 
-	public void decorate(World par1World, Random par2Random, int par3, int par4) {
+	public void decorate(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		this.theBiomeDecorator.decorate(par1World, par2Random, par3, par4);
 	}
 }

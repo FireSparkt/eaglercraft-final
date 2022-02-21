@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 abstract class ComponentVillage extends StructureComponent {
 	/** The number of villagers that have been spawned in this component. */
@@ -20,7 +21,7 @@ abstract class ComponentVillage extends StructureComponent {
 	 * and Z direction.
 	 */
 	protected StructureComponent getNextComponentNN(ComponentVillageStartPiece par1ComponentVillageStartPiece,
-			List par2List, Random par3Random, int par4, int par5) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return StructureVillagePieces.getNextStructureComponent(par1ComponentVillageStartPiece, par2List,
@@ -52,7 +53,7 @@ abstract class ComponentVillage extends StructureComponent {
 	 * and Z direction.
 	 */
 	protected StructureComponent getNextComponentPP(ComponentVillageStartPiece par1ComponentVillageStartPiece,
-			List par2List, Random par3Random, int par4, int par5) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return StructureVillagePieces.getNextStructureComponent(par1ComponentVillageStartPiece, par2List,

@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockFurnace extends BlockContainer {
 	/**
 	 * Is the random generator used by furnace to drop the inventory contents in
 	 * random directions.
 	 */
-	private final Random furnaceRand = new Random();
+	private final EaglercraftRandom furnaceRand = new EaglercraftRandom();
 
 	/** True if this is an active furnace, false if idle */
 	private final boolean isActive;
@@ -27,7 +27,7 @@ public class BlockFurnace extends BlockContainer {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return Block.furnaceIdle.blockID;
 	}
 

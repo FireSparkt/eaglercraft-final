@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import java.net.SocketAddress;
-
 public interface INetworkManager {
 	/**
 	 * Sets the NetHandler for this NetworkManager. Server-only.
@@ -23,11 +21,6 @@ public interface INetworkManager {
 	 * Checks timeouts and processes all pending read packets.
 	 */
 	void processReadPackets();
-
-	/**
-	 * Returns the socket address of the remote side. Server-only.
-	 */
-	SocketAddress getRemoteAddress();
 
 	/**
 	 * Shuts down the server. (Only actually used on the server)

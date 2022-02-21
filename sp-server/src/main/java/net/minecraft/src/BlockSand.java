@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockSand extends Block {
 	/** Do blocks fall instantly to where they stop or do they fall over time */
@@ -34,7 +34,7 @@ public class BlockSand extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			this.tryToFall(par1World, par2, par3, par4);
 		}

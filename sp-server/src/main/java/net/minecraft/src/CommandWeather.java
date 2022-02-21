@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 import net.minecraft.server.MinecraftServer;
 
 public class CommandWeather extends CommandBase {
@@ -20,7 +21,8 @@ public class CommandWeather extends CommandBase {
 		if (par2ArrayOfStr.length < 1) {
 			throw new WrongUsageException("commands.weather.usage", new Object[0]);
 		} else {
-			int var3 = (300 + (new Random()).nextInt(600)) * 20;
+			boolean clear = "clear".equalsIgnoreCase(par2ArrayOfStr[0]);
+			int var3 = (300 + (new EaglercraftRandom()).nextInt(600)) * (clear ? 80 : 20);
 
 			if (par2ArrayOfStr.length >= 2) {
 				var3 = parseIntBounded(par1ICommandSender, par2ArrayOfStr[1], 1, 1000000) * 20;
@@ -31,7 +33,7 @@ public class CommandWeather extends CommandBase {
 			var5.setRainTime(var3);
 			var5.setThunderTime(var3);
 
-			if ("clear".equalsIgnoreCase(par2ArrayOfStr[0])) {
+			if (clear) {
 				var5.setRaining(false);
 				var5.setThundering(false);
 				notifyAdmins(par1ICommandSender, "commands.weather.clear", new Object[0]);

@@ -1,13 +1,14 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentVillageWell extends ComponentVillage {
 	private final boolean field_74924_a = true;
 	private int averageGroundLevel = -1;
 
-	public ComponentVillageWell(ComponentVillageStartPiece par1ComponentVillageStartPiece, int par2, Random par3Random,
+	public ComponentVillageWell(ComponentVillageStartPiece par1ComponentVillageStartPiece, int par2, EaglercraftRandom par3Random,
 			int par4, int par5) {
 		super(par1ComponentVillageStartPiece, par2);
 		this.coordBaseMode = par3Random.nextInt(4);
@@ -27,7 +28,7 @@ public class ComponentVillageWell extends ComponentVillage {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		StructureVillagePieces.getNextStructureComponentVillagePath((ComponentVillageStartPiece) par1StructureComponent,
 				par2List, par3Random, this.boundingBox.minX - 1, this.boundingBox.maxY - 4, this.boundingBox.minZ + 1,
 				1, this.getComponentType());
@@ -46,7 +47,7 @@ public class ComponentVillageWell extends ComponentVillage {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.averageGroundLevel < 0) {
 			this.averageGroundLevel = this.getAverageGroundLevel(par1World, par3StructureBoundingBox);

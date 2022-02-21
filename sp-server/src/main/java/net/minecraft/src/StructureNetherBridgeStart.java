@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 class StructureNetherBridgeStart extends StructureStart {
-	public StructureNetherBridgeStart(World par1World, Random par2Random, int par3, int par4) {
+	public StructureNetherBridgeStart(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		ComponentNetherBridgeStartPiece var5 = new ComponentNetherBridgeStartPiece(par2Random, (par3 << 4) + 2,
 				(par4 << 4) + 2);
 		this.components.add(var5);

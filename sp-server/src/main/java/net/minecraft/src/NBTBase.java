@@ -68,17 +68,8 @@ public abstract class NBTBase {
 		} else {
 			String var2 = par0DataInput.readUTF();
 			NBTBase var3 = newTag(var1, var2);
-
-			try {
-				var3.load(par0DataInput);
-				return var3;
-			} catch (IOException var7) {
-				CrashReport var5 = CrashReport.makeCrashReport(var7, "Loading NBT data");
-				CrashReportCategory var6 = var5.makeCategory("NBT Tag");
-				var6.addCrashSection("Tag name", var2);
-				var6.addCrashSection("Tag type", Byte.valueOf(var1));
-				throw new ReportedException(var5);
-			}
+			var3.load(par0DataInput);
+			return var3;
 		}
 	}
 

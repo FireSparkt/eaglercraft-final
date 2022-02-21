@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentNetherBridgeCorridor2 extends ComponentNetherBridgePiece {
-	public ComponentNetherBridgeCorridor2(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentNetherBridgeCorridor2(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -15,7 +16,7 @@ public class ComponentNetherBridgeCorridor2 extends ComponentNetherBridgePiece {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		this.getNextComponentZ((ComponentNetherBridgeStartPiece) par1StructureComponent, par2List, par3Random, 0, 1,
 				true);
 	}
@@ -24,7 +25,7 @@ public class ComponentNetherBridgeCorridor2 extends ComponentNetherBridgePiece {
 	 * Creates and returns a new component piece. Or null if it could not find
 	 * enough room to place it.
 	 */
-	public static ComponentNetherBridgeCorridor2 createValidComponent(List par0List, Random par1Random, int par2,
+	public static ComponentNetherBridgeCorridor2 createValidComponent(List par0List, EaglercraftRandom par1Random, int par2,
 			int par3, int par4, int par5, int par6) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -1, 0, 0, 5, 7,
 				5, par5);
@@ -37,7 +38,7 @@ public class ComponentNetherBridgeCorridor2 extends ComponentNetherBridgePiece {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		this.fillWithBlocks(par1World, par3StructureBoundingBox, 0, 0, 0, 4, 1, 4, Block.netherBrick.blockID,
 				Block.netherBrick.blockID, false);

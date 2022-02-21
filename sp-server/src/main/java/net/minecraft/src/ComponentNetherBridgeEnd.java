@@ -1,12 +1,13 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentNetherBridgeEnd extends ComponentNetherBridgePiece {
 	private int fillSeed;
 
-	public ComponentNetherBridgeEnd(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentNetherBridgeEnd(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -14,7 +15,7 @@ public class ComponentNetherBridgeEnd extends ComponentNetherBridgePiece {
 		this.fillSeed = par2Random.nextInt();
 	}
 
-	public static ComponentNetherBridgeEnd func_74971_a(List par0List, Random par1Random, int par2, int par3, int par4,
+	public static ComponentNetherBridgeEnd func_74971_a(List par0List, EaglercraftRandom par1Random, int par2, int par3, int par4,
 			int par5, int par6) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -1, -3, 0, 5,
 				10, 8, par5);
@@ -27,9 +28,9 @@ public class ComponentNetherBridgeEnd extends ComponentNetherBridgePiece {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
-		Random var4 = new Random((long) this.fillSeed);
+		EaglercraftRandom var4 = new EaglercraftRandom((long) this.fillSeed);
 		int var5;
 		int var6;
 		int var7;

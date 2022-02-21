@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenBigTree extends WorldGenerator {
 	/**
@@ -10,7 +10,7 @@ public class WorldGenBigTree extends WorldGenerator {
 	static final byte[] otherCoordPairs = new byte[] { (byte) 2, (byte) 0, (byte) 0, (byte) 1, (byte) 2, (byte) 1 };
 
 	/** random seed for GenBigTree */
-	Random rand = new Random();
+	EaglercraftRandom rand = new EaglercraftRandom();
 
 	/** Reference to the World object. */
 	World worldObj;
@@ -415,7 +415,7 @@ public class WorldGenBigTree extends WorldGenerator {
 		this.leafDensity = par5;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		this.worldObj = par1World;
 		long var6 = par2Random.nextLong();
 		this.rand.setSeed(var6);

@@ -7,10 +7,10 @@ public class MapGenNetherBridge extends MapGenStructure {
 	private List spawnList = new ArrayList();
 
 	public MapGenNetherBridge() {
-		this.spawnList.add(new SpawnListEntry(EntityBlaze.class, 10, 2, 3));
-		this.spawnList.add(new SpawnListEntry(EntityPigZombie.class, 5, 4, 4));
-		this.spawnList.add(new SpawnListEntry(EntitySkeleton.class, 10, 4, 4));
-		this.spawnList.add(new SpawnListEntry(EntityMagmaCube.class, 3, 4, 4));
+		this.spawnList.add(new SpawnListEntry((w) -> new EntityBlaze(w), 10, 2, 3));
+		this.spawnList.add(new SpawnListEntry((w) -> new EntityPigZombie(w), 5, 4, 4));
+		this.spawnList.add(new SpawnListEntry((w) -> new EntitySkeleton(w), 10, 4, 4));
+		this.spawnList.add(new SpawnListEntry((w) -> new EntityMagmaCube(w), 3, 4, 4));
 	}
 
 	public List getSpawnList() {

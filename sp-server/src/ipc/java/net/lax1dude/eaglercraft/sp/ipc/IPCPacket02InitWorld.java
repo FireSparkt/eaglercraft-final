@@ -20,10 +20,10 @@ public class IPCPacket02InitWorld implements IPCPacketBase {
 	public IPCPacket02InitWorld() {
 	}
 	
-	public IPCPacket02InitWorld(String worldName, byte gamemode, byte worldType, String worldArgs, long seed, boolean cheats, boolean structures, boolean bonusChest) {
+	public IPCPacket02InitWorld(String worldName, int gamemode, int worldType, String worldArgs, long seed, boolean cheats, boolean structures, boolean bonusChest) {
 		this.worldName = worldName;
-		this.gamemode = gamemode;
-		this.worldType = worldType;
+		this.gamemode = (byte)gamemode;
+		this.worldType = (byte)worldType;
 		this.worldArgs = worldArgs;
 		this.seed = seed;
 		this.cheats = cheats;

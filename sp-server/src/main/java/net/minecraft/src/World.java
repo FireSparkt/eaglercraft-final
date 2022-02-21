@@ -6,8 +6,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class World implements IBlockAccess {
 	/**
@@ -42,7 +43,7 @@ public abstract class World implements IBlockAccess {
 	 * planar series of values ill-suited for choosing random blocks in a 16x128x16
 	 * field.
 	 */
-	protected int updateLCG = (new Random()).nextInt();
+	protected int updateLCG = (new EaglercraftRandom()).nextInt();
 
 	/**
 	 * magic number used to generate fast random numbers for 3d distribution within
@@ -64,7 +65,7 @@ public abstract class World implements IBlockAccess {
 	public int difficultySetting;
 
 	/** RNG for World. */
-	public Random rand = new Random();
+	public EaglercraftRandom rand = new EaglercraftRandom();
 
 	/** The WorldProvider instance that World uses. */
 	public final WorldProvider provider;
@@ -172,20 +173,7 @@ public abstract class World implements IBlockAccess {
 		this.chunkProvider = this.createChunkProvider();
 
 		if (!this.worldInfo.isInitialized()) {
-			try {
-				this.initialize(par3WorldSettings);
-			} catch (Throwable var11) {
-				CrashReport var8 = CrashReport.makeCrashReport(var11, "Exception initializing level");
-
-				try {
-					this.addWorldInfoToCrashReport(var8);
-				} catch (Throwable var10) {
-					;
-				}
-
-				throw new ReportedException(var8);
-			}
-
+			this.initialize(par3WorldSettings);
 			this.worldInfo.setServerInitialized(true);
 		}
 
@@ -237,18 +225,8 @@ public abstract class World implements IBlockAccess {
 			} else if (par2 >= 256) {
 				return 0;
 			} else {
-				Chunk var4 = null;
-
-				try {
-					var4 = this.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
-					return var4.getBlockID(par1 & 15, par2, par3 & 15);
-				} catch (Throwable var8) {
-					CrashReport var6 = CrashReport.makeCrashReport(var8, "Exception getting block type in world");
-					CrashReportCategory var7 = var6.makeCategory("Requested block coordinates");
-					var7.addCrashSection("Found chunk", Boolean.valueOf(var4 == null));
-					var7.addCrashSection("Location", CrashReportCategory.getLocationInfo(par1, par2, par3));
-					throw new ReportedException(var6);
-				}
+				Chunk var4 = this.getChunkFromChunkCoords(par1 >> 4, par3 >> 4);
+				return var4.getBlockID(par1 & 15, par2, par3 & 15);
 			}
 		} else {
 			return 0;
@@ -595,23 +573,7 @@ public abstract class World implements IBlockAccess {
 			Block var6 = Block.blocksList[var5];
 
 			if (var6 != null) {
-				try {
-					var6.onNeighborBlockChange(this, par1, par2, par3, par4);
-				} catch (Throwable var13) {
-					CrashReport var8 = CrashReport.makeCrashReport(var13, "Exception while updating neighbours");
-					CrashReportCategory var9 = var8.makeCategory("Block being updated");
-					int var10;
-
-					try {
-						var10 = this.getBlockMetadata(par1, par2, par3);
-					} catch (Throwable var12) {
-						var10 = -1;
-					}
-
-					var9.addCrashSectionCallable("Source block type", new CallableLvl1(this, par4));
-					CrashReportCategory.func_85068_a(var9, par1, par2, par3, var5, var10);
-					throw new ReportedException(var8);
-				}
+				var6.onNeighborBlockChange(this, par1, par2, par3, par4);
 			}
 		}
 	}
@@ -1340,27 +1302,12 @@ public abstract class World implements IBlockAccess {
 		this.theProfiler.startSection("global");
 		int var1;
 		Entity var2;
-		CrashReport var4;
-		CrashReportCategory var5;
 
 		for (var1 = 0; var1 < this.weatherEffects.size(); ++var1) {
 			var2 = (Entity) this.weatherEffects.get(var1);
-
-			try {
-				++var2.ticksExisted;
-				var2.onUpdate();
-			} catch (Throwable var8) {
-				var4 = CrashReport.makeCrashReport(var8, "Ticking entity");
-				var5 = var4.makeCategory("Entity being ticked");
-
-				if (var2 == null) {
-					var5.addCrashSection("Entity", "~~NULL~~");
-				} else {
-					var2.func_85029_a(var5);
-				}
-
-				throw new ReportedException(var4);
-			}
+			
+			++var2.ticksExisted;
+			var2.onUpdate();
 
 			if (var2.isDead) {
 				this.weatherEffects.remove(var1--);
@@ -1404,14 +1351,7 @@ public abstract class World implements IBlockAccess {
 			this.theProfiler.startSection("tick");
 
 			if (!var2.isDead) {
-				try {
-					this.updateEntity(var2);
-				} catch (Throwable var7) {
-					var4 = CrashReport.makeCrashReport(var7, "Ticking entity");
-					var5 = var4.makeCategory("Entity being ticked");
-					var2.func_85029_a(var5);
-					throw new ReportedException(var4);
-				}
+				this.updateEntity(var2);
 			}
 
 			this.theProfiler.endSection();
@@ -1440,14 +1380,7 @@ public abstract class World implements IBlockAccess {
 			TileEntity var9 = (TileEntity) var14.next();
 
 			if (!var9.isInvalid() && var9.func_70309_m() && this.blockExists(var9.xCoord, var9.yCoord, var9.zCoord)) {
-				try {
-					var9.updateEntity();
-				} catch (Throwable var6) {
-					var4 = CrashReport.makeCrashReport(var6, "Ticking tile entity");
-					var5 = var4.makeCategory("Tile entity being ticked");
-					var9.func_85027_a(var5);
-					throw new ReportedException(var4);
-				}
+				var9.updateEntity();
 			}
 
 			if (var9.isInvalid()) {
@@ -3153,19 +3086,9 @@ public abstract class World implements IBlockAccess {
 	 * See description for playAuxSFX.
 	 */
 	public void playAuxSFXAtEntity(EntityPlayer par1EntityPlayer, int par2, int par3, int par4, int par5, int par6) {
-		try {
-			for (int var7 = 0; var7 < this.worldAccesses.size(); ++var7) {
-				((IWorldAccess) this.worldAccesses.get(var7)).playAuxSFX(par1EntityPlayer, par2, par3, par4, par5,
-						par6);
-			}
-		} catch (Throwable var10) {
-			CrashReport var8 = CrashReport.makeCrashReport(var10, "Playing level event");
-			CrashReportCategory var9 = var8.makeCategory("Level event being played");
-			var9.addCrashSection("Block coordinates", CrashReportCategory.getLocationInfo(par3, par4, par5));
-			var9.addCrashSection("Event source", par1EntityPlayer);
-			var9.addCrashSection("Event type", Integer.valueOf(par2));
-			var9.addCrashSection("Event data", Integer.valueOf(par6));
-			throw new ReportedException(var8);
+		for (int var7 = 0; var7 < this.worldAccesses.size(); ++var7) {
+			((IWorldAccess) this.worldAccesses.get(var7)).playAuxSFX(par1EntityPlayer, par2, par3, par4, par5,
+					par6);
 		}
 	}
 
@@ -3190,7 +3113,7 @@ public abstract class World implements IBlockAccess {
 	/**
 	 * puts the World Random seed to a specific state dependant on the inputs
 	 */
-	public Random setRandomSeed(int par1, int par2, int par3) {
+	public EaglercraftRandom setRandomSeed(int par1, int par2, int par3) {
 		long var4 = (long) par1 * 341873128712L + (long) par2 * 132897987541L + this.getWorldInfo().getSeed()
 				+ (long) par3;
 		this.rand.setSeed(var4);
@@ -3203,24 +3126,6 @@ public abstract class World implements IBlockAccess {
 	 */
 	public ChunkPosition findClosestStructure(String par1Str, int par2, int par3, int par4) {
 		return this.getChunkProvider().findClosestStructure(this, par1Str, par2, par3, par4);
-	}
-
-	/**
-	 * Adds some basic stats of the world to the given crash report.
-	 */
-	public CrashReportCategory addWorldInfoToCrashReport(CrashReport par1CrashReport) {
-		CrashReportCategory var2 = par1CrashReport.makeCategoryDepth("Affected level", 1);
-		var2.addCrashSection("Level name", this.worldInfo == null ? "????" : this.worldInfo.getWorldName());
-		var2.addCrashSectionCallable("All players", new CallableLvl2(this));
-		var2.addCrashSectionCallable("Chunk stats", new CallableLvl3(this));
-
-		try {
-			this.worldInfo.addToCrashReport(var2);
-		} catch (Throwable var4) {
-			var2.addCrashSectionThrowable("Level Data Unobtainable", var4);
-		}
-
-		return var2;
 	}
 
 	/**

@@ -3,10 +3,11 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class StructureVillagePieces {
-	public static ArrayList getStructureVillageWeightedPieceList(Random par0Random, int par1) {
+	public static ArrayList getStructureVillageWeightedPieceList(EaglercraftRandom par0Random, int par1) {
 		ArrayList var2 = new ArrayList();
 		var2.add(new StructureVillagePieceWeight(ComponentVillageHouse4_Garden.class, 4,
 				MathHelper.getRandomIntegerInRange(par0Random, 2 + par1, 4 + par1 * 2)));
@@ -54,7 +55,7 @@ public class StructureVillagePieces {
 	}
 
 	private static ComponentVillage func_75083_a(ComponentVillageStartPiece par0ComponentVillageStartPiece,
-			StructureVillagePieceWeight par1StructureVillagePieceWeight, List par2List, Random par3Random, int par4,
+			StructureVillagePieceWeight par1StructureVillagePieceWeight, List par2List, EaglercraftRandom par3Random, int par4,
 			int par5, int par6, int par7, int par8) {
 		Class var9 = par1StructureVillagePieceWeight.villagePieceClass;
 		Object var10 = null;
@@ -95,7 +96,7 @@ public class StructureVillagePieces {
 	 * attempts to find a next Village Component to be spawned
 	 */
 	private static ComponentVillage getNextVillageComponent(ComponentVillageStartPiece par0ComponentVillageStartPiece,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		int var8 = func_75079_a(par0ComponentVillageStartPiece.structureVillageWeightedPieceList);
 
 		if (var8 <= 0) {
@@ -153,7 +154,7 @@ public class StructureVillagePieces {
 	 * function
 	 */
 	private static StructureComponent getNextVillageStructureComponent(
-			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, Random par2Random, int par3,
+			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, EaglercraftRandom par2Random, int par3,
 			int par4, int par5, int par6, int par7) {
 		if (par7 > 50) {
 			return null;
@@ -184,7 +185,7 @@ public class StructureVillagePieces {
 	}
 
 	private static StructureComponent getNextComponentVillagePath(
-			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, Random par2Random, int par3,
+			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, EaglercraftRandom par2Random, int par3,
 			int par4, int par5, int par6, int par7) {
 		if (par7 > 3 + par0ComponentVillageStartPiece.terrainType) {
 			return null;
@@ -220,13 +221,13 @@ public class StructureVillagePieces {
 	 * attempts to find a next Structure Component to be spawned
 	 */
 	static StructureComponent getNextStructureComponent(ComponentVillageStartPiece par0ComponentVillageStartPiece,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		return getNextVillageStructureComponent(par0ComponentVillageStartPiece, par1List, par2Random, par3, par4, par5,
 				par6, par7);
 	}
 
 	static StructureComponent getNextStructureComponentVillagePath(
-			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, Random par2Random, int par3,
+			ComponentVillageStartPiece par0ComponentVillageStartPiece, List par1List, EaglercraftRandom par2Random, int par3,
 			int par4, int par5, int par6, int par7) {
 		return getNextComponentVillagePath(par0ComponentVillageStartPiece, par1List, par2Random, par3, par4, par5, par6,
 				par7);

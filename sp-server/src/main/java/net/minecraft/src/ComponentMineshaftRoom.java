@@ -3,13 +3,14 @@ package net.minecraft.src;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentMineshaftRoom extends StructureComponent {
 	/** List of other Mineshaft components linked to this room. */
 	private List roomsLinkedToTheRoom = new LinkedList();
 
-	public ComponentMineshaftRoom(int par1, Random par2Random, int par3, int par4) {
+	public ComponentMineshaftRoom(int par1, EaglercraftRandom par2Random, int par3, int par4) {
 		super(par1);
 		this.boundingBox = new StructureBoundingBox(par3, 50, par4, par3 + 7 + par2Random.nextInt(6),
 				54 + par2Random.nextInt(6), par4 + 7 + par2Random.nextInt(6));
@@ -19,7 +20,7 @@ public class ComponentMineshaftRoom extends StructureComponent {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		int var4 = this.getComponentType();
 		int var6 = this.boundingBox.getYSize() - 3 - 1;
 
@@ -108,7 +109,7 @@ public class ComponentMineshaftRoom extends StructureComponent {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

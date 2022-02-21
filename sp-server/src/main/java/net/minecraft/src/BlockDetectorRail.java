@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockDetectorRail extends BlockRailBase {
 	public BlockDetectorRail(int par1) {
@@ -41,7 +42,7 @@ public class BlockDetectorRail extends BlockRailBase {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			int var6 = par1World.getBlockMetadata(par2, par3, par4);
 

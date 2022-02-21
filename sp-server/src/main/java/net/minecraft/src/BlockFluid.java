@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class BlockFluid extends Block {
 	protected BlockFluid(int par1, Material par2Material) {
@@ -111,14 +111,14 @@ public abstract class BlockFluid extends Block {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return 0;
 	}
 
 	/**
 	 * Returns the quantity of items to drop on block destruction.
 	 */
-	public int quantityDropped(Random par1Random) {
+	public int quantityDropped(EaglercraftRandom par1Random) {
 		return 0;
 	}
 

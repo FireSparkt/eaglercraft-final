@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGeneratorBonusChest extends WorldGenerator {
 	/**
@@ -20,7 +20,7 @@ public class WorldGeneratorBonusChest extends WorldGenerator {
 		this.itemsToGenerateInBonusChest = par2;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		int var12;
 
 		for (boolean var6 = false; ((var12 = par1World.getBlockId(par3, par4, par5)) == 0

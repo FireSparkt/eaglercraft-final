@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockRedstoneLight extends Block {
 	/** Whether this lamp block is the powered version. */
@@ -46,7 +46,7 @@ public class BlockRedstoneLight extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote && this.powered && !par1World.isBlockIndirectlyGettingPowered(par2, par3, par4)) {
 			par1World.setBlock(par2, par3, par4, Block.redstoneLampIdle.blockID, 0, 2);
 		}
@@ -55,7 +55,7 @@ public class BlockRedstoneLight extends Block {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return Block.redstoneLampIdle.blockID;
 	}
 }

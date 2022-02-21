@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 abstract class ComponentStronghold extends StructureComponent {
 	protected ComponentStronghold(int par1) {
@@ -11,7 +12,7 @@ abstract class ComponentStronghold extends StructureComponent {
 	/**
 	 * builds a door of the enumerated types (empty opening is a door)
 	 */
-	protected void placeDoor(World par1World, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	protected void placeDoor(World par1World, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			EnumDoor par4EnumDoor, int par5, int par6, int par7) {
 		switch (EnumDoorHelper.doorEnum[par4EnumDoor.ordinal()]) {
 		case 1:
@@ -88,7 +89,7 @@ abstract class ComponentStronghold extends StructureComponent {
 		}
 	}
 
-	protected EnumDoor getRandomDoor(Random par1Random) {
+	protected EnumDoor getRandomDoor(EaglercraftRandom par1Random) {
 		int var2 = par1Random.nextInt(5);
 
 		switch (var2) {
@@ -112,7 +113,7 @@ abstract class ComponentStronghold extends StructureComponent {
 	 * Gets the next component in any cardinal direction
 	 */
 	protected StructureComponent getNextComponentNormal(ComponentStrongholdStairs2 par1ComponentStrongholdStairs2,
-			List par2List, Random par3Random, int par4, int par5) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return StructureStrongholdPieces.getNextValidComponentAccess(par1ComponentStrongholdStairs2, par2List,
@@ -143,7 +144,7 @@ abstract class ComponentStronghold extends StructureComponent {
 	 * Gets the next component in the +/- X direction
 	 */
 	protected StructureComponent getNextComponentX(ComponentStrongholdStairs2 par1ComponentStrongholdStairs2,
-			List par2List, Random par3Random, int par4, int par5) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return StructureStrongholdPieces.getNextValidComponentAccess(par1ComponentStrongholdStairs2, par2List,
@@ -174,7 +175,7 @@ abstract class ComponentStronghold extends StructureComponent {
 	 * Gets the next component in the +/- Z direction
 	 */
 	protected StructureComponent getNextComponentZ(ComponentStrongholdStairs2 par1ComponentStrongholdStairs2,
-			List par2List, Random par3Random, int par4, int par5) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return StructureStrongholdPieces.getNextValidComponentAccess(par1ComponentStrongholdStairs2, par2List,

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentScatteredFeatureDesertPyramid extends ComponentScatteredFeature {
 	private boolean[] field_74940_h = new boolean[4];
@@ -14,7 +14,7 @@ public class ComponentScatteredFeatureDesertPyramid extends ComponentScatteredFe
 			new WeightedRandomChestContent(Item.bone.itemID, 0, 4, 6, 20),
 			new WeightedRandomChestContent(Item.rottenFlesh.itemID, 0, 3, 7, 16) };
 
-	public ComponentScatteredFeatureDesertPyramid(Random par1Random, int par2, int par3) {
+	public ComponentScatteredFeatureDesertPyramid(EaglercraftRandom par1Random, int par2, int par3) {
 		super(par1Random, par2, 64, par3, 21, 15, 21);
 	}
 
@@ -22,7 +22,7 @@ public class ComponentScatteredFeatureDesertPyramid extends ComponentScatteredFe
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		this.fillWithBlocks(par1World, par3StructureBoundingBox, 0, -4, 0, this.scatteredFeatureSizeX - 1, 0,
 				this.scatteredFeatureSizeZ - 1, Block.sandStone.blockID, Block.sandStone.blockID, false);

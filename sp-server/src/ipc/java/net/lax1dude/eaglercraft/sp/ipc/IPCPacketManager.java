@@ -3,7 +3,6 @@ package net.lax1dude.eaglercraft.sp.ipc;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class IPCPacketManager {
@@ -23,6 +22,7 @@ public class IPCPacketManager {
 		mappings.put(IPCPacket03DeleteWorld.ID, IPCPacket03DeleteWorld.class);
 		mappings.put(IPCPacket04RenameWorld.ID, IPCPacket04RenameWorld.class);
 		mappings.put(IPCPacket05RequestData.ID, IPCPacket05RequestData.class);
+		mappings.put(IPCPacket06RenameWorldNBT.ID, IPCPacket06RenameWorldNBT.class);
 		mappings.put(IPCPacket07ImportWorld.ID, IPCPacket07ImportWorld.class);
 		mappings.put(IPCPacket09RequestResponse.ID, IPCPacket09RequestResponse.class);
 		mappings.put(IPCPacket0ASetWorldDifficulty.ID, IPCPacket0ASetWorldDifficulty.class);
@@ -35,12 +35,14 @@ public class IPCPacketManager {
 		mappings.put(IPCPacket12FileWrite.ID, IPCPacket12FileWrite.class);
 		mappings.put(IPCPacket13FileCopyMove.ID, IPCPacket13FileCopyMove.class);
 		mappings.put(IPCPacket14StringList.ID, IPCPacket14StringList.class);
+		mappings.put(IPCPacket15ThrowException.ID, IPCPacket15ThrowException.class);
+		mappings.put(IPCPacket16NBTList.ID, IPCPacket16NBTList.class);
 		mappings.put(IPCPacketFFProcessKeepAlive.ID, IPCPacketFFProcessKeepAlive.class);
 	}
 	
 	public static byte[] IPCSerialize(IPCPacketBase pkt) throws IOException {
 		
-		IPC_OUTPUT_STREAM.feedBuffer(new byte[1 + pkt.size()], pkt.getClass().getSimpleName());
+		IPC_OUTPUT_STREAM.feedBuffer(new byte[pkt.size() + 1], pkt.getClass().getSimpleName());
 		IPC_OUTPUT_STREAM.write(pkt.id());
 		pkt.serialize(IPC_DATA_OUTPUT_STREAM);
 		
@@ -59,15 +61,19 @@ public class IPCPacketManager {
 		
 		IPCPacketBase p;
 		try {
-			p = pk.getDeclaredConstructor().newInstance();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException("Packet type '" + pk.getSimpleName() + "' could not be constructed", e);
+			p = pk.newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | SecurityException e) {
+			throw new RuntimeException("Packet type 0x" + Integer.toHexString(i) + " class '" + pk.getSimpleName() + "' could not be constructed", e);
 		}
 		
 		IPC_INPUT_STREAM.nameBuffer(pk.getSimpleName());
 		
 		p.deserialize(IPC_DATA_INPUT_STREAM);
+		
+		int lo = IPC_INPUT_STREAM.getLeftoverCount();
+		if(lo > 0) {
+			System.err.println("Packet type 0x" + Integer.toHexString(i) + " class '" + pk.getSimpleName() + "' was size " + (pkt.length - 1) + " but only " + (pkt.length - 1 - lo) + " bytes were read");
+		}
 		
 		return p;
 	}

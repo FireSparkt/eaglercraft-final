@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 import net.minecraft.server.MinecraftServer;
 
 public class WorldServer extends World {
@@ -443,22 +444,7 @@ public class WorldServer extends World {
 					int var6 = this.getBlockId(var4.xCoord, var4.yCoord, var4.zCoord);
 
 					if (var6 > 0 && Block.isAssociatedBlockID(var6, var4.blockID)) {
-						try {
-							Block.blocksList[var6].updateTick(this, var4.xCoord, var4.yCoord, var4.zCoord, this.rand);
-						} catch (Throwable var13) {
-							CrashReport var8 = CrashReport.makeCrashReport(var13, "Exception while ticking a block");
-							CrashReportCategory var9 = var8.makeCategory("Block being ticked");
-							int var10;
-
-							try {
-								var10 = this.getBlockMetadata(var4.xCoord, var4.yCoord, var4.zCoord);
-							} catch (Throwable var12) {
-								var10 = -1;
-							}
-
-							CrashReportCategory.func_85068_a(var9, var4.xCoord, var4.yCoord, var4.zCoord, var6, var10);
-							throw new ReportedException(var8);
-						}
+						Block.blocksList[var6].updateTick(this, var4.xCoord, var4.yCoord, var4.zCoord, this.rand);
 					}
 				} else {
 					this.scheduleBlockUpdate(var4.xCoord, var4.yCoord, var4.zCoord, var4.blockID, 0);
@@ -602,7 +588,7 @@ public class WorldServer extends World {
 			this.findingSpawnPoint = true;
 			WorldChunkManager var2 = this.provider.worldChunkMgr;
 			List var3 = var2.getBiomesToSpawnIn();
-			Random var4 = new Random(this.getSeed());
+			EaglercraftRandom var4 = new EaglercraftRandom(this.getSeed());
 			ChunkPosition var5 = var2.findBiomePosition(0, 0, 256, var3, var4);
 			int var6 = 0;
 			int var7 = this.provider.getAverageGroundLevel();

@@ -1,8 +1,9 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+
+import net.lax1dude.eaglercraft.sp.EaglerUUID;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 import net.minecraft.server.MinecraftServer;
 
 public abstract class Entity {
@@ -141,7 +142,7 @@ public abstract class Entity {
 	 * Reduces the velocity applied by entity collisions by the specified percent.
 	 */
 	public float entityCollisionReduction;
-	protected Random rand;
+	protected EaglercraftRandom rand;
 
 	/** How many ticks has this entity had ran since being alive */
 	public int ticksExisted;
@@ -191,7 +192,7 @@ public abstract class Entity {
 	public int dimension;
 	protected int teleportDirection;
 	private boolean invulnerable;
-	private UUID entityUniqueID;
+	private EaglerUUID entityUniqueID;
 	public EnumEntitySize myEntitySize;
 
 	public Entity(World par1World) {
@@ -216,7 +217,7 @@ public abstract class Entity {
 		this.stepHeight = 0.0F;
 		this.noClip = false;
 		this.entityCollisionReduction = 0.0F;
-		this.rand = new Random();
+		this.rand = new EaglercraftRandom();
 		this.ticksExisted = 0;
 		this.fireResistance = 1;
 		this.fire = 0;
@@ -228,7 +229,7 @@ public abstract class Entity {
 		this.addedToChunk = false;
 		this.teleportDirection = 0;
 		this.invulnerable = false;
-		this.entityUniqueID = UUID.randomUUID();
+		this.entityUniqueID = EaglerUUID.randomUUID();
 		this.myEntitySize = EnumEntitySize.SIZE_2;
 		this.worldObj = par1World;
 		this.setPosition(0.0D, 0.0D, 0.0D);
@@ -1228,36 +1229,29 @@ public abstract class Entity {
 	 * Save the entity to NBT (calls an abstract helper method to write extra data)
 	 */
 	public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
-		try {
-			par1NBTTagCompound.setTag("Pos",
-					this.newDoubleNBTList(new double[] { this.posX, this.posY + (double) this.ySize, this.posZ }));
-			par1NBTTagCompound.setTag("Motion",
-					this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
-			par1NBTTagCompound.setTag("Rotation",
-					this.newFloatNBTList(new float[] { this.rotationYaw, this.rotationPitch }));
-			par1NBTTagCompound.setFloat("FallDistance", this.fallDistance);
-			par1NBTTagCompound.setShort("Fire", (short) this.fire);
-			par1NBTTagCompound.setShort("Air", (short) this.getAir());
-			par1NBTTagCompound.setBoolean("OnGround", this.onGround);
-			par1NBTTagCompound.setInteger("Dimension", this.dimension);
-			par1NBTTagCompound.setBoolean("Invulnerable", this.invulnerable);
-			par1NBTTagCompound.setInteger("PortalCooldown", this.timeUntilPortal);
-			par1NBTTagCompound.setLong("UUIDMost", this.entityUniqueID.getMostSignificantBits());
-			par1NBTTagCompound.setLong("UUIDLeast", this.entityUniqueID.getLeastSignificantBits());
-			this.writeEntityToNBT(par1NBTTagCompound);
+		par1NBTTagCompound.setTag("Pos",
+				this.newDoubleNBTList(new double[] { this.posX, this.posY + (double) this.ySize, this.posZ }));
+		par1NBTTagCompound.setTag("Motion",
+				this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
+		par1NBTTagCompound.setTag("Rotation",
+				this.newFloatNBTList(new float[] { this.rotationYaw, this.rotationPitch }));
+		par1NBTTagCompound.setFloat("FallDistance", this.fallDistance);
+		par1NBTTagCompound.setShort("Fire", (short) this.fire);
+		par1NBTTagCompound.setShort("Air", (short) this.getAir());
+		par1NBTTagCompound.setBoolean("OnGround", this.onGround);
+		par1NBTTagCompound.setInteger("Dimension", this.dimension);
+		par1NBTTagCompound.setBoolean("Invulnerable", this.invulnerable);
+		par1NBTTagCompound.setInteger("PortalCooldown", this.timeUntilPortal);
+		par1NBTTagCompound.setLong("UUIDMost", this.entityUniqueID.getMostSignificantBits());
+		par1NBTTagCompound.setLong("UUIDLeast", this.entityUniqueID.getLeastSignificantBits());
+		this.writeEntityToNBT(par1NBTTagCompound);
 
-			if (this.ridingEntity != null) {
-				NBTTagCompound var2 = new NBTTagCompound("Riding");
+		if (this.ridingEntity != null) {
+			NBTTagCompound var2 = new NBTTagCompound("Riding");
 
-				if (this.ridingEntity.addNotRiddenEntityID(var2)) {
-					par1NBTTagCompound.setTag("Riding", var2);
-				}
+			if (this.ridingEntity.addNotRiddenEntityID(var2)) {
+				par1NBTTagCompound.setTag("Riding", var2);
 			}
-		} catch (Throwable var5) {
-			CrashReport var3 = CrashReport.makeCrashReport(var5, "Saving entity NBT");
-			CrashReportCategory var4 = var3.makeCategory("Entity being saved");
-			this.func_85029_a(var4);
-			throw new ReportedException(var3);
 		}
 	}
 
@@ -1266,53 +1260,46 @@ public abstract class Entity {
 	 * specialized data)
 	 */
 	public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
-		try {
-			NBTTagList var2 = par1NBTTagCompound.getTagList("Pos");
-			NBTTagList var6 = par1NBTTagCompound.getTagList("Motion");
-			NBTTagList var7 = par1NBTTagCompound.getTagList("Rotation");
-			this.motionX = ((NBTTagDouble) var6.tagAt(0)).data;
-			this.motionY = ((NBTTagDouble) var6.tagAt(1)).data;
-			this.motionZ = ((NBTTagDouble) var6.tagAt(2)).data;
+		NBTTagList var2 = par1NBTTagCompound.getTagList("Pos");
+		NBTTagList var6 = par1NBTTagCompound.getTagList("Motion");
+		NBTTagList var7 = par1NBTTagCompound.getTagList("Rotation");
+		this.motionX = ((NBTTagDouble) var6.tagAt(0)).data;
+		this.motionY = ((NBTTagDouble) var6.tagAt(1)).data;
+		this.motionZ = ((NBTTagDouble) var6.tagAt(2)).data;
 
-			if (Math.abs(this.motionX) > 10.0D) {
-				this.motionX = 0.0D;
-			}
-
-			if (Math.abs(this.motionY) > 10.0D) {
-				this.motionY = 0.0D;
-			}
-
-			if (Math.abs(this.motionZ) > 10.0D) {
-				this.motionZ = 0.0D;
-			}
-
-			this.prevPosX = this.lastTickPosX = this.posX = ((NBTTagDouble) var2.tagAt(0)).data;
-			this.prevPosY = this.lastTickPosY = this.posY = ((NBTTagDouble) var2.tagAt(1)).data;
-			this.prevPosZ = this.lastTickPosZ = this.posZ = ((NBTTagDouble) var2.tagAt(2)).data;
-			this.prevRotationYaw = this.rotationYaw = ((NBTTagFloat) var7.tagAt(0)).data;
-			this.prevRotationPitch = this.rotationPitch = ((NBTTagFloat) var7.tagAt(1)).data;
-			this.fallDistance = par1NBTTagCompound.getFloat("FallDistance");
-			this.fire = par1NBTTagCompound.getShort("Fire");
-			this.setAir(par1NBTTagCompound.getShort("Air"));
-			this.onGround = par1NBTTagCompound.getBoolean("OnGround");
-			this.dimension = par1NBTTagCompound.getInteger("Dimension");
-			this.invulnerable = par1NBTTagCompound.getBoolean("Invulnerable");
-			this.timeUntilPortal = par1NBTTagCompound.getInteger("PortalCooldown");
-
-			if (par1NBTTagCompound.hasKey("UUIDMost") && par1NBTTagCompound.hasKey("UUIDLeast")) {
-				this.entityUniqueID = new UUID(par1NBTTagCompound.getLong("UUIDMost"),
-						par1NBTTagCompound.getLong("UUIDLeast"));
-			}
-
-			this.setPosition(this.posX, this.posY, this.posZ);
-			this.setRotation(this.rotationYaw, this.rotationPitch);
-			this.readEntityFromNBT(par1NBTTagCompound);
-		} catch (Throwable var5) {
-			CrashReport var3 = CrashReport.makeCrashReport(var5, "Loading entity NBT");
-			CrashReportCategory var4 = var3.makeCategory("Entity being loaded");
-			this.func_85029_a(var4);
-			throw new ReportedException(var3);
+		if (Math.abs(this.motionX) > 10.0D) {
+			this.motionX = 0.0D;
 		}
+
+		if (Math.abs(this.motionY) > 10.0D) {
+			this.motionY = 0.0D;
+		}
+
+		if (Math.abs(this.motionZ) > 10.0D) {
+			this.motionZ = 0.0D;
+		}
+
+		this.prevPosX = this.lastTickPosX = this.posX = ((NBTTagDouble) var2.tagAt(0)).data;
+		this.prevPosY = this.lastTickPosY = this.posY = ((NBTTagDouble) var2.tagAt(1)).data;
+		this.prevPosZ = this.lastTickPosZ = this.posZ = ((NBTTagDouble) var2.tagAt(2)).data;
+		this.prevRotationYaw = this.rotationYaw = ((NBTTagFloat) var7.tagAt(0)).data;
+		this.prevRotationPitch = this.rotationPitch = ((NBTTagFloat) var7.tagAt(1)).data;
+		this.fallDistance = par1NBTTagCompound.getFloat("FallDistance");
+		this.fire = par1NBTTagCompound.getShort("Fire");
+		this.setAir(par1NBTTagCompound.getShort("Air"));
+		this.onGround = par1NBTTagCompound.getBoolean("OnGround");
+		this.dimension = par1NBTTagCompound.getInteger("Dimension");
+		this.invulnerable = par1NBTTagCompound.getBoolean("Invulnerable");
+		this.timeUntilPortal = par1NBTTagCompound.getInteger("PortalCooldown");
+
+		if (par1NBTTagCompound.hasKey("UUIDMost") && par1NBTTagCompound.hasKey("UUIDLeast")) {
+			this.entityUniqueID = new EaglerUUID(par1NBTTagCompound.getLong("UUIDMost"),
+					par1NBTTagCompound.getLong("UUIDLeast"));
+		}
+
+		this.setPosition(this.posX, this.posY, this.posZ);
+		this.setRotation(this.rotationYaw, this.rotationPitch);
+		this.readEntityFromNBT(par1NBTTagCompound);
 	}
 
 	/**
@@ -1960,19 +1947,6 @@ public abstract class Entity {
 	 */
 	public boolean doesEntityNotTriggerPressurePlate() {
 		return false;
-	}
-
-	public void func_85029_a(CrashReportCategory par1CrashReportCategory) {
-		par1CrashReportCategory.addCrashSectionCallable("Entity Type", new CallableEntityType(this));
-		par1CrashReportCategory.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
-		par1CrashReportCategory.addCrashSectionCallable("Entity Name", new CallableEntityName(this));
-		par1CrashReportCategory.addCrashSection("Entity\'s Exact location", String.format("%.2f, %.2f, %.2f",
-				new Object[] { Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ) }));
-		par1CrashReportCategory.addCrashSection("Entity\'s Block location",
-				CrashReportCategory.getLocationInfo(MathHelper.floor_double(this.posX),
-						MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
-		par1CrashReportCategory.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {
-				Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ) }));
 	}
 
 	public boolean func_96092_aw() {

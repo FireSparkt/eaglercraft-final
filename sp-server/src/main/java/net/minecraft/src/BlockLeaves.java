@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockLeaves extends BlockLeavesBase {
 	public static final String[] LEAF_TYPES = new String[] { "oak", "spruce", "birch", "jungle" };
@@ -43,7 +43,7 @@ public class BlockLeaves extends BlockLeavesBase {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			int var6 = par1World.getBlockMetadata(par2, par3, par4);
 
@@ -152,14 +152,14 @@ public class BlockLeaves extends BlockLeavesBase {
 	/**
 	 * Returns the quantity of items to drop on block destruction.
 	 */
-	public int quantityDropped(Random par1Random) {
+	public int quantityDropped(EaglercraftRandom par1Random) {
 		return par1Random.nextInt(20) == 0 ? 1 : 0;
 	}
 
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return Block.sapling.blockID;
 	}
 

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class EnchantmentDurability extends Enchantment {
 	protected EnchantmentDurability(int par1, int par2) {
@@ -35,7 +35,7 @@ public class EnchantmentDurability extends Enchantment {
 		return par1ItemStack.isItemStackDamageable() ? true : super.func_92089_a(par1ItemStack);
 	}
 
-	public static boolean func_92097_a(ItemStack par0ItemStack, int par1, Random par2Random) {
+	public static boolean func_92097_a(ItemStack par0ItemStack, int par1, EaglercraftRandom par2Random) {
 		return par0ItemStack.getItem() instanceof ItemArmor && par2Random.nextFloat() < 0.6F ? false
 				: par2Random.nextInt(par1 + 1) > 0;
 	}

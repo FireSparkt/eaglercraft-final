@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class StructureComponent {
 	protected StructureBoundingBox boundingBox;
@@ -22,14 +23,14 @@ public abstract class StructureComponent {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 	}
 
 	/**
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public abstract boolean addComponentParts(World var1, Random var2, StructureBoundingBox var3);
+	public abstract boolean addComponentParts(World var1, EaglercraftRandom var2, StructureBoundingBox var3);
 
 	public StructureBoundingBox getBoundingBox() {
 		return this.boundingBox;
@@ -507,7 +508,7 @@ public abstract class StructureComponent {
 	 * StructurePieceBlockSelector blockselector
 	 */
 	protected void fillWithRandomizedBlocks(World par1World, StructureBoundingBox par2StructureBoundingBox, int par3,
-			int par4, int par5, int par6, int par7, int par8, boolean par9, Random par10Random,
+			int par4, int par5, int par6, int par7, int par8, boolean par9, EaglercraftRandom par10Random,
 			StructurePieceBlockSelector par11StructurePieceBlockSelector) {
 		for (int var12 = par4; var12 <= par7; ++var12) {
 			for (int var13 = par3; var13 <= par6; ++var13) {
@@ -532,7 +533,7 @@ public abstract class StructureComponent {
 	 * olaceBlockId, int replaceBlockId, boolean alwaysreplace
 	 */
 	protected void randomlyFillWithBlocks(World par1World, StructureBoundingBox par2StructureBoundingBox,
-			Random par3Random, float par4, int par5, int par6, int par7, int par8, int par9, int par10, int par11,
+			EaglercraftRandom par3Random, float par4, int par5, int par6, int par7, int par8, int par9, int par10, int par11,
 			int par12, boolean par13) {
 		for (int var14 = par6; var14 <= par9; ++var14) {
 			for (int var15 = par5; var15 <= par8; ++var15) {
@@ -557,7 +558,7 @@ public abstract class StructureComponent {
 	 * Randomly decides if placing or not. Used for Decoration such as Torches and
 	 * Spiderwebs
 	 */
-	protected void randomlyPlaceBlock(World par1World, StructureBoundingBox par2StructureBoundingBox, Random par3Random,
+	protected void randomlyPlaceBlock(World par1World, StructureBoundingBox par2StructureBoundingBox, EaglercraftRandom par3Random,
 			float par4, int par5, int par6, int par7, int par8, int par9) {
 		if (par3Random.nextFloat() < par4) {
 			this.placeBlockAtCurrentPosition(par1World, par8, par9, par5, par6, par7, par2StructureBoundingBox);
@@ -642,7 +643,7 @@ public abstract class StructureComponent {
 	 * Blacksmith Chests, Mineshaft Chests.
 	 */
 	protected boolean generateStructureChestContents(World par1World, StructureBoundingBox par2StructureBoundingBox,
-			Random par3Random, int par4, int par5, int par6,
+			EaglercraftRandom par3Random, int par4, int par5, int par6,
 			WeightedRandomChestContent[] par7ArrayOfWeightedRandomChestContent, int par8) {
 		int var9 = this.getXWithOffset(par4, par6);
 		int var10 = this.getYWithOffset(par5);
@@ -668,7 +669,7 @@ public abstract class StructureComponent {
 	 * Used to generate dispenser contents for structures. ex: Jungle Temples.
 	 */
 	protected boolean generateStructureDispenserContents(World par1World, StructureBoundingBox par2StructureBoundingBox,
-			Random par3Random, int par4, int par5, int par6, int par7,
+			EaglercraftRandom par3Random, int par4, int par5, int par6, int par7,
 			WeightedRandomChestContent[] par8ArrayOfWeightedRandomChestContent, int par9) {
 		int var10 = this.getXWithOffset(par4, par6);
 		int var11 = this.getYWithOffset(par5);
@@ -692,7 +693,7 @@ public abstract class StructureComponent {
 	}
 
 	protected void placeDoorAtCurrentPosition(World par1World, StructureBoundingBox par2StructureBoundingBox,
-			Random par3Random, int par4, int par5, int par6, int par7) {
+			EaglercraftRandom par3Random, int par4, int par5, int par6, int par7) {
 		int var8 = this.getXWithOffset(par4, par6);
 		int var9 = this.getYWithOffset(par5);
 		int var10 = this.getZWithOffset(par4, par6);

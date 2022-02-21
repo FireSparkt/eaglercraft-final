@@ -1,12 +1,13 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentNetherBridgeThrone extends ComponentNetherBridgePiece {
 	private boolean hasSpawner;
 
-	public ComponentNetherBridgeThrone(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentNetherBridgeThrone(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -17,7 +18,7 @@ public class ComponentNetherBridgeThrone extends ComponentNetherBridgePiece {
 	 * Creates and returns a new component piece. Or null if it could not find
 	 * enough room to place it.
 	 */
-	public static ComponentNetherBridgeThrone createValidComponent(List par0List, Random par1Random, int par2, int par3,
+	public static ComponentNetherBridgeThrone createValidComponent(List par0List, EaglercraftRandom par1Random, int par2, int par3,
 			int par4, int par5, int par6) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -2, 0, 0, 7, 8,
 				9, par5);
@@ -30,7 +31,7 @@ public class ComponentNetherBridgeThrone extends ComponentNetherBridgePiece {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		this.fillWithBlocks(par1World, par3StructureBoundingBox, 0, 2, 0, 6, 7, 7, 0, 0, false);
 		this.fillWithBlocks(par1World, par3StructureBoundingBox, 1, 0, 0, 5, 1, 7, Block.netherBrick.blockID,

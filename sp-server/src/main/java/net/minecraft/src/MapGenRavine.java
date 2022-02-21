@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenRavine extends MapGenBase {
 	private float[] field_75046_d = new float[1024];
 
 	protected void generateRavine(long par1, int par3, int par4, byte[] par5ArrayOfByte, double par6, double par8,
 			double par10, float par12, float par13, float par14, int par15, int par16, double par17) {
-		Random var19 = new Random(par1);
+		EaglercraftRandom var19 = new EaglercraftRandom(par1);
 		double var20 = (double) (par3 * 16 + 8);
 		double var22 = (double) (par4 * 16 + 8);
 		float var24 = 0.0F;

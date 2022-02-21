@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenLiquids extends WorldGenerator {
 	/** The ID of the liquid block used in this liquid generator. */
@@ -10,7 +10,7 @@ public class WorldGenLiquids extends WorldGenerator {
 		this.liquidBlockId = par1;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		if (par1World.getBlockId(par3, par4 + 1, par5) != Block.stone.blockID) {
 			return false;
 		} else if (par1World.getBlockId(par3, par4 - 1, par5) != Block.stone.blockID) {

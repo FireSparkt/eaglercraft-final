@@ -1,13 +1,14 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentVillagePathGen extends ComponentVillageRoadPiece {
 	private int averageGroundLevel;
 
 	public ComponentVillagePathGen(ComponentVillageStartPiece par1ComponentVillageStartPiece, int par2,
-			Random par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
+			EaglercraftRandom par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
 		super(par1ComponentVillageStartPiece, par2);
 		this.coordBaseMode = par5;
 		this.boundingBox = par4StructureBoundingBox;
@@ -18,7 +19,7 @@ public class ComponentVillagePathGen extends ComponentVillageRoadPiece {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		boolean var4 = false;
 		int var5;
 		StructureComponent var6;
@@ -107,7 +108,7 @@ public class ComponentVillagePathGen extends ComponentVillageRoadPiece {
 	}
 
 	public static StructureBoundingBox func_74933_a(ComponentVillageStartPiece par0ComponentVillageStartPiece,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6) {
 		for (int var7 = 7 * MathHelper.getRandomIntegerInRange(par2Random, 3, 5); var7 >= 7; var7 -= 7) {
 			StructureBoundingBox var8 = StructureBoundingBox.getComponentToAddBoundingBox(par3, par4, par5, 0, 0, 0, 3,
 					3, var7, par6);
@@ -124,7 +125,7 @@ public class ComponentVillagePathGen extends ComponentVillageRoadPiece {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		int var4 = this.getBiomeSpecificBlock(Block.gravel.blockID, 0);
 

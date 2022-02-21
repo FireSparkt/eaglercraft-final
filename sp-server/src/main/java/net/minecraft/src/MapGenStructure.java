@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class MapGenStructure extends MapGenBase {
 	/**
@@ -20,21 +21,9 @@ public abstract class MapGenStructure extends MapGenBase {
 	protected void recursiveGenerate(World par1World, int par2, int par3, int par4, int par5, byte[] par6ArrayOfByte) {
 		if (!this.structureMap.containsKey(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(par2, par3)))) {
 			this.rand.nextInt();
-
-			try {
-				if (this.canSpawnStructureAtCoords(par2, par3)) {
-					StructureStart var7 = this.getStructureStart(par2, par3);
-					this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(par2, par3)), var7);
-				}
-			} catch (Throwable var10) {
-				CrashReport var8 = CrashReport.makeCrashReport(var10, "Exception preparing structure feature");
-				CrashReportCategory var9 = var8.makeCategory("Feature being prepared");
-				var9.addCrashSectionCallable("Is feature chunk", new CallableIsFeatureChunk(this, par2, par3));
-				var9.addCrashSection("Chunk location",
-						String.format("%d,%d", new Object[] { Integer.valueOf(par2), Integer.valueOf(par3) }));
-				var9.addCrashSectionCallable("Chunk pos hash", new CallableChunkPosHash(this, par2, par3));
-				var9.addCrashSectionCallable("Structure type", new CallableStructureType(this));
-				throw new ReportedException(var8);
+			if (this.canSpawnStructureAtCoords(par2, par3)) {
+				StructureStart var7 = this.getStructureStart(par2, par3);
+				this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(par2, par3)), var7);
 			}
 		}
 	}
@@ -43,7 +32,7 @@ public abstract class MapGenStructure extends MapGenBase {
 	 * Generates structures in specified chunk next to existing structures. Does
 	 * *not* generate StructureStarts.
 	 */
-	public boolean generateStructuresInChunk(World par1World, Random par2Random, int par3, int par4) {
+	public boolean generateStructuresInChunk(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		int var5 = (par3 << 4) + 8;
 		int var6 = (par4 << 4) + 8;
 		boolean var7 = false;

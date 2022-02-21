@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 abstract class ComponentNetherBridgePiece extends StructureComponent {
 	protected ComponentNetherBridgePiece(int par1) {
@@ -27,7 +28,7 @@ abstract class ComponentNetherBridgePiece extends StructureComponent {
 
 	private ComponentNetherBridgePiece getNextComponent(
 			ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece, List par2List, List par3List,
-			Random par4Random, int par5, int par6, int par7, int par8, int par9) {
+			EaglercraftRandom par4Random, int par5, int par6, int par7, int par8, int par9) {
 		int var10 = this.getTotalWeight(par2List);
 		boolean var11 = var10 > 0 && par9 <= 30;
 		int var12 = 0;
@@ -72,7 +73,7 @@ abstract class ComponentNetherBridgePiece extends StructureComponent {
 	 * Finds a random component to tack on to the bridge. Or builds the end.
 	 */
 	private StructureComponent getNextComponent(ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece,
-			List par2List, Random par3Random, int par4, int par5, int par6, int par7, int par8, boolean par9) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5, int par6, int par7, int par8, boolean par9) {
 		if (Math.abs(par4 - par1ComponentNetherBridgeStartPiece.getBoundingBox().minX) <= 112
 				&& Math.abs(par6 - par1ComponentNetherBridgeStartPiece.getBoundingBox().minZ) <= 112) {
 			List var10 = par1ComponentNetherBridgeStartPiece.primaryWeights;
@@ -99,7 +100,7 @@ abstract class ComponentNetherBridgePiece extends StructureComponent {
 	 * Gets the next component in any cardinal direction
 	 */
 	protected StructureComponent getNextComponentNormal(
-			ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece, List par2List, Random par3Random,
+			ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece, List par2List, EaglercraftRandom par3Random,
 			int par4, int par5, boolean par6) {
 		switch (this.coordBaseMode) {
 		case 0:
@@ -131,7 +132,7 @@ abstract class ComponentNetherBridgePiece extends StructureComponent {
 	 * Gets the next component in the +/- X direction
 	 */
 	protected StructureComponent getNextComponentX(ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece,
-			List par2List, Random par3Random, int par4, int par5, boolean par6) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5, boolean par6) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return this.getNextComponent(par1ComponentNetherBridgeStartPiece, par2List, par3Random,
@@ -162,7 +163,7 @@ abstract class ComponentNetherBridgePiece extends StructureComponent {
 	 * Gets the next component in the +/- Z direction
 	 */
 	protected StructureComponent getNextComponentZ(ComponentNetherBridgeStartPiece par1ComponentNetherBridgeStartPiece,
-			List par2List, Random par3Random, int par4, int par5, boolean par6) {
+			List par2List, EaglercraftRandom par3Random, int par4, int par5, boolean par6) {
 		switch (this.coordBaseMode) {
 		case 0:
 			return this.getNextComponent(par1ComponentNetherBridgeStartPiece, par2List, par3Random,

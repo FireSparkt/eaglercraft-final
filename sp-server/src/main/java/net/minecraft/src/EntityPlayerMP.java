@@ -12,7 +12,7 @@ import java.util.List;
 import net.minecraft.server.MinecraftServer;
 
 public class EntityPlayerMP extends EntityPlayer implements ICrafting {
-	private StringTranslate translator = new StringTranslate("en_US");
+	private StringTranslate translator = StringTranslate.getInstance();
 
 	/**
 	 * The NetServerHandler assigned to this player by the
@@ -223,42 +223,35 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	}
 
 	public void onUpdateEntity() {
-		try {
-			super.onUpdate();
+		super.onUpdate();
 
-			for (int var1 = 0; var1 < this.inventory.getSizeInventory(); ++var1) {
-				ItemStack var5 = this.inventory.getStackInSlot(var1);
+		for (int var1 = 0; var1 < this.inventory.getSizeInventory(); ++var1) {
+			ItemStack var5 = this.inventory.getStackInSlot(var1);
 
-				if (var5 != null && Item.itemsList[var5.itemID].isMap()
-						&& this.playerNetServerHandler.getNumChunkDataPackets() <= 5) {
-					Packet var6 = ((ItemMapBase) Item.itemsList[var5.itemID]).getUpdatePacket(var5, this.worldObj,
-							this);
+			if (var5 != null && Item.itemsList[var5.itemID].isMap()
+					&& this.playerNetServerHandler.getNumChunkDataPackets() <= 5) {
+				Packet var6 = ((ItemMapBase) Item.itemsList[var5.itemID]).getUpdatePacket(var5, this.worldObj,
+						this);
 
-					if (var6 != null) {
-						this.playerNetServerHandler.sendPacket(var6);
-					}
+				if (var6 != null) {
+					this.playerNetServerHandler.sendPacket(var6);
 				}
 			}
+		}
 
-			if (this.getHealth() != this.lastHealth || this.lastFoodLevel != this.foodStats.getFoodLevel()
-					|| this.foodStats.getSaturationLevel() == 0.0F != this.wasHungry) {
-				this.playerNetServerHandler.sendPacket(new Packet8UpdateHealth(this.getHealth(),
-						this.foodStats.getFoodLevel(), this.foodStats.getSaturationLevel()));
-				this.lastHealth = this.getHealth();
-				this.lastFoodLevel = this.foodStats.getFoodLevel();
-				this.wasHungry = this.foodStats.getSaturationLevel() == 0.0F;
-			}
+		if (this.getHealth() != this.lastHealth || this.lastFoodLevel != this.foodStats.getFoodLevel()
+				|| this.foodStats.getSaturationLevel() == 0.0F != this.wasHungry) {
+			this.playerNetServerHandler.sendPacket(new Packet8UpdateHealth(this.getHealth(),
+					this.foodStats.getFoodLevel(), this.foodStats.getSaturationLevel()));
+			this.lastHealth = this.getHealth();
+			this.lastFoodLevel = this.foodStats.getFoodLevel();
+			this.wasHungry = this.foodStats.getSaturationLevel() == 0.0F;
+		}
 
-			if (this.experienceTotal != this.lastExperience) {
-				this.lastExperience = this.experienceTotal;
-				this.playerNetServerHandler.sendPacket(
-						new Packet43Experience(this.experience, this.experienceTotal, this.experienceLevel));
-			}
-		} catch (Throwable var4) {
-			CrashReport var2 = CrashReport.makeCrashReport(var4, "Ticking player");
-			CrashReportCategory var3 = var2.makeCategory("Player being ticked");
-			this.func_85029_a(var3);
-			throw new ReportedException(var2);
+		if (this.experienceTotal != this.lastExperience) {
+			this.lastExperience = this.experienceTotal;
+			this.playerNetServerHandler.sendPacket(
+					new Packet43Experience(this.experience, this.experienceTotal, this.experienceLevel));
 		}
 	}
 
@@ -800,16 +793,19 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	 * Gets the player's IP address. Used in /banip.
 	 */
 	public String getPlayerIP() {
-		String var1 = this.playerNetServerHandler.netManager.getRemoteAddress().toString();
-		var1 = var1.substring(var1.indexOf("/") + 1);
-		var1 = var1.substring(0, var1.indexOf(":"));
-		return var1;
+		//String var1 = this.playerNetServerHandler.netManager.getRemoteAddress().toString();
+		//var1 = var1.substring(var1.indexOf("/") + 1);
+		//var1 = var1.substring(0, var1.indexOf(":"));
+		return "not implemented";
 	}
 
 	public void updateClientInfo(Packet204ClientInfo par1Packet204ClientInfo) {
-		if (this.translator.getLanguageList().containsKey(par1Packet204ClientInfo.getLanguage())) {
-			this.translator.setLanguage(par1Packet204ClientInfo.getLanguage(), false);
-		}
+		
+		// rip
+		
+		//if (this.translator.getLanguageList().containsKey(par1Packet204ClientInfo.getLanguage())) {
+		//	this.translator.setLanguage(par1Packet204ClientInfo.getLanguage(), false);
+		//}
 
 		int var2 = 256 >> par1Packet204ClientInfo.getRenderDistance();
 

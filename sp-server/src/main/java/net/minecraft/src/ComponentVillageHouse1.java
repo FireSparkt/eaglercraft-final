@@ -1,20 +1,21 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentVillageHouse1 extends ComponentVillage {
 	private int averageGroundLevel = -1;
 
 	public ComponentVillageHouse1(ComponentVillageStartPiece par1ComponentVillageStartPiece, int par2,
-			Random par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
+			EaglercraftRandom par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
 		super(par1ComponentVillageStartPiece, par2);
 		this.coordBaseMode = par5;
 		this.boundingBox = par4StructureBoundingBox;
 	}
 
 	public static ComponentVillageHouse1 func_74898_a(ComponentVillageStartPiece par0ComponentVillageStartPiece,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		StructureBoundingBox var8 = StructureBoundingBox.getComponentToAddBoundingBox(par3, par4, par5, 0, 0, 0, 9, 9,
 				6, par6);
 		return canVillageGoDeeper(var8) && StructureComponent.findIntersecting(par1List, var8) == null
@@ -26,7 +27,7 @@ public class ComponentVillageHouse1 extends ComponentVillage {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.averageGroundLevel < 0) {
 			this.averageGroundLevel = this.getAverageGroundLevel(par1World, par3StructureBoundingBox);

@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentMineshaftStairs extends StructureComponent {
-	public ComponentMineshaftStairs(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentMineshaftStairs(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -14,7 +15,7 @@ public class ComponentMineshaftStairs extends StructureComponent {
 	/**
 	 * Trys to find a valid place to put this component.
 	 */
-	public static StructureBoundingBox findValidPlacement(List par0List, Random par1Random, int par2, int par3,
+	public static StructureBoundingBox findValidPlacement(List par0List, EaglercraftRandom par1Random, int par2, int par3,
 			int par4, int par5) {
 		StructureBoundingBox var6 = new StructureBoundingBox(par2, par3 - 5, par4, par2, par3 + 2, par4);
 
@@ -46,7 +47,7 @@ public class ComponentMineshaftStairs extends StructureComponent {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		int var4 = this.getComponentType();
 
 		switch (this.coordBaseMode) {
@@ -75,7 +76,7 @@ public class ComponentMineshaftStairs extends StructureComponent {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

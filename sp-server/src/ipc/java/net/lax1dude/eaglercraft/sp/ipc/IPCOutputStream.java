@@ -3,21 +3,21 @@ package net.lax1dude.eaglercraft.sp.ipc;
 import java.io.IOException;
 import java.io.OutputStream;
 
-class IPCOutputStream extends OutputStream {
+public class IPCOutputStream extends OutputStream {
 
 	private String className = null;
 	private byte[] currentBuffer = null;
 	private int idx = 0;
 	private int originalSize = 0;
 	
-	void feedBuffer(byte[] buf, String clazzName) {
+	public void feedBuffer(byte[] buf, String clazzName) {
 		currentBuffer = buf;
 		idx = 0;
 		originalSize = buf.length;
 		className = clazzName;
 	}
 	
-	byte[] returnBuffer() {
+	public byte[] returnBuffer() {
 		if(className != null && currentBuffer.length != originalSize) {
 			System.err.println("WARNING: Packet '" + className + "' was supposed to be " + originalSize + " bytes but buffer has grown by " + (currentBuffer.length - originalSize) + " to " + currentBuffer.length + " bytes");
 		}
@@ -39,8 +39,7 @@ class IPCOutputStream extends OutputStream {
 		if(idx >= currentBuffer.length) {
 			growBuffer(idx + 1);
 		}
-		currentBuffer[idx] = (byte) b;
-		++idx;
+		currentBuffer[idx++] = (byte) b;
 	}
 	
 	@Override

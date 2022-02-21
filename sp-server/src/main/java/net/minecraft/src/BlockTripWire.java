@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockTripWire extends Block {
 	public BlockTripWire(int par1) {
@@ -53,7 +54,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return Item.silk.itemID;
 	}
 
@@ -166,7 +167,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			if ((par1World.getBlockMetadata(par2, par3, par4) & 1) == 1) {
 				this.updateTripWireState(par1World, par2, par3, par4);

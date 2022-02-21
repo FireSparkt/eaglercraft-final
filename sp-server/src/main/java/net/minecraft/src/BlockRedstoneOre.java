@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockRedstoneOre extends Block {
 	private boolean glowing;
@@ -62,7 +62,7 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (this.blockID == Block.oreRedstoneGlowing.blockID) {
 			par1World.setBlock(par2, par3, par4, Block.oreRedstone.blockID);
 		}
@@ -71,7 +71,7 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return Item.redstone.itemID;
 	}
 
@@ -79,14 +79,14 @@ public class BlockRedstoneOre extends Block {
 	 * Returns the usual quantity dropped by the block plus a bonus of 1 to 'i'
 	 * (inclusive).
 	 */
-	public int quantityDroppedWithBonus(int par1, Random par2Random) {
+	public int quantityDroppedWithBonus(int par1, EaglercraftRandom par2Random) {
 		return this.quantityDropped(par2Random) + par2Random.nextInt(par1 + 1);
 	}
 
 	/**
 	 * Returns the quantity of items to drop on block destruction.
 	 */
-	public int quantityDropped(Random par1Random) {
+	public int quantityDropped(EaglercraftRandom par1Random) {
 		return 4 + par1Random.nextInt(2);
 	}
 
@@ -107,7 +107,7 @@ public class BlockRedstoneOre extends Block {
 	 * The redstone ore sparkles.
 	 */
 	private void sparkle(World par1World, int par2, int par3, int par4) {
-		Random var5 = par1World.rand;
+		EaglercraftRandom var5 = par1World.rand;
 		double var6 = 0.0625D;
 
 		for (int var8 = 0; var8 < 6; ++var8) {

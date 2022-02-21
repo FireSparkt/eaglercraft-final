@@ -180,11 +180,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public byte getByte(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagByte) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 1, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagByte) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -192,11 +188,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public short getShort(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagShort) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 2, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagShort) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -204,11 +196,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public int getInteger(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagInt) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 3, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0 : ((NBTTagInt) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -216,11 +204,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public long getLong(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0L : ((NBTTagLong) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 4, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0L : ((NBTTagLong) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -228,11 +212,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public float getFloat(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0.0F : ((NBTTagFloat) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 5, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0.0F : ((NBTTagFloat) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -240,11 +220,7 @@ public class NBTTagCompound extends NBTBase {
 	 * stored.
 	 */
 	public double getDouble(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? 0.0D : ((NBTTagDouble) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 6, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? 0.0D : ((NBTTagDouble) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -252,11 +228,7 @@ public class NBTTagCompound extends NBTBase {
 	 * such key was stored.
 	 */
 	public String getString(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? "" : ((NBTTagString) this.tagMap.get(par1Str)).data;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 8, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? "" : ((NBTTagString) this.tagMap.get(par1Str)).data;
 	}
 
 	/**
@@ -264,12 +236,8 @@ public class NBTTagCompound extends NBTBase {
 	 * such key was stored.
 	 */
 	public byte[] getByteArray(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? new byte[0]
-					: ((NBTTagByteArray) this.tagMap.get(par1Str)).byteArray;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 7, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? new byte[0]
+				: ((NBTTagByteArray) this.tagMap.get(par1Str)).byteArray;
 	}
 
 	/**
@@ -277,12 +245,8 @@ public class NBTTagCompound extends NBTBase {
 	 * such key was stored.
 	 */
 	public int[] getIntArray(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? new int[0]
-					: ((NBTTagIntArray) this.tagMap.get(par1Str)).intArray;
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 11, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? new int[0]
+				: ((NBTTagIntArray) this.tagMap.get(par1Str)).intArray;
 	}
 
 	/**
@@ -290,12 +254,8 @@ public class NBTTagCompound extends NBTBase {
 	 * NBTTagCompound if no such key was stored.
 	 */
 	public NBTTagCompound getCompoundTag(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? new NBTTagCompound(par1Str)
-					: (NBTTagCompound) this.tagMap.get(par1Str);
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 10, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? new NBTTagCompound(par1Str)
+				: (NBTTagCompound) this.tagMap.get(par1Str);
 	}
 
 	/**
@@ -303,11 +263,7 @@ public class NBTTagCompound extends NBTBase {
 	 * NBTTagList if no such key was stored.
 	 */
 	public NBTTagList getTagList(String par1Str) {
-		try {
-			return !this.tagMap.containsKey(par1Str) ? new NBTTagList(par1Str) : (NBTTagList) this.tagMap.get(par1Str);
-		} catch (ClassCastException var3) {
-			throw new ReportedException(this.createCrashReport(par1Str, 9, var3));
-		}
+		return !this.tagMap.containsKey(par1Str) ? new NBTTagList(par1Str) : (NBTTagList) this.tagMap.get(par1Str);
 	}
 
 	/**
@@ -342,23 +298,6 @@ public class NBTTagCompound extends NBTBase {
 	 */
 	public boolean hasNoTags() {
 		return this.tagMap.isEmpty();
-	}
-
-	/**
-	 * Create a crash report which indicates a NBT read error.
-	 */
-	private CrashReport createCrashReport(String par1Str, int par2, ClassCastException par3ClassCastException) {
-		CrashReport var4 = CrashReport.makeCrashReport(par3ClassCastException, "Reading NBT data");
-		CrashReportCategory var5 = var4.makeCategoryDepth("Corrupt NBT tag", 1);
-		var5.addCrashSectionCallable("Tag type found", new CallableTagCompound1(this, par1Str));
-		var5.addCrashSectionCallable("Tag type expected", new CallableTagCompound2(this, par2));
-		var5.addCrashSection("Tag name", par1Str);
-
-		if (this.getName() != null && this.getName().length() > 0) {
-			var5.addCrashSection("Tag parent", this.getName());
-		}
-
-		return var4;
 	}
 
 	/**

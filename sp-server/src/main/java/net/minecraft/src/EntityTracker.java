@@ -108,21 +108,8 @@ public class EntityTracker {
 			this.trackedEntityHashTable.addKey(par1Entity.entityId, var5);
 			var5.updatePlayerEntities(this.theWorld.playerEntities);
 		} catch (Throwable var11) {
-			CrashReport var6 = CrashReport.makeCrashReport(var11, "Adding entity to track");
-			CrashReportCategory var7 = var6.makeCategory("Entity To Track");
-			var7.addCrashSection("Tracking range", par2 + " blocks");
-			var7.addCrashSectionCallable("Update interval", new CallableEntityTracker(this, par3));
-			par1Entity.func_85029_a(var7);
-			CrashReportCategory var8 = var6.makeCategory("Entity That Is Already Tracked");
-			((EntityTrackerEntry) this.trackedEntityHashTable.lookup(par1Entity.entityId)).trackedEntity
-					.func_85029_a(var8);
-
-			try {
-				throw new ReportedException(var6);
-			} catch (ReportedException var10) {
-				System.err.println("\"Silently\" catching entity tracking error.");
-				var10.printStackTrace();
-			}
+			System.err.println("\"Silently\" catching entity tracking error.");
+			var11.printStackTrace();
 		}
 	}
 

@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class WorldGenerator {
 	/**
@@ -18,7 +18,7 @@ public abstract class WorldGenerator {
 		this.doBlockNotify = par1;
 	}
 
-	public abstract boolean generate(World var1, Random var2, int var3, int var4, int var5);
+	public abstract boolean generate(World var1, EaglercraftRandom var2, int var3, int var4, int var5);
 
 	/**
 	 * Rescales the generator settings, only used in WorldGenBigTree

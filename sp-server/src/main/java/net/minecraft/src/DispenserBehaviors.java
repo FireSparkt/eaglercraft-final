@@ -1,7 +1,11 @@
 package net.minecraft.src;
 
 public class DispenserBehaviors {
+	private static boolean hasInit = false;
 	public static void func_96467_a() {
+		if(hasInit) {
+			return;
+		}
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.arrow, new DispenserBehaviorArrow());
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.egg, new DispenserBehaviorEgg());
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.snowball, new DispenserBehaviorSnowball());
@@ -19,5 +23,6 @@ public class DispenserBehaviors {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.dyePowder, new DispenserBehaviorDye());
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.itemsList[Block.tnt.blockID],
 				new DispenserBehaviorTNT());
+		hasInit = true;
 	}
 }

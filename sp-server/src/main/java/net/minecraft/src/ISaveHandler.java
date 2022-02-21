@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.io.File;
+import net.lax1dude.eaglercraft.sp.VFile;
 
 public interface ISaveHandler {
 	/**
@@ -38,7 +38,7 @@ public interface ISaveHandler {
 	/**
 	 * Gets the file location of the given map
 	 */
-	File getMapFileFromName(String var1);
+	VFile getMapFileFromName(String var1);
 
 	/**
 	 * Returns the name of the directory where world information is saved.

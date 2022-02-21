@@ -205,14 +205,6 @@ public class TileEntity {
 		this.blockMetadata = -1;
 	}
 
-	public void func_85027_a(CrashReportCategory par1CrashReportCategory) {
-		par1CrashReportCategory.addCrashSectionCallable("Name", new CallableTileEntityName(this));
-		CrashReportCategory.func_85068_a(par1CrashReportCategory, this.xCoord, this.yCoord, this.zCoord,
-				this.getBlockType().blockID, this.getBlockMetadata());
-		par1CrashReportCategory.addCrashSectionCallable("Actual block type", new CallableTileEntityID(this));
-		par1CrashReportCategory.addCrashSectionCallable("Actual block data value", new CallableTileEntityData(this));
-	}
-
 	static Map getClassToNameMap() {
 		return classToNameMap;
 	}

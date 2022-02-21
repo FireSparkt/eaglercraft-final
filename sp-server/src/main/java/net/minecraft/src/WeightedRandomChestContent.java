@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WeightedRandomChestContent extends WeightedRandomItem {
 	/** The Item/Block ID to generate in the Chest. */
@@ -29,7 +29,7 @@ public class WeightedRandomChestContent extends WeightedRandomItem {
 	/**
 	 * Generates the Chest contents.
 	 */
-	public static void generateChestContents(Random par0Random,
+	public static void generateChestContents(EaglercraftRandom par0Random,
 			WeightedRandomChestContent[] par1ArrayOfWeightedRandomChestContent, IInventory par2IInventory, int par3) {
 		for (int var4 = 0; var4 < par3; ++var4) {
 			WeightedRandomChestContent var5 = (WeightedRandomChestContent) WeightedRandom.getRandomItem(par0Random,
@@ -55,7 +55,7 @@ public class WeightedRandomChestContent extends WeightedRandomItem {
 	/**
 	 * Generates the Dispenser contents.
 	 */
-	public static void generateDispenserContents(Random par0Random,
+	public static void generateDispenserContents(EaglercraftRandom par0Random,
 			WeightedRandomChestContent[] par1ArrayOfWeightedRandomChestContent,
 			TileEntityDispenser par2TileEntityDispenser, int par3) {
 		for (int var4 = 0; var4 < par3; ++var4) {

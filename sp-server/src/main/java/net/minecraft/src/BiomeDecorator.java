@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BiomeDecorator {
 	/** The world the BiomeDecorator is currently decorating */
 	protected World currentWorld;
 
 	/** The Biome Decorator's random number generator. */
-	protected Random randomGenerator;
+	protected EaglercraftRandom randomGenerator;
 
 	/** The X-coordinate of the chunk currently being decorated */
 	protected int chunk_X;
@@ -175,7 +175,7 @@ public class BiomeDecorator {
 	 * Decorates the world. Calls code that was formerly (pre-1.8) in
 	 * ChunkProviderGenerate.populate
 	 */
-	public void decorate(World par1World, Random par2Random, int par3, int par4) {
+	public void decorate(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		if (this.currentWorld != null) {
 			throw new RuntimeException("Already decorating!!");
 		} else {

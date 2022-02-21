@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockCrops extends BlockFlower {
 	protected BlockCrops(int par1) {
@@ -25,7 +25,7 @@ public class BlockCrops extends BlockFlower {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		super.updateTick(par1World, par2, par3, par4, par5Random);
 
 		if (par1World.getBlockLightValue(par2, par3 + 1, par4) >= 9) {
@@ -149,14 +149,14 @@ public class BlockCrops extends BlockFlower {
 	/**
 	 * Returns the ID of the items to drop on destruction.
 	 */
-	public int idDropped(int par1, Random par2Random, int par3) {
+	public int idDropped(int par1, EaglercraftRandom par2Random, int par3) {
 		return par1 == 7 ? this.getCropItem() : this.getSeedItem();
 	}
 
 	/**
 	 * Returns the quantity of items to drop on block destruction.
 	 */
-	public int quantityDropped(Random par1Random) {
+	public int quantityDropped(EaglercraftRandom par1Random) {
 		return 1;
 	}
 }

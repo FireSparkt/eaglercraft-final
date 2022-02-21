@@ -2,14 +2,14 @@ package net.minecraft.src;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import net.lax1dude.eaglercraft.sp.VFile;
 
 public class MapStorage {
 	private ISaveHandler saveHandler;
@@ -44,7 +44,7 @@ public class MapStorage {
 		} else {
 			if (this.saveHandler != null) {
 				try {
-					File var4 = this.saveHandler.getMapFileFromName(par2Str);
+					VFile var4 = this.saveHandler.getMapFileFromName(par2Str);
 
 					if (var4 != null && var4.exists()) {
 						try {
@@ -53,10 +53,8 @@ public class MapStorage {
 						} catch (Exception var7) {
 							throw new RuntimeException("Failed to instantiate " + par1Class.toString(), var7);
 						}
-
-						FileInputStream var5 = new FileInputStream(var4);
-						NBTTagCompound var6 = CompressedStreamTools.readCompressed(var5);
-						var5.close();
+						
+						NBTTagCompound var6 = CompressedStreamTools.readCompressed(var4.getInputStream());
 						var3.readFromNBT(var6.getCompoundTag("data"));
 					}
 				} catch (Exception var8) {
@@ -110,16 +108,16 @@ public class MapStorage {
 	private void saveData(WorldSavedData par1WorldSavedData) {
 		if (this.saveHandler != null) {
 			try {
-				File var2 = this.saveHandler.getMapFileFromName(par1WorldSavedData.mapName);
+				VFile var2 = this.saveHandler.getMapFileFromName(par1WorldSavedData.mapName);
 
 				if (var2 != null) {
 					NBTTagCompound var3 = new NBTTagCompound();
 					par1WorldSavedData.writeToNBT(var3);
 					NBTTagCompound var4 = new NBTTagCompound();
 					var4.setCompoundTag("data", var3);
-					FileOutputStream var5 = new FileOutputStream(var2);
-					CompressedStreamTools.writeCompressed(var4, var5);
-					var5.close();
+					OutputStream st = var2.getOutputStream();
+					CompressedStreamTools.writeCompressed(var4, st);
+					st.close();
 				}
 			} catch (Exception var6) {
 				var6.printStackTrace();
@@ -138,10 +136,10 @@ public class MapStorage {
 				return;
 			}
 
-			File var1 = this.saveHandler.getMapFileFromName("idcounts");
+			VFile var1 = this.saveHandler.getMapFileFromName("idcounts");
 
 			if (var1 != null && var1.exists()) {
-				DataInputStream var2 = new DataInputStream(new FileInputStream(var1));
+				DataInputStream var2 = new DataInputStream(var1.getInputStream());
 				NBTTagCompound var3 = CompressedStreamTools.read(var2);
 				var2.close();
 				Iterator var4 = var3.getTags().iterator();
@@ -181,7 +179,7 @@ public class MapStorage {
 			return var2.shortValue();
 		} else {
 			try {
-				File var3 = this.saveHandler.getMapFileFromName("idcounts");
+				VFile var3 = this.saveHandler.getMapFileFromName("idcounts");
 
 				if (var3 != null) {
 					NBTTagCompound var4 = new NBTTagCompound();
@@ -192,10 +190,11 @@ public class MapStorage {
 						short var7 = ((Short) this.idCounts.get(var6)).shortValue();
 						var4.setShort(var6, var7);
 					}
-
-					DataOutputStream var9 = new DataOutputStream(new FileOutputStream(var3));
+					
+					OutputStream os = var3.getOutputStream();
+					DataOutputStream var9 = new DataOutputStream(os);
 					CompressedStreamTools.write(var4, var9);
-					var9.close();
+					os.close();
 				}
 			} catch (Exception var8) {
 				var8.printStackTrace();

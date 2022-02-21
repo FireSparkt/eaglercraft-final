@@ -10,6 +10,7 @@ import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerNotice;
 import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.TextureLocation;
@@ -22,6 +23,7 @@ public class GuiMainMenu extends GuiScreen {
 	/** The splash message. */
 	private String splashText = "missingno";
 	private GuiButton buttonResetDemo;
+	private boolean hasClickedSingleplayer = false;
 	
 	private long start;
 
@@ -142,7 +144,7 @@ public class GuiMainMenu extends GuiScreen {
 		this.buttonList.add(single = new GuiButton(1, this.width / 2 - 100, var4, var2.translateKey("menu.singleplayer")));
 		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, var4 + 24 * 1, var2.translateKey("menu.multiplayer")));
 		this.buttonList.add(new GuiButton(3, this.width / 2 - 100, var4 + 24 * 2, var2.translateKey("menu.forkme")));
-		single.enabled = false;
+		single.enabled = true;
 
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, var4 + 72 + 12, 98, 20, var2.translateKey("menu.options")));
 		this.buttonList.add(new GuiButton(4, this.width / 2 + 2, var4 + 72 + 12, 98, 20, var2.translateKey("menu.editprofile")));
@@ -231,6 +233,13 @@ public class GuiMainMenu extends GuiScreen {
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 0) {
 			this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
+		}
+		
+		if (par1GuiButton.id == 1) {
+			//if(!hasClickedSingleplayer) {
+				this.mc.displayGuiScreen(new GuiScreenSingleplayerNotice(this));
+			//}
+			//hasClickedSingleplayer = true;
 		}
 
 		if (par1GuiButton.id == 5) {

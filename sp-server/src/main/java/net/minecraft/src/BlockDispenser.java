@@ -1,11 +1,11 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BlockDispenser extends BlockContainer {
 	/** Registry for all dispense behaviors. */
 	public static final IRegistry dispenseBehaviorRegistry = new RegistryDefaulted(new BehaviorDefaultDispenseItem());
-	protected Random random = new Random();
+	protected EaglercraftRandom random = new EaglercraftRandom();
 
 	protected BlockDispenser(int par1) {
 		super(par1, Material.rock);
@@ -127,7 +127,7 @@ public class BlockDispenser extends BlockContainer {
 	/**
 	 * Ticks the block if it's been scheduled
 	 */
-	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
+	public void updateTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
 		if (!par1World.isRemote) {
 			this.dispense(par1World, par2, par3, par4);
 		}

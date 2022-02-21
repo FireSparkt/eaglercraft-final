@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentVillageStartPiece extends ComponentVillageWell {
 	public final WorldChunkManager worldChunkMngr;
@@ -21,7 +22,7 @@ public class ComponentVillageStartPiece extends ComponentVillageWell {
 	public ArrayList field_74932_i = new ArrayList();
 	public ArrayList field_74930_j = new ArrayList();
 
-	public ComponentVillageStartPiece(WorldChunkManager par1WorldChunkManager, int par2, Random par3Random, int par4,
+	public ComponentVillageStartPiece(WorldChunkManager par1WorldChunkManager, int par2, EaglercraftRandom par3Random, int par4,
 			int par5, ArrayList par6ArrayList, int par7) {
 		super((ComponentVillageStartPiece) null, 0, par3Random, par4, par5);
 		this.worldChunkMngr = par1WorldChunkManager;

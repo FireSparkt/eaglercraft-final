@@ -98,14 +98,6 @@ public abstract class NetHandler {
 		this.unexpectedPacket(par1Packet2ClientProtocol);
 	}
 
-	public void handleServerAuthData(Packet253ServerAuthData par1Packet253ServerAuthData) {
-		this.unexpectedPacket(par1Packet253ServerAuthData);
-	}
-
-	public void handleSharedKey(Packet252SharedKey par1Packet252SharedKey) {
-		this.unexpectedPacket(par1Packet252SharedKey);
-	}
-
 	public void handleMobSpawn(Packet24MobSpawn par1Packet24MobSpawn) {
 		this.unexpectedPacket(par1Packet24MobSpawn);
 	}

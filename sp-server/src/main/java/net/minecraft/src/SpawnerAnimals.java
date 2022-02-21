@@ -3,7 +3,8 @@ package net.minecraft.src;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public final class SpawnerAnimals {
 	/** The 17x17 area around the player where mobs can spawn */
@@ -133,9 +134,7 @@ public final class SpawnerAnimals {
 															EntityLiving var39;
 
 															try {
-																var39 = (EntityLiving) var22.entityClass
-																		.getConstructor(new Class[] { World.class })
-																		.newInstance(new Object[] { par0WorldServer });
+																var39 = (EntityLiving) var22.entityConstructor.apply(par0WorldServer);
 															} catch (Exception var31) {
 																var31.printStackTrace();
 																return var4;
@@ -213,7 +212,7 @@ public final class SpawnerAnimals {
 	 * Called during chunk generation to spawn initial creatures.
 	 */
 	public static void performWorldGenSpawning(World par0World, BiomeGenBase par1BiomeGenBase, int par2, int par3,
-			int par4, int par5, Random par6Random) {
+			int par4, int par5, EaglercraftRandom par6Random) {
 		List var7 = par1BiomeGenBase.getSpawnableList(EnumCreatureType.creature);
 
 		if (!var7.isEmpty()) {
@@ -238,8 +237,7 @@ public final class SpawnerAnimals {
 							EntityLiving var21;
 
 							try {
-								var21 = (EntityLiving) var8.entityClass.getConstructor(new Class[] { World.class })
-										.newInstance(new Object[] { par0World });
+								var21 = (EntityLiving) var8.entityConstructor.apply(par0World);
 							} catch (Exception var23) {
 								var23.printStackTrace();
 								continue;

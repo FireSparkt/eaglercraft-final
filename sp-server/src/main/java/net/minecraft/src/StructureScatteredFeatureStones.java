@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 class StructureScatteredFeatureStones extends StructurePieceBlockSelector {
 	private StructureScatteredFeatureStones() {
@@ -9,7 +9,7 @@ class StructureScatteredFeatureStones extends StructurePieceBlockSelector {
 	/**
 	 * picks Block Ids and Metadata (Silverfish)
 	 */
-	public void selectBlocks(Random par1Random, int par2, int par3, int par4, boolean par5) {
+	public void selectBlocks(EaglercraftRandom par1Random, int par2, int par3, int par4, boolean par5) {
 		if (par1Random.nextFloat() < 0.4F) {
 			this.selectedBlockId = Block.cobblestone.blockID;
 		} else {

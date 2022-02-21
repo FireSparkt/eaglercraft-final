@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenHugeTrees extends WorldGenerator {
 	/** The base height of the tree */
@@ -19,7 +19,7 @@ public class WorldGenHugeTrees extends WorldGenerator {
 		this.leavesMetadata = par4;
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		int var6 = par2Random.nextInt(3) + this.baseHeight;
 		boolean var7 = true;
 
@@ -180,7 +180,7 @@ public class WorldGenHugeTrees extends WorldGenerator {
 		}
 	}
 
-	private void growLeaves(World par1World, int par2, int par3, int par4, int par5, Random par6Random) {
+	private void growLeaves(World par1World, int par2, int par3, int par4, int par5, EaglercraftRandom par6Random) {
 		byte var7 = 2;
 
 		for (int var8 = par4 - var7; var8 <= par4; ++var8) {

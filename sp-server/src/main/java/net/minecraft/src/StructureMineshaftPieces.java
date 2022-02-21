@@ -1,7 +1,8 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class StructureMineshaftPieces {
 	/** List of contents that can generate in Mineshafts. */
@@ -18,7 +19,7 @@ public class StructureMineshaftPieces {
 			new WeightedRandomChestContent(Item.melonSeeds.itemID, 0, 2, 4, 10),
 			new WeightedRandomChestContent(Item.pumpkinSeeds.itemID, 0, 2, 4, 10) };
 
-	private static StructureComponent getRandomComponent(List par0List, Random par1Random, int par2, int par3, int par4,
+	private static StructureComponent getRandomComponent(List par0List, EaglercraftRandom par1Random, int par2, int par3, int par4,
 			int par5, int par6) {
 		int var7 = par1Random.nextInt(100);
 		StructureBoundingBox var8;
@@ -47,7 +48,7 @@ public class StructureMineshaftPieces {
 	}
 
 	private static StructureComponent getNextMineShaftComponent(StructureComponent par0StructureComponent,
-			List par1List, Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			List par1List, EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		if (par7 > 8) {
 			return null;
 		} else if (Math.abs(par3 - par0StructureComponent.getBoundingBox().minX) <= 80
@@ -66,7 +67,7 @@ public class StructureMineshaftPieces {
 	}
 
 	static StructureComponent getNextComponent(StructureComponent par0StructureComponent, List par1List,
-			Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+			EaglercraftRandom par2Random, int par3, int par4, int par5, int par6, int par7) {
 		return getNextMineShaftComponent(par0StructureComponent, par1List, par2Random, par3, par4, par5, par6, par7);
 	}
 

@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class EntityLiving extends Entity {
 	/**
@@ -276,7 +277,7 @@ public abstract class EntityLiving extends Entity {
 		return this.senses;
 	}
 
-	public Random getRNG() {
+	public EaglercraftRandom getRNG() {
 		return this.rand;
 	}
 
@@ -1923,26 +1924,13 @@ public abstract class EntityLiving extends Entity {
 		while (var1.hasNext()) {
 			Integer var2 = (Integer) var1.next();
 			PotionEffect var3 = (PotionEffect) this.activePotionsMap.get(var2);
-
-			try {
-				if (!var3.onUpdate(this)) {
-					if (!this.worldObj.isRemote) {
-						var1.remove();
-						this.onFinishedPotionEffect(var3);
-					}
-				} else if (var3.getDuration() % 600 == 0) {
-					this.onChangedPotionEffect(var3);
+			if (!var3.onUpdate(this)) {
+				if (!this.worldObj.isRemote) {
+					var1.remove();
+					this.onFinishedPotionEffect(var3);
 				}
-			} catch (Throwable var11) {
-				CrashReport var5 = CrashReport.makeCrashReport(var11, "Ticking mob effect instance");
-				CrashReportCategory var6 = var5.makeCategory("Mob effect being ticked");
-				var6.addCrashSectionCallable("Effect Name", new CallableEffectName(this, var3));
-				var6.addCrashSectionCallable("Effect ID", new CallableEffectID(this, var3));
-				var6.addCrashSectionCallable("Effect Duration", new CallableEffectDuration(this, var3));
-				var6.addCrashSectionCallable("Effect Amplifier", new CallableEffectAmplifier(this, var3));
-				var6.addCrashSectionCallable("Effect is Splash", new CallableEffectIsSplash(this, var3));
-				var6.addCrashSectionCallable("Effect is Ambient", new CallableEffectIsAmbient(this, var3));
-				throw new ReportedException(var5);
+			} else if (var3.getDuration() % 600 == 0) {
+				this.onChangedPotionEffect(var3);
 			}
 		}
 

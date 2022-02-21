@@ -3,6 +3,8 @@ package net.lax1dude.eaglercraft.sp;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class VFile {
 
@@ -14,7 +16,7 @@ public class VFile {
 			p = p.replace(altPathSeperator[i], pathSeperator);
 		}
 		if(p.startsWith(pathSeperator)) {
-			p = p.substring(pathSeperator.length());
+			p = p.substring(1);
 		}
 		if(p.endsWith(pathSeperator)) {
 			p = p.substring(0, p.length() - pathSeperator.length());
@@ -30,7 +32,7 @@ public class VFile {
 		return pth;
 	}
 	
-	private String path;
+	protected String path;
 	
 	public static String createPath(Object... p) {
 		ArrayList<String> r = new ArrayList();
@@ -136,8 +138,8 @@ public class VFile {
 		return !isRelative() && SYS.VFS.deleteFile(path);
 	}
 	
-	public boolean renameTo(String p) {
-		if(!isRelative() && SYS.VFS.renameFile(path, p)) {
+	public boolean renameTo(String p, boolean copy) {
+		if(!isRelative() && SYS.VFS.renameFile(path, p, copy)) {
 			path = p;
 			return true;
 		}
@@ -210,4 +212,16 @@ public class VFile {
 		}
 		return SYS.VFS.getFile(path).setAllBytes(bytes, copy);
 	}
+	
+	public List<String> list() {
+		if(isRelative()) {
+			return Arrays.asList(path);
+		}
+		return SYS.VFS.listFiles(path);
+	}
+	
+	public int deleteAll() {
+		return isRelative() ? 0 : SYS.VFS.deleteFiles(path);
+	}
+	
 }

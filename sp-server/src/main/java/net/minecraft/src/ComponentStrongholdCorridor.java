@@ -1,12 +1,13 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentStrongholdCorridor extends ComponentStronghold {
 	private final int field_74993_a;
 
-	public ComponentStrongholdCorridor(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentStrongholdCorridor(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1);
 		this.coordBaseMode = par4;
@@ -15,7 +16,7 @@ public class ComponentStrongholdCorridor extends ComponentStronghold {
 				: par3StructureBoundingBox.getZSize();
 	}
 
-	public static StructureBoundingBox func_74992_a(List par0List, Random par1Random, int par2, int par3, int par4,
+	public static StructureBoundingBox func_74992_a(List par0List, EaglercraftRandom par1Random, int par2, int par3, int par4,
 			int par5) {
 		StructureBoundingBox var7 = StructureBoundingBox.getComponentToAddBoundingBox(par2, par3, par4, -1, -1, 0, 5, 5,
 				4, par5);
@@ -44,7 +45,7 @@ public class ComponentStrongholdCorridor extends ComponentStronghold {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

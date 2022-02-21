@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public abstract class StructureStart {
 	/** List of all StructureComponents that are part of this structure */
@@ -21,7 +22,7 @@ public abstract class StructureStart {
 	 * Keeps iterating Structure Pieces and spawning them until the checks tell it
 	 * to stop
 	 */
-	public void generateStructure(World par1World, Random par2Random, StructureBoundingBox par3StructureBoundingBox) {
+	public void generateStructure(World par1World, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox) {
 		Iterator var4 = this.components.iterator();
 
 		while (var4.hasNext()) {
@@ -52,7 +53,7 @@ public abstract class StructureStart {
 	 * offsets the structure Bounding Boxes up to a certain height, typically 63 -
 	 * 10
 	 */
-	protected void markAvailableHeight(World par1World, Random par2Random, int par3) {
+	protected void markAvailableHeight(World par1World, EaglercraftRandom par2Random, int par3) {
 		int var4 = 63 - par3;
 		int var5 = this.boundingBox.getYSize() + 1;
 
@@ -70,7 +71,7 @@ public abstract class StructureStart {
 		}
 	}
 
-	protected void setRandomHeight(World par1World, Random par2Random, int par3, int par4) {
+	protected void setRandomHeight(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		int var5 = par4 - par3 + 1 - this.boundingBox.getYSize();
 		boolean var6 = true;
 		int var10;

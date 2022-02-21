@@ -22,7 +22,7 @@ public abstract class Packet {
 
 	/** List of the server's packet IDs. */
 	private static Set serverPacketIdList = new HashSet();
-	protected ILogAgent field_98193_m;
+	public ILogAgent field_98193_m;
 
 	/** the system time in milliseconds when this packet was created. */
 	public final long creationTimeMillis = System.currentTimeMillis();
@@ -389,8 +389,6 @@ public abstract class Packet {
 		addIdClassMapping(208, true, false, Packet208SetDisplayObjective.class);
 		addIdClassMapping(209, true, false, Packet209SetPlayerTeam.class);
 		addIdClassMapping(250, true, true, Packet250CustomPayload.class);
-		addIdClassMapping(252, true, true, Packet252SharedKey.class);
-		addIdClassMapping(253, true, false, Packet253ServerAuthData.class);
 		addIdClassMapping(254, false, true, Packet254ServerPing.class);
 		addIdClassMapping(255, true, true, Packet255KickDisconnect.class);
 	}

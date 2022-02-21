@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ChunkProviderFlat implements IChunkProvider {
 	private World worldObj;
-	private Random random;
+	private EaglercraftRandom random;
 	private final byte[] field_82700_c = new byte[256];
 	private final byte[] field_82698_d = new byte[256];
 	private final FlatGeneratorInfo field_82699_e;
@@ -20,7 +21,7 @@ public class ChunkProviderFlat implements IChunkProvider {
 
 	public ChunkProviderFlat(World par1World, long par2, boolean par4, String par5Str) {
 		this.worldObj = par1World;
-		this.random = new Random(par2);
+		this.random = new EaglercraftRandom(par2);
 		this.field_82699_e = FlatGeneratorInfo.createFlatGeneratorFromString(par5Str);
 
 		if (par4) {

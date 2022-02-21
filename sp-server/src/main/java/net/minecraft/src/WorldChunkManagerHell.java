@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldChunkManagerHell extends WorldChunkManager {
 	/** The biome generator object. */
@@ -92,7 +93,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	/**
 	 * Finds a valid position within a range, that is once of the listed biomes.
 	 */
-	public ChunkPosition findBiomePosition(int par1, int par2, int par3, List par4List, Random par5Random) {
+	public ChunkPosition findBiomePosition(int par1, int par2, int par3, List par4List, EaglercraftRandom par5Random) {
 		return par4List.contains(this.biomeGenerator)
 				? new ChunkPosition(par1 - par3 + par5Random.nextInt(par3 * 2 + 1), 0,
 						par2 - par3 + par5Random.nextInt(par3 * 2 + 1))

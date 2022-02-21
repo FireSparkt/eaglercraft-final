@@ -257,10 +257,4 @@ public class EntityFallingSand extends Entity {
 	public void setIsAnvil(boolean par1) {
 		this.isAnvil = par1;
 	}
-
-	public void func_85029_a(CrashReportCategory par1CrashReportCategory) {
-		super.func_85029_a(par1CrashReportCategory);
-		par1CrashReportCategory.addCrashSection("Immitating block ID", Integer.valueOf(this.blockID));
-		par1CrashReportCategory.addCrashSection("Immitating block data", Integer.valueOf(this.metadata));
-	}
 }

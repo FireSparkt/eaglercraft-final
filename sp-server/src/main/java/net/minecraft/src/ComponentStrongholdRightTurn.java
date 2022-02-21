@@ -1,10 +1,11 @@
 package net.minecraft.src;
 
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentStrongholdRightTurn extends ComponentStrongholdLeftTurn {
-	public ComponentStrongholdRightTurn(int par1, Random par2Random, StructureBoundingBox par3StructureBoundingBox,
+	public ComponentStrongholdRightTurn(int par1, EaglercraftRandom par2Random, StructureBoundingBox par3StructureBoundingBox,
 			int par4) {
 		super(par1, par2Random, par3StructureBoundingBox, par4);
 	}
@@ -13,7 +14,7 @@ public class ComponentStrongholdRightTurn extends ComponentStrongholdLeftTurn {
 	 * Initiates construction of the Structure Component picked, at the current
 	 * Location of StructGen
 	 */
-	public void buildComponent(StructureComponent par1StructureComponent, List par2List, Random par3Random) {
+	public void buildComponent(StructureComponent par1StructureComponent, List par2List, EaglercraftRandom par3Random) {
 		if (this.coordBaseMode != 2 && this.coordBaseMode != 3) {
 			this.getNextComponentX((ComponentStrongholdStairs2) par1StructureComponent, par2List, par3Random, 1, 1);
 		} else {
@@ -25,7 +26,7 @@ public class ComponentStrongholdRightTurn extends ComponentStrongholdLeftTurn {
 	 * second Part of Structure generating, this for example places Spiderwebs, Mob
 	 * Spawners, it closes Mineshafts at the end, it adds Fences...
 	 */
-	public boolean addComponentParts(World par1World, Random par2Random,
+	public boolean addComponentParts(World par1World, EaglercraftRandom par2Random,
 			StructureBoundingBox par3StructureBoundingBox) {
 		if (this.isLiquidInStructureBoundingBox(par1World, par3StructureBoundingBox)) {
 			return false;

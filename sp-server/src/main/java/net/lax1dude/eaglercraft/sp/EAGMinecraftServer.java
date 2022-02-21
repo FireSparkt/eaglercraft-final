@@ -1,78 +1,124 @@
 package net.lax1dude.eaglercraft.sp;
 
-import java.io.File;
 import java.io.IOException;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EnumGameType;
 import net.minecraft.src.ILogAgent;
-import net.minecraft.src.NetworkListenThread;
+import net.minecraft.src.WorldSettings;
 
 public class EAGMinecraftServer extends MinecraftServer {
+	
+	protected int difficulty;
+	protected EnumGameType gamemode;
+	protected long lastTick;
+	protected WorkerListenThread listenThreadImpl;
+	protected WorldSettings newWorldSettings;
+	protected boolean paused;
 
-	public EAGMinecraftServer(File par1File) {
-		super(par1File);
-		// TODO Auto-generated constructor stub
+	public EAGMinecraftServer(String world, String owner, WorldSettings currentWorldSettings) {
+		super(world);
+		this.setServerOwner(owner);
+		this.setConfigurationManager(new EAGPlayerList(this));
+		this.listenThreadImpl = new WorkerListenThread(this);
+		this.newWorldSettings = currentWorldSettings;
+	}
+	
+	public void setBaseServerProperties(int difficulty, EnumGameType gamemode) {
+		this.difficulty = difficulty;
+		this.gamemode = gamemode;
+	}
+	
+	public void mainLoop() {
+		if(paused) {
+			return;
+		}
+		
+		long ctm = System.currentTimeMillis();
+		long delta = ctm - lastTick;
+		
+		if (delta > 2000L && ctm - this.timeOfLastWarning >= 15000L) {
+			this.getLogAgent().func_98236_b("Can\'t keep up! Did the system time change, or is the server overloaded? Skipping " + ((delta - 2000l) / 50l) + " ticks");
+			delta = 2000L;
+			this.timeOfLastWarning = ctm;
+		}
+
+		if (delta < 0L) {
+			this.getLogAgent().func_98236_b("Time ran backwards! Did the fucking system time change?");
+			delta = 0L;
+		}
+
+		if (this.worldServers[0].areAllPlayersAsleep()) {
+			this.tick();
+			lastTick = ctm;
+		} else {
+			while (delta > 50L) {
+				delta -= 50L;
+				this.tick();
+			}
+			lastTick = System.currentTimeMillis();
+		}
+		
+	}
+	
+	public void setPaused(boolean p) {
+		paused = p;
+	}
+	
+	public boolean getPaused() {
+		return paused;
 	}
 
 	@Override
 	protected boolean startServer() throws IOException {
-		// TODO Auto-generated method stub
-		return false;
+		this.loadAllWorlds(folderName, "world", difficulty, newWorldSettings);
+		this.lastTick = System.currentTimeMillis();
+		return true;
 	}
 
 	@Override
 	public boolean canStructuresSpawn() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public EnumGameType getGameType() {
-		// TODO Auto-generated method stub
-		return null;
+		return gamemode;
 	}
 
 	@Override
 	public int getDifficulty() {
-		// TODO Auto-generated method stub
-		return 0;
+		return difficulty;
 	}
 
 	@Override
 	public boolean isHardcore() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isDedicatedServer() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isCommandBlockEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
-	public NetworkListenThread getNetworkThread() {
-		// TODO Auto-generated method stub
-		return null;
+	public WorkerListenThread getNetworkThread() {
+		return listenThreadImpl;
 	}
 
 	@Override
 	public String shareToLAN(EnumGameType var1, boolean var2) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ILogAgent getLogAgent() {
-		// TODO Auto-generated method stub
-		return null;
+		return IntegratedServer.logger;
 	}
 
 }

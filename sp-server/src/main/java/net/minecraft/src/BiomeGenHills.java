@@ -1,6 +1,6 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class BiomeGenHills extends BiomeGenBase {
 	private WorldGenerator theWorldGenerator;
@@ -10,7 +10,7 @@ public class BiomeGenHills extends BiomeGenBase {
 		this.theWorldGenerator = new WorldGenMinable(Block.silverfish.blockID, 8);
 	}
 
-	public void decorate(World par1World, Random par2Random, int par3, int par4) {
+	public void decorate(World par1World, EaglercraftRandom par2Random, int par3, int par4) {
 		super.decorate(par1World, par2Random, par3, par4);
 		int var5 = 3 + par2Random.nextInt(6);
 		int var6;

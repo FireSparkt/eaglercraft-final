@@ -2,7 +2,8 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class ComponentNetherBridgeStartPiece extends ComponentNetherBridgeCrossing3 {
 	/** Instance of StructureNetherBridgePieceWeight. */
@@ -21,7 +22,7 @@ public class ComponentNetherBridgeStartPiece extends ComponentNetherBridgeCrossi
 	public List secondaryWeights;
 	public ArrayList field_74967_d = new ArrayList();
 
-	public ComponentNetherBridgeStartPiece(Random par1Random, int par2, int par3) {
+	public ComponentNetherBridgeStartPiece(EaglercraftRandom par1Random, int par2, int par3) {
 		super(par1Random, par2, par3);
 		StructureNetherBridgePieceWeight[] var4 = StructureNetherBridgePieces.getPrimaryComponents();
 		int var5 = var4.length;

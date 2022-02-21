@@ -10,6 +10,7 @@ public class IPCPacket04RenameWorld implements IPCPacketBase {
 
 	public String worldOldName;
 	public String worldNewName;
+	public String displayName;
 	public boolean copy;
 	
 	public IPCPacket04RenameWorld() {
@@ -25,6 +26,7 @@ public class IPCPacket04RenameWorld implements IPCPacketBase {
 	public void deserialize(DataInput bin) throws IOException {
 		worldOldName = bin.readUTF();
 		worldNewName = bin.readUTF();
+		displayName = bin.readUTF();
 		copy = bin.readBoolean();
 	}
 
@@ -32,6 +34,7 @@ public class IPCPacket04RenameWorld implements IPCPacketBase {
 	public void serialize(DataOutput bin) throws IOException {
 		bin.writeUTF(worldOldName);
 		bin.writeUTF(worldNewName);
+		bin.writeUTF(displayName);
 		bin.writeBoolean(copy);
 	}
 
@@ -42,7 +45,7 @@ public class IPCPacket04RenameWorld implements IPCPacketBase {
 
 	@Override
 	public int size() {
-		return IPCPacketBase.strLen(worldOldName) + IPCPacketBase.strLen(worldNewName) + 1;
+		return IPCPacketBase.strLen(worldOldName) + IPCPacketBase.strLen(worldNewName) + IPCPacketBase.strLen(displayName) + 1;
 	}
 
 }

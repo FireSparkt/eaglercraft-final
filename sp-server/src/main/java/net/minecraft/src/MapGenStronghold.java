@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenStronghold extends MapGenStructure {
 	private BiomeGenBase[] allowedBiomeGenBases;
@@ -57,7 +58,7 @@ public class MapGenStronghold extends MapGenStructure {
 
 	protected boolean canSpawnStructureAtCoords(int par1, int par2) {
 		if (!this.ranBiomeCheck) {
-			Random var3 = new Random();
+			EaglercraftRandom var3 = new EaglercraftRandom();
 			var3.setSeed(this.worldObj.getSeed());
 			double var4 = var3.nextDouble() * Math.PI * 2.0D;
 			int var6 = 1;

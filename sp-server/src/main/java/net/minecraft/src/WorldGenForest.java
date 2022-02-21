@@ -1,13 +1,13 @@
 package net.minecraft.src;
 
-import java.util.Random;
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class WorldGenForest extends WorldGenerator {
 	public WorldGenForest(boolean par1) {
 		super(par1);
 	}
 
-	public boolean generate(World par1World, Random par2Random, int par3, int par4, int par5) {
+	public boolean generate(World par1World, EaglercraftRandom par2Random, int par3, int par4, int par5) {
 		int var6 = par2Random.nextInt(3) + 5;
 		boolean var7 = true;
 

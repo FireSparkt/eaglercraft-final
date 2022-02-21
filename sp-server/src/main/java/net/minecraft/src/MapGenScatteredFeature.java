@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+
+import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
 public class MapGenScatteredFeature extends MapGenStructure {
 	private static List biomelist = Arrays.asList(new BiomeGenBase[] { BiomeGenBase.desert, BiomeGenBase.desertHills,
@@ -25,7 +26,7 @@ public class MapGenScatteredFeature extends MapGenStructure {
 		this.scatteredFeatureSpawnList = new ArrayList();
 		this.maxDistanceBetweenScatteredFeatures = 32;
 		this.minDistanceBetweenScatteredFeatures = 8;
-		this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
+		this.scatteredFeatureSpawnList.add(new SpawnListEntry((w) -> new EntityWitch(w), 1, 1, 1));
 	}
 
 	public MapGenScatteredFeature(Map par1Map) {
@@ -57,7 +58,7 @@ public class MapGenScatteredFeature extends MapGenStructure {
 
 		int var5 = par1 / this.maxDistanceBetweenScatteredFeatures;
 		int var6 = par2 / this.maxDistanceBetweenScatteredFeatures;
-		Random var7 = this.worldObj.setRandomSeed(var5, var6, 14357617);
+		EaglercraftRandom var7 = this.worldObj.setRandomSeed(var5, var6, 14357617);
 		var5 *= this.maxDistanceBetweenScatteredFeatures;
 		var6 *= this.maxDistanceBetweenScatteredFeatures;
 		var5 += var7.nextInt(this.maxDistanceBetweenScatteredFeatures - this.minDistanceBetweenScatteredFeatures);
