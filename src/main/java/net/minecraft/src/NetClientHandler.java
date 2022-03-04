@@ -12,6 +12,7 @@ import java.util.Random;
 
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.WebsocketNetworkManager;
 import net.minecraft.client.Minecraft;
 
@@ -47,6 +48,11 @@ public class NetClientHandler extends NetHandler {
 
 	/** RNG. */
 	Random rand = new Random();
+
+	public NetClientHandler(Minecraft par1Minecraft, String channel) throws IOException {
+		this.mc = par1Minecraft;
+		this.netManager = IntegratedServer.openConnection(channel, this);
+	}
 
 	public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3) throws IOException {
 		this.mc = par1Minecraft;
@@ -454,7 +460,7 @@ public class NetClientHandler extends NetHandler {
 		this.disconnected = true;
 		this.mc.loadWorld((WorldClient) null);
 
-		this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
+		this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
 
 	}
 
@@ -463,7 +469,7 @@ public class NetClientHandler extends NetHandler {
 			this.disconnected = true;
 			this.mc.loadWorld((WorldClient) null);
 
-			this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", par1Str, par2ArrayOfObj));
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", par1Str, par2ArrayOfObj));
 		}
 	}
 

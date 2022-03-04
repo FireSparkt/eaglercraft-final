@@ -47,12 +47,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	protected final ICommandManager commandManager;
 	public final Profiler theProfiler = new Profiler();
 
-	/** The server's hostname. */
-	protected String hostname;
-
-	/** The server's port. */
-	protected int serverPort = -1;
-
 	/** The server world instances. */
 	public WorldServer[] worldServers;
 
@@ -79,9 +73,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 
 	/** The percentage of the current task finished so far. */
 	protected int percentDone;
-
-	/** True if the server is in online mode. */
-	protected boolean onlineMode;
 
 	/** True if the server has animals turned on. */
 	protected boolean canSpawnAnimals;
@@ -114,8 +105,6 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	/** Username of the server owner (for integrated servers) */
 	protected String serverOwner;
 	protected String folderName;
-	protected boolean isDemo;
-	protected boolean enableBonusChest;
 
 	/**
 	 * If true, there is no need to save chunks or stop the server, because that is
@@ -164,26 +153,21 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		this.userMessage = par1Str;
 	}
 
-	protected void loadAllWorlds(String par1Str, String par2Str, long par3, WorldSettings par5WorldType) {
-		this.convertMapIfNeeded(par1Str);
+	protected void loadAllWorlds(String par1Str, long par3, WorldSettings par5WorldType) {
 		this.setUserMessage("menu.loadingLevel");
 		this.worldServers = new WorldServer[3];
 		this.timeOfLastDimensionTick = new long[this.worldServers.length][100];
-		ISaveHandler var7 = new VFSSaveHandler(new VFile(par1Str));
+		ISaveHandler var7 = new VFSSaveHandler(new VFile("worlds", par1Str));
 		WorldInfo var9 = var7.loadWorldInfo();
 		WorldSettings var8;
 
 		if (var9 == null) {
 			if(par5WorldType == null) {
-				throw new IllegalArgumentException("World '" + par1Str + "/" + par2Str + "' does not exist and WorldSettings is null");
+				throw new IllegalArgumentException("World '" + par1Str + "' does not exist and WorldSettings is null");
 			}
 			var8 = par5WorldType;
 		} else {
 			var8 = new WorldSettings(var9);
-		}
-
-		if (this.enableBonusChest) {
-			var8.enableBonusChest();
 		}
 
 		for (int var10 = 0; var10 < this.worldServers.length; ++var10) {
@@ -198,17 +182,14 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 			}
 
 			if (var10 == 0) {
-				this.worldServers[var10] = new WorldServer(this, var7, par2Str, var11, var8, this.theProfiler, this.getLogAgent());
+				this.worldServers[var10] = new WorldServer(this, var7, par1Str, var11, var8, this.theProfiler, this.getLogAgent());
 			} else {
-				this.worldServers[var10] = new WorldServerMulti(this, var7, par2Str, var11, var8, this.worldServers[0],
+				this.worldServers[var10] = new WorldServerMulti(this, var7, par1Str, var11, var8, this.worldServers[0],
 						this.theProfiler, this.getLogAgent());
 			}
 
 			this.worldServers[var10].addWorldAccess(new WorldManager(this, this.worldServers[var10]));
-
-			if (!this.isSinglePlayer()) {
-				this.worldServers[var10].getWorldInfo().setGameType(this.getGameType());
-			}
+			this.worldServers[var10].getWorldInfo().setGameType(this.getGameType());
 
 			this.serverConfigManager.setPlayerManager(this.worldServers);
 		}
@@ -225,9 +206,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		WorldServer var7 = this.worldServers[var6];
 		ChunkCoordinates var8 = var7.getSpawnPoint();
 		long var9 = System.currentTimeMillis();
+		
+		int prepareRadius = 48;
 
-		for (int var11 = -192; var11 <= 192 && this.isServerRunning(); var11 += 16) {
-			for (int var12 = -192; var12 <= 192 && this.isServerRunning(); var12 += 16) {
+		for (int var11 = -prepareRadius; var11 <= prepareRadius && this.isServerRunning(); var11 += 16) {
+			for (int var12 = -prepareRadius; var12 <= prepareRadius && this.isServerRunning(); var12 += 16) {
 				long var13 = System.currentTimeMillis();
 
 				if (var13 - var9 > 1000L) {
@@ -278,7 +261,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	/**
 	 * par1 indicates if a log message should be output.
 	 */
-	protected void saveAllWorlds(boolean par1) {
+	public void saveAllWorlds(boolean par1) {
 		if (!this.worldIsBeingDeleted) {
 			WorldServer[] var2 = this.worldServers;
 			int var3 = var2.length;
@@ -333,11 +316,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * "getHostname" is already taken, but both return the hostname.
 	 */
 	public String getServerHostname() {
-		return this.hostname;
+		return "127.1.1.1";
 	}
 
 	public void setHostname(String par1Str) {
-		this.hostname = par1Str;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	public boolean isServerRunning() {
@@ -545,14 +528,14 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Returns the server's hostname.
 	 */
 	public String getHostname() {
-		return this.hostname;
+		return this.getServerHostname();
 	}
 
 	/**
 	 * Never used, but "getServerPort" is already taken.
 	 */
 	public int getPort() {
-		return this.serverPort;
+		return this.getServerPort();
 	}
 
 	/**
@@ -609,7 +592,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Returns true if debugging is enabled, false otherwise.
 	 */
 	public boolean isDebuggingEnabled() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -629,7 +612,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	}
 
 	public String getServerModName() {
-		return "vanilla";
+		return "eaglercraft";
 	}
 
 	/**
@@ -688,7 +671,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Gets the name of this command sender (usually username, but possibly "Rcon")
 	 */
 	public String getCommandSenderName() {
-		return "Server";
+		return "Host";
 	}
 
 	public void sendChatToPlayer(String par1Str) {
@@ -699,7 +682,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Returns true if the command sender is allowed to use the given command.
 	 */
 	public boolean canCommandSenderUseCommand(int par1, String par2Str) {
-		return true;
+		return par2Str.equals(this.getServerOwner());
 	}
 
 	/**
@@ -717,11 +700,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Gets serverPort.
 	 */
 	public int getServerPort() {
-		return this.serverPort;
+		return 1;
 	}
 
 	public void setServerPort(int par1) {
-		this.serverPort = par1;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	/**
@@ -778,18 +761,18 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Gets whether this is a demo or not.
 	 */
 	public boolean isDemo() {
-		return this.isDemo;
+		return false;
 	}
 
 	/**
 	 * Sets whether this is a demo or not.
 	 */
 	public void setDemo(boolean par1) {
-		this.isDemo = par1;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	public void canCreateBonusChest(boolean par1) {
-		this.enableBonusChest = par1;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	public ISaveFormat getActiveAnvilConverter() {
@@ -818,11 +801,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	}
 
 	public String getTexturePack() {
-		return this.texturePack;
+		return null;
 	}
 
 	public void setTexturePack(String par1Str) {
-		this.texturePack = par1Str;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	/**
@@ -836,11 +819,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	public abstract boolean isDedicatedServer();
 
 	public boolean isServerInOnlineMode() {
-		return this.onlineMode;
+		return false;
 	}
 
 	public void setOnlineMode(boolean par1) {
-		this.onlineMode = par1;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	public boolean getCanSpawnAnimals() {
@@ -889,11 +872,11 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	}
 
 	public int getBuildLimit() {
-		return this.buildLimit;
+		return 256;
 	}
 
 	public void setBuildLimit(int par1) {
-		this.buildLimit = par1;
+		throw new IllegalArgumentException("variable removed");
 	}
 
 	public boolean isServerStopped() {
@@ -948,7 +931,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 * Return the spawn protection area's size.
 	 */
 	public int getSpawnProtectionSize() {
-		return 16;
+		return 0;
 	}
 
 	public boolean func_96290_a(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer) {

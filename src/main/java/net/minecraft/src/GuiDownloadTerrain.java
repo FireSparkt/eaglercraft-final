@@ -25,6 +25,10 @@ public class GuiDownloadTerrain extends GuiScreen {
 		this.buttonList.clear();
 	}
 
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+	
 	/**
 	 * Called from the main game loop to update the screen.
 	 */

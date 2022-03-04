@@ -11,7 +11,7 @@ public class EAGPlayerList extends ServerConfigurationManager {
 
 	public EAGPlayerList(MinecraftServer par1MinecraftServer) {
 		super(par1MinecraftServer);
-		this.viewDistance = 15;
+		this.viewDistance = 4;
 	}
 
 	protected void writePlayerData(EntityPlayerMP par1EntityPlayerMP) {
@@ -19,10 +19,6 @@ public class EAGPlayerList extends ServerConfigurationManager {
 			this.hostPlayerNBT = new NBTTagCompound();
 			par1EntityPlayerMP.writeToNBT(hostPlayerNBT);
 		}
-	}
-	
-	public String allowUserToConnect(String par2Str) {
-		return par2Str.equalsIgnoreCase(this.getServerInstance().getServerOwner()) ? "fuck off don't hack your friends" : super.allowUserToConnect(par2Str);
 	}
 	
 	public NBTTagCompound getHostPlayerData() {

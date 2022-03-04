@@ -6,6 +6,9 @@ public class EntityMinecartEmpty extends EntityMinecart {
 		super(par1, par2, par4, par6);
 	}
 
+	public EntityMinecartEmpty() {
+	}
+
 	/**
 	 * Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.

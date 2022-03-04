@@ -45,6 +45,9 @@ public class EntityPainting extends EntityHanging {
 		this.setDirection(par5);
 	}
 
+	public EntityPainting() {
+	}
+
 	/**
 	 * (abstract) Protected helper method to write subclass entity data to NBT.
 	 */

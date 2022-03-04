@@ -9,6 +9,9 @@ public class EntityMinecartFurnace extends EntityMinecart {
 		super(par1World, par2, par4, par6);
 	}
 
+	public EntityMinecartFurnace() {
+	}
+
 	public int getMinecartType() {
 		return 2;
 	}

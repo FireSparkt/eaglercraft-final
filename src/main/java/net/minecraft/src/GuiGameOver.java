@@ -56,7 +56,7 @@ public class GuiGameOver extends GuiScreen {
 		case 2:
 			this.mc.theWorld.sendQuittingDisconnectingPacket();
 			this.mc.loadWorld((WorldClient) null);
-			this.mc.displayGuiScreen(new GuiMainMenu());
+			this.mc.stopServerAndDisplayGuiScreen(new GuiMainMenu());
 		}
 	}
 

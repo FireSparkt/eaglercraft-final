@@ -1,12 +1,12 @@
 package net.lax1dude.eaglercraft.sp;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import net.lax1dude.eaglercraft.sp.ipc.IPCInputStream;
-import net.lax1dude.eaglercraft.sp.ipc.IPCOutputStream;
 import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0CPlayerChannel;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.INetworkManager;
@@ -15,14 +15,9 @@ import net.minecraft.src.NetLoginHandler;
 import net.minecraft.src.Packet;
 
 public class WorkerNetworkManager implements INetworkManager {
-
-	public static final IPCInputStream NET_INPUT_STREAM = new IPCInputStream();
-	public static final IPCOutputStream NET_OUTPUT_STREAM = new IPCOutputStream();
-
-	public static final DataInputStream NET_DATA_INPUT_STREAM = new DataInputStream(NET_INPUT_STREAM);
-	public static final DataOutputStream NET_DATA_OUTPUT_STREAM = new DataOutputStream(NET_OUTPUT_STREAM);
 	
 	private NetHandler theNetHandler;
+	private MinecraftServer minecraftServer;
 	private String ipcChannel;
 	private boolean isAlive;
 	private WorkerListenThread listenThread;
@@ -32,6 +27,8 @@ public class WorkerNetworkManager implements INetworkManager {
 	public WorkerNetworkManager(String ipcChannel, MinecraftServer srv, WorkerListenThread th) {
 		this.ipcChannel = ipcChannel;
 		this.theNetHandler = new NetLoginHandler(srv, this);
+		th.addPlayer(theNetHandler);
+		this.minecraftServer = srv;
 		this.isAlive = true;
 		this.listenThread = th;
 	}
@@ -39,6 +36,7 @@ public class WorkerNetworkManager implements INetworkManager {
 	@Override
 	public void setNetHandler(NetHandler var1) {
 		theNetHandler = var1;
+		listenThread.addPlayer(theNetHandler);
 	}
 
 	@Override
@@ -46,17 +44,19 @@ public class WorkerNetworkManager implements INetworkManager {
 		if(!isAlive) {
 			return;
 		}
-		NET_OUTPUT_STREAM.feedBuffer(new byte[var1.getPacketSize() + 1], "[MC]" + var1.getClass().getSimpleName());
 		try {
-			Packet.writePacket(var1, NET_DATA_OUTPUT_STREAM);
+			ByteArrayOutputStream bao = new ByteArrayOutputStream(var1.getPacketSize() + 1);
+			Packet.writePacket(var1, new DataOutputStream(bao));
+			IntegratedServer.sendPlayerPacket(ipcChannel, bao.toByteArray());
 		}catch(IOException e) {
 			System.err.println("Failed to serialize minecraft packet '" + var1.getPacketId() + "' for IPC channel 'NET|" + ipcChannel + "'");
 			e.printStackTrace();
+			return;
 		}
-		IntegratedServer.sendPlayerPacket(ipcChannel, NET_OUTPUT_STREAM.returnBuffer());
 	}
 	
 	public void addToRecieveQueue(byte[] fragment) {
+		//System.out.println("[Server][READ][QUEUE][" + ipcChannel + "]: " + fragment.length);
 		if(!isAlive) {
 			return;
 		}
@@ -70,70 +70,37 @@ public class WorkerNetworkManager implements INetworkManager {
 
 	@Override
 	public void processReadPackets() {
-		if(!isAlive) {
-			return;
-		}
-		if(frags.size() <= 0) {
-			return;
-		}
-		
-		int blockSize = 0;
-		for(byte[] pkt : frags) {
-			blockSize += pkt.length;
-		}
-
-		int idx = 0;
-		byte[] block = new byte[blockSize];
-		for(byte[] pkt : frags) {
-			System.arraycopy(pkt, 0, block, idx, pkt.length);
-			idx += pkt.length;
-		}
-		
-		LinkedList<Packet> readPackets = new LinkedList();
-		
-		NET_INPUT_STREAM.feedBuffer(block);
-		
-		while(true) {
+		while(frags.size() > 0) {
+			byte[] pktBytes = frags.remove(0);
 			try {
-				int pktId = NET_INPUT_STREAM.read();
+				ByteArrayInputStream bai = new ByteArrayInputStream(pktBytes);
+				int pktId = bai.read();
 				
 				if(pktId == -1) {
 					System.err.println("Recieved invalid '-1' packet");
-					NET_INPUT_STREAM.markIndex();
-					break;
+					continue;
 				}
 				
-				Packet pkt = Packet.getNewPacket(IntegratedServer.logger, idx);
+				Packet pkt = Packet.getNewPacket(minecraftServer.getLogAgent(), pktId);
 				
 				if(pkt == null) {
-					NET_INPUT_STREAM.markIndex();
-					break;
+					System.err.println("Recieved invalid '" + pktId + "' packet");
+					continue;
 				}
 				
-				pkt.field_98193_m = IntegratedServer.logger;
-				pkt.readPacketData(NET_DATA_INPUT_STREAM);
+				pkt.readPacketData(new DataInputStream(bai));
 				
-				readPackets.add(pkt);
+				//System.out.println("[Server][" + ipcChannel + "]: packet '" + pkt.getClass().getSimpleName() + "' recieved");
 				
-				NET_INPUT_STREAM.markIndex();
+				try {
+					pkt.processPacket(theNetHandler);
+				}catch(Throwable t) {
+					System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' on channel 'NET|" + ipcChannel + "'");
+					t.printStackTrace();
+				}
 				
 			}catch(IOException ex) {
-				// end
-				break;
-			}
-		}
-		
-		NET_INPUT_STREAM.rewindIndex();
-		
-		frags.clear();
-		frags.add(NET_INPUT_STREAM.getLeftover());
-		
-		for(Packet p : readPackets) {
-			try {
-				p.processPacket(theNetHandler);
-			}catch(Throwable t) {
-				System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(p.getPacketId()) + " class '" + p.getClass().getSimpleName() + "' on channel 'NET|" + ipcChannel + "'");
-				t.printStackTrace();
+				System.err.println("Could not deserialize a " + pktBytes.length + " byte long minecraft packet of type '" + (pktBytes.length <= 0 ? -1 : (int)(pktBytes[0] & 0xFF)) + "' on channel 'NET|" + ipcChannel + "'");
 			}
 		}
 		
@@ -149,7 +116,7 @@ public class WorkerNetworkManager implements INetworkManager {
 	}
 
 	@Override
-	public int getNumChunkDataPackets() { // why is this a thing, it limits map (the item) updates
+	public int getNumChunkDataPackets() { // why is this a thing
 		return 0;
 	}
 
@@ -160,6 +127,14 @@ public class WorkerNetworkManager implements INetworkManager {
 			IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(ipcChannel, false));
 		}
 		isAlive = false;
+	}
+	
+	public boolean equals(Object o) {
+		return (o instanceof WorkerNetworkManager) && ((WorkerNetworkManager)o).ipcChannel.equals(ipcChannel);
+	}
+	
+	public int hashCode() {
+		return ipcChannel.hashCode();
 	}
 
 }

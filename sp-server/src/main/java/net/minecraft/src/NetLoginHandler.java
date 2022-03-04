@@ -27,21 +27,31 @@ public class NetLoginHandler extends NetHandler {
 	private int loginTimer = 0;
 	private String clientUsername = null;
 	private volatile boolean field_72544_i = false;
-	
+
 	private boolean field_92079_k = false;
+
+	private int hash = 0;
+	private static int hashBase = 69696969;
 
 	public NetLoginHandler(MinecraftServer par1MinecraftServer, WorkerNetworkManager par2Socket) {
 		this.mcServer = par1MinecraftServer;
 		this.myTCPConnection = par2Socket;
+		hash = ++hashBase;
+	}
+	
+	public boolean shouldBeRemoved() {
+		return this.finishedProcessing;
 	}
 
 	/**
 	 * Logs the user in if a login packet is found, otherwise keeps processing
 	 * network packets unless the timeout has occurred.
 	 */
-	public void tryLogin() {
+	public void handlePackets() {
+		System.out.println("[Server][LOGIN][HANDLE][" + clientUsername + "]");
 		if (this.field_72544_i) {
 			this.initializePlayerConnection();
+			return;
 		}
 
 		if (this.loginTimer++ == 600) {
@@ -49,6 +59,14 @@ public class NetLoginHandler extends NetHandler {
 		} else {
 			this.myTCPConnection.processReadPackets();
 		}
+	}
+	
+	public boolean equals(Object o) {
+		return (o instanceof NetLoginHandler) && ((NetLoginHandler)o).hash == hash;
+	}
+	
+	public int hashCode() {
+		return hash;
 	}
 
 	/**
@@ -67,6 +85,7 @@ public class NetLoginHandler extends NetHandler {
 
 	public void handleClientProtocol(Packet2ClientProtocol par1Packet2ClientProtocol) {
 		this.clientUsername = par1Packet2ClientProtocol.getUsername();
+		System.out.println("[Server][HANDSHAKE][" + this.clientUsername + "]");
 
 		if (!this.clientUsername.equals(StringUtils.stripControlCodes(this.clientUsername))) {
 			this.kickUser("Invalid username!");
@@ -77,6 +96,8 @@ public class NetLoginHandler extends NetHandler {
 				} else {
 					this.kickUser("Outdated client!");
 				}
+			}else {
+				this.initializePlayerConnection();
 			}
 		}
 	}
@@ -111,6 +132,8 @@ public class NetLoginHandler extends NetHandler {
 
 			if (var2 != null) {
 				this.mcServer.getConfigurationManager().initializeConnectionToPlayer(this.myTCPConnection, var2);
+			}else {
+				this.kickUser("Could not construct EntityPlayerMP for '" + var1 + "'");
 			}
 		}
 
@@ -169,7 +192,7 @@ public class NetLoginHandler extends NetHandler {
 	}
 
 	public String getUsernameAndAddress() {
-		return this.clientUsername + " [EAG]";
+		return this.clientUsername + "[EAG]";
 	}
 
 	/**

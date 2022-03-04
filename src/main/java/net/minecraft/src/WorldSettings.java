@@ -103,6 +103,13 @@ public final class WorldSettings {
 	public boolean areCommandsAllowed() {
 		return this.commandsAllowed;
 	}
+	
+	/**
+	 * for eaglercraft IPC
+	 */
+	public int getIPCGamemode() {
+		return this.hardcoreEnabled ? 2 : (this.getGameType().isCreative() ? 1 : 0);
+	}
 
 	/**
 	 * Gets the GameType by ID

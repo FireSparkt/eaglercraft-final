@@ -49,13 +49,24 @@ public class NetServerHandler extends NetHandler {
 	/** is true when the player has moved since his last movement packet */
 	private boolean hasMoved = true;
 	private IntHashMap field_72586_s = new IntHashMap();
+	private int hash = 0;
+	private static int hashCounter = 0;
 
 	public NetServerHandler(MinecraftServer par1, INetworkManager par2, EntityPlayerMP par3) {
 		this.mcServer = par1;
 		this.netManager = par2;
-		par2.setNetHandler(this);
 		this.playerEntity = par3;
 		par3.playerNetServerHandler = this;
+		System.out.println("made nethandlerserver for '" + par3.username + "'");
+		par2.setNetHandler(this);
+	}
+	
+	public boolean equals(Object o) {
+		return (o instanceof NetServerHandler) && ((NetServerHandler)o).hash == hash;
+	}
+	
+	public int hashCode() {
+		return hash;
 	}
 
 	/**
@@ -85,6 +96,10 @@ public class NetServerHandler extends NetHandler {
 
 		this.mcServer.theProfiler.endStartSection("playerTick");
 		this.mcServer.theProfiler.endSection();
+	}
+	
+	public boolean shouldBeRemoved() {
+		return connectionClosed;
 	}
 
 	/**

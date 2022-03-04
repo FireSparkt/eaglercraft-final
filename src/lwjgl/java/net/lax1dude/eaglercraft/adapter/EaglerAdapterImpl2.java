@@ -57,6 +57,7 @@ import org.lwjgl.util.glu.GLU;
 import de.cuina.fireandfuel.CodecJLayerMP3;
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
+import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.adapter.lwjgl.GameWindowListener;
 import net.minecraft.src.MathHelper;
 import paulscode.sound.SoundSystem;
@@ -1175,4 +1176,36 @@ public class EaglerAdapterImpl2 {
 		return appendbuffer;
 	}
 
+	public static final boolean isIntegratedServerAvailable() {
+		return true; //TODO: change to false
+	}
+	
+	public static final void beginLoadingIntegratedServer() {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
+	public static final boolean isIntegratedServerAlive() {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
+	public static final void terminateIntegratedServer() {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+
+	public static final void enableChannel(String channel) {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+
+	public static final void disableChannel(String channel) {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
+	public static final void sendToIntegratedServer(String channel, byte[] pkt) {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
+	public static final PKT recieveFromIntegratedServer(String channel, byte[] pkt) {
+		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
 }

@@ -44,7 +44,7 @@ public class GuiIngameMenu extends GuiScreen {
 			par1GuiButton.enabled = false;
 			this.mc.theWorld.sendQuittingDisconnectingPacket();
 			this.mc.loadWorld((WorldClient) null);
-			this.mc.displayGuiScreen(new GuiMainMenu());
+			this.mc.stopServerAndDisplayGuiScreen(new GuiMainMenu());
 
 		case 2:
 		case 3:

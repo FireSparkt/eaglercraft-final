@@ -3,16 +3,19 @@ package net.minecraft.src;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class EntityList {
 	/** Provides a mapping between entity classes and a string */
 	private static Map stringToClassMapping = new HashMap();
+	private static Map stringToClassReflectMapping = new HashMap();
 
 	/** Provides a mapping between a string and an entity classes */
 	private static Map classToStringMapping = new HashMap();
 
 	/** provides a mapping between an entityID and an Entity Class */
 	private static Map IDtoClassMapping = new HashMap();
+	private static Map IDtoClassReflectMapping = new HashMap();
 
 	/** provides a mapping between an Entity Class and an entity ID */
 	private static Map classToIDMapping = new HashMap();
@@ -27,10 +30,12 @@ public class EntityList {
 	 * adds a mapping between Entity classes and both a string representation and an
 	 * ID
 	 */
-	private static void addMapping(Class par0Class, String par1Str, int par2) {
-		stringToClassMapping.put(par1Str, par0Class);
+	private static void addMapping(Class par0Class, Supplier<Entity> constructor, String par1Str, int par2) {
+		stringToClassMapping.put(par1Str, constructor);
+		stringToClassReflectMapping.put(par1Str, par0Class);
 		classToStringMapping.put(par0Class, par1Str);
-		IDtoClassMapping.put(Integer.valueOf(par2), par0Class);
+		IDtoClassMapping.put(Integer.valueOf(par2), constructor);
+		IDtoClassReflectMapping.put(Integer.valueOf(par2), par0Class);
 		classToIDMapping.put(par0Class, Integer.valueOf(par2));
 		stringToIDMapping.put(par1Str, Integer.valueOf(par2));
 	}
@@ -38,8 +43,8 @@ public class EntityList {
 	/**
 	 * Adds a entity mapping with egg info.
 	 */
-	private static void addMapping(Class par0Class, String par1Str, int par2, int par3, int par4) {
-		addMapping(par0Class, par1Str, par2);
+	private static void addMapping(Class par0Class, Supplier<Entity> constructor, String par1Str, int par2, int par3, int par4) {
+		addMapping(par0Class, constructor, par1Str, par2);
 		entityEggs.put(Integer.valueOf(par2), new EntityEggInfo(par2, par3, par4));
 	}
 
@@ -48,18 +53,18 @@ public class EntityList {
 	 */
 	public static Entity createEntityByName(String par0Str, World par1World) {
 		Entity var2 = null;
-		Class var3 = (Class) stringToClassMapping.get(par0Str);
 
-		if (var3 != null) {
-			try {
-				var2 = (Entity) var3.getConstructor(new Class[] { World.class }).newInstance(new Object[] { par1World });
-			} catch (Exception var4) {
-				try {
-					var2 = (Entity) var3.getConstructor(new Class[0]).newInstance(new Object[0]);
-				} catch (Exception e) {
-					e.printStackTrace();
+		try {
+			Supplier<Entity> var3 = (Supplier<Entity>) stringToClassMapping.get(par0Str);
+
+			if (var3 != null) {
+				var2 = var3.get();
+				if(par1World != null) {
+					var2.setWorld(par1World);
 				}
 			}
+		} catch (Exception var4) {
+			var4.printStackTrace();
 		}
 
 		return var2;
@@ -89,10 +94,13 @@ public class EntityList {
 		}
 
 		try {
-			Class var3 = (Class) stringToClassMapping.get(par0NBTTagCompound.getString("id"));
+			Supplier<Entity> var3 = (Supplier<Entity>) stringToClassMapping.get(par0NBTTagCompound.getString("id"));
 
 			if (var3 != null) {
-				var2 = (Entity) var3.getConstructor(new Class[] { World.class }).newInstance(new Object[] { par1World });
+				var2 = var3.get();
+				if(par1World != null) {
+					var2.setWorld(par1World);
+				}
 			}
 		} catch (Exception var4) {
 			var4.printStackTrace();
@@ -114,10 +122,13 @@ public class EntityList {
 		Entity var2 = null;
 
 		try {
-			Class var3 = getClassFromID(par0);
+			Supplier<Entity> var3 = (Supplier<Entity>) IDtoClassMapping.get(par0);
 
 			if (var3 != null) {
-				var2 = (Entity) var3.newInstance();
+				var2 = var3.get();
+				if(par1World != null) {
+					var2.setWorld(par1World);
+				}
 			}
 		} catch (Exception var4) {
 			var4.printStackTrace();
@@ -125,8 +136,6 @@ public class EntityList {
 
 		if (var2 == null) {
 			System.err.println("Skipping Entity with id " + par0);
-		}else {
-			var2.setWorld(par1World);
 		}
 
 		return var2;
@@ -144,7 +153,7 @@ public class EntityList {
 	 * Return the class assigned to this entity ID.
 	 */
 	public static Class getClassFromID(int par0) {
-		return (Class) IDtoClassMapping.get(Integer.valueOf(par0));
+		return (Class) IDtoClassReflectMapping.get(Integer.valueOf(par0));
 	}
 
 	/**
@@ -163,58 +172,58 @@ public class EntityList {
 	}
 
 	static {
-		addMapping(EntityItem.class, "Item", 1);
-		addMapping(EntityXPOrb.class, "XPOrb", 2);
-		addMapping(EntityPainting.class, "Painting", 9);
-		addMapping(EntityArrow.class, "Arrow", 10);
-		addMapping(EntitySnowball.class, "Snowball", 11);
-		addMapping(EntityLargeFireball.class, "Fireball", 12);
-		addMapping(EntitySmallFireball.class, "SmallFireball", 13);
-		addMapping(EntityEnderPearl.class, "ThrownEnderpearl", 14);
-		addMapping(EntityEnderEye.class, "EyeOfEnderSignal", 15);
-		addMapping(EntityPotion.class, "ThrownPotion", 16);
-		addMapping(EntityExpBottle.class, "ThrownExpBottle", 17);
-		addMapping(EntityItemFrame.class, "ItemFrame", 18);
-		addMapping(EntityWitherSkull.class, "WitherSkull", 19);
-		addMapping(EntityTNTPrimed.class, "PrimedTnt", 20);
-		addMapping(EntityFallingSand.class, "FallingSand", 21);
-		addMapping(EntityFireworkRocket.class, "FireworksRocketEntity", 22);
-		addMapping(EntityBoat.class, "Boat", 41);
-		addMapping(EntityMinecartEmpty.class, "MinecartRideable", 42);
-		addMapping(EntityMinecartChest.class, "MinecartChest", 43);
-		addMapping(EntityMinecartFurnace.class, "MinecartFurnace", 44);
-		addMapping(EntityMinecartTNT.class, "MinecartTNT", 45);
-		addMapping(EntityMinecartHopper.class, "MinecartHopper", 46);
-		addMapping(EntityMinecartMobSpawner.class, "MinecartSpawner", 47);
-		addMapping(EntityLiving.class, "Mob", 48);
-		addMapping(EntityMob.class, "Monster", 49);
-		addMapping(EntityCreeper.class, "Creeper", 50, 894731, 0);
-		addMapping(EntitySkeleton.class, "Skeleton", 51, 12698049, 4802889);
-		addMapping(EntitySpider.class, "Spider", 52, 3419431, 11013646);
-		addMapping(EntityZombie.class, "Zombie", 54, 44975, 7969893);
-		addMapping(EntitySlime.class, "Slime", 55, 5349438, 8306542);
-		addMapping(EntityGhast.class, "Ghast", 56, 16382457, 12369084);
-		addMapping(EntityPigZombie.class, "PigZombie", 57, 15373203, 5009705);
-		addMapping(EntityEnderman.class, "Enderman", 58, 1447446, 0);
-		addMapping(EntityCaveSpider.class, "CaveSpider", 59, 803406, 11013646);
-		addMapping(EntitySilverfish.class, "Silverfish", 60, 7237230, 3158064);
-		addMapping(EntityBlaze.class, "Blaze", 61, 16167425, 16775294);
-		addMapping(EntityMagmaCube.class, "LavaSlime", 62, 3407872, 16579584);
-		addMapping(EntityDragon.class, "EnderDragon", 63);
-		addMapping(EntityWither.class, "WitherBoss", 64);
-		addMapping(EntityBat.class, "Bat", 65, 4996656, 986895);
-		addMapping(EntityWitch.class, "Witch", 66, 3407872, 5349438);
-		addMapping(EntityPig.class, "Pig", 90, 15771042, 14377823);
-		addMapping(EntitySheep.class, "Sheep", 91, 15198183, 16758197);
-		addMapping(EntityCow.class, "Cow", 92, 4470310, 10592673);
-		addMapping(EntityChicken.class, "Chicken", 93, 10592673, 16711680);
-		addMapping(EntitySquid.class, "Squid", 94, 2243405, 7375001);
-		addMapping(EntityWolf.class, "Wolf", 95, 14144467, 13545366);
-		addMapping(EntityMooshroom.class, "MushroomCow", 96, 10489616, 12040119);
-		addMapping(EntitySnowman.class, "SnowMan", 97);
-		addMapping(EntityOcelot.class, "Ozelot", 98, 15720061, 5653556);
-		addMapping(EntityIronGolem.class, "VillagerGolem", 99);
-		addMapping(EntityVillager.class, "Villager", 120, 5651507, 12422002);
-		addMapping(EntityEnderCrystal.class, "EnderCrystal", 200);
+		addMapping(EntityItem.class, () -> new EntityItem(), "Item", 1);
+		addMapping(EntityXPOrb.class, () -> new EntityXPOrb(), "XPOrb", 2);
+		addMapping(EntityPainting.class, () -> new EntityPainting(), "Painting", 9);
+		addMapping(EntityArrow.class, () -> new EntityArrow(), "Arrow", 10);
+		addMapping(EntitySnowball.class, () -> new EntitySnowball(), "Snowball", 11);
+		addMapping(EntityLargeFireball.class, () -> new EntityLargeFireball(), "Fireball", 12);
+		addMapping(EntitySmallFireball.class, () -> new EntitySmallFireball(), "SmallFireball", 13);
+		addMapping(EntityEnderPearl.class, () -> new EntityEnderPearl(), "ThrownEnderpearl", 14);
+		addMapping(EntityEnderEye.class, () -> new EntityEnderEye(), "EyeOfEnderSignal", 15);
+		addMapping(EntityPotion.class, () -> new EntityPotion(), "ThrownPotion", 16);
+		addMapping(EntityExpBottle.class, () -> new EntityExpBottle(), "ThrownExpBottle", 17);
+		addMapping(EntityItemFrame.class, () -> new EntityItemFrame(), "ItemFrame", 18);
+		addMapping(EntityWitherSkull.class, () -> new EntityWitherSkull(), "WitherSkull", 19);
+		addMapping(EntityTNTPrimed.class, () -> new EntityTNTPrimed(), "PrimedTnt", 20);
+		addMapping(EntityFallingSand.class, () -> new EntityFallingSand(), "FallingSand", 21);
+		addMapping(EntityFireworkRocket.class, () -> new EntityFireworkRocket(), "FireworksRocketEntity", 22);
+		addMapping(EntityBoat.class, () -> new EntityBoat(), "Boat", 41);
+		addMapping(EntityMinecartEmpty.class, () -> new EntityMinecartEmpty(), "MinecartRideable", 42);
+		addMapping(EntityMinecartChest.class, () -> new EntityMinecartChest(), "MinecartChest", 43);
+		addMapping(EntityMinecartFurnace.class, () -> new EntityMinecartFurnace(), "MinecartFurnace", 44);
+		addMapping(EntityMinecartTNT.class, () -> new EntityMinecartTNT(), "MinecartTNT", 45);
+		addMapping(EntityMinecartHopper.class, () -> new EntityMinecartHopper(), "MinecartHopper", 46);
+		addMapping(EntityMinecartMobSpawner.class, () -> new EntityMinecartMobSpawner(), "MinecartSpawner", 47);
+		addMapping(EntityLiving.class, null, "Mob", 48);
+		addMapping(EntityMob.class, null, "Monster", 49);
+		addMapping(EntityCreeper.class, () -> new EntityCreeper(), "Creeper", 50, 894731, 0);
+		addMapping(EntitySkeleton.class, () -> new EntitySkeleton(), "Skeleton", 51, 12698049, 4802889);
+		addMapping(EntitySpider.class, () -> new EntitySpider(), "Spider", 52, 3419431, 11013646);
+		addMapping(EntityZombie.class, () -> new EntityZombie(), "Zombie", 54, 44975, 7969893);
+		addMapping(EntitySlime.class, () -> new EntitySlime(), "Slime", 55, 5349438, 8306542);
+		addMapping(EntityGhast.class, () -> new EntityGhast(), "Ghast", 56, 16382457, 12369084);
+		addMapping(EntityPigZombie.class, () -> new EntityPigZombie(), "PigZombie", 57, 15373203, 5009705);
+		addMapping(EntityEnderman.class, () -> new EntityEnderman(), "Enderman", 58, 1447446, 0);
+		addMapping(EntityCaveSpider.class, () -> new EntityCaveSpider(), "CaveSpider", 59, 803406, 11013646);
+		addMapping(EntitySilverfish.class, () -> new EntitySilverfish(), "Silverfish", 60, 7237230, 3158064);
+		addMapping(EntityBlaze.class, () -> new EntityBlaze(), "Blaze", 61, 16167425, 16775294);
+		addMapping(EntityMagmaCube.class, () -> new EntityMagmaCube(), "LavaSlime", 62, 3407872, 16579584);
+		addMapping(EntityDragon.class, () -> new EntityDragon(), "EnderDragon", 63);
+		addMapping(EntityWither.class, () -> new EntityWither(), "WitherBoss", 64);
+		addMapping(EntityBat.class, () -> new EntityBat(), "Bat", 65, 4996656, 986895);
+		addMapping(EntityWitch.class, () -> new EntityWitch(), "Witch", 66, 3407872, 5349438);
+		addMapping(EntityPig.class, () -> new EntityPig(), "Pig", 90, 15771042, 14377823);
+		addMapping(EntitySheep.class, () -> new EntitySheep(), "Sheep", 91, 15198183, 16758197);
+		addMapping(EntityCow.class, () -> new EntityCow(), "Cow", 92, 4470310, 10592673);
+		addMapping(EntityChicken.class, () -> new EntityChicken(), "Chicken", 93, 10592673, 16711680);
+		addMapping(EntitySquid.class, () -> new EntitySquid(), "Squid", 94, 2243405, 7375001);
+		addMapping(EntityWolf.class, () -> new EntityWolf(), "Wolf", 95, 14144467, 13545366);
+		addMapping(EntityMooshroom.class, () -> new EntityMooshroom(), "MushroomCow", 96, 10489616, 12040119);
+		addMapping(EntitySnowman.class, () -> new EntitySnowman(), "SnowMan", 97);
+		addMapping(EntityOcelot.class, () -> new EntityOcelot(), "Ozelot", 98, 15720061, 5653556);
+		addMapping(EntityIronGolem.class, () -> new EntityIronGolem(), "VillagerGolem", 99);
+		addMapping(EntityVillager.class, () -> new EntityVillager(), "Villager", 120, 5651507, 12422002);
+		addMapping(EntityEnderCrystal.class, () -> new EntityEnderCrystal(), "EnderCrystal", 200);
 	}
 }

@@ -12,6 +12,13 @@ public abstract class NetHandler {
 	 */
 	public void handleMapChunk(Packet51MapChunk par1Packet51MapChunk) {
 	}
+	
+	public void handlePackets() {
+	}
+	
+	public boolean shouldBeRemoved() {
+		return true;
+	}
 
 	/**
 	 * Default handler called for packets that don't have their own handlers in

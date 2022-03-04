@@ -2,8 +2,10 @@ package net.minecraft.src;
 
 public class GuiScreenChatOptions extends GuiScreen {
 	/** An array of all EnumOptions which are to do with chat. */
-	private static final EnumOptions[] allScreenChatOptions = new EnumOptions[] { EnumOptions.CHAT_VISIBILITY, EnumOptions.CHAT_COLOR, EnumOptions.CHAT_LINKS, EnumOptions.CHAT_OPACITY, EnumOptions.CHAT_LINKS_PROMPT, EnumOptions.CHAT_SCALE,
-			EnumOptions.CHAT_HEIGHT_FOCUSED, EnumOptions.CHAT_HEIGHT_UNFOCUSED, EnumOptions.CHAT_WIDTH };
+	private static final EnumOptions[] allScreenChatOptions = new EnumOptions[] { EnumOptions.CHAT_VISIBILITY,
+			EnumOptions.CHAT_COLOR, EnumOptions.CHAT_LINKS, EnumOptions.CHAT_OPACITY, EnumOptions.CHAT_LINKS_PROMPT,
+			EnumOptions.CHAT_SCALE, EnumOptions.CHAT_HEIGHT_FOCUSED, EnumOptions.CHAT_HEIGHT_UNFOCUSED,
+			EnumOptions.CHAT_WIDTH };
 	private static final EnumOptions[] allMultiplayerOptions = new EnumOptions[] { EnumOptions.SHOW_CAPE };
 
 	/** Instance of GuiScreen. */
@@ -37,9 +39,12 @@ public class GuiScreenChatOptions extends GuiScreen {
 			var6 = var3[var5];
 
 			if (var6.getEnumFloat()) {
-				this.buttonList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6), this.theSettings.getOptionFloatValue(var6)));
+				this.buttonList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160,
+						this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6),
+						this.theSettings.getOptionFloatValue(var6)));
 			} else {
-				this.buttonList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6)));
+				this.buttonList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160,
+						this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6)));
 			}
 
 			++var2;
@@ -58,15 +63,19 @@ public class GuiScreenChatOptions extends GuiScreen {
 			var6 = var3[var5];
 
 			if (var6.getEnumFloat()) {
-				this.buttonList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6), this.theSettings.getOptionFloatValue(var6)));
+				this.buttonList.add(new GuiSlider(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160,
+						this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6),
+						this.theSettings.getOptionFloatValue(var6)));
 			} else {
-				this.buttonList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160, this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6)));
+				this.buttonList.add(new GuiSmallButton(var6.returnEnumOrdinal(), this.width / 2 - 155 + var2 % 2 * 160,
+						this.height / 6 + 24 * (var2 >> 1), var6, this.theSettings.getKeyBinding(var6)));
 			}
 
 			++var2;
 		}
 
-		this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, var1.translateKey("gui.done")));
+		this.buttonList
+				.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, var1.translateKey("gui.done")));
 	}
 
 	/**
@@ -77,7 +86,8 @@ public class GuiScreenChatOptions extends GuiScreen {
 		if (par1GuiButton.enabled) {
 			if (par1GuiButton.id < 100 && par1GuiButton instanceof GuiSmallButton) {
 				this.theSettings.setOptionValue(((GuiSmallButton) par1GuiButton).returnEnumOptions(), 1);
-				par1GuiButton.displayString = this.theSettings.getKeyBinding(EnumOptions.getEnumOptions(par1GuiButton.id));
+				par1GuiButton.displayString = this.theSettings
+						.getKeyBinding(EnumOptions.getEnumOptions(par1GuiButton.id));
 			}
 
 			if (par1GuiButton.id == 200) {
@@ -93,7 +103,8 @@ public class GuiScreenChatOptions extends GuiScreen {
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, this.theChatOptions, this.width / 2, 20, 16777215);
-		this.drawCenteredString(this.fontRenderer, this.field_82268_n, this.width / 2, this.field_82269_o + 7, 16777215);
+		this.drawCenteredString(this.fontRenderer, this.field_82268_n, this.width / 2, this.field_82269_o + 7,
+				16777215);
 		super.drawScreen(par1, par2, par3);
 	}
 }

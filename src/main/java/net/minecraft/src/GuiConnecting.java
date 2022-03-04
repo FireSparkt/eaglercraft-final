@@ -110,8 +110,8 @@ public class GuiConnecting extends GuiScreen {
 			if (this.clientHandler != null) {
 				this.clientHandler.disconnect();
 			}
-
-			this.mc.displayGuiScreen(this.field_98098_c);
+			
+			this.mc.stopServerAndDisplayGuiScreen(this.field_98098_c);
 		}
 	}
 
@@ -131,6 +131,10 @@ public class GuiConnecting extends GuiScreen {
 		}
 
 		super.drawScreen(par1, par2, par3);
+	}
+	
+	public boolean doesGuiPauseGame() {
+		return false;
 	}
 
 	/**

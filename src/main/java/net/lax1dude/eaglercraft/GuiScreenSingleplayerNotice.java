@@ -1,15 +1,15 @@
 package net.lax1dude.eaglercraft;
 
-import net.minecraft.src.EnumChatFormatting;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.GuiSelectWorld;
 
 public class GuiScreenSingleplayerNotice extends GuiScreen {
 
-	private GuiScreen singleplayer;
+	private GuiScreen mainmenu;
 	
-	public GuiScreenSingleplayerNotice(GuiScreen singleplayer) {
-		this.singleplayer = singleplayer;
+	public GuiScreenSingleplayerNotice(GuiScreen mainmenu) {
+		this.mainmenu = mainmenu;
 	}
 	
 	public void initGui() {
@@ -39,7 +39,8 @@ public class GuiScreenSingleplayerNotice extends GuiScreen {
 
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if(par1GuiButton.id == 0) {
-			this.mc.displayGuiScreen(singleplayer);
+			IntegratedServer.begin();
+			this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(new GuiSelectWorld(mainmenu), "starting up integrated server", () -> IntegratedServer.isReady()));
 		}
 	}
 	

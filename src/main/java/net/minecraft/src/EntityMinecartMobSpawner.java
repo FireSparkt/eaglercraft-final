@@ -7,6 +7,9 @@ public class EntityMinecartMobSpawner extends EntityMinecart {
 		super(par1World, par2, par4, par6);
 	}
 
+	public EntityMinecartMobSpawner() {
+	}
+
 	public int getMinecartType() {
 		return 4;
 	}

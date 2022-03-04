@@ -557,8 +557,9 @@ public class VirtualFilesystem {
 				@Override
 				public void handleEvent() {
 					IDBCursor c = r.getResult();
-					if(c == null) {
+					if(c == null || c.getKey() == null) {
 						cb.complete(res[0]);
+						return;
 					}
 					String k = readKey(c.getKey());
 					if(k != null) {
@@ -593,8 +594,9 @@ public class VirtualFilesystem {
 				@Override
 				public void handleEvent() {
 					IDBCursor c = r.getResult();
-					if(c == null) {
+					if(c == null || c.getKey() == null) {
 						cb.complete(res[0]);
+						return;
 					}
 					String k = readKey(c.getKey());
 					if(k != null) {

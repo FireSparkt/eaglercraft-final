@@ -2,14 +2,16 @@ package net.lax1dude.eaglercraft.sp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.NetServerHandler;
+import net.minecraft.src.NetHandler;
 
 public class WorkerListenThread {
 	/** Reference to the MinecraftServer object. */
 	private final MinecraftServer mcServer;
-	private final List connections = new ArrayList();
+	private final HashSet connections = new HashSet();
 	private final HashMap<String, WorkerNetworkManager> channels = new HashMap();
 
 	/** Whether the network listener object is listening. */
@@ -23,7 +25,8 @@ public class WorkerListenThread {
 	/**
 	 * adds this connection to the list of currently connected players
 	 */
-	public void addPlayer(NetServerHandler par1NetServerHandler) {
+	public void addPlayer(NetHandler par1NetServerHandler) {
+		System.out.println("[Server][ADDPLAYER][" + par1NetServerHandler.getClass().getSimpleName() + "]");
 		this.connections.add(par1NetServerHandler);
 	}
 
@@ -32,6 +35,7 @@ public class WorkerListenThread {
 	}
 	
 	public boolean openChannel(String player) {
+		System.out.println("[Server][OPENCHANNEL][" + player + "]");
 		return channels.put(player, new WorkerNetworkManager(player, mcServer, this)) == null;
 	}
 	
@@ -44,26 +48,39 @@ public class WorkerListenThread {
 	}
 	
 	public boolean closeChannel(String player) {
+		System.out.println("[Server][CLOSECHANNEL][" + player + "]");
 		WorkerNetworkManager channel = channels.get(player);
 		if(channel == null) {
 			return false;
 		}
-		channel.networkShutdown(null, null, null);
 		channels.remove(player);
+		channel.networkShutdown(null, null, null);
 		return true;
+	}
+	
+	private void deleteDeadConnections() {
+		Iterator<NetHandler> itr = this.connections.iterator();
+		while(itr.hasNext()) {
+			if(((NetHandler)itr.next()).shouldBeRemoved()) {
+				itr.remove();
+				//System.out.println("[Client][REMOVEDEAD]");
+			}
+		}
 	}
 
 	/**
 	 * Handles all incoming connections and packets
 	 */
 	public void handleNetworkListenThread() {
-		for(WorkerNetworkManager mgr : channels.values()) {
-			mgr.processReadPackets();
-		}
-		for (int var1 = 0; var1 < this.connections.size(); ++var1) {
-			NetServerHandler var2 = (NetServerHandler) this.connections.get(var1);
+		
+		deleteDeadConnections();
+		
+		for (NetHandler var2 : (HashSet<NetHandler>)this.connections) {
 			var2.handlePackets();
 		}
+		
+		deleteDeadConnections();
+		
 	}
 
 	public MinecraftServer getServer() {

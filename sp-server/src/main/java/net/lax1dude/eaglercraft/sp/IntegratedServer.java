@@ -1,6 +1,8 @@
 package net.lax1dude.eaglercraft.sp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,7 +69,9 @@ public class IntegratedServer {
 				pkt[i] = (byte) a.get(i);
 			}
 			
-			messageQueue.add(new PKT(channel, pkt));
+			synchronized(messageQueue) {
+				messageQueue.add(new PKT(channel, pkt));
+			}
 		}
 		
 	}
@@ -85,7 +89,7 @@ public class IntegratedServer {
 	}
 	
 	private static boolean isServerStopped() {
-		return currentProcess == null || currentProcess.isServerRunning();
+		return currentProcess == null || !currentProcess.isServerRunning();
 	}
 	
 	public static void throwExceptionToClient(String msg, Throwable t) {
@@ -101,8 +105,25 @@ public class IntegratedServer {
 	}
 	
 	private static void processAsyncMessageQueue() {
-		while(messageQueue.size() > 0) {
-			PKT msg = messageQueue.remove(0);
+		ArrayList<PKT> cur;
+		synchronized(messageQueue) {
+			if(messageQueue.size() <= 0) {
+				return;
+			}
+			cur = new ArrayList<PKT>(messageQueue);
+			messageQueue.clear();
+		}
+		long watchDog = System.currentTimeMillis();
+		Iterator<PKT> itr = cur.iterator();
+		int overflow = 0;
+		while(itr.hasNext()) {
+			PKT msg = itr.next();
+			
+			if(System.currentTimeMillis() - watchDog > 150l && !msg.channel.equals("IPC")) {
+				++overflow;
+				continue;
+			}
+			
 			
 			if(msg.channel.equals("IPC")) {
 				
@@ -112,7 +133,7 @@ public class IntegratedServer {
 				}catch(IOException e) {
 					System.err.print("Failed to deserialize IPC packet: ");
 					e.printStackTrace();
-					return;
+					continue;
 				}
 				
 				int id = packet.id();
@@ -126,9 +147,33 @@ public class IntegratedServer {
 								currentProcess.stopServer();
 							}
 							
-							currentProcess = new EAGMinecraftServer("worlds/" + pkt.worldName, pkt.ownerName, newWorldSettings);
+							currentProcess = new EAGMinecraftServer(pkt.worldName, pkt.ownerName, newWorldSettings);
 							currentProcess.setBaseServerProperties(pkt.initialDifficulty, newWorldSettings == null ? EnumGameType.SURVIVAL : newWorldSettings.getGameType());
 							currentProcess.startServer();
+							
+							String[] worlds = SYS.VFS.getFile("worlds.txt").getAllLines();
+							if(worlds == null || (worlds.length == 1 && worlds[0].trim().length() <= 0)) {
+								worlds = null;
+							}
+							if(worlds == null) {
+								SYS.VFS.getFile("worlds.txt").setAllChars(pkt.worldName);
+							}else {
+								boolean found = false;
+								for(String s : worlds) {
+									if(s.equals(pkt.worldName)) {
+										found = true;
+										break;
+									}
+								}
+								if(!found) {
+									String[] s = new String[worlds.length + 1];
+									s[0] = pkt.worldName;
+									System.arraycopy(worlds, 0, s, 1, worlds.length);
+									SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", s));
+								}
+							}
+							
+							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket00StartServer.ID));
 						}
 						break;
 					case IPCPacket01StopServer.ID: {
@@ -140,8 +185,9 @@ public class IntegratedServer {
 									throwExceptionToClient("Failed to stop server!", t);
 								}
 							}else {
-								System.err.println("Client tried to stop server while it was running for some reason");
+								System.err.println("Client tried to stop server while it wasn't running for some reason");
 							}
+							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket01StopServer.ID));
 						}
 						break;
 					case IPCPacket02InitWorld.ID: {
@@ -164,6 +210,7 @@ public class IntegratedServer {
 							if(SYS.VFS.deleteFiles("worlds/" + pkt.worldName) <= 0) {
 								throwExceptionToClient("Failed to delete world!", new RuntimeException("VFS did not delete directory 'worlds/" + pkt.worldName + "' correctly"));
 							}
+							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket03DeleteWorld.ID));
 						}
 						break;
 					case IPCPacket04RenameWorld.ID: {
@@ -181,6 +228,7 @@ public class IntegratedServer {
 									throwExceptionToClient("Failed to copy/rename world!", new RuntimeException("Failed to change level.dat world '" + pkt.worldNewName + "' display name to '" + pkt.displayName + "' because level.dat was missing"));
 								}
 							}
+							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket04RenameWorld.ID));
 						}
 						break;
 					case IPCPacket05RequestData.ID:
@@ -220,7 +268,15 @@ public class IntegratedServer {
 					case IPCPacket0BPause.ID: {
 							IPCPacket0BPause pkt = (IPCPacket0BPause)packet;
 							if(!isServerStopped()) {
-								currentProcess.setPaused(pkt.pause);
+								if(!pkt.pause && !currentProcess.getPaused()) {
+									currentProcess.saveAllWorlds(true);
+								}else {
+									currentProcess.setPaused(pkt.pause);
+									if(pkt.pause) {
+										currentProcess.saveAllWorlds(true);
+									}
+								}
+								sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket0BPause.ID));
 							}else {
 								System.err.println("Client tried to " + (pkt.pause ? "pause" : "unpause") + " while server was stopped");
 							}
@@ -247,6 +303,13 @@ public class IntegratedServer {
 							IPCPacket0EListWorlds pkt = (IPCPacket0EListWorlds)packet;
 							if(isServerStopped()) {
 								String[] worlds = SYS.VFS.getFile("worlds.txt").getAllLines();
+								if(worlds == null || (worlds.length == 1 && worlds[0].trim().length() <= 0)) {
+									worlds = null;
+								}
+								if(worlds == null) {
+									sendIPCPacket(new IPCPacket16NBTList(IPCPacket16NBTList.WORLD_LIST, new LinkedList<NBTTagCompound>()));
+									break;
+								}
 								LinkedList<String> updatedList = new LinkedList();
 								LinkedList<NBTTagCompound> sendListNBT = new LinkedList();
 								boolean rewrite = false;
@@ -261,7 +324,9 @@ public class IntegratedServer {
 									}else {
 										NBTTagCompound worldDatNBT;
 										try {
-											sendListNBT.add(CompressedStreamTools.decompress(lvl.getAllBytes()));
+											worldDatNBT = CompressedStreamTools.decompress(lvl.getAllBytes());
+											worldDatNBT.setString("folderName", w);
+											sendListNBT.add(worldDatNBT);
 											updatedList.add(w);
 										}catch(IOException e) {
 											rewrite = true;
@@ -319,13 +384,17 @@ public class IntegratedServer {
 					t.printStackTrace();
 				}
 				
-				return;
+				continue;
 			}else if(msg.channel.startsWith("NET|")) {
 				String u = msg.channel.substring(4);
 				currentProcess.getNetworkThread().recievePacket(u, msg.data);
+				continue;
 			}
 				
 			System.err.println("Unknown IPC channel: " + msg.channel);
+		}
+		if(overflow > 0) {
+			System.err.println("Async ICP queue is overloaded, server dropped " + overflow + " player packets");
 		}
 	}
 	
@@ -350,6 +419,7 @@ public class IntegratedServer {
 	}
 	
 	public static void sendPlayerPacket(String channel, byte[] buf) {
+		//System.out.println("[Server][SEND][" + channel + "]: " + buf.length);
 		ArrayBuffer arb = ArrayBuffer.create(buf.length);
 		Uint8Array ar = Uint8Array.create(arb);
 		ar.set(buf);
@@ -389,7 +459,7 @@ public class IntegratedServer {
 		
 		isRunning = true;
 		
-		sendIPCPacket(new IPCPacketFFProcessKeepAlive());
+		sendIPCPacket(new IPCPacketFFProcessKeepAlive(0xFF));
 		
 		while(isRunning) {
 			

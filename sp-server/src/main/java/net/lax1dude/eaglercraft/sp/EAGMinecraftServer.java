@@ -19,18 +19,22 @@ public class EAGMinecraftServer extends MinecraftServer {
 	public EAGMinecraftServer(String world, String owner, WorldSettings currentWorldSettings) {
 		super(world);
 		this.setServerOwner(owner);
+		System.out.println("server owner: " + owner);
 		this.setConfigurationManager(new EAGPlayerList(this));
 		this.listenThreadImpl = new WorkerListenThread(this);
 		this.newWorldSettings = currentWorldSettings;
+		this.paused = false;
 	}
 	
 	public void setBaseServerProperties(int difficulty, EnumGameType gamemode) {
 		this.difficulty = difficulty;
 		this.gamemode = gamemode;
+		this.setCanSpawnAnimals(true);
+		this.setCanSpawnNPCs(true);
 	}
 	
 	public void mainLoop() {
-		if(paused) {
+		if(paused && this.playersOnline.size() <= 1) {
 			return;
 		}
 		
@@ -50,19 +54,31 @@ public class EAGMinecraftServer extends MinecraftServer {
 
 		if (this.worldServers[0].areAllPlayersAsleep()) {
 			this.tick();
-			lastTick = ctm;
+			lastTick = System.currentTimeMillis();
 		} else {
+			boolean mustYield = false;
 			while (delta > 50L) {
+				if(mustYield) {
+					try {
+						Thread.sleep(1l); // allow some async
+					}catch(InterruptedException e) {
+						System.err.println("you eagler");
+					}
+				}
 				delta -= 50L;
 				this.tick();
+				mustYield = true;
+				lastTick = System.currentTimeMillis();
 			}
-			lastTick = System.currentTimeMillis();
 		}
 		
 	}
 	
 	public void setPaused(boolean p) {
 		paused = p;
+		if(!p) {
+			lastTick = System.currentTimeMillis();
+		}
 	}
 	
 	public boolean getPaused() {
@@ -71,7 +87,7 @@ public class EAGMinecraftServer extends MinecraftServer {
 
 	@Override
 	protected boolean startServer() throws IOException {
-		this.loadAllWorlds(folderName, "world", difficulty, newWorldSettings);
+		this.loadAllWorlds(folderName, 0l, newWorldSettings);
 		this.lastTick = System.currentTimeMillis();
 		return true;
 	}

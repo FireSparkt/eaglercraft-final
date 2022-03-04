@@ -11,7 +11,9 @@ import net.lax1dude.eaglercraft.EaglerImage;
 
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerNotice;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
@@ -236,10 +238,19 @@ public class GuiMainMenu extends GuiScreen {
 		}
 		
 		if (par1GuiButton.id == 1) {
-			//if(!hasClickedSingleplayer) {
-				this.mc.displayGuiScreen(new GuiScreenSingleplayerNotice(this));
-			//}
-			//hasClickedSingleplayer = true;
+			if(EaglerAdapter.isIntegratedServerAvailable()) {
+				if(!hasClickedSingleplayer) {
+					this.mc.displayGuiScreen(new GuiScreenSingleplayerNotice(this));
+				}else {
+					if(!IntegratedServer.isAlive()) {
+						IntegratedServer.begin();
+						this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(new GuiSelectWorld(this), "starting up integrated server", () -> IntegratedServer.isReady()));
+					}else {
+						this.mc.displayGuiScreen(new GuiSelectWorld(this));
+					}
+				}
+				hasClickedSingleplayer = true;
+			}
 		}
 
 		if (par1GuiButton.id == 5) {

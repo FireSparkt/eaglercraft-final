@@ -60,5 +60,12 @@ public class IPCPacket15ThrowException implements IPCPacketBase {
 		}
 		return len;
 	}
+	
+	public void log() {
+		System.err.println("Integrated server exception: " + errorMessage);
+		for(String s : stackTrace) {
+			System.err.println("    at " + s);
+		}
+	}
 
 }

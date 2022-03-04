@@ -8,16 +8,18 @@ import java.nio.IntBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.ajax.ReadyStateChangeHandler;
 import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
-import org.teavm.jso.core.JSNumber;
+import org.teavm.jso.dom.events.ErrorEvent;
 import org.teavm.jso.dom.events.EventListener;
 import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MessageEvent;
@@ -48,11 +50,13 @@ import org.teavm.jso.webgl.WebGLTexture;
 import org.teavm.jso.webgl.WebGLUniformLocation;
 import org.teavm.jso.websocket.CloseEvent;
 import org.teavm.jso.websocket.WebSocket;
+import org.teavm.jso.workers.Worker;
 
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.LocalStorageManager;
+import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
 import net.minecraft.src.MathHelper;
@@ -1567,5 +1571,125 @@ public class EaglerAdapterImpl2 {
 	private static int remapKey(int k) {
 		return (k > LWJGLKeyCodes.length || k < 0) ? -1 : LWJGLKeyCodes[k];
 	}
-
+	
+	public static final boolean isIntegratedServerAvailable() {
+		return true;
+	}
+	
+	@JSFunctor
+	private static interface WorkerBinaryPacketHandler extends JSObject {
+		public void onMessage(String channel, ArrayBuffer buf);
+	}
+	
+	private static final HashMap<String,List<PKT>> workerMessageQueue = new HashMap();
+	
+	private static Worker server = null;
+	private static boolean serverAlive = false;
+	
+	private static class WorkerBinaryPacketHandlerImpl implements WorkerBinaryPacketHandler {
+		
+		public void onMessage(String channel, ArrayBuffer buf) {
+			if(channel == null) {
+				System.err.println("Recieved IPC packet with null channel");
+				return;
+			}
+			
+			serverAlive = true;
+			synchronized(workerMessageQueue) {
+				List<PKT> existingQueue = workerMessageQueue.get(channel);
+				
+				if(existingQueue == null) {
+					System.err.println("Recieved IPC packet with unknown '" + channel + "' channel");
+					return;
+				}
+				
+				if(buf == null) {
+					System.err.println("Recieved IPC packet with null buffer");
+					return;
+				}
+				
+				Uint8Array a = Uint8Array.create(buf);
+				byte[] pkt = new byte[a.getLength()];
+				for(int i = 0; i < pkt.length; ++i) {
+					pkt[i] = (byte) a.get(i);
+				}
+				
+				existingQueue.add(new PKT(channel, pkt));
+			}
+		}
+		
+	}
+	
+	@JSBody(params = { "w", "wb" }, script = "w.onmessage = function(o) { wb(o.data.ch, o.data.dat); };")
+	private static native void registerPacketHandler(Worker w, WorkerBinaryPacketHandler wb);
+	
+	@JSBody(params = { "w", "ch", "dat" }, script = "w.postMessage({ ch: ch, dat : dat });")
+	private static native void sendWorkerPacket(Worker w, String channel, ArrayBuffer arr);
+	
+	public static final void beginLoadingIntegratedServer() {
+		if(server != null) {
+			server.terminate();
+		}
+		workerMessageQueue.put("IPC", new LinkedList<PKT>());
+		server = Worker.create("bootstrap.js");
+		server.onError(new EventListener<ErrorEvent>() {
+			@Override
+			public void handleEvent(ErrorEvent evt) {
+				System.err.println("Worker Error: " + evt.getError());
+			}
+		});
+		registerPacketHandler(server, new WorkerBinaryPacketHandlerImpl());
+	}
+	
+	public static final boolean isIntegratedServerAlive() {
+		return serverAlive && server != null;
+	}
+	
+	public static final void terminateIntegratedServer() {
+		if(server != null) {
+			server.terminate();
+			server = null;
+			serverAlive = false;
+		}
+	}
+	
+	public static final void sendToIntegratedServer(String channel, byte[] pkt) {
+		ArrayBuffer arb = ArrayBuffer.create(pkt.length);
+		Uint8Array ar = Uint8Array.create(arb);
+		ar.set(pkt);
+		sendWorkerPacket(server, channel, arb);
+		//System.out.println("[Client][WRITE][" + channel + "]: " + pkt.length);
+	}
+	
+	public static final void enableChannel(String channel) {
+		synchronized(workerMessageQueue) {
+			if(workerMessageQueue.containsKey(channel)) {
+				System.err.println("Tried to enable existing channel '" + channel + "' again");
+			}else {
+				System.out.println("[Client][ENABLE][" + channel + "]");
+				workerMessageQueue.put(channel, new LinkedList());
+			}
+		}
+	}
+	
+	public static final void disableChannel(String channel) {
+		synchronized(workerMessageQueue) {
+			if(workerMessageQueue.remove(channel) == null) {
+				System.err.println("Tried to disable unknown channel '" + channel + "'");
+			}
+			System.out.println("[Client][DISABLE][" + channel + "]");
+		}
+	}
+	
+	public static final PKT recieveFromIntegratedServer(String channel) {
+		synchronized(workerMessageQueue) {
+			List<PKT> list = workerMessageQueue.get(channel);
+			if(list == null) {
+				System.err.println("Tried to read from unknown channel '" + channel + "'");
+				return null;
+			}else {
+				return list.size() > 0 ? list.remove(0) : null;
+			}
+		}
+	}
 }

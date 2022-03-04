@@ -34,7 +34,7 @@ public class VFSSaveHandler implements ISaveHandler, IPlayerFileData {
 		
 		try {
 			NBTTagCompound level_dat = CompressedStreamTools.decompress(level_dat_bin);
-			return new WorldInfo(level_dat);
+			return new WorldInfo(level_dat.getCompoundTag("Data"));
 		}catch(Throwable t) {
 			System.err.println("Could not parse level.dat!");
 			t.printStackTrace();

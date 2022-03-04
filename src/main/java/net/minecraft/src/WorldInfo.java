@@ -484,6 +484,13 @@ public class WorldInfo {
 	public void setServerInitialized(boolean par1) {
 		this.initialized = par1;
 	}
+	
+	/**
+	 * for eaglercraft IPC
+	 */
+	public int getIPCGamemode() {
+		return this.hardcore ? 2 : (this.getGameType().isCreative() ? 1 : 0);
+	}
 
 	/**
 	 * Gets the GameRules class Instance.

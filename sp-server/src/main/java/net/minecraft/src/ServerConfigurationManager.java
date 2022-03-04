@@ -83,9 +83,9 @@ public class ServerConfigurationManager {
 		this.mcServer.getNetworkThread().addPlayer(var7);
 		var7.sendPacket(new Packet4UpdateTime(var5.getTotalWorldTime(), var5.getWorldTime()));
 
-		if (this.mcServer.getTexturePack().length() > 0) {
-			par2EntityPlayerMP.requestTexturePackLoad(this.mcServer.getTexturePack(), this.mcServer.textureSize());
-		}
+		//if (this.mcServer.getTexturePack().length() > 0) {
+		//	par2EntityPlayerMP.requestTexturePackLoad(this.mcServer.getTexturePack(), this.mcServer.textureSize());
+		//}
 
 		Iterator var8 = par2EntityPlayerMP.getActivePotionEffects().iterator();
 

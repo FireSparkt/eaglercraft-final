@@ -94,7 +94,6 @@ public class WebsocketNetworkManager implements INetworkManager {
 				stream.mark();
 				try {
 					Packet pkt = Packet.readPacket(packetStream, false);
-					//System.out.println(pkt.toString());
 					pkt.processPacket(this.netHandler);
 				} catch (EOFException e) {
 					stream.reset();

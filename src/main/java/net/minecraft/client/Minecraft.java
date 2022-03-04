@@ -10,7 +10,10 @@ import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerProfile;
 
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
@@ -487,6 +490,15 @@ public class Minecraft implements Runnable {
 				: (var0.contains("mac") ? EnumOS.MACOS
 						: (var0.contains("solaris") ? EnumOS.SOLARIS : (var0.contains("sunos") ? EnumOS.SOLARIS : (var0.contains("linux") ? EnumOS.LINUX : (var0.contains("unix") ? EnumOS.LINUX : EnumOS.UNKNOWN)))));
 	}
+	
+	public void stopServerAndDisplayGuiScreen(GuiScreen par1GuiScreen) {
+		if(IntegratedServer.isWorldRunning()) {
+			IntegratedServer.unloadWorld();
+			displayGuiScreen(new GuiScreenSingleplayerLoading(par1GuiScreen, "saving world", () -> !IntegratedServer.isWorldRunning()));
+		}else {
+			displayGuiScreen(par1GuiScreen);
+		}
+	}
 
 	/**
 	 * Sets the argument GuiScreen as the main (topmost visible) screen.
@@ -592,7 +604,7 @@ public class Minecraft implements Runnable {
 					this.runGameLoop();
 				} catch (OutOfMemoryError var10) {
 					this.freeMemory();
-					this.displayGuiScreen(new GuiMemoryErrorScreen());
+					this.stopServerAndDisplayGuiScreen(new GuiMemoryErrorScreen());
 					System.gc();
 				}
 			}
@@ -636,6 +648,8 @@ public class Minecraft implements Runnable {
 		for (int var3 = 0; var3 < this.timer.elapsedTicks; ++var3) {
 			this.runTick();
 		}
+		
+		IntegratedServer.processICP();
 
 		this.mcProfiler.endStartSection("preRenderErrors");
 		long var7 = System.nanoTime() - var6;
@@ -712,8 +726,8 @@ public class Minecraft implements Runnable {
 
 		this.checkGLError("Post render");
 		++this.fpsCounter;
-		boolean var5 = this.isGamePaused;
-		this.isGamePaused = false;
+		//boolean var5 = this.isGamePaused;
+		//this.isGamePaused = false;
 		
 		if(System.currentTimeMillis() - secondTimer > 1000l) {
 			debugFPS = fpsCounter;
@@ -955,6 +969,9 @@ public class Minecraft implements Runnable {
 	public void displayInGameMenu() {
 		if (this.currentScreen == null) {
 			this.displayGuiScreen(new GuiIngameMenu());
+			if(IntegratedServer.isWorldRunning() && !this.isSingleplayer()) {
+				IntegratedServer.autoSave();
+			}
 		}
 	}
 
@@ -1074,6 +1091,8 @@ public class Minecraft implements Runnable {
 			this.currentScreen.setWorldAndResolution(this, var4, var5);
 		}
 	}
+	
+	private boolean wasPaused = false;
 
 	/**
 	 * Runs the current tick.
@@ -1087,7 +1106,14 @@ public class Minecraft implements Runnable {
 
 		this.mcProfiler.startSection("stats");
 		this.mcProfiler.endStartSection("gui");
-
+		
+		this.isGamePaused = this.isSingleplayer() && this.theWorld != null && this.thePlayer != null && this.currentScreen != null && this.currentScreen.doesGuiPauseGame();
+		
+		if(wasPaused != isGamePaused) {
+			IntegratedServer.setPaused(this.isGamePaused);
+			wasPaused = isGamePaused;
+		}
+		
 		if (!this.isGamePaused) {
 			this.ingameGUI.updateTick();
 		}
@@ -1460,10 +1486,12 @@ public class Minecraft implements Runnable {
 			if (this.myNetworkManager != null) {
 				this.myNetworkManager.closeConnections();
 			}
+			
+			this.myNetworkManager = null;
+			
 		}
 
 		this.renderViewEntity = null;
-		this.myNetworkManager = null;
 
 		if (this.loadingScreen != null) {
 			this.loadingScreen.resetProgressAndMessage(par2Str);
@@ -1518,6 +1546,10 @@ public class Minecraft implements Runnable {
 
 		System.gc();
 		this.systemTime = 0L;
+	}
+	
+	public void setNetManager(INetworkManager nm) {
+		this.myNetworkManager = nm;
 	}
 	
 	/*
@@ -1752,7 +1784,7 @@ public class Minecraft implements Runnable {
 	}
 
 	public boolean isIntegratedServerRunning() {
-		return this.integratedServerIsRunning;
+		return IntegratedServer.isWorldRunning();
 	}
 
 	/**
@@ -1760,7 +1792,7 @@ public class Minecraft implements Runnable {
 	 * the integrated one.
 	 */
 	public boolean isSingleplayer() {
-		return false;
+		return isIntegratedServerRunning();
 	}
 	
 	/**
@@ -1779,5 +1811,13 @@ public class Minecraft implements Runnable {
 	
 	public static int getGLMaximumTextureSize() {
 		return 8192;
+	}
+
+	public void launchIntegratedServer(String folderName, String trim, WorldSettings var6) {
+		this.loadWorld((WorldClient)null);
+		
+		IntegratedServer.loadWorld(folderName, gameSettings.difficulty, var6);
+		
+		this.displayGuiScreen(new GuiScreenSingleplayerLoading(new GuiScreenSingleplayerConnecting(new GuiMainMenu(), "Connecting to " + folderName), "Loading world: " + folderName, () -> IntegratedServer.isWorldRunning()));
 	}
 }

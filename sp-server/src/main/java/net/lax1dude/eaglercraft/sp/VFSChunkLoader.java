@@ -43,7 +43,7 @@ public class VFSChunkLoader implements IChunkLoader {
 
 	@Override
 	public Chunk loadChunk(World var1, int var2, int var3) throws IOException {
-		VFile file = new VFile(chunkDirectory, getChunkPath(var2, var3), ".dat");
+		VFile file = new VFile(chunkDirectory, getChunkPath(var2, var3) + ".dat");
 		byte[] bytes = file.getAllBytes();
 		
 		if(bytes == null) {
@@ -72,7 +72,7 @@ public class VFSChunkLoader implements IChunkLoader {
 		
 		try {
 			NBTTagCompound chunkFileSave = new NBTTagCompound();
-			chunkFileSave.setCompoundTag("Level", chunkFileSave);
+			chunkFileSave.setCompoundTag("Level", chunkFile);
 			save = CompressedStreamTools.compress(chunkFileSave);
 		}catch(IOException e) {
 			System.err.println("Corrupted chunk could not be serialized: [" + var2.xPosition + ", " + var2.zPosition + "]");

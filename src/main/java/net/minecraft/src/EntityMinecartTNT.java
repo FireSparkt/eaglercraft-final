@@ -9,6 +9,9 @@ public class EntityMinecartTNT extends EntityMinecart {
 		super(par1, par2, par4, par6);
 	}
 
+	public EntityMinecartTNT() {
+	}
+
 	public int getMinecartType() {
 		return 3;
 	}

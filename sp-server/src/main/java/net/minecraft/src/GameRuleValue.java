@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.sp.NoCatchParse;
+
 class GameRuleValue {
 	private String valueString;
 	private boolean valueBoolean;
@@ -16,17 +18,17 @@ class GameRuleValue {
 	public void setValue(String par1Str) {
 		this.valueString = par1Str;
 		this.valueBoolean = Boolean.parseBoolean(par1Str);
-
-		try {
-			this.valueInteger = Integer.parseInt(par1Str);
-		} catch (NumberFormatException var4) {
-			;
+		
+		this.valueInteger = NoCatchParse.parseInt(par1Str);
+		
+		if(this.valueInteger == NoCatchParse.INT_EXCEPTION) {
+			this.valueInteger = 0;
 		}
-
-		try {
-			this.valueDouble = Double.parseDouble(par1Str);
-		} catch (NumberFormatException var3) {
-			;
+		
+		this.valueDouble = NoCatchParse.parseDouble(par1Str);
+		
+		if(this.valueDouble == NoCatchParse.DOUBLE_EXCEPTION) {
+			this.valueDouble = 0.0d;
 		}
 	}
 

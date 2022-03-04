@@ -177,15 +177,15 @@ public abstract class World implements IBlockAccess {
 			this.worldInfo.setServerInitialized(true);
 		}
 
-		VillageCollection var7 = (VillageCollection) this.mapStorage.loadData(VillageCollection.class, "villages");
+		//VillageCollection var7 = (VillageCollection) this.mapStorage.loadData(VillageCollection.class, "villages");
 
-		if (var7 == null) {
+		//if (var7 == null) {
 			this.villageCollectionObj = new VillageCollection(this);
 			this.mapStorage.setData("villages", this.villageCollectionObj);
-		} else {
-			this.villageCollectionObj = var7;
-			this.villageCollectionObj.func_82566_a(this);
-		}
+		//} else {
+		//	this.villageCollectionObj = var7;
+		//	this.villageCollectionObj.func_82566_a(this);
+		//}
 
 		this.calculateInitialSkylight();
 		this.calculateInitialWeather();

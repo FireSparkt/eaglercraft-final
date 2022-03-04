@@ -16,9 +16,10 @@ public class IPCPacket04RenameWorld implements IPCPacketBase {
 	public IPCPacket04RenameWorld() {
 	}
 	
-	public IPCPacket04RenameWorld(String worldOldName, String worldNewName, boolean copy) {
+	public IPCPacket04RenameWorld(String worldOldName, String worldNewName, String displayName, boolean copy) {
 		this.worldOldName = worldOldName;
 		this.worldNewName = worldNewName;
+		this.displayName = displayName;
 		this.copy = copy;
 	}
 

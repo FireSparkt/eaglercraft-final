@@ -11,6 +11,9 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements Hop
 		super(par1World, par2, par4, par6);
 	}
 
+	public EntityMinecartHopper() {
+	}
+
 	public int getMinecartType() {
 		return 5;
 	}

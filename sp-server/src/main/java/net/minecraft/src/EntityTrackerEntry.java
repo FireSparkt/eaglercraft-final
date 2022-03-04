@@ -272,12 +272,14 @@ public class EntityTrackerEntry {
 
 		while (var1.hasNext()) {
 			EntityPlayerMP var2 = (EntityPlayerMP) var1.next();
+			//System.out.println(this.trackedEntity.getEntityName() + ": sendDestroyEntityPacketToTrackedPlayers");
 			var2.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
 		}
 	}
 
 	public void removeFromTrackedPlayers(EntityPlayerMP par1EntityPlayerMP) {
 		if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
+			//System.out.println(this.trackedEntity.getEntityName() + ": removeFromTrackedPlayers");
 			par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
 			this.trackingPlayers.remove(par1EntityPlayerMP);
 		}
@@ -352,6 +354,7 @@ public class EntityTrackerEntry {
 				}
 			} else if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
 				this.trackingPlayers.remove(par1EntityPlayerMP);
+				//System.out.println(this.trackedEntity.getEntityName() + ": updatePlayerEntity");
 				par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
 			}
 		}
@@ -466,6 +469,7 @@ public class EntityTrackerEntry {
 	public void removeTrackedPlayerSymmetric(EntityPlayerMP par1EntityPlayerMP) {
 		if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
 			this.trackingPlayers.remove(par1EntityPlayerMP);
+			System.out.println(this.trackedEntity.getEntityName() + ": removeTrackedPlayerSymmetric");
 			par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
 		}
 	}

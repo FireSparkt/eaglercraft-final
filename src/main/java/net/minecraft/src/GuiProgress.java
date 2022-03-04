@@ -46,7 +46,11 @@ public class GuiProgress extends GuiScreen implements IProgressUpdate {
 	public void onNoMoreProgress() {
 		this.noMoreProgress = true;
 	}
-
+	
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+	
 	/**
 	 * Draws the screen and all the components in it.
 	 */

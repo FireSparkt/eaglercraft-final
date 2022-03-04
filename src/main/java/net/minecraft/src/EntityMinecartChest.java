@@ -6,6 +6,9 @@ public class EntityMinecartChest extends EntityMinecartContainer {
 		super(par1, par2, par4, par6);
 	}
 
+	public EntityMinecartChest() {
+	}
+
 	public void killMinecart(DamageSource par1DamageSource) {
 		super.killMinecart(par1DamageSource);
 		this.dropItemWithOffset(Block.chest.blockID, 1, 0.0F);

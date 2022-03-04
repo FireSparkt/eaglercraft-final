@@ -467,7 +467,9 @@ public class GuiIngame extends Gui {
 				if (this.recordIsPlaying) {
 					var13 = BiomeGenBase.HSBtoRGB(var33 / 50.0F, 0.7F, 0.6F) & 16777215;
 				}
-
+				
+				String str = this.recordPlaying + " (jukebox not enabled)";
+				
 				var8.drawString(this.recordPlaying, -var8.getStringWidth(this.recordPlaying) / 2, -4, var13 + (var12 << 24));
 				EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 				EaglerAdapter.glPopMatrix();
