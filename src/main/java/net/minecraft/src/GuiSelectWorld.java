@@ -2,11 +2,13 @@ package net.minecraft.src;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.GuiScreenBackupWorld;
 import net.lax1dude.eaglercraft.GuiScreenCreateWorldSelection;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerNotImplemented;
 import net.lax1dude.eaglercraft.IntegratedServer;
 
@@ -94,12 +96,15 @@ public class GuiSelectWorld extends GuiScreen {
 	 * loads the saves
 	 */
 	private void loadSaves() {
+		this.saveList.clear();
 		List<NBTTagCompound> levels = IntegratedServer.getWorldList();
 		for(NBTTagCompound n : levels) {
 			WorldInfo w = new WorldInfo(n.getCompoundTag("Data"));
 			this.saveList.add(new SaveFormatComparator(n.getString("folderName"), w.getWorldName(), w.getLastTimePlayed(),
 					w.getSizeOnDisk(), w.getGameType(), false, w.isHardcoreModeEnabled(), w.areCommandsAllowed(), n));
 		}
+		Collections.sort(this.saveList);
+		this.selectedWorld = -1;
 	}
 
 	/**
@@ -147,7 +152,6 @@ public class GuiSelectWorld extends GuiScreen {
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.enabled) {
 			if (par1GuiButton.id == 2) {
-				/*
 				String var2 = this.getSaveName(this.selectedWorld);
 
 				if (var2 != null) {
@@ -155,8 +159,7 @@ public class GuiSelectWorld extends GuiScreen {
 					GuiYesNo var3 = getDeleteWorldScreen(this, var2, this.selectedWorld);
 					this.mc.displayGuiScreen(var3);
 				}
-				*/
-				this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "delete world"));
+				//this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "delete world"));
 			} else if (par1GuiButton.id == 1) {
 				this.selectWorld(this.selectedWorld);
 			} else if (par1GuiButton.id == 3) {
@@ -169,7 +172,8 @@ public class GuiSelectWorld extends GuiScreen {
 				//GuiCreateWorld var5 = new GuiCreateWorld(this);
 				//var5.func_82286_a(new WorldInfo(this.saveList.get(this.selectedWorld).levelDat));
 				//this.mc.displayGuiScreen(var5);
-				this.mc.displayGuiScreen(new GuiScreenBackupWorld(this, this.getSaveFileName(this.selectedWorld), 11111111l));
+				this.mc.displayGuiScreen(new GuiScreenBackupWorld(this, this.getSaveFileName(this.selectedWorld),
+						((SaveFormatComparator)getSize(this).get(selectedWorld)).levelDat));
 			} else {
 				this.worldSlotContainer.actionPerformed(par1GuiButton);
 			}
@@ -204,13 +208,18 @@ public class GuiSelectWorld extends GuiScreen {
 	public void confirmClicked(boolean par1, int par2) {
 		if (this.deleting) {
 			this.deleting = false;
-/*
+			/*
 			if (par1) {
 				waitingForWorlds = true;
 				IntegratedServer.requestWorldList();
 			}
-*/
-			this.mc.displayGuiScreen(this);
+			*/
+			if (par1) {
+				IntegratedServer.deleteWorld(this.getSaveFileName(par2));
+				this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(this, "selectWorld.progress.deleting", () -> IntegratedServer.isReady()));
+			}else {
+				this.mc.displayGuiScreen(this);
+			}
 		}
 	}
 

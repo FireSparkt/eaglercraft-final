@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import net.lax1dude.eaglercraft.sp.VFile;
 
@@ -36,7 +37,7 @@ public class MapStorage {
 	 * instantiating the given Class, or returns null if none such file exists.
 	 * args: Class to instantiate, String dataid
 	 */
-	public WorldSavedData loadData(Class par1Class, String par2Str) {
+	public WorldSavedData loadData(Function<String, WorldSavedData> par1Class, String par2Str) {
 		WorldSavedData var3 = (WorldSavedData) this.loadedDataMap.get(par2Str);
 
 		if (var3 != null) {
@@ -48,8 +49,7 @@ public class MapStorage {
 
 					if (var4 != null && var4.exists()) {
 						try {
-							var3 = (WorldSavedData) par1Class.getConstructor(new Class[] { String.class })
-									.newInstance(new Object[] { par2Str });
+							var3 = (WorldSavedData) par1Class.apply(par2Str);
 						} catch (Exception var7) {
 							throw new RuntimeException("Failed to instantiate " + par1Class.toString(), var7);
 						}

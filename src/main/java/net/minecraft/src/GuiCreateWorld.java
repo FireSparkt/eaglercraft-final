@@ -136,22 +136,24 @@ public class GuiCreateWorld extends GuiScreen {
 	 * available.
 	 */
 	private void makeUseableName() {
-		this.folderName = this.textboxWorldName.getText().trim();
+		this.folderName = makeUsableName(this.textboxWorldName.getText().trim());
+	}
+
+	public static String makeUsableName(String s) {
 		char[] var1 = ChatAllowedCharacters.allowedCharactersArray;
 		int var2 = var1.length;
 
 		for (int var3 = 0; var3 < var2; ++var3) {
 			char var4 = var1[var3];
-			this.folderName = this.folderName.replace(var4, '_');
+			s = s.replace(var4, '_');
 		}
 
-		if (MathHelper.stringNullOrLengthZero(this.folderName)) {
-			this.folderName = "World";
+		if (MathHelper.stringNullOrLengthZero(s)) {
+			s = "World";
 		}
-
-		this.folderName = func_73913_a(this.folderName);
+		return func_73913_a(s);
 	}
-
+	
 	private void updateButtonText() {
 		StringTranslate var1 = StringTranslate.getInstance();
 		this.buttonGameMode.displayString = var1.translateKey("selectWorld.gameMode") + " "

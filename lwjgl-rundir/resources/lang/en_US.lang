@@ -11,6 +11,7 @@ gui.up=Up
 gui.down=Down
 gui.yes=Yes
 gui.no=No
+gui.killTask=Kill Task
 
 menu.singleplayer=Singleplayer
 menu.multiplayer=Multiplayer
@@ -72,6 +73,9 @@ selectWorld.enterSeed=Seed for the World Generator
 selectWorld.seedInfo=Leave blank for a random seed
 selectWorld.cheats=Cheats
 selectWorld.customizeType=Customize
+selectWorld.duplicateTitle=Duplicate World
+selectWorld.duplicateButton=Duplicate
+selectWorld.importName=Set World Name
 
 selectWorld.backup.title=World Backup Menu:
 selectWorld.backup.recreate=Re-Create World
@@ -136,6 +140,17 @@ selectWorld.allowCommands.info=Commands like /gamemode, /xp
 selectWorld.hardcoreMode=Hardcore:
 selectWorld.hardcoreMode.info=World is deleted upon death
 selectWorld.bonusItems=Bonus Chest:
+
+selectWorld.progress.deleting=Deleting World
+selectWorld.progress.renaming=Renaming World
+selectWorld.progress.copying=Copying World
+selectWorld.progress.exporting.1=Exporting as EPK
+selectWorld.progress.exporting.2=Exporting as Vanilla
+selectWorld.progress.importing.0=Importing as EPK
+selectWorld.progress.importing.1=Importing as Vanilla
+selectWorld.progress.cancelWarning=Do you really want to 'Kill Task'? Your world may fail to save
+selectWorld.progress.confirmCancel=Yes, Kill Task
+selectWorld.progress.continue=Continue
 
 generator.default=Default
 generator.flat=Superflat

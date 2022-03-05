@@ -9,6 +9,7 @@ public class IPCPacketFFProcessKeepAlive implements IPCPacketBase {
 	public static final int ID = 0xFF;
 
 	public static final int KEEPALIVE = 0;
+	public static final int FAILURE = 0xFE;
 	
 	public int ack;
 	

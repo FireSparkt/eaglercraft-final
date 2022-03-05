@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
 
@@ -177,15 +178,15 @@ public abstract class World implements IBlockAccess {
 			this.worldInfo.setServerInitialized(true);
 		}
 
-		//VillageCollection var7 = (VillageCollection) this.mapStorage.loadData(VillageCollection.class, "villages");
+		VillageCollection var7 = (VillageCollection) this.mapStorage.loadData((s) -> new VillageCollection(s), "villages");
 
-		//if (var7 == null) {
+		if (var7 == null) {
 			this.villageCollectionObj = new VillageCollection(this);
 			this.mapStorage.setData("villages", this.villageCollectionObj);
-		//} else {
-		//	this.villageCollectionObj = var7;
-		//	this.villageCollectionObj.func_82566_a(this);
-		//}
+		} else {
+			this.villageCollectionObj = var7;
+			this.villageCollectionObj.func_82566_a(this);
+		}
 
 		this.calculateInitialSkylight();
 		this.calculateInitialWeather();
@@ -3056,7 +3057,7 @@ public abstract class World implements IBlockAccess {
 	 * using the MapStorage, instantiating the given Class, or returns null if none
 	 * such file exists. args: Class to instantiate, String dataid
 	 */
-	public WorldSavedData loadItemData(Class par1Class, String par2Str) {
+	public WorldSavedData loadItemData(Function<String, WorldSavedData> par1Class, String par2Str) {
 		return this.mapStorage.loadData(par1Class, par2Str);
 	}
 

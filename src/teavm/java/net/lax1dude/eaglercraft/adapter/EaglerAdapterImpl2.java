@@ -291,6 +291,7 @@ public class EaglerAdapterImpl2 {
 				"var f = window.eagsFileChooser.inputElement.files;\r\n" + 
 				"if(f.length == 0){\r\n" + 
 				"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
+				"window.eagsFileChooser.getFileChooserResultName = \"<none>\";\r\n" + 
 				"}else{\r\n" + 
 				"(async function(){\r\n" + 
 				"window.eagsFileChooser.getFileChooserResult = await f[0].arrayBuffer();\r\n" + 
@@ -300,7 +301,7 @@ public class EaglerAdapterImpl2 {
 				"});\r\n" + 
 				"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
 				"window.eagsFileChooser.getFileChooserResultName = null;\r\n" + 
-				"el.accept = mime;\r\n" + 
+				"el.accept = (mime === null ? \".\"+ext : mime);\r\n" + 
 				"el.click();\r\n" + 
 				"},\r\n" + 
 				"getFileChooserResult: null,\r\n" + 
@@ -1097,6 +1098,9 @@ public class EaglerAdapterImpl2 {
 	@JSBody(params = { "ext", "mime" }, script = "window.eagsFileChooser.openFileChooser(ext, mime);")
 	public static native void openFileChooser(String ext, String mime);
 	
+	@JSBody(params = { }, script = "return window.eagsFileChooser.getFileChooserResult != null;")
+	public static final native boolean getFileChooserResultAvailable();
+	
 	public static final byte[] getFileChooserResult() {
 		ArrayBuffer b = getFileChooserResult0();
 		if(b == null) return null;
@@ -1692,4 +1696,18 @@ public class EaglerAdapterImpl2 {
 			}
 		}
 	}
+	
+	@JSBody(params = { "name", "buf" }, script =
+		"var hr = window.URL.createObjectURL(new Blob([buf], {type: \"octet/stream\"}));" +
+		"var a = document.createElement(\"a\");" +
+		"a.href = hr; a.download = name; a.click();" +
+		"window.URL.revokeObjectURL(hr);")
+	private static final native void downloadBytesImpl(String str, ArrayBuffer buf);
+	
+	public static final void downloadBytes(String str, byte[] dat) {
+		ArrayBuffer d = ArrayBuffer.create(dat.length);
+		Uint8Array.create(d).set(dat);
+		downloadBytesImpl(str, d);
+	}
+	
 }

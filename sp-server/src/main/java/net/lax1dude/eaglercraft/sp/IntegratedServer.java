@@ -88,6 +88,10 @@ public class IntegratedServer {
 		}
 	}
 	
+	public static void updateStatusString(String stat, float prog) {
+		sendIPCPacket(new IPCPacket0DProgressUpdate(stat, prog));
+	}
+	
 	private static boolean isServerStopped() {
 		return currentProcess == null || !currentProcess.isServerRunning();
 	}
@@ -102,6 +106,10 @@ public class IntegratedServer {
 			System.err.println("    " + st);
 		}
 		sendIPCPacket(new IPCPacket15ThrowException(str, arr));
+	}
+	
+	public static void sendTaskFailed() {
+		sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacketFFProcessKeepAlive.FAILURE));
 	}
 	
 	private static void processAsyncMessageQueue() {
@@ -207,8 +215,20 @@ public class IntegratedServer {
 					case IPCPacket03DeleteWorld.ID: {
 							tryStopServer();
 							IPCPacket03DeleteWorld pkt = (IPCPacket03DeleteWorld)packet;
-							if(SYS.VFS.deleteFiles("worlds/" + pkt.worldName) <= 0) {
+							if(SYS.VFS.deleteFiles("worlds/" + pkt.worldName + "/") <= 0) {
 								throwExceptionToClient("Failed to delete world!", new RuntimeException("VFS did not delete directory 'worlds/" + pkt.worldName + "' correctly"));
+								sendTaskFailed();
+								break;
+							}
+							String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+							if(worldsTxt != null) {
+								LinkedList<String> newWorlds = new LinkedList();
+								for(String str : worldsTxt) {
+									if(!str.equalsIgnoreCase(pkt.worldName)) {
+										newWorlds.add(str);
+									}
+								}
+								SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", newWorlds));
 							}
 							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket03DeleteWorld.ID));
 						}
@@ -216,23 +236,63 @@ public class IntegratedServer {
 					case IPCPacket04RenameWorld.ID: {
 							tryStopServer();
 							IPCPacket04RenameWorld pkt = (IPCPacket04RenameWorld)packet;
-							if(SYS.VFS.renameFiles("worlds/" + pkt.worldOldName, "worlds/" + pkt.worldNewName, pkt.copy) <= 0) {
+							if(SYS.VFS.renameFiles("worlds/" + pkt.worldOldName + "/", "worlds/" + pkt.worldNewName + "/", pkt.copy) <= 0) {
 								throwExceptionToClient("Failed to copy/rename server!", new RuntimeException("VFS did not copy/rename directory 'worlds/" + pkt.worldOldName + "' correctly"));
+								sendTaskFailed();
+								break;
 							}else {
+								String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+								LinkedList<String> newWorlds = new LinkedList();
+								if(worldsTxt != null) {
+									for(String str : worldsTxt) {
+										if(pkt.copy || !str.equalsIgnoreCase(pkt.worldOldName)) {
+											newWorlds.add(str);
+										}
+									}
+								}
+								newWorlds.add(pkt.worldNewName);
+								SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", newWorlds));
 								VFile worldDat = new VFile("worlds", pkt.worldNewName, "level.dat");
 								if(worldDat.canRead()) {
 									NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(worldDat.getAllBytes());
-									worldDatNBT.setString("LevelName", pkt.displayName);
+									worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.displayName);
 									worldDat.setAllBytes(CompressedStreamTools.compress(worldDatNBT));
 								}else {
 									throwExceptionToClient("Failed to copy/rename world!", new RuntimeException("Failed to change level.dat world '" + pkt.worldNewName + "' display name to '" + pkt.displayName + "' because level.dat was missing"));
+									sendTaskFailed();
+									break;
 								}
 							}
 							sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket04RenameWorld.ID));
 						}
 						break;
-					case IPCPacket05RequestData.ID:
-						
+					case IPCPacket05RequestData.ID: {
+							IPCPacket05RequestData pkt = (IPCPacket05RequestData)packet;
+							if(pkt.request == IPCPacket05RequestData.REQUEST_LEVEL_EAG) {
+								try {
+									final int[] bytesWritten = new int[1];
+									final int[] lastUpdate = new int[1];
+									String pfx = "worlds/" + pkt.worldName + "/";
+									EPKCompiler c = new EPKCompiler("contains backup of world '" + pkt.worldName + "'");
+									SYS.VFS.iterateFiles(pfx, false, (i) -> {
+										byte[] b = i.getAllBytes();
+										c.append(i.path.substring(pfx.length()), b);
+										bytesWritten[0] += b.length;
+										if(bytesWritten[0] - lastUpdate[0] > 10000) {
+											lastUpdate[0] = bytesWritten[0];
+											updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
+										}
+									});
+									sendIPCPacket(new IPCPacket09RequestResponse(c.complete()));
+								}catch(Throwable t) {
+									throwExceptionToClient("Failed to export world '" + pkt.worldName + "' as EPK", t);
+									sendTaskFailed();
+								}
+							}else {
+								System.err.println("Unknown IPCPacket05RequestData type '" + pkt.request + "'");
+								sendTaskFailed();
+							}
+						}
 						break;
 					case IPCPacket06RenameWorldNBT.ID: {
 							IPCPacket06RenameWorldNBT pkt = (IPCPacket06RenameWorldNBT)packet;
@@ -240,18 +300,63 @@ public class IntegratedServer {
 								VFile worldDat = new VFile("worlds", pkt.worldName, "level.dat");
 								if(worldDat.canRead()) {
 									NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(worldDat.getAllBytes());
-									worldDatNBT.setString("LevelName", pkt.displayName);
+									worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.displayName);
 									worldDat.setAllBytes(CompressedStreamTools.compress(worldDatNBT));
 								}else {
 									throwExceptionToClient("Failed to rename world!", new RuntimeException("Failed to change level.dat world '" + pkt.worldName + "' display name to '" + pkt.displayName + "' because level.dat was missing"));
 								}
 							}else {
 								System.err.println("Client tried to rename a world '" + pkt.worldName + "' to have name '" + pkt.displayName + "' while the server is running");
+								sendTaskFailed();
 							}
 						}
 						break;
-					case IPCPacket07ImportWorld.ID:
-						
+					case IPCPacket07ImportWorld.ID: {
+							IPCPacket07ImportWorld pkt = (IPCPacket07ImportWorld)packet;
+							if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_EAG) {
+								try {
+									String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
+									VFile dir = new VFile("worlds", folder);
+									EPKDecompiler dc = new EPKDecompiler(pkt.worldData);
+									EPKDecompiler.FileEntry f = null;
+									int lastProgUpdate = 0;
+									int prog = 0;
+									while((f = dc.readFile()) != null) {
+										byte[] b = f.data;
+										if(f.name.equals("level.dat")) {
+											NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
+											worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
+											worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
+											b = CompressedStreamTools.compress(worldDatNBT);
+										}
+										VFile ff = new VFile(dir, f.name);
+										ff.setAllBytes(b);
+										prog += b.length;
+										if(prog - lastProgUpdate > 10000) {
+											lastProgUpdate = prog;
+											updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+										}
+									}
+									String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+									if(worldsTxt == null || worldsTxt.length <= 0) {
+										worldsTxt = new String[] { folder };
+									}else {
+										String[] tmp = worldsTxt;
+										worldsTxt = new String[worldsTxt.length + 1];
+										System.arraycopy(tmp, 0, worldsTxt, 0, tmp.length);
+										worldsTxt[worldsTxt.length - 1] = folder;
+									}
+									SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
+									sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
+								}catch(Throwable t) {
+									throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as EPK", t);
+									sendTaskFailed();
+								}
+							}else {
+								System.err.println("Client tried to import a world '" + pkt.worldName + "' while the server is running");
+								sendTaskFailed();
+							}
+						}
 						break;
 					case IPCPacket09RequestResponse.ID:
 						
@@ -262,6 +367,7 @@ public class IntegratedServer {
 								currentProcess.setDifficultyForAllWorlds(pkt.difficulty);
 							}else {
 								System.err.println("Client tried to set difficulty '" + pkt.difficulty + "' while server was stopped");
+								sendTaskFailed();
 							}
 						}
 						break;
@@ -279,6 +385,7 @@ public class IntegratedServer {
 								sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket0BPause.ID));
 							}else {
 								System.err.println("Client tried to " + (pkt.pause ? "pause" : "unpause") + " while server was stopped");
+								sendTaskFailed();
 							}
 						}
 						break;
@@ -314,28 +421,24 @@ public class IntegratedServer {
 								LinkedList<NBTTagCompound> sendListNBT = new LinkedList();
 								boolean rewrite = false;
 								for(String w : worlds) {
-									VFile lvl = new VFile("worlds", w, "level.dat");
-									if(!lvl.canRead()) {
-										rewrite = true;
-										System.err.println("World level.dat for '" + w + "' was not found, attempting to delete 'worlds/" + w + "/*'");
-										if(SYS.VFS.deleteFiles("worlds/" + w) <= 0) {
-											System.err.println("No files were deleted in 'worlds/" + w + "/*', this may be corruption but '" + w + "' will still be removed from worlds.txt");
-										}
-									}else {
+									byte[] dat = (new VFile("worlds", w, "level.dat")).getAllBytes();
+									if(dat != null) {
 										NBTTagCompound worldDatNBT;
 										try {
-											worldDatNBT = CompressedStreamTools.decompress(lvl.getAllBytes());
+											worldDatNBT = CompressedStreamTools.decompress(dat);
 											worldDatNBT.setString("folderName", w);
 											sendListNBT.add(worldDatNBT);
 											updatedList.add(w);
+											continue;
 										}catch(IOException e) {
-											rewrite = true;
-											System.err.println("World level.dat for '" + w + "' was corrupt, attempting to delete 'worlds/" + w + "/*'");
-											if(SYS.VFS.deleteFiles("worlds/" + w) <= 0) {
-												System.err.println("No files were deleted in 'worlds/" + w + "/*', this may be corruption but '" + w + "' will still be removed from worlds.txt");
-											}
+											// shit fuck
 										}
 										
+									}
+									rewrite = true;
+									System.err.println("World level.dat for '" + w + "' was not found, attempting to delete 'worlds/" + w + "/*'");
+									if(SYS.VFS.deleteFiles("worlds/" + w) <= 0) {
+										System.err.println("No files were deleted in 'worlds/" + w + "/*', this may be corruption but '" + w + "' will still be removed from worlds.txt");
 									}
 								}
 								if(rewrite) {
@@ -344,6 +447,7 @@ public class IntegratedServer {
 								sendIPCPacket(new IPCPacket16NBTList(IPCPacket16NBTList.WORLD_LIST, sendListNBT));
 							}else {
 								System.err.println("Client tried to list worlds while server was running");
+								sendTaskFailed();
 							}
 						}
 						break;
@@ -377,11 +481,14 @@ public class IntegratedServer {
 						break;
 					default:
 						System.err.println("IPC packet type 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "' was not handled");
+						sendTaskFailed();
 						break;
 					}
 				}catch(Throwable t) {
-					System.err.println("IPC packet 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "' was not processed correctly");
-					t.printStackTrace();
+					String str = "IPC packet 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "' was not processed correctly";
+					System.err.println(str);
+					throwExceptionToClient(str, t);
+					sendTaskFailed();
 				}
 				
 				continue;

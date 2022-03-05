@@ -34,6 +34,7 @@ public class IntegratedServer {
 	}
 	
 	public static void begin(String[] locale, String[] stats) {
+		logException = true;
 		if(!isWorkerAlive()) {
 			openConnections.clear();
 			exceptions.clear();
@@ -129,7 +130,7 @@ public class IntegratedServer {
 	
 	public static NBTTagCompound getWorld(String folderName) {
 		for(NBTTagCompound nbt : worlds) {
-			if(folderName.equals(nbt.getString(folderName))) {
+			if(folderName.equals(nbt.getString("folderName"))) {
 				return nbt;
 			}
 		}
@@ -177,10 +178,50 @@ public class IntegratedServer {
 		return exceptions.size() > 0 ? exceptions.remove(0) : null;
 	}
 	
+	public static IPCPacket15ThrowException[] worldStatusErrors() {
+		if(exceptions.size() <= 0) {
+			return null;
+		}
+		IPCPacket15ThrowException[] t = new IPCPacket15ThrowException[exceptions.size()];
+		for(int i = 0; i < t.length; ++i) {
+			t[i] = exceptions.get(i);
+		}
+		exceptions.clear();
+		return t;
+	}
+	
 	private static boolean logException = false;
 	
 	public static void enableExceptionLog(boolean f) {
 		logException = f;
+	}
+	
+	private static boolean callFailed = false;
+	
+	public static boolean didLastCallFail() {
+		boolean c = callFailed;
+		callFailed = false;
+		return c;
+	}
+	
+	public static void importWorld(String name, byte[] data, int format) {
+		ensureReady();
+		statusState = IntegratedState.WORLD_IMPORTING;
+		sendIPCPacket(new IPCPacket07ImportWorld(name, data, (byte)format));
+	}
+	
+	public static void exportWorld(String name, int format) {
+		ensureReady();
+		statusState = IntegratedState.WORLD_EXPORTING;
+		sendIPCPacket(new IPCPacket05RequestData(name, (byte)format));
+	}
+	
+	private static byte[] exportResponse = null;
+
+	public static byte[] getExportResponse() {
+		byte[] dat = exportResponse;
+		exportResponse = null;
+		return dat;
 	}
 	
 	public static void processICP() {
@@ -223,6 +264,11 @@ public class IntegratedServer {
 							case IPCPacket0BPause.ID:
 								statusState = isPaused ? IntegratedState.WORLD_PAUSED : IntegratedState.WORLD_LOADED;
 								break;
+							case IPCPacketFFProcessKeepAlive.FAILURE:
+								System.err.println("Server signaled 'FAILURE' response in state '" + IntegratedState.getStateName(statusState) + "'");
+								statusState = IntegratedState.WORLD_NONE;
+								callFailed = true;
+								break;
 							case IPCPacket01StopServer.ID:
 							case IPCPacket03DeleteWorld.ID:
 							case IPCPacket04RenameWorld.ID:
@@ -239,9 +285,12 @@ public class IntegratedServer {
 					}
 					case IPCPacket09RequestResponse.ID: {
 						IPCPacket09RequestResponse pkt = (IPCPacket09RequestResponse)packet;
-						
-						// import/export/read 
-						
+						if(statusState == IntegratedState.WORLD_EXPORTING) {
+							statusState = IntegratedState.WORLD_NONE;
+							exportResponse = pkt.response;
+						}else {
+							System.err.println("IPCPacket09RequestResponse was recieved but statusState was '" + IntegratedState.getStateName(statusState) + "' instead of 'WORLD_EXPORTING'");
+						}
 						break;
 					}
 					case IPCPacket0DProgressUpdate.ID: {
@@ -249,7 +298,7 @@ public class IntegratedServer {
 						worldStatusString = pkt.updateMessage;
 						worldStatusProgress = pkt.updateProgress;
 						if(logException) {
-							System.out.println("IntegratedServer: task '" + pkt.updateMessage + "' is " + ((int)(pkt.updateProgress * 100.0f)) + "% complete");
+							System.out.println("IntegratedServer: task \"" + pkt.updateMessage + "\"" + (pkt.updateProgress > 0.0f ? " is " + ((int)(pkt.updateProgress * 100.0f)) + "% complete" : ""));
 						}
 						break;
 					}

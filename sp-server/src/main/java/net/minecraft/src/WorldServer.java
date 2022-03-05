@@ -78,7 +78,7 @@ public class WorldServer extends World {
 
 		this.field_85177_Q = new Teleporter(this);
 		this.worldScoreboard = new ServerScoreboard(par1MinecraftServer);
-		ScoreboardSaveData var8 = (ScoreboardSaveData) this.mapStorage.loadData(ScoreboardSaveData.class, "scoreboard");
+		ScoreboardSaveData var8 = (ScoreboardSaveData) this.mapStorage.loadData((s) -> new ScoreboardSaveData(s), "scoreboard");
 
 		if (var8 == null) {
 			var8 = new ScoreboardSaveData();

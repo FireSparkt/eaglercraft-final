@@ -1,15 +1,25 @@
 package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
+import net.lax1dude.eaglercraft.IntegratedServer;
 
 public class GuiRenameWorld extends GuiScreen {
 	private GuiScreen parentGuiScreen;
 	private GuiTextField theGuiTextField;
 	private final String worldName;
+	private final boolean duplicate;
 
 	public GuiRenameWorld(GuiScreen par1GuiScreen, String par2Str) {
 		this.parentGuiScreen = par1GuiScreen;
 		this.worldName = par2Str;
+		this.duplicate = false;
+	}
+
+	public GuiRenameWorld(GuiScreen par1GuiScreen, String par2Str, boolean d) {
+		this.parentGuiScreen = par1GuiScreen;
+		this.worldName = par2Str;
+		this.duplicate = d;
 	}
 
 	/**
@@ -27,12 +37,15 @@ public class GuiRenameWorld extends GuiScreen {
 		EaglerAdapter.enableRepeatEvents(true);
 		this.buttonList.clear();
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 12,
-				var1.translateKey("selectWorld.renameButton")));
+				var1.translateKey(duplicate ? "selectWorld.duplicateButton" : "selectWorld.renameButton")));
 		this.buttonList.add(
 				new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12, var1.translateKey("gui.cancel")));
 		//ISaveFormat var2 = this.mc.getSaveLoader();
 		//WorldInfo var3 = var2.getWorldInfo(this.worldName);
 		String var4 = worldName; //var3.getWorldName(); //TODO: add rename logic
+		if(duplicate) {
+			var4 = "Copy of " + var4;
+		}
 		this.theGuiTextField = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 + 3, 200, 20);
 		this.theGuiTextField.setFocused(true);
 		this.theGuiTextField.setText(var4);
@@ -56,7 +69,13 @@ public class GuiRenameWorld extends GuiScreen {
 			} else if (par1GuiButton.id == 0) {
 				//ISaveFormat var2 = this.mc.getSaveLoader();
 				//var2.renameWorld(this.worldName, this.theGuiTextField.getText().trim());
-				this.mc.displayGuiScreen(this.parentGuiScreen);
+				String str = theGuiTextField.getText().trim();
+				if(duplicate) {
+					IntegratedServer.copyMoveWorld(worldName, GuiCreateWorld.makeUsableName(str), str, true);
+				}else {
+					IntegratedServer.setWorldName(worldName, str);
+				}
+				this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(this.parentGuiScreen, "selectWorld.progress." + (duplicate ? "copying" : "renaming"), () -> IntegratedServer.isReady()));
 			}
 		}
 	}
@@ -88,7 +107,7 @@ public class GuiRenameWorld extends GuiScreen {
 	public void drawScreen(int par1, int par2, float par3) {
 		StringTranslate var4 = StringTranslate.getInstance();
 		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRenderer, var4.translateKey("selectWorld.renameTitle"), this.width / 2, this.height / 4 - 60 + 20, 16777215);
+		this.drawCenteredString(this.fontRenderer, var4.translateKey("selectWorld." + (duplicate ? "duplicateTitle" : "renameTitle")), this.width / 2, this.height / 4 - 60 + 20, 16777215);
 		this.drawString(this.fontRenderer, var4.translateKey("selectWorld.enterName"), this.width / 2 - 100, this.height / 4 - 60 + 50, 10526880);
 		this.theGuiTextField.drawTextBox();
 		super.drawScreen(par1, par2, par3);

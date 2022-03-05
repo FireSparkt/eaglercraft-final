@@ -8,7 +8,7 @@ public class ItemMap extends ItemMapBase {
 
 	public MapData getMapData(ItemStack par1ItemStack, World par2World) {
 		String var3 = "map_" + par1ItemStack.getItemDamage();
-		MapData var4 = (MapData) par2World.loadItemData(MapData.class, var3);
+		MapData var4 = (MapData) par2World.loadItemData((s) -> new MapData(s), var3);
 
 		if (var4 == null && !par2World.isRemote) {
 			par1ItemStack.setItemDamage(par2World.getUniqueDataId("map"));

@@ -10,6 +10,10 @@ public class IPCPacket07ImportWorld implements IPCPacketBase {
 
 	public String worldName;
 	public byte[] worldData;
+	public byte worldFormat;
+	
+	public static final byte WORLD_FORMAT_EAG = 0x00;
+	public static final byte WORLD_FORMAT_MCA = 0x01;
 	
 	public IPCPacket07ImportWorld() {
 	}
@@ -17,12 +21,14 @@ public class IPCPacket07ImportWorld implements IPCPacketBase {
 	public IPCPacket07ImportWorld(String worldName, byte[] worldData, byte worldFormat) {
 		this.worldName = worldName;
 		this.worldData = worldData;
+		this.worldFormat = worldFormat;
 	}
 
 	@Override
 	public void deserialize(DataInput bin) throws IOException {
 		worldName = bin.readUTF();
 		worldData = new byte[bin.readInt()];
+		worldFormat = bin.readByte();
 		bin.readFully(worldData);
 	}
 
@@ -30,6 +36,7 @@ public class IPCPacket07ImportWorld implements IPCPacketBase {
 	public void serialize(DataOutput bin) throws IOException {
 		bin.writeUTF(worldName);
 		bin.writeInt(worldData.length);
+		bin.writeByte(worldFormat);
 		bin.write(worldData);
 	}
 

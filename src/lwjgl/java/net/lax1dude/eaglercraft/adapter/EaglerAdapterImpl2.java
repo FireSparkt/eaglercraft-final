@@ -1010,6 +1010,9 @@ public class EaglerAdapterImpl2 {
 			
 		});
 	}
+	public static final boolean getFileChooserResultAvailable() {
+		return fileChooserFile != null;
+	}
 	public static final byte[] getFileChooserResult() {
 		byte[] b = fileChooserFile;
 		fileChooserFile = null;
@@ -1206,6 +1209,10 @@ public class EaglerAdapterImpl2 {
 	
 	public static final PKT recieveFromIntegratedServer(String channel, byte[] pkt) {
 		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+	}
+	
+	public static final void downloadBytes(String str, byte[] dat) {
+		JOptionPane.showMessageDialog(null, "downloadBytes was called for file '" + str + "' with " + dat.length + " bytes");
 	}
 	
 }

@@ -2,6 +2,7 @@ package net.lax1dude.eaglercraft.sp;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import net.minecraft.src.CompressedStreamTools;
 import net.minecraft.src.EntityPlayer;
@@ -153,6 +154,20 @@ public class VFSSaveHandler implements ISaveHandler, IPlayerFileData {
 	@Override
 	public String[] getAvailablePlayerDat() {
 		return null;
+	}
+	
+	public static String worldNameToFolderName(String par1Str) {
+		par1Str = par1Str.replaceAll("[\\./\"]", "_");
+		
+		boolean shit = true;
+		while(shit) {
+			shit = (new VFile("worlds", par1Str, "level.dat")).exists();
+			if(shit) {
+				par1Str = par1Str + "_";
+			}
+		}
+
+		return par1Str;
 	}
 
 }

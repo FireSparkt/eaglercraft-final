@@ -148,8 +148,15 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	/**
 	 * Typically "menu.convertingLevel", "menu.loadingLevel" or others.
 	 */
-	protected synchronized void setUserMessage(String par1Str) {
+	protected void setUserMessage(String par1Str) {
 		IntegratedServer.sendIPCPacket(new IPCPacket0DProgressUpdate(par1Str, 0.0f));
+		this.logInfo(par1Str);
+		this.userMessage = par1Str;
+	}
+	
+	protected void setUserMessage(String par1Str, float prog) {
+		IntegratedServer.sendIPCPacket(new IPCPacket0DProgressUpdate(par1Str, prog));
+		this.logInfo(par1Str + ": " + (prog > 1.0f ? "" + (int)prog : "" + (int)(prog * 100.0f) + "%"));
 		this.userMessage = par1Str;
 	}
 
@@ -195,26 +202,27 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		}
 
 		this.setDifficultyForAllWorlds(this.getDifficulty());
+		this.setGameType(var8.getGameType());
 		this.initialWorldChunkLoad();
 	}
 
 	protected void initialWorldChunkLoad() {
 		int var5 = 0;
-		this.setUserMessage("menu.generatingTerrain");
+		//this.setUserMessage("menu.generatingTerrain");
 		byte var6 = 0;
-		this.getLogAgent().func_98233_a("Preparing start region for level " + var6);
+		this.setUserMessage("Preparing start region for level " + var6);
 		WorldServer var7 = this.worldServers[var6];
 		ChunkCoordinates var8 = var7.getSpawnPoint();
 		long var9 = System.currentTimeMillis();
 		
-		int prepareRadius = 48;
+		int prepareRadius = 64;
 
 		for (int var11 = -prepareRadius; var11 <= prepareRadius && this.isServerRunning(); var11 += 16) {
 			for (int var12 = -prepareRadius; var12 <= prepareRadius && this.isServerRunning(); var12 += 16) {
 				long var13 = System.currentTimeMillis();
 
 				if (var13 - var9 > 1000L) {
-					this.outputPercentRemaining("Preparing spawn area", var5 * 100 / 625);
+					setUserMessage("Preparing spawn area", Math.min(var5 / 64.0f, 0.99f));
 					var9 = var13;
 				}
 
@@ -247,7 +255,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	protected void outputPercentRemaining(String par1Str, int par2) {
 		this.currentTask = par1Str;
 		this.percentDone = par2;
-		this.getLogAgent().func_98233_a(par1Str + ": " + par2 + "%");
+		setUserMessage(par1Str, (par2 / 100.0f));
 	}
 
 	/**
@@ -270,10 +278,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 				WorldServer var5 = var2[var4];
 
 				if (var5 != null) {
-					if (!par1) {
-						this.getLogAgent().func_98233_a("Saving chunks for level \'"
-								+ var5.getWorldInfo().getWorldName() + "\'/" + var5.provider.getDimensionName());
-					}
+					setUserMessage("Saving chunks for level \'" + var5.getWorldInfo().getWorldName() + "\'/" + var5.provider.getDimensionName());
 
 					try {
 						var5.saveAllChunks(true, (IProgressUpdate) null);
@@ -290,7 +295,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	 */
 	public void stopServer() {
 		if (!this.worldIsBeingDeleted) {
-			this.getLogAgent().func_98233_a("Stopping server");
+			setUserMessage("Stopping server");
 
 			if (this.getNetworkThread() != null) {
 				this.getNetworkThread().stopListening();
@@ -302,7 +307,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 				this.serverConfigManager.removeAllPlayers();
 			}
 
-			this.getLogAgent().func_98233_a("Saving worlds");
+			setUserMessage("Saving worlds");
 			this.saveAllWorlds(false);
 
 			for (int var1 = 0; var1 < this.worldServers.length; ++var1) {

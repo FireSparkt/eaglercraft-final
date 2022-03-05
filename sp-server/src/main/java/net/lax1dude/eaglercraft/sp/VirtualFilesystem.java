@@ -280,15 +280,17 @@ public class VirtualFilesystem {
 					if(!AsyncHandlers.writeWholeFile(virtualFilesystem.indexeddb, newName, arr).bool) {
 						return false;
 					}
-					if(!AsyncHandlers.deleteFile(virtualFilesystem.indexeddb, filePath).bool) {
+					if(!copy && !AsyncHandlers.deleteFile(virtualFilesystem.indexeddb, filePath).bool) {
 						return false;
 					}
 				}else {
 					exists = false;
 				}
-				virtualFilesystem.fileMap.remove(filePath);
-				filePath = newName;
-				virtualFilesystem.fileMap.put(newName, this);
+				if(!copy) {
+					virtualFilesystem.fileMap.remove(filePath);
+					filePath = newName;
+					virtualFilesystem.fileMap.put(newName, this);
+				}
 				return true;
 			}
 			return false;
@@ -557,7 +559,7 @@ public class VirtualFilesystem {
 				@Override
 				public void handleEvent() {
 					IDBCursor c = r.getResult();
-					if(c == null || c.getKey() == null) {
+					if(c == null || c.getKey() == null || c.getValue() == null) {
 						cb.complete(res[0]);
 						return;
 					}
@@ -569,6 +571,7 @@ public class VirtualFilesystem {
 								itr.next(VIteratorFile.create(ci, vfs, c));
 							}catch(VFSIterator.BreakLoop ex) {
 								cb.complete(res[0]);
+								return;
 							}
 						}
 					}
@@ -594,7 +597,7 @@ public class VirtualFilesystem {
 				@Override
 				public void handleEvent() {
 					IDBCursor c = r.getResult();
-					if(c == null || c.getKey() == null) {
+					if(c == null || c.getKey() == null || c.getValue() == null) {
 						cb.complete(res[0]);
 						return;
 					}

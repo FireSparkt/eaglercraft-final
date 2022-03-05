@@ -1,8 +1,13 @@
 package net.lax1dude.eaglercraft;
 
+import net.lax1dude.eaglercraft.sp.ipc.IPCPacket05RequestData;
 import net.minecraft.src.GuiButton;
+import net.minecraft.src.GuiCreateWorld;
+import net.minecraft.src.GuiRenameWorld;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.StringTranslate;
+import net.minecraft.src.WorldInfo;
 
 public class GuiScreenBackupWorld extends GuiScreen {
 
@@ -13,13 +18,15 @@ public class GuiScreenBackupWorld extends GuiScreen {
 	private GuiButton worldExport = null;
 	private GuiButton worldConvert = null;
 	private long worldSeed;
+	private NBTTagCompound levelDat;
 	
 	private String worldName;
 	
-	public GuiScreenBackupWorld(GuiScreen selectWorld, String worldName, long worldSeed) {
+	public GuiScreenBackupWorld(GuiScreen selectWorld, String worldName, NBTTagCompound levelDat) {
 		this.selectWorld = selectWorld;
 		this.worldName = worldName;
-		this.worldSeed = worldSeed;
+		this.levelDat = levelDat;
+		this.worldSeed = levelDat.getCompoundTag("Data").getLong("RandomSeed");
 	}
 	
 	public void initGui() {
@@ -56,11 +63,21 @@ public class GuiScreenBackupWorld extends GuiScreen {
 		if(par1GuiButton.id == 0) {
 			this.mc.displayGuiScreen(selectWorld);
 		}else if(par1GuiButton.id == 1) {
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "recreate world"));
+			GuiCreateWorld cw = new GuiCreateWorld(selectWorld);
+			cw.func_82286_a(new WorldInfo(this.levelDat.getCompoundTag("Data")));
+			this.mc.displayGuiScreen(cw);
 		}else if(par1GuiButton.id == 2) {
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "duplicate world"));
+			this.mc.displayGuiScreen(new GuiRenameWorld(this.selectWorld, this.worldName, true));
 		}else if(par1GuiButton.id == 3) {
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "export world"));
+			IntegratedServer.exportWorld(worldName, IPCPacket05RequestData.REQUEST_LEVEL_EAG);
+			this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(selectWorld, "selectWorld.progress.exporting.1", () -> {
+				byte[] b = IntegratedServer.getExportResponse();
+				if(b != null) {
+					EaglerAdapter.downloadBytes(worldName + ".epk", b);
+					return true;
+				}
+				return false;
+			}));
 		}else if(par1GuiButton.id == 4) {
 			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "export vanilla 1.5.2 world"));
 		}

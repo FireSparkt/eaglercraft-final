@@ -494,7 +494,7 @@ public class Minecraft implements Runnable {
 	public void stopServerAndDisplayGuiScreen(GuiScreen par1GuiScreen) {
 		if(IntegratedServer.isWorldRunning()) {
 			IntegratedServer.unloadWorld();
-			displayGuiScreen(new GuiScreenSingleplayerLoading(par1GuiScreen, "saving world", () -> !IntegratedServer.isWorldRunning()));
+			displayGuiScreen(new GuiScreenSingleplayerLoading(par1GuiScreen, "saving world", () -> IntegratedServer.isReady()));
 		}else {
 			displayGuiScreen(par1GuiScreen);
 		}
@@ -1191,7 +1191,7 @@ public class Minecraft implements Runnable {
 					}
 
 					if (this.currentScreen == null) {
-						if (!this.inGameHasFocus && EaglerAdapter.mouseGetEventButtonState()) {
+						if ((!this.inGameHasFocus || !EaglerAdapter.isPointerLocked()) && EaglerAdapter.mouseGetEventButtonState()) {
 							this.setIngameFocus();
 						}
 					} else if (this.currentScreen != null) {
@@ -1792,7 +1792,7 @@ public class Minecraft implements Runnable {
 	 * the integrated one.
 	 */
 	public boolean isSingleplayer() {
-		return isIntegratedServerRunning();
+		return isIntegratedServerRunning() && (this.theWorld == null || this.theWorld.playerEntities.size() <= 1);
 	}
 	
 	/**
