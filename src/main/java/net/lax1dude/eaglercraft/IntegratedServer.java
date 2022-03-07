@@ -26,6 +26,15 @@ public class IntegratedServer {
 	private static String[] loadLocale = null;
 	private static String[] loadStats = null;
 	private static boolean isPaused = false;
+	private static List<String> integratedServerTPS = new LinkedList();
+	
+	public static List<String> getTPS() {
+		return integratedServerTPS;
+	}
+	
+	public static void clearTPS() { 
+		integratedServerTPS.clear();
+	}
 	
 	public static void begin() {
 		if(!isWorkerAlive()) {
@@ -42,6 +51,7 @@ public class IntegratedServer {
 			isPaused = false;
 			loadLocale = locale;
 			loadStats = stats;
+			clearTPS();
 			EaglerAdapter.beginLoadingIntegratedServer();
 		}
 	}
@@ -78,6 +88,7 @@ public class IntegratedServer {
 	
 	public static void loadWorld(String name, int difficulty, WorldSettings gen) {
 		ensureReady();
+		clearTPS();
 		statusState = IntegratedState.WORLD_LOADING;
 		isPaused = false;
 		
@@ -304,6 +315,11 @@ public class IntegratedServer {
 					}
 					case IPCPacket14StringList.ID: {
 						IPCPacket14StringList pkt = (IPCPacket14StringList)packet;
+						
+						if(pkt.opCode == IPCPacket14StringList.SERVER_TPS) {
+							integratedServerTPS.clear();
+							integratedServerTPS.addAll(pkt.stringList);
+						}
 						
 						// file path list for file browser
 						

@@ -178,6 +178,10 @@ public class Minecraft implements Runnable {
 	private void startTimerHackThread() {
 
 	}
+	
+	public boolean isSingleplayerOrLAN() {
+		return IntegratedServer.isWorldRunning();
+	}
 
 	public void setServer(String par1Str, int par2) {
 		this.serverName = par1Str;
@@ -1502,7 +1506,7 @@ public class Minecraft implements Runnable {
 			if (this.texturePackList.getIsDownloading()) {
 				this.texturePackList.onDownloadFinished();
 			}
-
+			IntegratedServer.unloadWorld();
 			this.setServerData((ServerData) null);
 			this.integratedServerIsRunning = false;
 		}

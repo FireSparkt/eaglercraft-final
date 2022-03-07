@@ -54,8 +54,9 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	private int ticksOfInvuln = 60;
 
 	/** must be between 3>x>15 (strictly between) */
-	private int renderDistance = 0;
-	private int chatVisibility = 0;
+	public int renderDistance = 0;
+	public int lastRenderDistance = 0;
+	public int chatVisibility = 0;
 	private boolean chatColours = true;
 
 	/**
@@ -81,7 +82,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		super(par2World);
 		par4ItemInWorldManager.thisPlayerMP = this;
 		this.theItemInWorldManager = par4ItemInWorldManager;
-		this.renderDistance = par1MinecraftServer.getConfigurationManager().getViewDistance();
+		this.renderDistance = this.lastRenderDistance = par1MinecraftServer.getConfigurationManager().getViewDistance();
 		ChunkCoordinates var5 = par2World.getSpawnPoint();
 		int var6 = var5.posX;
 		int var7 = var5.posZ;
@@ -180,7 +181,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 			Iterator var7 = this.loadedChunks.iterator();
 			ArrayList var8 = new ArrayList();
 
-			while (var7.hasNext() && var6.size() < 5) {
+			while (var7.hasNext() && var6.size() < this.renderDistance / 2) {
 				ChunkCoordIntPair var9 = (ChunkCoordIntPair) var7.next();
 				var7.remove();
 
@@ -806,11 +807,18 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		//if (this.translator.getLanguageList().containsKey(par1Packet204ClientInfo.getLanguage())) {
 		//	this.translator.setLanguage(par1Packet204ClientInfo.getLanguage(), false);
 		//}
-
-		int var2 = 256 >> par1Packet204ClientInfo.getRenderDistance();
+		
+		int var2 = 64 << 3 - par1Packet204ClientInfo.getRenderDistance();
+		if(var2 > 400) {
+			var2 = 400;
+		}
+		var2 = (var2 >> 5) + 2;
 
 		if (var2 > 3 && var2 < 15) {
 			this.renderDistance = var2;
+			if(this.lastRenderDistance != this.renderDistance) {
+				((WorldServer)this.worldObj).getPlayerManager().cycleRenderDistance(this);
+			}
 		}
 
 		this.chatVisibility = par1Packet204ClientInfo.getChatVisibility();

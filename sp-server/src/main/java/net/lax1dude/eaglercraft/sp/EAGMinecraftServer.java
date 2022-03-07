@@ -51,13 +51,13 @@ public class EAGMinecraftServer extends MinecraftServer {
 			this.getLogAgent().func_98236_b("Time ran backwards! Did the fucking system time change?");
 			delta = 0L;
 		}
-
+		
 		if (this.worldServers[0].areAllPlayersAsleep()) {
 			this.tick();
 			lastTick = System.currentTimeMillis();
 		} else {
 			boolean mustYield = false;
-			while (delta > 50L) {
+			while (delta >= 50L) {
 				if(mustYield) {
 					try {
 						Thread.sleep(1l); // allow some async

@@ -246,6 +246,9 @@ public class GameSettings {
 
 		if (par1EnumOptions == EnumOptions.RENDER_DISTANCE) {
 			this.renderDistance = this.renderDistance + par2 & 3;
+			if(this.mc.isSingleplayerOrLAN()) {
+				Minecraft.getMinecraft().displayEaglercraftText("changing render distance in singleplayer may take a few seconds, this is not a glitch plz don't report");
+			}
 		}
 
 		if (par1EnumOptions == EnumOptions.GUI_SCALE) {

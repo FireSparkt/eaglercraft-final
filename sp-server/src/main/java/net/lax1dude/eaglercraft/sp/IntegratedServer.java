@@ -121,18 +121,9 @@ public class IntegratedServer {
 			cur = new ArrayList<PKT>(messageQueue);
 			messageQueue.clear();
 		}
-		long watchDog = System.currentTimeMillis();
 		Iterator<PKT> itr = cur.iterator();
-		int overflow = 0;
 		while(itr.hasNext()) {
 			PKT msg = itr.next();
-			
-			if(System.currentTimeMillis() - watchDog > 150l && !msg.channel.equals("IPC")) {
-				++overflow;
-				continue;
-			}
-			
-			
 			if(msg.channel.equals("IPC")) {
 				
 				IPCPacketBase packet;
@@ -492,13 +483,25 @@ public class IntegratedServer {
 				}
 				
 				continue;
-			}else if(msg.channel.startsWith("NET|")) {
+			}
+		}
+		long watchDog = System.currentTimeMillis();
+		itr = cur.iterator();
+		int overflow = 0;
+		while(itr.hasNext()) {
+			PKT msg = itr.next();
+			if(!msg.channel.equals("IPC")) {
+				if(System.currentTimeMillis() - watchDog > 500l) {
+					++overflow;
+					continue;
+				}
+				if(!msg.channel.startsWith("NET|") || currentProcess == null) {
+					System.err.println("Unknown ICP channel: '" + msg.channel + "' passed " + msg.data.length + " bytes");
+					continue;
+				}
 				String u = msg.channel.substring(4);
 				currentProcess.getNetworkThread().recievePacket(u, msg.data);
-				continue;
 			}
-				
-			System.err.println("Unknown IPC channel: " + msg.channel);
 		}
 		if(overflow > 0) {
 			System.err.println("Async ICP queue is overloaded, server dropped " + overflow + " player packets");

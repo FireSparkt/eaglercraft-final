@@ -40,6 +40,14 @@ class PlayerInstance {
 			par1EntityPlayerMP.loadedChunks.add(this.currentChunk);
 		}
 	}
+	
+	public boolean hasPlayer(EntityPlayerMP player) {
+		return this.players.contains(player);
+	}
+	
+	public boolean isEmpty() {
+		return this.players.size() <= 0;
+	}
 
 	/**
 	 * remove player from this instance
@@ -53,8 +61,8 @@ class PlayerInstance {
 			par1EntityPlayerMP.loadedChunks.remove(this.currentChunk);
 
 			if (this.players.isEmpty()) {
-				long var2 = (long) this.currentChunk.chunkXPos + 2147483647L
-						| (long) this.currentChunk.chunkZPos + 2147483647L << 32;
+				long var2 = ((long) this.currentChunk.chunkXPos + 2147483647L)
+						| (((long) this.currentChunk.chunkZPos + 2147483647L) << 32);
 				PlayerManager.getChunkWatchers(this.thePlayerManager).remove(var2);
 
 				if (this.numBlocksToUpdate > 0) {

@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UnknownFormatConversionException;
 
 public class PlayerManager {
 	private final WorldServer theWorldServer;
@@ -15,12 +16,6 @@ public class PlayerManager {
 	/** the playerInstances(chunks) that need to be updated */
 	private final List playerInstancesToUpdate = new ArrayList();
 
-	/**
-	 * Number of chunks the server sends to the client. Valid 3<=x<=15. In
-	 * server.properties.
-	 */
-	private final int playerViewRadius;
-
 	/** x, z direction vectors: east, south, west, north */
 	private final int[][] xzDirectionsConst = new int[][] { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
 
@@ -30,7 +25,7 @@ public class PlayerManager {
 		} else if (par2 < 3) {
 			throw new IllegalArgumentException("Too small view radius!");
 		} else {
-			this.playerViewRadius = par2;
+			//this.playerViewRadius = par2;
 			this.theWorldServer = par1WorldServer;
 		}
 	}
@@ -65,8 +60,8 @@ public class PlayerManager {
 	 * passi n the chunk x and y and a flag as to whether or not the instance should
 	 * be made if it doesnt exist
 	 */
-	private PlayerInstance getPlayerInstance(int par1, int par2, boolean par3) {
-		long var4 = (long) par1 + 2147483647L | (long) par2 + 2147483647L << 32;
+	public PlayerInstance getPlayerInstance(int par1, int par2, boolean par3) {
+		long var4 = ((long) par1 + 2147483647L) | (((long) par2 + 2147483647L) << 32);
 		PlayerInstance var6 = (PlayerInstance) this.playerInstances.getValueByKey(var4);
 
 		if (var6 == null && par3) {
@@ -75,6 +70,11 @@ public class PlayerManager {
 		}
 
 		return var6;
+	}
+	
+	public void freePlayerInstance(long l) {
+		this.playerInstances.remove(l);
+		this.playerInstancesToUpdate.remove(l);
 	}
 
 	public void markBlockNeedsUpdate(int par1, int par2, int par3) {
@@ -86,6 +86,12 @@ public class PlayerManager {
 			var6.markBlockNeedsUpdate(par1 & 15, par2, par3 & 15);
 		}
 	}
+	
+	public void cycleRenderDistance(EntityPlayerMP player) {
+		//System.out.println("" + player.lastRenderDistance + " => " + player.renderDistance);
+		removePlayer(player);
+		addPlayer(player);
+	}
 
 	/**
 	 * Adds an EntityPlayerMP to the PlayerManager.
@@ -95,9 +101,10 @@ public class PlayerManager {
 		int var3 = (int) par1EntityPlayerMP.posZ >> 4;
 		par1EntityPlayerMP.managedPosX = par1EntityPlayerMP.posX;
 		par1EntityPlayerMP.managedPosZ = par1EntityPlayerMP.posZ;
-
-		for (int var4 = var2 - this.playerViewRadius; var4 <= var2 + this.playerViewRadius; ++var4) {
-			for (int var5 = var3 - this.playerViewRadius; var5 <= var3 + this.playerViewRadius; ++var5) {
+		
+		int rd = par1EntityPlayerMP.lastRenderDistance = par1EntityPlayerMP.renderDistance;
+		for (int var4 = var2 - rd; var4 <= var2 + rd; ++var4) {
+			for (int var5 = var3 - rd; var5 <= var3 + rd; ++var5) {
 				this.getPlayerInstance(var4, var5, true).addPlayer(par1EntityPlayerMP);
 			}
 		}
@@ -111,9 +118,12 @@ public class PlayerManager {
 	 * viewing range of the player.
 	 */
 	public void filterChunkLoadQueue(EntityPlayerMP par1EntityPlayerMP) {
+		if(par1EntityPlayerMP.lastRenderDistance != par1EntityPlayerMP.renderDistance) {
+			cycleRenderDistance(par1EntityPlayerMP);
+		}
 		ArrayList var2 = new ArrayList(par1EntityPlayerMP.loadedChunks);
 		int var3 = 0;
-		int var4 = this.playerViewRadius;
+		int var4 = par1EntityPlayerMP.renderDistance;
 		int var5 = (int) par1EntityPlayerMP.posX >> 4;
 		int var6 = (int) par1EntityPlayerMP.posZ >> 4;
 		int var7 = 0;
@@ -162,9 +172,10 @@ public class PlayerManager {
 	public void removePlayer(EntityPlayerMP par1EntityPlayerMP) {
 		int var2 = (int) par1EntityPlayerMP.managedPosX >> 4;
 		int var3 = (int) par1EntityPlayerMP.managedPosZ >> 4;
-
-		for (int var4 = var2 - this.playerViewRadius; var4 <= var2 + this.playerViewRadius; ++var4) {
-			for (int var5 = var3 - this.playerViewRadius; var5 <= var3 + this.playerViewRadius; ++var5) {
+		
+		int rd = par1EntityPlayerMP.lastRenderDistance;
+		for (int var4 = var2 - rd; var4 <= var2 + rd; ++var4) {
+			for (int var5 = var3 - rd; var5 <= var3 + rd; ++var5) {
 				PlayerInstance var6 = this.getPlayerInstance(var4, var5, false);
 
 				if (var6 != null) {
@@ -172,6 +183,7 @@ public class PlayerManager {
 				}
 			}
 		}
+		par1EntityPlayerMP.lastRenderDistance = par1EntityPlayerMP.renderDistance;
 
 		this.players.remove(par1EntityPlayerMP);
 	}
@@ -185,7 +197,10 @@ public class PlayerManager {
 	/**
 	 * update chunks around a player being moved by server logic (e.g. cart, boat)
 	 */
-	public void updateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
+	public void updateMountedMovingPlayer(final EntityPlayerMP par1EntityPlayerMP) {
+		if(par1EntityPlayerMP.renderDistance != par1EntityPlayerMP.lastRenderDistance) {
+			cycleRenderDistance(par1EntityPlayerMP);
+		}
 		int var2 = (int) par1EntityPlayerMP.posX >> 4;
 		int var3 = (int) par1EntityPlayerMP.posZ >> 4;
 		double var4 = par1EntityPlayerMP.managedPosX - par1EntityPlayerMP.posX;
@@ -195,7 +210,7 @@ public class PlayerManager {
 		if (var8 >= 64.0D) {
 			int var10 = (int) par1EntityPlayerMP.managedPosX >> 4;
 			int var11 = (int) par1EntityPlayerMP.managedPosZ >> 4;
-			int var12 = this.playerViewRadius;
+			int var12 = par1EntityPlayerMP.renderDistance;
 			int var13 = var2 - var10;
 			int var14 = var3 - var11;
 

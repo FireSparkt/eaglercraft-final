@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import java.util.function.BiConsumer;
+
 public class LongHashMap {
 	/** the array of all elements in the hash */
 	private transient LongHashMapEntry[] hashArray = new LongHashMapEntry[16];
@@ -178,6 +180,19 @@ public class LongHashMap {
 		}
 
 		return var6;
+	}
+	
+	public void iterate(BiConsumer<Long, Object> con) {
+		for(int i = 0; i < this.hashArray.length; ++i) {
+			LongHashMapEntry var5 = this.hashArray[i];
+			LongHashMapEntry var6;
+			LongHashMapEntry var7;
+	
+			for (var6 = var5; var6 != null; var6 = var7) {
+				var7 = var6.nextEntry;
+				con.accept(var6.key, var6.value);
+			}
+		}
 	}
 
 	/**

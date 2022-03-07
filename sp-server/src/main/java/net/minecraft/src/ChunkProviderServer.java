@@ -47,6 +47,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	}
 
 	public void dropChunk(int par1, int par2) {
+		/*
 		if (this.worldObj.provider.canRespawnHere()) {
 			ChunkCoordinates var3 = this.worldObj.getSpawnPoint();
 			int var4 = par1 * 16 + 8 - var3.posX;
@@ -57,8 +58,9 @@ public class ChunkProviderServer implements IChunkProvider {
 				this.droppedChunksSet.add(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(par1, par2)));
 			}
 		} else {
+		*/
 			this.droppedChunksSet.add(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(par1, par2)));
-		}
+		//}
 	}
 
 	/**
@@ -88,8 +90,11 @@ public class ChunkProviderServer implements IChunkProvider {
 				if (this.serverChunkGenerator == null) {
 					var5 = this.dummyChunk;
 				} else {
+					++_g;
 					var5 = this.serverChunkGenerator.provideChunk(par1, par2);
 				}
+			}else {
+				++_r;
 			}
 
 			this.id2ChunkMap.add(var3, var5);
@@ -151,6 +156,7 @@ public class ChunkProviderServer implements IChunkProvider {
 
 	private void saveChunkData(Chunk par1Chunk) {
 		if (this.chunkLoader != null) {
+			++_w;
 			try {
 				par1Chunk.lastSaveTime = this.worldObj.getTotalWorldTime();
 				this.chunkLoader.saveChunk(this.worldObj, par1Chunk);
@@ -211,6 +217,8 @@ public class ChunkProviderServer implements IChunkProvider {
 			this.chunkLoader.saveExtraData();
 		}
 	}
+	
+	private long fixTheFuckingMemoryLeak = 0l;
 
 	/**
 	 * Unloads chunks that are marked to be unloaded. This is not guaranteed to
@@ -218,6 +226,20 @@ public class ChunkProviderServer implements IChunkProvider {
 	 */
 	public boolean unloadQueuedChunks() {
 		if (!this.worldObj.levelSaving) {
+			
+			long millis = System.currentTimeMillis();
+			if(millis - fixTheFuckingMemoryLeak > 10000l) {  // FUCK OFF SUCK MY FUCKING COCK
+				fixTheFuckingMemoryLeak = millis;
+				this.id2ChunkMap.iterate((l,o) -> {
+					Chunk id = (Chunk) o;
+					PlayerInstance ii = this.worldObj.getPlayerManager().getPlayerInstance(id.xPosition, id.zPosition, false);
+					if((ii == null || ii.isEmpty()) && !droppedChunksSet.contains(l)) {
+						this.droppedChunksSet.add(l);
+						//System.out.println("Leaked: " + id);
+					}
+				});
+			}
+			
 			for (int var1 = 0; var1 < 100; ++var1) {
 				if (!this.droppedChunksSet.isEmpty()) {
 					Long var2 = (Long) this.droppedChunksSet.iterator().next();
@@ -225,9 +247,11 @@ public class ChunkProviderServer implements IChunkProvider {
 					var3.onChunkUnload();
 					this.saveChunkData(var3);
 					this.saveChunkExtraData(var3);
+					this.worldObj.getPlayerManager().freePlayerInstance(var2);
 					this.droppedChunksSet.remove(var2);
 					this.id2ChunkMap.remove(var2.longValue());
 					this.loadedChunks.remove(var3);
+					//System.out.println("" + this.droppedChunksSet.size() + ", " + this.id2ChunkMap.getNumHashElements());
 				}
 			}
 
@@ -274,5 +298,27 @@ public class ChunkProviderServer implements IChunkProvider {
 	}
 
 	public void recreateStructures(int par1, int par2) {
+	}
+	
+	private int _r = 0;
+	private int _w = 0;
+	private int _g = 0;
+	
+	public int statR() {
+		int r = _r;
+		_r = 0;
+		return r;
+	}
+	
+	public int statW() {
+		int w = _w;
+		_w = 0;
+		return w;
+	}
+	
+	public int statG() {
+		int g = _g;
+		_g = 0;
+		return g;
 	}
 }

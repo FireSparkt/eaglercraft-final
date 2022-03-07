@@ -259,7 +259,7 @@ public class Chunk {
 	/**
 	 * Runs delayed skylight updates.
 	 */
-	private void updateSkylight_do() {
+	private boolean updateSkylight_do() {
 		this.worldObj.theProfiler.startSection("recheckGaps");
 
 		if (this.worldObj.doChunksNearChunkExist(this.xPosition * 16 + 8, 0, this.zPosition * 16 + 8, 16)) {
@@ -300,6 +300,8 @@ public class Chunk {
 		}
 
 		this.worldObj.theProfiler.endSection();
+		
+		return !this.isGapLightingUpdated;
 	}
 
 	/**
@@ -325,6 +327,8 @@ public class Chunk {
 			this.isModified = true;
 		}
 	}
+	
+	public static int totalBlockLightUpdates = 0;
 
 	/**
 	 * Initiates the recalculation of both the block-light and sky-light for a given
@@ -419,7 +423,9 @@ public class Chunk {
 				this.updateSkylightNeighborHeight(var6, var7 + 1, var12, var13);
 				this.updateSkylightNeighborHeight(var6, var7, var12, var13);
 			}
-
+			
+			++totalBlockLightUpdates;
+			
 			this.isModified = true;
 		}
 	}
@@ -991,10 +997,11 @@ public class Chunk {
 	/**
 	 * Checks whether skylight needs updated; if it does, calls updateSkylight_do
 	 */
-	public void updateSkylight() {
+	public boolean updateSkylight() {
 		if (this.isGapLightingUpdated && !this.worldObj.provider.hasNoSky) {
-			this.updateSkylight_do();
+			return this.updateSkylight_do();
 		}
+		return false;
 	}
 
 	/**

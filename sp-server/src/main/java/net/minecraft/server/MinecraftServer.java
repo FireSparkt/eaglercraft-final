@@ -10,11 +10,13 @@ import net.lax1dude.eaglercraft.sp.WorkerListenThread;
 import net.lax1dude.eaglercraft.sp.VFSSaveHandler;
 import net.lax1dude.eaglercraft.sp.VFile;
 import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0DProgressUpdate;
+import net.lax1dude.eaglercraft.sp.ipc.IPCPacket14StringList;
 import net.minecraft.src.AxisAlignedBB;
 import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.CommandBase;
 import net.minecraft.src.DispenserBehaviors;
 import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.EnumGameType;
 import net.minecraft.src.ICommandManager;
 import net.minecraft.src.ICommandSender;
@@ -121,6 +123,10 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 	protected String userMessage;
 	protected boolean startProfiling;
 	protected boolean field_104057_T = false;
+
+	private int tpsCounter = 0;
+	private int tpsMeasure = 0;
+	private long tpsTimer = 0l;
 
 	public MinecraftServer(String folder) {
 		mcServer = this;
@@ -441,6 +447,53 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		this.lastReceivedSize = Packet.receivedSize;
 		this.theProfiler.endSection();
 		this.theProfiler.endSection();
+		
+		++tpsCounter;
+		long millis = System.currentTimeMillis();
+		if(millis - tpsTimer >= 1000l) {
+			tpsTimer = millis;
+			tpsMeasure = tpsCounter;
+			IntegratedServer.sendIPCPacket(new IPCPacket14StringList(IPCPacket14StringList.SERVER_TPS, getTPSAndChunkBuffer()));
+			tpsCounter = 0;
+		}
+	}
+	
+	public List<String> getTPSAndChunkBuffer() {
+		ArrayList<String> strs = new ArrayList();
+		strs.add("Ticks/Second: " + tpsCounter + "/20");
+		
+		int c = 0;
+		int oc = 0;
+		int e = 0;
+		int te = 0;
+		int r = 0;
+		int w = 0;
+		int g = 0;
+		int tu = 0;
+		int lu = 0;
+		for(int i = 0; i < worldServers.length; ++i) {
+			c += worldServers[i].getChunkProvider().getLoadedChunkCount();
+			e += worldServers[i].loadedEntityList.size();
+			te += worldServers[i].loadedTileEntityList.size();
+			r += worldServers[i].getR();
+			w += worldServers[i].getW();
+			g += worldServers[i].getG();
+			lu += worldServers[i].getLU();
+			tu += worldServers[i].getTU();
+		}
+		for(EntityPlayerMP p : (List<EntityPlayerMP>)this.playersOnline) {
+			oc += p.loadedChunks.size();
+		}
+
+		strs.add("Chunks: " + c + "/" + (c + oc));
+		strs.add("Entities: " + e + "+" + te);
+		strs.add("R: " + r + ", G: " + g + ", W: " + w);
+		strs.add("TU: " + tu + " LU: " + lu);
+		int pp = this.playersOnline.size();
+		if(pp > 1) {
+			strs.add("Players: " + pp);
+		}
+		return strs;
 	}
 
 	public void updateTimeLightAndEntities() {

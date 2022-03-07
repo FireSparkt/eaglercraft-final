@@ -13,6 +13,7 @@ public class IPCPacket14StringList implements IPCPacketBase {
 	public static final int FILE_LIST = 0x0;
 	public static final int LOCALE = 0x1;
 	public static final int STAT_GUID = 0x2;
+	public static final int SERVER_TPS = 0x3;
 
 	public int opCode;
 	public final List<String> stringList;

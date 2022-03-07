@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
@@ -416,6 +417,14 @@ public class GuiIngame extends Gui {
 			var24 = MathHelper.floor_double((double) (this.mc.thePlayer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 			this.drawString(var8, "f: " + var24 + " (" + Direction.directions[var24] + ") / " + MathHelper.wrapAngleTo180_float(this.mc.thePlayer.rotationYaw), 2, 88, 14737632);
 
+			if(IntegratedServer.isWorldRunning()) {
+				this.drawString(var8, "IntegratedServer is running", 2, 106, 14737632);
+				List<String> info = IntegratedServer.getTPS();
+				for(int i = 0, size = info.size(); i < size; ++i) {
+					this.drawString(var8, info.get(i), 2, 122 + i * 8, 14737632);
+				}
+			}
+			
 			//this.drawString(var8, String.format("ws: %.3f, fs: %.3f, g: %b, fl: %d", new Object[] { Float.valueOf(this.mc.thePlayer.capabilities.getWalkSpeed()), Float.valueOf(this.mc.thePlayer.capabilities.getFlySpeed()),
 			//		Boolean.valueOf(this.mc.thePlayer.onGround), Integer.valueOf(this.mc.theWorld.getHeightValue(var47, var23)) }), 2, 104, 14737632);
 			var45 = "opengl emulator status - v1.0";
@@ -445,6 +454,14 @@ public class GuiIngame extends Gui {
 			EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
 			var8.drawStringWithShadow(this.mc.renderGlobal.getDebugInfoShort(), 2, 2, 16777215);
 			var8.drawStringWithShadow("x: "+MathHelper.floor_double(this.mc.thePlayer.posX)+", y: "+MathHelper.floor_double(this.mc.thePlayer.posY)+", z: "+MathHelper.floor_double(this.mc.thePlayer.posZ), 2, 12, 16777215);
+			if(IntegratedServer.isWorldRunning()) {
+				String strr = "Playing Singleplayer";
+				var8.drawStringWithShadow(strr, (int)(var6 / 0.75f) - var8.getStringWidth(strr) - 2, 2, 0xFFFFAA);
+				List<String> info = IntegratedServer.getTPS();
+				for(int i = 0, size = info.size(); i < size; ++i) {
+					var8.drawStringWithShadow(info.get(i), (int)(var6 / 0.75f) - var8.getStringWidth(info.get(i)) - 2, 12 + i * 10, 14737632);
+				}
+			}
 			EaglerAdapter.glPopMatrix();
 		}
 

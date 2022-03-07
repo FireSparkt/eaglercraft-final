@@ -28,6 +28,20 @@ public class WorldServer extends World {
 	private int updateEntityTick = 0;
 	private final Teleporter field_85177_Q;
 
+	private int r = 0;
+	private int w = 0;
+	private int g = 0;
+	private int tu = 0;
+	private int lu = 0;
+	
+	private int _r = 0;
+	private int _w = 0;
+	private int _g = 0;
+	private int _tu = 0;
+	private int _lu = 0;
+	
+	private long rwgtuluTimer = 0l;
+	
 	/**
 	 * Double buffer of ServerBlockEventList[] for holding pending BlockEventData's
 	 */
@@ -145,6 +159,43 @@ public class WorldServer extends World {
 		this.field_85177_Q.removeStalePortalLocations(this.getTotalWorldTime());
 		this.theProfiler.endSection();
 		this.sendAndApplyBlockEvents();
+
+		_r += this.theChunkProviderServer.statR();
+		_w += this.theChunkProviderServer.statW();
+		_g += this.theChunkProviderServer.statG();
+		_lu += Chunk.totalBlockLightUpdates;
+		Chunk.totalBlockLightUpdates = 0;
+		
+		long millis = System.currentTimeMillis();
+		if(millis - rwgtuluTimer >= 1000l) {
+			rwgtuluTimer = millis;
+			r = _r; _r = 0;
+			w = _w; _w = 0;
+			g = _g; _g = 0;
+			tu = _tu; _tu = 0;
+			lu = _lu; _lu = 0;
+		}
+		
+	}
+	
+	public int getR() {
+		return r;
+	}
+	
+	public int getW() {
+		return w;
+	}
+	
+	public int getG() {
+		return g;
+	}
+	
+	public int getTU() {
+		return tu;
+	}
+	
+	public int getLU() {
+		return lu;
 	}
 
 	/**
@@ -232,7 +283,9 @@ public class WorldServer extends World {
 			Chunk var7 = this.getChunkFromChunkCoords(var4.chunkXPos, var4.chunkZPos);
 			this.moodSoundAndLightCheck(var5, var6, var7);
 			this.theProfiler.endStartSection("tickChunk");
-			var7.updateSkylight();
+			if(var7.updateSkylight()) {
+				++_lu;
+			}
 			this.theProfiler.endStartSection("thunder");
 			int var8;
 			int var9;
@@ -303,6 +356,7 @@ public class WorldServer extends World {
 						if (var18 != null && var18.getTickRandomly()) {
 							++var1;
 							var18.updateTick(this, var14 + var5, var16 + var20.getYLocation(), var15 + var6, this.rand);
+							++_tu;
 						}
 					}
 				}
@@ -340,6 +394,7 @@ public class WorldServer extends World {
 
 					if (var9 == var7.blockID && var9 > 0) {
 						Block.blocksList[var9].updateTick(this, var7.xCoord, var7.yCoord, var7.zCoord, this.rand);
+						++_tu;
 					}
 				}
 
@@ -445,6 +500,7 @@ public class WorldServer extends World {
 
 					if (var6 > 0 && Block.isAssociatedBlockID(var6, var4.blockID)) {
 						Block.blocksList[var6].updateTick(this, var4.xCoord, var4.yCoord, var4.zCoord, this.rand);
+						++_tu;
 					}
 				} else {
 					this.scheduleBlockUpdate(var4.xCoord, var4.yCoord, var4.zCoord, var4.blockID, 0);
