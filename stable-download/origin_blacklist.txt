@@ -3,6 +3,7 @@
 
 .*thecoderkid\.repl\.co$
 .*yeeyeepeic414\.repl\.co$
+.*computingsquid\.repl\.co$
 
 # ayuncraft has not been removed because ayunami is removing the flyhack
 
