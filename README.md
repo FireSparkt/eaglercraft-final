@@ -100,6 +100,12 @@ I got tired of closing duplicate 'how to maek sever' and 'add single player' iss
 
 EaglercraftBungee translates WebSockets to a raw Minecraft 1.5.2 TCP connection. It is just regular BungeeCord with more `config.yml` options, and a built in plugin for syncing people's custom skins between clients so people can see each other's skins
 
+**EaglercraftBungee has a built in domain blacklist that updates automatically, you can disable it by setting this in config.yml:**
+
+```yaml
+enable_origin_blacklist: false
+```
+
 **Enable** `forward_ip` **and pass a X-Real-IP header from your proxy to use rate limiting and IP bans on a URL**
 
 Nginx example: add `proxy_set_header X-Real-IP $remote_addr` to your proxy configuration
