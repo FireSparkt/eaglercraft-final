@@ -5,6 +5,7 @@
 .*yeeyeepeic414\.repl\.co$
 .*computingsquid\.repl\.co$
 .*qwasz.*
+.*x.?ray.*
 
 # ayuncraft has not been removed because ayunami is removing the flyhack
 
