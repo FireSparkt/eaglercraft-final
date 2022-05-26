@@ -4,7 +4,7 @@ public class EaglercraftBungee {
 
 	public static final String brand = "Eagtek";
 	public static final String name = "EaglercraftBungee";
-	public static final String version = "0.2.0";
+	public static final String version = "0.3.0"; // wtf does this even mean at this point
 	public static final boolean cracked = true;
 
 }

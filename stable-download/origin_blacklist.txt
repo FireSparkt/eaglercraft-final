@@ -1,0 +1,9 @@
+# eaglercraft domain blacklist
+# this is a fallback in case eags.us goes down
+
+.*thecoderkid\.repl\.co$
+
+# ayuncraft has not been removed because ayunami is removing the flyhack
+
+# snitch other domains out at https://g.eags.us/eaglercraft/report.html
+# or join the discord server at https://discord.com/invite/KMQW9Uvjyq and ping @Moderator with the domain and name of the client

@@ -139,31 +139,39 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		}
 		InetAddress sc = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
 		if(sc == null) {
-			System.out.println("WARNING: player '" + un + "' doesn't have a websocket IP, remote address: " + this.ch.getHandle().remoteAddress().toString());
+			this.bungee.getLogger().log(Level.WARNING, "player '" + un + "' doesn't have a websocket IP, remote address: " + this.ch.getHandle().remoteAddress().toString());
 		}else {
 			BanCheck bc = BanList.checkIpBanned(sc);
 			if(bc.isBanned()) {
-				System.err.println("Player '" + un + "' [" + sc.toString() + "] is banned by IP: " + bc.match + " (" + bc.string + ")");
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' [" + sc.toString() + "] is banned by IP: " + bc.match + " (" + bc.string + ")");
 				this.disconnect("" + ChatColor.RED + "You are banned.\n" + ChatColor.DARK_GRAY + "Reason: " + bc.string);
 				return;
 			}else {
-				System.out.println("Player '" + un + "' [" + sc.toString() + "] has remote websocket IP: " + sc.getHostAddress());
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] has remote websocket IP: " + sc.getHostAddress());
+			}
+		}
+		String dnm = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		if(dnm != null) {
+			if(dnm.equalsIgnoreCase("null")) {
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] is using an offline download");
+			}else {
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] is using a client at: " + dnm);
 			}
 		}
 		BanCheck bc = BanList.checkBanned(un);
 		if(bc.isBanned()) {
 			switch(bc.reason) {
 			case USER_BANNED:
-				System.err.println("Player '" + un + "' is banned by username, because '" + bc.string + "'");
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by username, because '" + bc.string + "'");
 				break;
 			case WILDCARD_BANNED:
-				System.err.println("Player '" + un + "' is banned by wildcard: " + bc.match);
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by wildcard: " + bc.match);
 				break;
 			case REGEX_BANNED:
-				System.err.println("Player '" + un + "' is banned by regex: " + bc.match);
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by regex: " + bc.match);
 				break;
 			default:
-				System.err.println("Player '" + un + "' is banned: " + bc.string);
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned: " + bc.string);
 			}
 			if(bc.reason == BanState.USER_BANNED || ((BungeeCord)bungee).config.shouldShowBanType()) {
 				this.disconnect("" + ChatColor.RED + "You are banned.\n" + ChatColor.DARK_GRAY + "Reason: " + bc.string);
@@ -241,6 +249,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		InetAddress ins = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
 		if(ins != null) {
 			userCon.getAttachment().put("remoteAddr", ins);
+		}
+		String origin = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		if(origin != null) {
+			userCon.getAttachment().put("origin", origin);
 		}
 		userCon.init();
 		this.bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));

@@ -31,10 +31,12 @@ public class WebSocketListener extends WebSocketServer {
 	public static class PendingSocket {
 		public long openTime;
 		public InetAddress realAddress;
+		public String origin;
 		public boolean bypassBan;
-		protected PendingSocket(long openTime, InetAddress realAddress, boolean bypassBan) {
+		protected PendingSocket(long openTime, InetAddress realAddress, String origin, boolean bypassBan) {
 			this.openTime = openTime;
 			this.realAddress = realAddress;
+			this.origin = origin;
 			this.bypassBan = bypassBan;
 		}
 	}
@@ -192,7 +194,7 @@ public class WebSocketListener extends WebSocketServer {
 					return;
 				}
 			}
-			WebSocketProxy proxyObj = new WebSocketProxy(arg0, realAddr, bungeeProxy);
+			WebSocketProxy proxyObj = new WebSocketProxy(arg0, realAddr, ((PendingSocket)o).origin, bungeeProxy);
 			arg0.setAttachment(proxyObj);
 			if(!proxyObj.connect()) {
 				System.err.println("loopback to '" + bungeeProxy.toString() + "' failed - " + realAddr);
@@ -212,6 +214,19 @@ public class WebSocketListener extends WebSocketServer {
 
 	@Override
 	public void onOpen(WebSocket arg0, ClientHandshake arg1) {
+		String origin = arg1.getFieldValue("Origin");
+		if(origin != null) {
+			int idx = origin.indexOf("://");
+			if(idx != -1) {
+				origin = origin.substring(idx + 3);
+			}
+			origin = origin.trim();
+			if(DomainBlacklist.test(origin)) {
+				arg0.send(createRawKickPacket("End of Stream (RIP)"));
+				arg0.close();
+				return;
+			}
+		}
 		InetAddress addr;
 		if(info.hasForwardedHeaders()) {
 			String s = arg1.getFieldValue("X-Real-IP");
@@ -242,7 +257,7 @@ public class WebSocketListener extends WebSocketServer {
 				return;
 			}
 		}
-		arg0.setAttachment(new PendingSocket(System.currentTimeMillis(), addr, bypassBan));
+		arg0.setAttachment(new PendingSocket(System.currentTimeMillis(), addr, origin, bypassBan));
 	}
 
 	@Override

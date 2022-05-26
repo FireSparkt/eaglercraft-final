@@ -31,20 +31,24 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 	private InetSocketAddress tcpListener;
 	private InetSocketAddress localAddress;
 	private InetAddress realRemoteAddr;
+	private String origin;
 	private NioSocketChannel tcpChannel;
 	
 	private static final EventLoopGroup group = new NioEventLoopGroup(4);
 	public static final HashMap<InetSocketAddress,InetAddress> localToRemote = new HashMap();
+	public static final HashMap<InetSocketAddress,String> origins = new HashMap();
 	
-	public WebSocketProxy(WebSocket w, InetAddress remoteAddr, InetSocketAddress addr) {
+	public WebSocketProxy(WebSocket w, InetAddress remoteAddr, String originz, InetSocketAddress addr) {
 		client = w;
 		realRemoteAddr = remoteAddr;
+		origin = originz;
 		tcpListener = addr;
 		tcpChannel = null;
 	}
 	
 	public void killConnection() {
 		localToRemote.remove(localAddress);
+		origins.remove(localAddress);
 		if(tcpChannel != null && tcpChannel.isOpen()) {
 			try {
 				tcpChannel.disconnect().sync();
@@ -69,12 +73,16 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 							@Override
 							public void operationComplete(Future<? super Void> paramF) throws Exception {
 								localToRemote.remove(localAddress);
+								origins.remove(localAddress);
 							}
 						});
 				    }
 				});
 				tcpChannel = (NioSocketChannel) clientBootstrap.connect().sync().channel();
 				localToRemote.put(localAddress = tcpChannel.localAddress(), realRemoteAddr);
+				if(origin != null) {
+					origins.put(localAddress, origin);
+				}
 				return true;
 			}
 		}catch(Throwable t) {
@@ -104,6 +112,7 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 	
 	public void finalize() {
 		localToRemote.remove(localAddress);
+		origins.remove(localAddress);
 	}
 	
 }

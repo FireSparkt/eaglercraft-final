@@ -70,10 +70,11 @@ public class YamlConfig implements ConfigurationAdapter {
 		}
 		final Map<String, Object> permissions = this.get("permissions", new HashMap<String, Object>());
 		if (permissions.isEmpty()) {
-			permissions.put("default", Arrays.asList("bungeecord.command.server", "bungeecord.command.list"));
+			permissions.put("default", Arrays.asList("bungeecord.command.server", "bungeecord.command.list", "bungeecord.command.eag.domain"));
 			permissions.put("admin", Arrays.asList("bungeecord.command.alert", "bungeecord.command.end", "bungeecord.command.ip", "bungeecord.command.reload",
 			"bungeecord.command.eag.ban", "bungeecord.command.eag.banwildcard", "bungeecord.command.eag.banip", "bungeecord.command.eag.banregex",
-			"bungeecord.command.eag.reloadban", "bungeecord.command.eag.banned", "bungeecord.command.eag.banlist", "bungeecord.command.eag.unban", "bungeecord.command.eag.ratelimit"));
+			"bungeecord.command.eag.reloadban", "bungeecord.command.eag.banned", "bungeecord.command.eag.banlist", "bungeecord.command.eag.unban", "bungeecord.command.eag.ratelimit",
+			"bungeecord.command.eag.blockdomain", "bungeecord.command.eag.blockdomainname", "bungeecord.command.eag.unblockdomain"));
 		}
 		this.get("groups", new HashMap<String, Object>());
 	}
@@ -286,6 +287,27 @@ public class YamlConfig implements ConfigurationAdapter {
 	@Override
 	public void forceSave() {
 		this.save();
+	}
+
+	@Override
+	public Collection<String> getBlacklistURLs() {
+		boolean blacklistEnable = this.getBoolean("enable_origin_blacklist", true);
+		if(!blacklistEnable) {
+			return null;
+		}
+		Collection<String> c = this.get("origin_blacklist_subscriptions", null);
+		if(c == null) {
+			c = new ArrayList();
+			c.add("https://g.eags.us/eaglercraft/origin_blacklist.txt");
+			c.add("https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt");
+			c = this.get("origin_blacklist_subscriptions", c);
+		}
+		return c;
+	}
+
+	@Override
+	public boolean getBlacklistOfflineDownload() {
+		return this.getBoolean("enable_offline_download_blacklist", false);
 	}
 	
 }

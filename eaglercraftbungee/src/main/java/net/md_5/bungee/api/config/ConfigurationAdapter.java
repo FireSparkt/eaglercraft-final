@@ -23,6 +23,10 @@ public interface ConfigurationAdapter {
 	Collection<String> getGroups(final String p0);
 
 	Collection<String> getPermissions(final String p0);
+
+	Collection<String> getBlacklistURLs();
+	
+	boolean getBlacklistOfflineDownload();
 	
 	AuthServiceInfo getAuthSettings();
 

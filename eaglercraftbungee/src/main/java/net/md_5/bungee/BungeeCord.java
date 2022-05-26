@@ -61,6 +61,10 @@ import net.md_5.bungee.command.CommandPerms;
 import net.md_5.bungee.command.CommandBungee;
 import net.md_5.bungee.command.CommandClearRatelimit;
 import net.md_5.bungee.command.CommandConfirmCode;
+import net.md_5.bungee.command.CommandDomain;
+import net.md_5.bungee.command.CommandDomainBlock;
+import net.md_5.bungee.command.CommandDomainBlockDomain;
+import net.md_5.bungee.command.CommandDomainUnblock;
 import net.md_5.bungee.command.CommandAlert;
 import net.md_5.bungee.command.CommandIP;
 import net.md_5.bungee.command.CommandServer;
@@ -72,6 +76,7 @@ import net.md_5.bungee.command.CommandReload;
 import net.md_5.bungee.scheduler.BungeeScheduler;
 import net.md_5.bungee.config.YamlConfig;
 import net.md_5.bungee.eaglercraft.BanList;
+import net.md_5.bungee.eaglercraft.DomainBlacklist;
 import net.md_5.bungee.eaglercraft.PluginEaglerSkins;
 import net.md_5.bungee.eaglercraft.WebSocketListener;
 
@@ -156,6 +161,10 @@ public class BungeeCord extends ProxyServer {
 		this.getPluginManager().registerCommand(null, new CommandFind());
 		this.getPluginManager().registerCommand(null, new CommandClearRatelimit());
 		this.getPluginManager().registerCommand(null, new CommandConfirmCode());
+		this.getPluginManager().registerCommand(null, new CommandDomain());
+		this.getPluginManager().registerCommand(null, new CommandDomainBlock());
+		this.getPluginManager().registerCommand(null, new CommandDomainBlockDomain());
+		this.getPluginManager().registerCommand(null, new CommandDomainUnblock());
 		this.registerChannel("BungeeCord");
 		Log.setOutput(new PrintStream(ByteStreams.nullOutputStream()));
 		AnsiConsole.systemInstall();
@@ -243,9 +252,11 @@ public class BungeeCord extends ProxyServer {
 				BanList.maybeReloadBans(null);
 			}
 		}, 0L, TimeUnit.SECONDS.toMillis(3L));
+		DomainBlacklist.init();
 		this.closeInactiveSockets.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
+				DomainBlacklist.update();
 				for(WebSocketListener lst : BungeeCord.this.wsListeners) {
 					lst.closeInactiveSockets();
 					ListenerInfo info = lst.getInfo();
