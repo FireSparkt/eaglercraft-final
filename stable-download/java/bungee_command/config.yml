@@ -61,6 +61,7 @@ permissions:
   default:
   - bungeecord.command.server
   - bungeecord.command.list
+  - bungeecord.command.eag.domain
   admin:
   - bungeecord.command.alert
   - bungeecord.command.end
@@ -75,4 +76,7 @@ permissions:
   - bungeecord.command.eag.banlist
   - bungeecord.command.eag.unban
   - bungeecord.command.eag.ratelimit
+  - bungeecord.command.eag.blockdomain
+  - bungeecord.command.eag.blockdomainname
+  - bungeecord.command.eag.unblockdomain
 groups: {}

@@ -18,14 +18,29 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.config.ConfigurationAdapter;
 
 public class DomainBlacklist {
 
-	public static final Collection<Pattern> regexBlacklist = new HashSet();
-	public static final Collection<Pattern> regexLocalBlacklist = new HashSet();
+	public static final Collection<Pattern> regexBlacklist = new ArrayList();
+	public static final Collection<Pattern> regexLocalBlacklist = new ArrayList();
+	public static final Collection<Pattern> regexBlacklistReplit = new ArrayList();
 	public static final File localBlacklist = new File("origin_blacklist.txt");
+	private static Collection<String> blacklistSubscriptions = null;
+	private static boolean blockOfflineDownload = false;
+	private static boolean blockAllReplits = false;
 	private static final HashSet<String> brokenURLs = new HashSet();
 	private static final HashSet<String> brokenRegex = new HashSet();
+
+	public static final HashSet<String> regexBlacklistReplitInternalStrings = new HashSet();
+	public static final Collection<Pattern> regexBlacklistReplitInternal = new ArrayList();
+	
+	static {
+		regexBlacklistReplitInternalStrings.add(".*repl(it)?\\..{1,5}$");
+		for(String s : regexBlacklistReplitInternalStrings) {
+			regexBlacklistReplitInternal.add(Pattern.compile(s));
+		}
+	}
 
 	private static int updateRate = 15 * 60 * 1000;
 	private static long lastLocalUpdate = 0l;
@@ -33,8 +48,20 @@ public class DomainBlacklist {
 	
 	public static boolean test(String origin) {
 		synchronized(regexBlacklist) {
-			if(origin.equalsIgnoreCase("null") && BungeeCord.getInstance().getConfigurationAdapter().getBlacklistOfflineDownload()) {
+			if(blockOfflineDownload && origin.equalsIgnoreCase("null")) {
 				return true;
+			}
+			if(blockAllReplits) {
+				for(Pattern m : regexBlacklistReplitInternal) {
+					if(m.matcher(origin).matches()) {
+						return true;
+					}
+				}
+				for(Pattern m : regexBlacklistReplit) {
+					if(m.matcher(origin).matches()) {
+						return true;
+					}
+				}
 			}
 			for(Pattern m : regexBlacklist) {
 				if(m.matcher(origin).matches()) {
@@ -50,12 +77,17 @@ public class DomainBlacklist {
 		return false;
 	}
 	
-	public static void init() {
+	public static void init(BungeeCord bg) {
 		synchronized(regexBlacklist) {
 			brokenURLs.clear();
 			brokenRegex.clear();
 			regexBlacklist.clear();
 			regexLocalBlacklist.clear();
+			regexBlacklistReplit.clear();
+			ConfigurationAdapter cfg = bg.getConfigurationAdapter();
+			blacklistSubscriptions = cfg.getBlacklistURLs();
+			blockOfflineDownload = cfg.getBlacklistOfflineDownload();
+			blockAllReplits = cfg.getBlacklistReplits();
 			lastLocalUpdate = 0l;
 			lastUpdate = System.currentTimeMillis() - updateRate - 1000l;
 			update();
@@ -67,11 +99,12 @@ public class DomainBlacklist {
 		if((int)(ct - lastUpdate) > updateRate) {
 			lastUpdate = ct;
 			synchronized(regexBlacklist) {
-				Collection<String> blurls = BungeeCord.getInstance().getConfigurationAdapter().getBlacklistURLs();
-				if(blurls != null) {
+				if(blacklistSubscriptions != null) {
 					ArrayList<Pattern> newBlacklist = new ArrayList();
+					ArrayList<Pattern> newReplitBlacklist = new ArrayList();
 					HashSet<String> newBlacklistSet = new HashSet();
-					for(String str : blurls) {
+					newBlacklistSet.addAll(regexBlacklistReplitInternalStrings);
+					for(String str : blacklistSubscriptions) {
 						try {
 							URL u;
 							try {
@@ -103,6 +136,21 @@ public class DomainBlacklist {
 							while((ss = is.readLine()) != null) {
 								if((ss = ss.trim()).length() > 0) {
 									if(ss.startsWith("#")) {
+										ss = ss.substring(1).trim();
+										if(ss.startsWith("replit-wildcard:")) {
+											ss = ss.substring(16).trim();
+											if(newBlacklistSet.add(ss)) {
+												try {
+													newReplitBlacklist.add(Pattern.compile(ss));
+												}catch(PatternSyntaxException shit) {
+													if(brokenRegex.add(ss)) {
+														System.err.println("ERROR: the blacklist replit wildcard regex '" + ss + "' is invalid");
+														continue;
+													}
+												}
+												brokenRegex.remove(ss);
+											}
+										}
 										continue;
 									}
 									if(newBlacklistSet.add(ss)) {
@@ -131,11 +179,14 @@ public class DomainBlacklist {
 						regexBlacklist.clear();
 						regexBlacklist.addAll(newBlacklist);
 					}
+					if(!newReplitBlacklist.isEmpty()) {
+						regexBlacklistReplit.clear();
+						regexBlacklistReplit.addAll(newReplitBlacklist);
+					}
 				}else {
 					brokenURLs.clear();
 					brokenRegex.clear();
 					regexBlacklist.clear();
-					regexLocalBlacklist.clear();
 					lastLocalUpdate = 0l;
 				}
 			}

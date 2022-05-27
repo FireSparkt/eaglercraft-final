@@ -8,6 +8,8 @@
 .*qwasz.*
 .*x.?ray.*
 
+# replit-wildcard: .*repl(it)?\..{1,5}$
+
 # ayuncraft has not been removed because ayunami is removing the flyhack
 
 # snitch other domains out at https://g.eags.us/eaglercraft/report.html

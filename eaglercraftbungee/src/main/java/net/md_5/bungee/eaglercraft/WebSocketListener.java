@@ -43,6 +43,7 @@ public class WebSocketListener extends WebSocketServer {
 
 	private InetSocketAddress bungeeProxy;
 	private ProxyServer bungeeCord;
+	private boolean blockOriginless;
 	private ListenerInfo info;
 	private final WebSocketRateLimiter ratelimitIP;
 	private final WebSocketRateLimiter ratelimitLogin;
@@ -57,6 +58,7 @@ public class WebSocketListener extends WebSocketServer {
 		this.info = info;
 		this.bungeeProxy = sock;
 		this.bungeeCord = bungeeCord;
+		this.blockOriginless = bungeeCord.getConfigurationAdapter().getBlacklistOriginless();
 		this.ratelimitIP = info.getRateLimitIP();
 		this.ratelimitLogin = info.getRateLimitLogin();
 		this.ratelimitMOTD = info.getRateLimitMOTD();
@@ -220,12 +222,24 @@ public class WebSocketListener extends WebSocketServer {
 			if(idx != -1) {
 				origin = origin.substring(idx + 3);
 			}
-			origin = origin.trim();
+			origin = origin.trim().toLowerCase();
 			if(DomainBlacklist.test(origin)) {
-				arg0.send(createRawKickPacket("End of Stream (RIP)"));
+				arg0.send(createRawKickPacket("End of Stream"));
 				arg0.close();
 				return;
 			}
+		}else {
+			if(blockOriginless) {
+				arg0.send(createRawKickPacket("End of Stream"));
+				arg0.close();
+				return;
+			}
+		}
+		String ua = arg1.getFieldValue("User-Agent");
+		if(blockOriginless && (ua == null || (ua = ua.toLowerCase()).contains("java-websocket") || ua.contains("tootallnate") || ua.contains("eaglercraft"))) {
+			arg0.send(createRawKickPacket("End of Stream"));
+			arg0.close();
+			return;
 		}
 		InetAddress addr;
 		if(info.hasForwardedHeaders()) {

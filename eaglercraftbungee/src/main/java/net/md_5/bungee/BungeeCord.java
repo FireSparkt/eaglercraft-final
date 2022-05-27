@@ -252,7 +252,7 @@ public class BungeeCord extends ProxyServer {
 				BanList.maybeReloadBans(null);
 			}
 		}, 0L, TimeUnit.SECONDS.toMillis(3L));
-		DomainBlacklist.init();
+		DomainBlacklist.init(this);
 		this.closeInactiveSockets.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {

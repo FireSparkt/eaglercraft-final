@@ -25,8 +25,12 @@ public interface ConfigurationAdapter {
 	Collection<String> getPermissions(final String p0);
 
 	Collection<String> getBlacklistURLs();
-	
+
 	boolean getBlacklistOfflineDownload();
+	
+	boolean getBlacklistReplits();
+	
+	boolean getBlacklistOriginless();
 	
 	AuthServiceInfo getAuthSettings();
 

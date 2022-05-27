@@ -291,7 +291,7 @@ public class YamlConfig implements ConfigurationAdapter {
 
 	@Override
 	public Collection<String> getBlacklistURLs() {
-		boolean blacklistEnable = this.getBoolean("enable_origin_blacklist", true);
+		boolean blacklistEnable = this.getBoolean("enable_web_origin_blacklist", true);
 		if(!blacklistEnable) {
 			return null;
 		}
@@ -307,7 +307,17 @@ public class YamlConfig implements ConfigurationAdapter {
 
 	@Override
 	public boolean getBlacklistOfflineDownload() {
-		return this.getBoolean("enable_offline_download_blacklist", false);
+		return this.getBoolean("origin_blacklist_block_offline_download", false);
+	}
+
+	@Override
+	public boolean getBlacklistReplits() {
+		return this.getBoolean("origin_blacklist_block_replit_clients", false);
+	}
+
+	@Override
+	public boolean getBlacklistOriginless() {
+		return this.getBoolean("origin_blacklist_block_missing_origin_header", false);
 	}
 	
 }
