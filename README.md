@@ -1,13 +1,13 @@
 # Eaglercraft
 
-### Secure mode is now available: [stable-download-SECURE.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download-SECURE.zip)
-
-### Secure Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
-
 ### Regular Client: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
+
+### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
 
 **Secure mode Offline Download: [Offline_Download_Version_SECURE.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version_SECURE.html)**  
 **Regular Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)**
+
+**Download secure mode server: [stable-download-SECURE.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download-SECURE.zip)**
 
 ### Note: we will be transitioning away from Eaglercraft being standalone 'free browser minecraft' to Eaglercraft being a bukkit/bungee plugin for servers to allow 'online access' to players who register with a command as their real online-mode Minecraft account on the server. Server owners can still elect to set `online-mode=false` in their server.properties to allow free login but now that's their legal screw up instead of mine
 
@@ -103,8 +103,28 @@ EaglercraftBungee translates WebSockets to a raw Minecraft 1.5.2 TCP connection.
 **EaglercraftBungee has a built in domain blacklist that updates automatically, you can disable it by setting this in config.yml:**
 
 ```yaml
-enable_origin_blacklist: false
+enable_web_origin_blacklist: false
 ```
+
+**To block all clients on replit from joining, set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_replit_clients: true
+```
+
+**To block all offline-download clients, set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_offline_download: true
+```
+
+**To block the debug runtime (or other desktop clients), set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_missing_origin_header: true
+```
+
+**To add your own blacklisted domains**, create a file called `origin_blacklist.txt` in your bungeecord directory and put the regular expressions inside, one on each line. There 's also a `domain` command in the console to view a player's domain, and a `block-domain` and `block-domain-name` and `unblock-domain` command to manage the local `origin_blacklist.txt` from the bungee console (if you don't know how to edit a file on your own). The list reloads automatically when changes to the file are detected.
 
 **Enable** `forward_ip` **and pass a X-Real-IP header from your proxy to use rate limiting and IP bans on a URL**
 
