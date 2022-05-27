@@ -7,6 +7,7 @@
 .*exgeegaming\.repl\.co$
 .*qwasz.*
 .*x.?ray.*
+.*ha(ck|x).*
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
