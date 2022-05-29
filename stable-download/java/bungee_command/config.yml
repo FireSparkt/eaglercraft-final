@@ -1,3 +1,6 @@
+origin_blacklist_block_replit_clients: false
+enable_web_origin_blacklist: true
+server_name: EaglercraftBungee Server
 listeners:
 - fallback_server: lobby
   tab_list: GLOBAL_PING
@@ -49,14 +52,11 @@ listeners:
       limit_lockout: 25
       lockout_duration: 900
       exceptions: []
+stats: 1795b100-6c57-4568-957f-810efbd77cc3
+groups: {}
 player_limit: -1
-timeout: 30000
-servers:
-  lobby:
-    address: localhost:25569
-    restricted: false
-server_name: EaglercraftBungee Server
-display_ban_type_on_kick: false
+origin_blacklist_block_offline_download: false
+origin_blacklist_block_missing_origin_header: false
 permissions:
   default:
   - bungeecord.command.server
@@ -79,4 +79,8 @@ permissions:
   - bungeecord.command.eag.blockdomain
   - bungeecord.command.eag.blockdomainname
   - bungeecord.command.eag.unblockdomain
-groups: {}
+origin_blacklist_subscriptions:
+- https://g.eags.us/eaglercraft/origin_blacklist.txt
+- https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt
+display_ban_type_on_kick: false
+timeout: 30000

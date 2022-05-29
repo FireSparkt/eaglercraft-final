@@ -137,7 +137,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			this.disconnect("Go fuck yourself");
 			return;
 		}
-		InetAddress sc = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
+		InetAddress sc;
+		synchronized(WebSocketProxy.localToRemote) {
+			sc = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
+		}
 		if(sc == null) {
 			this.bungee.getLogger().log(Level.WARNING, "player '" + un + "' doesn't have a websocket IP, remote address: " + this.ch.getHandle().remoteAddress().toString());
 		}else {
@@ -150,7 +153,10 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] has remote websocket IP: " + sc.getHostAddress());
 			}
 		}
-		String dnm = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		String dnm;
+		synchronized(WebSocketProxy.localToRemote) {
+			dnm = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		}
 		if(dnm != null) {
 			if(dnm.equalsIgnoreCase("null")) {
 				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] is using an offline download");

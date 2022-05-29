@@ -47,8 +47,10 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 	}
 	
 	public void killConnection() {
-		localToRemote.remove(localAddress);
-		origins.remove(localAddress);
+		synchronized(localToRemote) {
+			localToRemote.remove(localAddress);
+			origins.remove(localAddress);
+		}
 		if(tcpChannel != null && tcpChannel.isOpen()) {
 			try {
 				tcpChannel.disconnect().sync();
@@ -72,16 +74,20 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 				        socketChannel.closeFuture().addListener(new GenericFutureListener<Future<? super Void>>() {
 							@Override
 							public void operationComplete(Future<? super Void> paramF) throws Exception {
-								localToRemote.remove(localAddress);
-								origins.remove(localAddress);
+								synchronized(localToRemote) {
+									localToRemote.remove(localAddress);
+									origins.remove(localAddress);
+								}
 							}
 						});
 				    }
 				});
 				tcpChannel = (NioSocketChannel) clientBootstrap.connect().sync().channel();
-				localToRemote.put(localAddress = tcpChannel.localAddress(), realRemoteAddr);
-				if(origin != null) {
-					origins.put(localAddress, origin);
+				synchronized(localToRemote) {
+					localToRemote.put(localAddress = tcpChannel.localAddress(), realRemoteAddr);
+					if(origin != null) {
+						origins.put(localAddress, origin);
+					}
 				}
 				return true;
 			}
@@ -111,8 +117,10 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
 	}
 	
 	public void finalize() {
-		localToRemote.remove(localAddress);
-		origins.remove(localAddress);
+		synchronized(localToRemote) {
+			localToRemote.remove(localAddress);
+			origins.remove(localAddress);
+		}
 	}
 	
 }
