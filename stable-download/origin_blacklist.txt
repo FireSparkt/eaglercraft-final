@@ -8,6 +8,8 @@
 .*qwasz.*
 .*x.?ray.*
 .*ha(ck|x).*
+.*hia5046\.repl\.co$
+.*zswm\.xyz$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
