@@ -55,6 +55,10 @@ listeners:
 stats: 1795b100-6c57-4568-957f-810efbd77cc3
 groups: {}
 player_limit: -1
+servers:
+  lobby:
+    address: localhost:25569
+    restricted: false
 origin_blacklist_block_offline_download: false
 origin_blacklist_block_missing_origin_header: false
 permissions:
