@@ -1,13 +1,12 @@
 # Eaglercraft
 
-### Regular Client: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
+### Client: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
 
-### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
+### Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
-**Secure mode Offline Download: [Offline_Download_Version_SECURE.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version_SECURE.html)**  
-**Regular Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)**
+**Scroll down for the 'secure client', if it is required for a server**
 
-**Download secure mode server: [stable-download-SECURE.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download-SECURE.zip)**
+### Minecraft Beta: [https://github.com/LAX1DUDE/eaglercraft-beta/](https://github.com/LAX1DUDE/eaglercraft-beta/)
 
 ### Note: we will be transitioning away from Eaglercraft being standalone 'free browser minecraft' to Eaglercraft being a bukkit/bungee plugin for servers to allow 'online access' to players who register with a command as their real online-mode Minecraft account on the server. Server owners can still elect to set `online-mode=false` in their server.properties to allow free login but now that's their legal screw up instead of mine
 
@@ -19,9 +18,13 @@
 
 (right click the link and press 'Save link as...' to download the file)
 
-### You can play Minecraft Beta singleplayer here: [https://g.eags.us/eaglercraft/singleplayer_test/](https://g.eags.us/eaglercraft/singleplayer_test/)
+### Play Minecraft Beta Singleplayer: [https://g.eags.us/eaglercraft/beta/](https://g.eags.us/eaglercraft/beta/)
 
 **For any questions you can join the discord server and hit me up there [https://discord.gg/KMQW9Uvjyq](https://discord.gg/KMQW9Uvjyq)**
+
+### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
+
+**'Secure' Offline Download: [Offline_Download_Version_SECURE.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version_SECURE.html)**  
 
 ## What is Eaglercraft?
 
