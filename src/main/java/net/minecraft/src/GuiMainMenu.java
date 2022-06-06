@@ -20,6 +20,22 @@ public class GuiMainMenu extends GuiScreen {
 	private String splashText = "missingno";
 	private GuiButton buttonResetDemo;
 	
+	private static boolean showingEndian = true;
+	private static final int showRandomItem;
+	
+	static {
+		if(ConfigConstants.mainMenuItemLink != null) {
+			EaglercraftRandom rand = new EaglercraftRandom();
+			int itm = 0;
+			do {
+				itm = rand.nextInt(256) + 256;
+			}while(Item.itemsList[itm] == null);
+			showRandomItem = itm;
+		}else {
+			showRandomItem = -1;
+		}
+	}
+	
 	private long start;
 
 	/**
@@ -206,7 +222,7 @@ public class GuiMainMenu extends GuiScreen {
 					EaglerAdapter.openConsole();
 				}
 				*/
-				if(ConfigConstants.mainMenuItem > 0 && ConfigConstants.mainMenuItemLink != null) {
+				if(ConfigConstants.mainMenuItemLink != null) {
 					//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);
 
 					int posX = this.width / 2 - 170 - this.width / 10;
@@ -256,14 +272,17 @@ public class GuiMainMenu extends GuiScreen {
 	 */
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 0) {
+			showingEndian = false;
 			this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
 		}
 
 		if (par1GuiButton.id == 5) {
+			showingEndian = false;
 			this.mc.displayGuiScreen(new GuiLanguage(this, this.mc.gameSettings));
 		}
 
 		if (par1GuiButton.id == 2) {
+			showingEndian = false;
 			this.mc.displayGuiScreen(new GuiMultiplayer(this));
 		}
 
@@ -273,6 +292,7 @@ public class GuiMainMenu extends GuiScreen {
 		}
 
 		if (par1GuiButton.id == 4) {
+			showingEndian = false;
 			this.mc.displayGuiScreen(new GuiScreenEditProfile(this));
 		}
 	}
@@ -470,7 +490,11 @@ public class GuiMainMenu extends GuiScreen {
 
 		var10 = "site resources are";
 		this.drawString(this.fontRenderer, var10, this.width - this.fontRenderer.getStringWidth(var10) - 2, this.height - 20, 16777215);
-
+		
+		if(showingEndian && EaglerAdapter.isBigEndian()) {
+			this.drawCenteredString(fontRenderer, "(BIG Endian)", this.width / 2, this.height - 10, 0xFFFFBBBB);
+		}
+		
 		if (this.field_92025_p != null && this.field_92025_p.length() > 0) {
 			drawRect(this.field_92022_t - 2, this.field_92021_u - 2, this.field_92020_v + 2, this.field_92019_w - 1, 1428160512);
 			this.drawString(this.fontRenderer, this.field_92025_p, this.field_92022_t, this.field_92021_u, 16777215);
@@ -518,7 +542,7 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glPopMatrix();
 		*/
 		
-		if(ConfigConstants.mainMenuItem > 0 && ConfigConstants.mainMenuItemLink != null) {
+		if(ConfigConstants.mainMenuItemLink != null) {
 			//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);
 
 			int posX = this.width / 2 - 170 - this.width / 10;
@@ -527,13 +551,13 @@ public class GuiMainMenu extends GuiScreen {
 			int hh = 46;
 			int ln0w = ConfigConstants.mainMenuItemLine0 == null ? 0 : fontRenderer.getStringWidth(ConfigConstants.mainMenuItemLine0);
 			ww = ww < ln0w ? ln0w : ww;
-			hh = hh < ln0w ? hh + 12 : hh;
+			hh = ln0w > 0 ? hh + 12 : hh;
 			int ln1w = ConfigConstants.mainMenuItemLine1 == null ? 0 : fontRenderer.getStringWidth(ConfigConstants.mainMenuItemLine1);
 			ww = ww < ln1w ? ln1w : ww;
-			hh = hh < ln1w ? hh + 12 : hh;
+			hh = ln1w > 0 ? hh + 12 : hh;
 			int ln2w = ConfigConstants.mainMenuItemLine2 == null ? 0 : fontRenderer.getStringWidth(ConfigConstants.mainMenuItemLine2);
 			ww = ww < ln2w ? ln2w : ww;
-			hh = hh < ln2w ? hh + 12 : hh;
+			hh = ln2w > 0 ? hh + 12 : hh;
 			
 			ww += 20;
 			hh += 20;
@@ -564,7 +588,7 @@ public class GuiMainMenu extends GuiScreen {
 				items.bindTexture();
 				
 				EaglerAdapter.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				this.drawTexturedModelRectFromIcon((ww - iconSize) / 2, i, Item.itemsList[ConfigConstants.mainMenuItem].getIconFromDamage(0), iconSize, iconSize);
+				this.drawTexturedModelRectFromIcon((ww - iconSize) / 2, i, Item.itemsList[showRandomItem].getIconFromDamage(0), iconSize, iconSize);
 				
 				i += iconSize + 5;
 				
@@ -594,7 +618,7 @@ public class GuiMainMenu extends GuiScreen {
 				EaglerAdapter.glPushMatrix();
 				EaglerAdapter.glTranslatef(posX, posY, 0.0f);
 				EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
-				this.drawTexturedModelRectFromIcon((ww - iconSize) / 2, ln0w > 0 ? 22 : 10, Item.itemsList[ConfigConstants.mainMenuItem].getIconFromDamage(0), iconSize, iconSize);
+				this.drawTexturedModelRectFromIcon((ww - iconSize) / 2, ln0w > 0 ? 22 : 10, Item.itemsList[showRandomItem].getIconFromDamage(0), iconSize, iconSize);
 				EaglerAdapter.glPopMatrix();
 				
 				EaglerAdapter.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

@@ -40,6 +40,7 @@ import org.teavm.jso.dom.html.HTMLVideoElement;
 import org.teavm.jso.dom.html.HTMLImageElement;
 import org.teavm.jso.media.MediaError;
 import org.teavm.jso.typedarrays.ArrayBuffer;
+import org.teavm.jso.typedarrays.DataView;
 import org.teavm.jso.typedarrays.Float32Array;
 import org.teavm.jso.typedarrays.Int32Array;
 import org.teavm.jso.typedarrays.Uint8Array;
@@ -70,11 +71,9 @@ import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.ServerQuery;
-import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
 import net.minecraft.src.MathHelper;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
 
@@ -635,18 +634,18 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglTexImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
 		int len = p9.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p9.get());
+			deevis.setInt32(i * 4, p9.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
 	}
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
 		int len = p9.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p9.get());
+			deevis.setInt32(i * 4, p9.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
@@ -666,6 +665,7 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, ByteBuffer p9) {
 		int len = p9.remaining();
 		for(int i = 0; i < len; ++i) {
+			//uploadBuffer.set(swapEndian ? ((i >> 2) + (3 - (i & 3))) : i, (short) ((int)p9.get() & 0xff));
 			uploadBuffer.set(i, (short) ((int)p9.get() & 0xff));
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len);
@@ -724,18 +724,18 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglBufferData0(int p1, IntBuffer p2, int p3) {
 		int len = p2.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p2.get());
+			deevis.setInt32(i * 4, p2.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.bufferData(p1, data, p3);
 	}
 	public static final void _wglBufferSubData0(int p1, int p2, IntBuffer p3) {
 		int len = p3.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p3.get());
+			deevis.setInt32(i * 4, p3.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.bufferSubData(p1, p2, data);
@@ -2474,6 +2474,65 @@ public class EaglerAdapterImpl2 {
 	
 	public static final String getServerToJoinOnLaunch() {
 		return serverToJoinOnLaunch;
+	}
+
+	private static boolean endianWasChecked = false;
+	private static boolean isBigEndian = false;
+	private static boolean isLittleEndian = false;
+	
+	public static final boolean isBigEndian() {
+		if(!endianWasChecked) {
+			int checkIntegerA = 0xFF000000;
+			int checkIntegerB = 0x000000FF;
+			
+			ArrayBuffer buf = ArrayBuffer.create(4);
+			Int32Array bufW = Int32Array.create(buf);
+			Uint8Array bufR = Uint8Array.create(buf);
+			
+			bufW.set(0, checkIntegerA);
+
+			boolean knownBig1 = false;
+			if(bufR.get(0) == (short)0xFF && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0) {
+				knownBig1 = true;
+			}
+			
+			boolean knownLittle1 = false;
+			if(bufR.get(0) == (short)0 && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0xFF) {
+				knownLittle1 = true;
+			}
+			
+			bufW.set(0, checkIntegerB);
+			
+			boolean knownBig2 = false;
+			if(bufR.get(0) == (short)0 && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0xFF) {
+				knownBig2 = true;
+			}
+
+			boolean knownLittle2 = false;
+			if(bufR.get(0) == (short)0xFF && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0) {
+				knownLittle2 = true;
+			}
+			
+			if(knownBig1 == knownBig2 && knownLittle1 == knownLittle2 && knownBig1 != knownLittle1) {
+				isBigEndian = knownBig1;
+				isLittleEndian = knownLittle1;
+			}
+			
+			if(isBigEndian) {
+				System.out.println("This browser is BIG endian!");
+			}else if(isLittleEndian) {
+				System.out.println("This browser is LITTLE endian!");
+			}else {
+				System.out.println("The byte order of this browser is inconsistent!");
+				System.out.println(" - the sequence FF000000 was " + (knownBig1 ? "" : "not ") + "big endian.");
+				System.out.println(" - the sequence FF000000 was " + (knownLittle1 ? "" : "not ") + "little endian.");
+				System.out.println(" - the sequence 000000FF was " + (knownBig2 ? "" : "not ") + "big endian.");
+				System.out.println(" - the sequence 000000FF was " + (knownLittle2 ? "" : "not ") + "little endian.");
+			}
+			
+			endianWasChecked = true;
+		}
+		return !isLittleEndian;
 	}
 	
 }

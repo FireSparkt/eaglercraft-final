@@ -42,12 +42,11 @@ public class ServerList {
 			ConfigConstants.ayonullLink = nbt.hasKey("serverListLink") ? nbt.getString("serverListLink") : null;
 			if(nbt.hasKey("mainMenu")) {
 				NBTTagCompound cmp = nbt.getCompoundTag("mainMenu");
-				ConfigConstants.mainMenuItem = cmp.hasKey("mainMenuItem") ? (int)cmp.getShort("mainMenuItem") & 0xffff : -1;
-				if(ConfigConstants.mainMenuItem > 0) {
+				ConfigConstants.mainMenuItemLink = cmp.getStringOrNull("itemLink");
+				if(ConfigConstants.mainMenuItemLink != null) {
 					ConfigConstants.mainMenuItemLine0 = cmp.getStringOrNull("itemLine0");
 					ConfigConstants.mainMenuItemLine1 = cmp.getStringOrNull("itemLine1");
 					ConfigConstants.mainMenuItemLine2 = cmp.getStringOrNull("itemLine2");
-					ConfigConstants.mainMenuItemLink = cmp.getStringOrNull("itemLink");
 				}
 			}
 			forcedServers.clear();

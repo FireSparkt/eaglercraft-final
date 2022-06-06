@@ -523,9 +523,9 @@ public abstract class BlockFluid extends Block {
 	 */
 	public void registerIcons(IconRegister par1IconRegister) {
 		if (this.blockMaterial == Material.lava) {
-			this.theIcon = new Icon[] { par1IconRegister.registerIcon("lava"), par1IconRegister.registerIcon("lava_flow") };
+			this.theIcon = new Icon[] { par1IconRegister.registerIcon("lava"), par1IconRegister.registerIcon("lava_flow", 2) };
 		} else {
-			this.theIcon = new Icon[] { par1IconRegister.registerIcon("water"), par1IconRegister.registerIcon("water_flow") };
+			this.theIcon = new Icon[] { par1IconRegister.registerIcon("water"), par1IconRegister.registerIcon("water_flow", 2) };
 		}
 	}
 

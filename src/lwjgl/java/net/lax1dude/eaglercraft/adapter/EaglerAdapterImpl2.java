@@ -1562,5 +1562,12 @@ public class EaglerAdapterImpl2 {
 	public static final String getServerToJoinOnLaunch() {
 		return serverToJoinOnLaunch;
 	}
+
+	/**
+	 * I'm pretty sure my IntBuffers address this problem but if byte order glitches (such as corrupted textures) appear then change to true
+	 */
+	public static final boolean isBigEndian() {
+		return false;
+	}
 	
 }

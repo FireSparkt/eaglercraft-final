@@ -158,19 +158,24 @@ public class TextureMap implements IconRegister {
 		return this.atlasTexture;
 	}
 
-	public Icon registerIcon(String par1Str) {
-		if (par1Str == null) {
-			(new RuntimeException("Don\'t register null!")).printStackTrace();
+	public Icon registerIcon(String par1Str, int w) {
+		if(w != 1) {
+			System.err.println("Error, texture '" + par1Str + "' was registered with size " + w + ", the item texure map only supports size 1 (16px)");
+			return missingTextureStiched;
+		}else {
+			if (par1Str == null) {
+				(new RuntimeException("Don\'t register null!")).printStackTrace();
+			}
+	
+			TextureStitched var2 = (TextureStitched) this.textureStichedMap.get(par1Str);
+	
+			if (var2 == null) {
+				var2 = TextureStitched.makeTextureStitched(par1Str);
+				this.textureStichedMap.put(par1Str, var2);
+			}
+	
+			return var2;
 		}
-
-		TextureStitched var2 = (TextureStitched) this.textureStichedMap.get(par1Str);
-
-		if (var2 == null) {
-			var2 = TextureStitched.makeTextureStitched(par1Str);
-			this.textureStichedMap.put(par1Str, var2);
-		}
-
-		return var2;
 	}
 
 	public Icon getMissingIcon() {

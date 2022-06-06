@@ -17,11 +17,12 @@ import net.minecraft.src.RenderManager;
 //supports only 16x16 textures, mipmap is four levels deep
 public class TextureTerrainMap implements IconRegister {
 	
-	private static class TerrainIcon implements Icon {
+	private static class TerrainIconV2 implements Icon {
 
 		public final TextureTerrainMap map;
 		public final String name;
 		public final int id;
+		public final int size;
 		private EaglerImage[][] frames = null;
 		private int[] framesIdx = null;
 
@@ -42,16 +43,29 @@ public class TextureTerrainMap implements IconRegister {
 		protected int frameCounter = 0;
 		protected int frameCurrent = 0;
 		
-		private TerrainIcon(int id, TextureTerrainMap map, String name) {
+		private TerrainIconV2(int id, int s, TextureTerrainMap map, String name) {
 			this.id = id;
+			this.size = s;
 			this.map = map;
 			this.name = name;
-			this.originX = (id % (map.width / 48)) * 48;
-			this.originY = (id / (map.width / 48)) * 48;
+			
+			if(s != 1 && s != 2) {
+				throw new IllegalArgumentException("Size " + s + " (" + (s * 16) + "px) is not supported on this texture map");
+			}
+			
+			int tw = s * 16 + 32;
+			
+			int adjId = id;
+			if(s == 2) {
+				adjId = (map.width / tw - 1) * (map.height / tw - 1) - id;
+			}
+			
+			this.originX = (adjId % (map.width / tw)) * tw;
+			this.originY = (adjId / (map.width / tw)) * tw;
 			this.minU = (float)originX / (float)map.width;
 			this.minV = (float)originY / (float)map.height;
-			this.maxU = (float)(originX + 48) / (float)map.width;
-			this.maxV = (float)(originY + 48) / (float)map.height;
+			this.maxU = (float)(originX + tw) / (float)map.width;
+			this.maxV = (float)(originY + tw) / (float)map.height;
 			this.originX_center = originX + 16;
 			this.originY_center = originY + 16;
 			this.minU_center = (float)(originX_center + 0.1f) / (float)map.width;
@@ -83,7 +97,7 @@ public class TextureTerrainMap implements IconRegister {
 		@Override
 		public float getInterpolatedU(double var1) {
 			float var3 = this.maxU_center - this.minU_center;
-			return this.minU_center + var3 * ((float) var1 / 16.0F);
+			return this.minU_center + var3 * ((float) var1 * size / 16.0F);
 		}
 
 		@Override
@@ -99,7 +113,7 @@ public class TextureTerrainMap implements IconRegister {
 		@Override
 		public float getInterpolatedV(double var1) {
 			float var3 = this.maxV_center - this.minV_center;
-			return this.minV_center + var3 * ((float) var1 / 16.0F);
+			return this.minV_center + var3 * ((float) var1 * size / 16.0F);
 		}
 
 		@Override
@@ -134,12 +148,12 @@ public class TextureTerrainMap implements IconRegister {
 			if(data == null) {
 				map.replaceTexture(this, map.missingData);
 			}else {
-				//EaglerImage img = EaglerImage.loadImage(data);
 				EaglerImage img = EaglerAdapter.loadPNG(data);
 				if(img == null) {
 					map.replaceTexture(this, map.missingData);
 				}else {
-					int divs = img.h / 16;
+					int ss = size * 16;
+					int divs = img.h / ss;
 					if(divs == 1) {
 						this.frames = null;
 						this.framesIdx = null;
@@ -147,7 +161,7 @@ public class TextureTerrainMap implements IconRegister {
 					}else {
 						frames = new EaglerImage[divs][];
 						for(int i = 0; i < divs; ++i) {
-							frames[i] = generateMip(img.getSubImage(0, i * 16, 16, 16));
+							frames[i] = generateMip(img.getSubImage(0, i * ss, ss, ss));
 						}
 						String dat = EaglerAdapter.fileContents("/" + map.basePath + name + ".txt");
 						if(dat != null) System.out.println("Found animation info for: " + map.basePath + name + ".png");
@@ -189,20 +203,20 @@ public class TextureTerrainMap implements IconRegister {
 	private final String basePath;
 	private final int width;
 	private final int height;
-	private TerrainIcon missingImage;
-	private ArrayList<TerrainIcon> iconList;
+	private TerrainIconV2 missingImage;
+	private ArrayList<TerrainIconV2> iconList;
 	public final int texture;
 	private final EaglerImage[] missingData;
 	
-	private static final IntBuffer uploadBuffer = EaglerAdapter.isWebGL ? IntBuffer.wrap(new int[4096]) : ByteBuffer.allocateDirect(4096 << 2).order(ByteOrder.nativeOrder()).asIntBuffer();
+	private int[] nextSlot = new int[3];
 	
-	private int nextSlot = 0;
+	private static final IntBuffer uploadBuffer = EaglerAdapter.isWebGL ? IntBuffer.wrap(new int[4096]) : ByteBuffer.allocateDirect(4096 << 2).order(ByteOrder.nativeOrder()).asIntBuffer();
 	
 	public TextureTerrainMap(int size, String par2, String par3Str, EaglerImage par4BufferedImage) {
 		this.width = size;
 		this.height = size;
 		this.basePath = par3Str;
-		this.missingImage = new TerrainIcon(nextSlot++, this, null);
+		this.missingImage = new TerrainIconV2(nextSlot[1]++, 1, this, null);
 		this.iconList = new ArrayList();
 		this.texture = EaglerAdapter.glGenTextures();
 		EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);
@@ -212,28 +226,28 @@ public class TextureTerrainMap implements IconRegister {
 		for(int i = 0; i < blank.limit(); ++i) {
 			blank.put(i, ((i / width + (i % width)) % 2 == 0) ? 0xffff00ff : 0xff000000);
 		}
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAG_FILTER, EaglerAdapter.GL_NEAREST);
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_WRAP_S, EaglerAdapter.GL_CLAMP);
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_WRAP_T, EaglerAdapter.GL_CLAMP);
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_LEVEL, 4);
-		EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 		for(int i = 0; i < 5; ++i) {
 			blank.clear().limit(levelW * levelH);
 			EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, i, EaglerAdapter.GL_RGBA, levelW, levelH, 0, EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, blank);
 			levelW /= 2;
 			levelH /= 2;
 		}
+		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
+		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAG_FILTER, EaglerAdapter.GL_NEAREST);
+		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_WRAP_S, EaglerAdapter.GL_CLAMP);
+		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_WRAP_T, EaglerAdapter.GL_CLAMP);
+		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_LEVEL, 4);
+		EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
 		replaceTexture(missingImage, missingData = generateMip(par4BufferedImage));
 	}
 	
 	public static EaglerImage[] generateMip(EaglerImage src16x16) {
 		EaglerImage[] ret = new EaglerImage[5];
-		ret[0] = populateAlpha(src16x16);
-		ret[1] = generateLevel(ret[0]); ret[0] = create3x3(ret[0]);
-		ret[2] = generateLevel(ret[1]); ret[1] = create3x3(ret[1]);
-		ret[3] = generateLevel(ret[2]); ret[2] = create3x3(ret[2]);
-		ret[4] = create3x3_2(generateLevel(ret[3])); ret[3] = create3x3(ret[3]);
+		ret[0] = populateAlpha(create3x3_V2(src16x16));
+		ret[1] = generateLevel(ret[0]);
+		ret[2] = generateLevel(ret[1]);
+		ret[3] = generateLevel(ret[2]);
+		ret[4] = generateLevel(ret[3]);
 		return ret;
 	}
 	
@@ -253,22 +267,6 @@ public class TextureTerrainMap implements IconRegister {
 				int cb = ((a & 255) + (b & 255) + (c & 255) + (d & 255)) >> 2;
 				e.data[y * e.w + x] = (ca << 24) | (cr << 16) | (cg << 8) | cb;
 			}
-		}
-		return e;
-	}
-	
-	public static EaglerImage premultiplyAlpha(EaglerImage src) {
-		EaglerImage e = new EaglerImage(src.w, src.h, true);
-		for(int i = 0; i < src.data.length; ++i) {
-			int x = src.data[i];
-			int a = (x >> 24) & 255;
-			int r = (x >> 16) & 255;
-			int g = (x >> 8) & 255;
-			int b = x & 255;
-			r = (r * a) / 255;
-			g = (g * a) / 255;
-			b = (b * a) / 255;
-			e.data[i] = (a << 24) | (r << 16) | (g << 8) | b;
 		}
 		return e;
 	}
@@ -361,49 +359,58 @@ public class TextureTerrainMap implements IconRegister {
 		return ret;
 	}
 	
-	public static EaglerImage create3x3(EaglerImage src) {
-		EaglerImage ret = new EaglerImage(src.w * 3, src.h * 3, true);
+	public static EaglerImage create3x3_V2(EaglerImage src) {
+		EaglerImage ret = new EaglerImage(src.w + 32, src.h + 32, true);
 		for(int y = 0; y < src.h; ++y) {
 			for(int x = 0; x < src.w; ++x) {
 				int pixel = src.data[y * src.w + x];
 				
-				//if(y != src.h - 1) {
-					ret.data[y * ret.w + (x)] = pixel;
-					ret.data[y * ret.w + (x + src.w)] = pixel;
-					ret.data[y * ret.w + (x + src.w*2)] = pixel;
-				//}
+				ret.data[(y + 16) * ret.w + (x + 16)] = pixel;
 				
-				ret.data[(y + src.h) * ret.w + (x)] = pixel;
-				ret.data[(y + src.h) * ret.w + (x + src.w)] = pixel;
-				ret.data[(y + src.h) * ret.w + (x + src.w*2)] = pixel;
+				if(x < 16) {
+					ret.data[(y + 16) * ret.w + x] = pixel;
+				}
+				
+				if(y < 16) {
+					ret.data[y * ret.w + (x + 16)] = pixel;
+				}
+				
+				if(x < 16 && y < 16) {
+					ret.data[y * ret.w + x] = pixel;
+				}
 
-				//if(y != 0) {
-					ret.data[(y + src.h * 2) * ret.w + (x)] = pixel;
-					ret.data[(y + src.h * 2) * ret.w + (x + src.w)] = pixel;
-					ret.data[(y + src.h * 2) * ret.w + (x + src.w*2)] = pixel;
-				//}
+				int mw = src.w - 16;
+				int mh = src.h - 16;
+				
+				if(x >= mw) {
+					ret.data[(y + 16) * ret.w + src.w + (x - mw + 16)] = pixel;
+				}
+				
+				if(y >= mh) {
+					ret.data[(y - mh + src.h + 16) * ret.w + (x + 16)] = pixel;
+				}
+				
+				if(x >= mw && y >= mh) {
+					ret.data[(y - mh + src.h + 16) * ret.w + src.w + (x - mw + 16)] = pixel;
+				}
+				
+				if(x >= mw && y < 16) {
+					ret.data[y * ret.w + src.w + (x - mw + 16)] = pixel;
+				}
+				
+				if(x < 16 && y >= mh) {
+					ret.data[(y - mh + src.h + 16) * ret.w + x] = pixel;
+				}
+				
 			}
 		}
-		return ret;
-	}
-	
-	public static EaglerImage create3x3_2(EaglerImage src) {
-		EaglerImage ret = new EaglerImage(3, 3, true);
-		ret.data[0] = src.data[0];
-		ret.data[1] = src.data[0];
-		ret.data[2] = src.data[0];
-		ret.data[3] = src.data[0];
-		ret.data[4] = src.data[0];
-		ret.data[5] = src.data[0];
-		ret.data[6] = src.data[0];
-		ret.data[7] = src.data[0];
-		ret.data[8] = src.data[0];
 		return ret;
 	}
 
 	public void refreshTextures() {
 		iconList.clear();
-		nextSlot = 1;
+		nextSlot = new int[3];
+		nextSlot[1] = 1;
 		Block[] var1 = Block.blocksList;
 		int var2 = var1.length;
 
@@ -418,12 +425,12 @@ public class TextureTerrainMap implements IconRegister {
 		Minecraft.getMinecraft().renderGlobal.registerDestroyBlockIcons(this);
 		RenderManager.instance.updateIcons(this);
 		
-		for(TerrainIcon t : iconList) {
+		for(TerrainIconV2 t : iconList) {
 			t.loadData();
 		}
 	}
 	
-	private void replaceTexture(TerrainIcon icon, EaglerImage[] textures) {
+	private void replaceTexture(TerrainIconV2 icon, EaglerImage[] textures) {
 		int levelW = width;
 		int levelH = height;
 		int divisor = 1;
@@ -432,7 +439,8 @@ public class TextureTerrainMap implements IconRegister {
 			uploadBuffer.clear();
 			uploadBuffer.put(textures[i].data);
 			uploadBuffer.flip();
-			EaglerAdapter.glTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX / divisor, icon.originY / divisor, 48 / divisor, 48 / divisor, EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+			EaglerAdapter.glTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX / divisor, icon.originY / divisor, 
+					(16 * icon.size + 32) / divisor, (16 * icon.size + 32) / divisor, EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
 			levelW /= 2;
 			levelH /= 2;
 			divisor *= 2;
@@ -440,19 +448,22 @@ public class TextureTerrainMap implements IconRegister {
 	}
 
 	public void updateAnimations() {
-		for(TerrainIcon t : iconList) {
+		for(TerrainIconV2 t : iconList) {
 			t.updateAnimation();
 		}
 	}
 
-	public Icon registerIcon(String par1Str) {
-		if(par1Str != null) {
-			for(TerrainIcon t : iconList) {
-				if(par1Str.equals(t.name)) {
+	public Icon registerIcon(String par1Str, int w) {
+		if(w != 1 && w != 2) {
+			System.err.println("Error, texture '" + par1Str + "' was registered with size " + w + ", the terrain texure map only supports size 1 and 2 (16px and 32px)");
+			return missingImage;
+		}else if(par1Str != null) {
+			for(TerrainIconV2 t : iconList) {
+				if(par1Str.equals(t.name) && w == t.size) {
 					return t;
 				}
 			}
-			TerrainIcon ret = new TerrainIcon(nextSlot++, this, par1Str);
+			TerrainIconV2 ret = new TerrainIconV2(nextSlot[w]++, w, this, par1Str);
 			iconList.add(ret);
 			return ret;
 		}else{
