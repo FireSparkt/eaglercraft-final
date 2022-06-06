@@ -77,4 +77,7 @@ permissions:
   - bungeecord.command.eag.banlist
   - bungeecord.command.eag.unban
   - bungeecord.command.eag.ratelimit
+  - bungeecord.command.eag.blockdomain
+  - bungeecord.command.eag.blockdomainname
+  - bungeecord.command.eag.unblockdomain
 groups: {}
