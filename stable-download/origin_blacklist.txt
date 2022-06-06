@@ -10,6 +10,7 @@
 .*ha(ck|x).*
 .*hia5046\.repl\.co$
 .*zswm\.xyz$
+.*fuchsiax\.dev$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
