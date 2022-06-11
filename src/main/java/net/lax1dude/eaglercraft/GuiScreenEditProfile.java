@@ -16,6 +16,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 	private String[] dropDownOptions;
 	private int slotsVisible = 0;
 	private int selectedSlot = 0;
+	private int newSkinNotificationIndexCurrent = 0;
 	private int scrollPos = -1;
 	private int skinsHeight = 0;
 	private boolean dragging = false;
@@ -59,13 +60,21 @@ public class GuiScreenEditProfile extends GuiScreen {
 			"Pig",
 			"Squid",
 			"Mooshroom",
-			"Villager"
+			"Villager",
+			"Long Arms",
+			"Weird Climber",
+			"Laxative Dude",
+			"Baby Charles",
+			"Baby Winston"
 	};
+
+	public static final int newDefaultNotice = defaultOptions.length - 5;
 	
 	protected String screenTitle = "Edit Profile";
 	
 	public GuiScreenEditProfile(GuiScreen parent) {
 		this.parent = parent;
+		newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
 		reconcatDD();
 	}
 	
@@ -101,7 +110,11 @@ public class GuiScreenEditProfile extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, this.screenTitle, this.width / 2, 15, 16777215);
 		this.drawString(this.fontRenderer, var1.translateKey("profile.screenname"), this.width / 2 - 20, this.height / 6 + 8, 10526880);
-		this.drawString(this.fontRenderer, var1.translateKey("profile.playerSkin"), this.width / 2 - 20, this.height / 6 + 66, 10526880);
+		
+		int cnt = defaultOptions.length - newSkinNotificationIndexCurrent;
+		if(cnt <= 0) {
+			this.drawString(this.fontRenderer, var1.translateKey("profile.playerSkin"), this.width / 2 - 20, this.height / 6 + 66, 10526880);
+		}
 		
 		mousex = mx;
 		mousey = my;
@@ -135,6 +148,14 @@ public class GuiScreenEditProfile extends GuiScreen {
 		drawTexturedModalRect(skinX + skinWidth - 18, skinY + 3, 0, 240, 16, 16);
 		
 		this.fontRenderer.drawStringWithShadow(dropDownOptions[selectedSlot], skinX + 5, skinY + 7, 14737632);
+		
+		if(cnt > 0) {
+			EaglerAdapter.glPushMatrix();
+			EaglerAdapter.glTranslatef(skinX, skinY - 11, 0.0f);
+			EaglerAdapter.glScalef(0.9f, 0.9f, 0.9f);
+			drawString(fontRenderer, "" + cnt + " new skin" + (cnt != 1 ? "" : "s") + " have been added:", 0, 0, 0xFFDDDDAA);
+			EaglerAdapter.glPopMatrix();
+		}
 
 		skinX = this.width / 2 - 20;
 		skinY = this.height / 6 + 103;
@@ -158,12 +179,19 @@ public class GuiScreenEditProfile extends GuiScreen {
 			drawRect(skinX + 1, skinY + 1, skinX + skinWidth - 1, skinY + skinHeight - 1, -16777216);
 			for(int i = 0; i < slotsVisible; i++) {
 				if(i + scrollPos < dropDownOptions.length) {
+					int idx = i + scrollPos - EaglerProfile.skins.size();
+					if(idx >= newSkinNotificationIndexCurrent) {
+						drawRect(skinX + 1, skinY + i*10 + 4, skinX + skinWidth - 1, skinY + i*10 + 14, 0x77ffdd88);
+					}
 					if(selectedSlot == i + scrollPos) {
 						drawRect(skinX + 1, skinY + i*10 + 4, skinX + skinWidth - 1, skinY + i*10 + 14, 0x77ffffff);
 					}else if(mx >= skinX && mx < (skinX + skinWidth - 10) && my >= (skinY + i*10 + 5) && my < (skinY + i*10 + 15)) {
 						drawRect(skinX + 1, skinY + i*10 + 4, skinX + skinWidth - 1, skinY + i*10 + 14, 0x55ffffff);
 					}
 					this.fontRenderer.drawStringWithShadow(dropDownOptions[i + scrollPos], skinX + 5, skinY + 5 + i*10, 14737632);
+					if(EaglerProfile.newSkinNotificationIndex <= idx) {
+						EaglerProfile.newSkinNotificationIndex = idx + 1;
+					}
 				}
 			}
 			int scrollerSize = skinHeight * slotsVisible / dropDownOptions.length;
@@ -273,6 +301,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		
 		LocalStorageManager.profileSettingsStorage.setInteger("ps", EaglerProfile.presetSkinId);
 		LocalStorageManager.profileSettingsStorage.setInteger("cs", EaglerProfile.customSkinId);
+		LocalStorageManager.profileSettingsStorage.setInteger("nsi", EaglerProfile.newSkinNotificationIndex);
 		LocalStorageManager.profileSettingsStorage.setString("name", EaglerProfile.username);
 		
 		NBTTagCompound skins = new NBTTagCompound();
@@ -427,6 +456,9 @@ public class GuiScreenEditProfile extends GuiScreen {
 		
 			if(par1 >= skinX && par1 < (skinX + 20) && par2 >= skinY && par2 < (skinY + 22)) {
 				dropDownOpen = !dropDownOpen;
+				if(!dropDownOpen) {
+					newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+				}
 			}
 			
 			skinX = this.width / 2 - 20;
@@ -437,6 +469,9 @@ public class GuiScreenEditProfile extends GuiScreen {
 			if(!(par1 >= skinX && par1 < (skinX + skinWidth) && par2 >= skinY && par2 < (skinY + skinHeight + 22))) {
 				dropDownOpen = false;
 				dragging = false;
+				if(!dropDownOpen) {
+					newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+				}
 			}
 			
 			skinY += 21;
@@ -449,6 +484,9 @@ public class GuiScreenEditProfile extends GuiScreen {
 								selectedSlot = i + scrollPos;
 								dropDownOpen = false;
 								dragging = false;
+								if(!dropDownOpen) {
+									newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+								}
 							}
 						}
 					}

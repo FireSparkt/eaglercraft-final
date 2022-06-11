@@ -36,6 +36,14 @@ public abstract class EntityPlayer extends EntityLiving implements ICommandSende
 	public float cameraYaw;
 	public String username;
 
+	public long eaglerHighPolyAnimationTick = System.currentTimeMillis();
+	public float eaglerHighPolyAnimationFloat1 = 0.0f;
+	public float eaglerHighPolyAnimationFloat2 = 0.0f;
+	public float eaglerHighPolyAnimationFloat3 = 0.0f;
+	public float eaglerHighPolyAnimationFloat4 = 0.0f;
+	public float eaglerHighPolyAnimationFloat5 = 0.0f;
+	public float eaglerHighPolyAnimationFloat6 = 0.0f;
+
 	/**
 	 * Used by EntityPlayer to prevent too many xp orbs from getting absorbed at
 	 * once.

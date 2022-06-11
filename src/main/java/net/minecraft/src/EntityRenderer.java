@@ -974,8 +974,13 @@ public class EntityRenderer {
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			RenderHelper.disableStandardItemLighting();
 			terrain.bindTexture();
-			EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
-			EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
+			if(EaglerAdapter.isKeyDown(34)) {
+				EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+				EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST);
+			}else {
+				EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
+				EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
+			}
 			EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.6f);
 			this.mc.mcProfiler.endStartSection("terrain");
 			var5.sortAndRender(var4, 0, (double) par1);

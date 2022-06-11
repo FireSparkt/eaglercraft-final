@@ -26,6 +26,8 @@ public class EaglerProfile {
 	public static int presetSkinId;
 	public static int customSkinId;
 	
+	public static int newSkinNotificationIndex = 0;
+	
 	public static String myChannel;
 	
 	public static final int[] SKIN_DATA_SIZE = new int[] { 64*32*4, 64*64*4, 128*64*4, 128*128*4, 2, 64*64*4, 128*128*4 };
@@ -120,61 +122,14 @@ public class EaglerProfile {
 	
 	static {
 		String[] usernameDefaultWords = ConfigConstants.profanity ? new String[] {
-				"Eagler",
-				"Eagler",
-				"Bitch",
-				"Cock",
-				"Milf",
-				"Milf",
-				"Yeer",
-				"Groon",
-				"Eag",
-				"Deevis",
-				"Chode",
-				"Deev",
-				"Deev",
-				"Fucker",
-				"Fucking",
-				"Dumpster",
-				"Dumpster",
-				"Cum",
-				"Chad",
-				"Egg",
-				"Fudgler",
-				"Fudgli",
-				"Yee",
-				"Yee",
-				"Yee",
-				"Yeet",
-				"Flumpter",
-				"Darvy",
-				"Darver",
-				"Darver",
-				"Fuck",
-				"Fuck",
-				"Frick",
-				"Eagler",
-				"Vigg",
-				"Vigg",
-				"Cunt",
-				"Darvig"
+				"Eagler", "Eagler", "Bitch", "Cock", "Milf", "Milf", "Yeer", "Groon",
+				"Eag", "Deevis", "Chode", "Deev", "Deev", "Fucker", "Fucking",
+				"Dumpster", "Dumpster", "Cum", "Chad", "Egg", "Fudgler", "Fudgli",
+				"Yee", "Yee", "Yee", "Yeet", "Flumpter", "Darvy", "Darver", "Darver",
+				"Fuck", "Fuck", "Frick", "Eagler", "Vigg", "Vigg", "Cunt", "Darvig"
 		} : new String[] {
-				"Yeeish",
-				"Yeeish",
-				"Yee",
-				"Yee",
-				"Yeer",
-				"Yeeler",
-				"Eagler",
-				"Eagl",
-				"Darver",
-				"Darvler",
-				"Vool",
-				"Vigg",
-				"Vigg",
-				"Deev",
-				"Yigg",
-				"Yeeg"
+				"Yeeish", "Yeeish", "Yee", "Yee", "Yeer", "Yeeler", "Eagler", "Eagl",
+				"Darver", "Darvler", "Vool", "Vigg", "Vigg", "Deev", "Yigg", "Yeeg"
 		};
 		
 		rand = new EaglercraftRandom();
@@ -193,6 +148,10 @@ public class EaglerProfile {
 			presetSkinId = LocalStorageManager.profileSettingsStorage.getInteger("ps");
 			customSkinId = LocalStorageManager.profileSettingsStorage.getInteger("cs");
 			username = LocalStorageManager.profileSettingsStorage.getString("name");
+			newSkinNotificationIndex = LocalStorageManager.profileSettingsStorage.getInteger("nsi");
+			if(newSkinNotificationIndex == 0) {
+				newSkinNotificationIndex = GuiScreenEditProfile.newDefaultNotice;
+			}
 			myChannel = username + "_" + (100 + rand.nextInt(900));
 			NBTTagCompound n = LocalStorageManager.profileSettingsStorage.getCompoundTag("skins");
 			for(Object s : NBTTagCompound.getTagMap(n).keySet()) {

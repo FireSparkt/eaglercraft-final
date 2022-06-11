@@ -69,7 +69,7 @@ public class GLAllocation {
 	 * native ordering to speed up access.
 	 */
 	public static ByteBuffer createDirectByteBuffer(int par0) {
-		return EaglerAdapter.isWebGL ? ByteBuffer.wrap(new byte[par0]).order(ByteOrder.nativeOrder()) : ByteBuffer.allocateDirect(par0).order(ByteOrder.nativeOrder());
+		return EaglerAdapter.isWebGL ? ByteBuffer.wrap(new byte[par0]) : ByteBuffer.allocateDirect(par0).order(ByteOrder.nativeOrder());
 	}
 
 	/**

@@ -23,6 +23,7 @@ import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.ajax.ReadyStateChangeHandler;
 import org.teavm.jso.ajax.XMLHttpRequest;
+import org.teavm.jso.browser.Storage;
 import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.canvas.CanvasRenderingContext2D;
@@ -260,6 +261,9 @@ public class EaglerAdapterImpl2 {
 				mouseY = canvas.getClientHeight() - getOffsetY(evt);
 				mouseDX += evt.getMovementX();
 				mouseDY += -evt.getMovementY();
+				if(hasBeenActive()) {
+					mouseEvents.add(evt);
+				}
 				evt.preventDefault();
 				evt.stopPropagation();
 			}
@@ -1443,7 +1447,7 @@ public class EaglerAdapterImpl2 {
 		return !mouseEvents.isEmpty() && (currentEvent = mouseEvents.remove(0)) != null;
 	}
 	public static final int mouseGetEventButton() {
-		if(currentEvent == null) return -1;
+		if(currentEvent == null || currentEvent.getType().equals(MouseEvent.MOUSEMOVE)) return -1;
 		int b = currentEvent.getButton();
 		return b == 1 ? 2 : (b == 2 ? 1 : b);
 	}
@@ -1783,15 +1787,23 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 	public static final byte[] loadLocalStorage(String key) {
-		String s = win.getLocalStorage().getItem("_eaglercraft."+key);
-		if(s != null) {
-			return Base64.decodeBase64(s);
+		Storage strg = win.getLocalStorage();
+		if(strg != null) {
+			String s =strg.getItem("_eaglercraft."+key);
+			if(s != null) {
+				return Base64.decodeBase64(s);
+			}else {
+				return null;
+			}
 		}else {
 			return null;
 		}
 	}
 	public static final void saveLocalStorage(String key, byte[] data) {
-		win.getLocalStorage().setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+		Storage strg = win.getLocalStorage();
+		if(strg != null) {
+			strg.setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+		}
 	}
 	public static final void openLink(String url) {
 		win.open(url, "_blank");

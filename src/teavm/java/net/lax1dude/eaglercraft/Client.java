@@ -97,6 +97,7 @@ public class Client {
 			str.append("eaglercraft.username = \"").append(EaglerProfile.username).append("\"\n");
 			str.append("eaglercraft.channel = \"").append(EaglerProfile.myChannel).append("\"\n");
 			str.append('\n');
+			shortenMinecraftOpts();
 			addArray(str, "window.minecraftOpts");
 			str.append('\n');
 			addDebug(str, "window.navigator.userAgent");
@@ -145,6 +146,9 @@ public class Client {
 	
 	@JSBody(params = { "v" }, script = "try { return \"\"+window.eval(v); } catch(e) { return \"<error>\"; }")
 	private static native String getString(String var);
+	
+	@JSBody(params = { }, script = "for(var i = 0; i < window.minecraftOpts.length; ++i) { if(window.minecraftOpts[i].length > 2048) window.minecraftOpts[i] = \"[\" + Math.floor(window.minecraftOpts[i].length * 0.001) + \"k characters]\"; }")
+	private static native void shortenMinecraftOpts();
 
 	private static void addDebug(StringBuilder str, String var) {
 		str.append(var).append(" = ").append(getString(var)).append('\n');

@@ -1,5 +1,6 @@
 package net.lax1dude.eaglercraft.glemu;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -695,6 +696,15 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 			}
 		}
 	}
+	public static final HighPolyMesh loadMesh(String path) {
+		try {
+			return HighPolyMesh.loadMeshData(EaglerAdapter.loadResourceBytes(path));
+		}catch(IOException ex) {
+			System.err.println("Could not load HighPolyMesh! " + ex.toString());
+			ex.printStackTrace();
+			return null;
+		}
+	}
 	public static final void glColor3f(float p1, float p2, float p3) {
 		colorR = p1;
 		colorG = p2;
@@ -919,6 +929,13 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 		if(enableAnisotropicFix) {
 			s.setAnisotropicFix(anisotropicFixX, anisotropicFixY);
 		}
+	}
+	public static final void drawHighPoly(HighPolyMesh msh) {
+		bindTheShader((msh.hasTexture ? (FixedFunctionShader.NORMAL | FixedFunctionShader.TEXTURE0) : FixedFunctionShader.NORMAL) | getShaderModeFlag1());
+		_wglBindVertexArray(msh.vertexArray);
+		_wglDrawElements(_wGL_TRIANGLES, msh.indexCount, _wGL_UNSIGNED_SHORT, 0);
+		triangleDrawn += msh.indexCount / 3;
+		shader.unuseProgram();
 	}
 	private static Object blankUploadArray = _wCreateLowLevelIntBuffer(525000);
 	public static final void glDrawArrays(int p1, int p2, int p3, Object buffer) {
