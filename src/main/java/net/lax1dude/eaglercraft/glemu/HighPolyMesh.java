@@ -80,10 +80,10 @@ public class HighPolyMesh {
 		
 		for(int i = 0; i < intsTotal; ++i) {
 			int ch1 = mdlIn.read();
-	        int ch2 = mdlIn.read();
-	        int ch3 = mdlIn.read();
-	        int ch4 = mdlIn.read();
-	        if ((ch1 | ch2 | ch3 | ch4) < 0) throw new EOFException(); // rip
+			int ch2 = mdlIn.read();
+			int ch3 = mdlIn.read();
+			int ch4 = mdlIn.read();
+			if ((ch1 | ch2 | ch3 | ch4) < 0) throw new EOFException(); // rip
 			up1.put((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
 		}
 		
