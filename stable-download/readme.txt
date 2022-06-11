@@ -1,7 +1,7 @@
 
-Download 'stable-download-SECURE.zip' to get started quickly
+Download 'stable-download-new.zip' to get started quickly
 
-Download 'stable-download-new.zip' to get started quickly with a modded client
+Download 'stable-download-SECURE.zip' to get started quickly if u don't want hacked clients
 
 Downloading 'Offline_Download_Version.html' will allow you to play without hosting an HTTP server
 
