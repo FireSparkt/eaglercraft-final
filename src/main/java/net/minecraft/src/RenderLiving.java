@@ -384,6 +384,7 @@ public abstract class RenderLiving extends Render {
 					EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
 					Tessellator var15 = Tessellator.instance;
 					EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
+					EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
 					var15.startDrawingQuads();
 					int var16 = var14.getStringWidth(var13) / 2;
 					var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
@@ -392,9 +393,12 @@ public abstract class RenderLiving extends Render {
 					var15.addVertex((double) (var16 + 1), 8.0D, 0.0D);
 					var15.addVertex((double) (var16 + 1), -1.0D, 0.0D);
 					var15.draw();
+					EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 					EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
 					EaglerAdapter.glDepthMask(true);
+					EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.01f);
 					var14.drawString(var13, -var14.getStringWidth(var13) / 2, 0, 553648127);
+					EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1f);
 					EaglerAdapter.glEnable(EaglerAdapter.GL_LIGHTING);
 					EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 					EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -449,6 +453,7 @@ public abstract class RenderLiving extends Render {
 			}
 
 			EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
+			EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
 			var15.startDrawingQuads();
 			int var17 = var12.getStringWidth(par2Str) / 2;
 			var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
@@ -458,7 +463,10 @@ public abstract class RenderLiving extends Render {
 			var15.addVertex((double) (var17 + 1), (double) (-1 + var16), 0.0D);
 			var15.draw();
 			EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
+			EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
+			EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.02f);
 			var12.drawString(par2Str, -var12.getStringWidth(par2Str) / 2, var16, 553648127);
+			EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1f);
 			EaglerAdapter.glEnable(EaglerAdapter.GL_DEPTH_TEST);
 			EaglerAdapter.glDepthMask(true);
 			var12.drawString(par2Str, -var12.getStringWidth(par2Str) / 2, var16, -1);

@@ -4,6 +4,7 @@ import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.HighPolySkin;
 import net.lax1dude.eaglercraft.ModelBipedNewSkins;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.minecraft.client.Minecraft;
@@ -30,7 +31,7 @@ public class RenderPlayer extends RenderLiving {
 	 * partialTick
 	 */
 	protected int setArmorModel(EntityPlayer par1EntityPlayer, int par2, float par3) {
-		if(!DefaultSkinRenderer.isPlayerStandard(par1EntityPlayer)) {
+		if(!DefaultSkinRenderer.isPlayerStandard(par1EntityPlayer) && !DefaultSkinRenderer.isZombieModel(DefaultSkinRenderer.getPlayerRenderer(par1EntityPlayer))) {
 			return -1;
 		}
 		ItemStack var4 = par1EntityPlayer.inventory.armorItemInSlot(3 - par2);
@@ -108,6 +109,7 @@ public class RenderPlayer extends RenderLiving {
 	}
 	
 	private boolean renderPass2 = false;
+	private final Matrix4f tmpMatrix = new Matrix4f();
 
 	public void renderPlayer(EntityPlayer par1EntityPlayer, double par2, double par4, double par6, float par8, float par9) {
 		if(DefaultSkinRenderer.isPlayerHighPoly(par1EntityPlayer)) {
@@ -283,14 +285,18 @@ public class RenderPlayer extends RenderLiving {
 					}else if(msh == HighPolySkin.LAXATIVE_DUDE) {
 						float fff = (i == 0) ? 1.0f : -1.0f;
 						float swing = (MathHelper.cos(var13 % 100000.0f) * fff + 0.2f) * var15;
-						float swing2 = (MathHelper.sin(var13 % 100000.0f) * fff + 1.2f) * var15;
-						EaglerAdapter.glRotatef(swing * 13.0f, 1.0f, 0.0f, 0.0f);
+						float swing2 = (MathHelper.cos(var13 % 100000.0f) * fff * 0.5f + 0.0f) * var15;
+						EaglerAdapter.glRotatef(swing * 25.0f, 1.0f, 0.0f, 0.0f);
 						if(par1EntityPlayer.isSwingInProgress) {
 							float var17 = MathHelper.cos(-par1EntityPlayer.getSwingProgress(par9) * (float)Math.PI * 2.0f - 1.2f) - 0.362f;
 							var17 *= var17;
 							EaglerAdapter.glRotatef(-var17 * 25.0f, 1.0f, 0.0f, 0.0f);
 						}
-						EaglerAdapter.glScalef(1.0f, 1.0f, 1.0f - swing2 * 0.4f);
+						
+						// shear matrix
+						tmpMatrix.setIdentity();
+						tmpMatrix.m21 = swing2;
+						EaglerAdapter.glMultMatrixf(tmpMatrix);
 					}
 					
 					if(i != 0) {
@@ -412,6 +418,7 @@ public class RenderPlayer extends RenderLiving {
 
 			EaglerAdapter.glPopMatrix();
 			EaglerAdapter.flipLightMatrix();
+			passSpecialRender(par1EntityPlayer, par2, par4, par6);
 		}else if(DefaultSkinRenderer.isPlayerStandard(par1EntityPlayer)) {
 			float var10 = 1.0F;
 			EaglerAdapter.glColor3f(var10, var10, var10);
@@ -598,7 +605,7 @@ public class RenderPlayer extends RenderLiving {
 	
 			float var11;
 			
-			if (par1EntityPlayer.username.equals("LAX1DUDE") && !par1EntityPlayer.isInvisible() && !par1EntityPlayer.getHideCape() && renderType != 21) {
+			if (par1EntityPlayer.username.equalsIgnoreCase("LAX1DUDE") && !par1EntityPlayer.isInvisible() && !par1EntityPlayer.getHideCape() && renderType != 21) {
 				lax1dude_cape.bindTexture();
 				EaglerAdapter.glPushMatrix();
 				EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.125F);
