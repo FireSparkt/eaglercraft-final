@@ -3,3 +3,4 @@ https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/cert
 https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/certs/22w22a-1.dat
 https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/certs/22w23a-1.dat
 https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/certs/22w23b-1.dat
+https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/certs/22w23c-1.dat
