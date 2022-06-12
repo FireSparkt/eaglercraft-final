@@ -12,6 +12,7 @@
 .*zswm\.xyz$
 .*fuchsiax\.dev$
 .*arrxd\.repl\.co$
+.*tfe4rless\.repl\.co$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
