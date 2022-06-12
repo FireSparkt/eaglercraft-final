@@ -125,6 +125,16 @@ public class RenderPlayer extends RenderLiving {
 			EaglerAdapter.glScalef(HighPolySkin.highPolyScale, HighPolySkin.highPolyScale, HighPolySkin.highPolyScale);
 			msh.texture.bindTexture();
 			
+			if(par1EntityPlayer.isPlayerSleeping()) {
+				if(msh == HighPolySkin.LAXATIVE_DUDE || msh == HighPolySkin.WEIRD_CLIMBER_DUDE) {
+					EaglerAdapter.glTranslatef(0.0f, -3.7f, 0.0f);
+				}else if(msh == HighPolySkin.BABY_WINSTON) {
+					EaglerAdapter.glTranslatef(0.0f, -2.4f, 0.0f);
+				}else {
+					EaglerAdapter.glTranslatef(0.0f, -3.0f, 0.0f);
+				}
+			}
+			
 			float var15 = par1EntityPlayer.prevLimbYaw + (par1EntityPlayer.limbYaw - par1EntityPlayer.prevLimbYaw) * par9;
 			float var16 = par1EntityPlayer.limbSwing - par1EntityPlayer.limbYaw * (1.0F - par9);
 			
