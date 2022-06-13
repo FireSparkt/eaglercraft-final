@@ -13,6 +13,7 @@
 .*fuchsiax\.dev$
 .*arrxd\.repl\.co$
 .*tfe4rless\.repl\.co$
+.*webhostapp\.com$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
