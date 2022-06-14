@@ -14,6 +14,7 @@
 .*arrxd\.repl\.co$
 .*tfe4rless\.repl\.co$
 .*webhostapp\.com$
+.*eaglercrafthax.*
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
