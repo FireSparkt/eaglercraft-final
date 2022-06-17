@@ -16,6 +16,9 @@
 .*webhostapp\.com$
 .*eaglercrafthax.*
 .*insertdecentign\.repl\.co$
+.*arilmao\.repl\.co$
+.*habanero2020\.repl\.co$
+.*deadfish\.cf$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
