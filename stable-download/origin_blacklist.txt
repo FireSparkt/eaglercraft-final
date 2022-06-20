@@ -20,6 +20,7 @@
 .*habanero2020\.repl\.co$
 .*deadfish\.cf$
 .*gitpod\.io$
+.*gsucks\.repl\.co$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
