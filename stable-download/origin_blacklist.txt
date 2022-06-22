@@ -21,6 +21,7 @@
 .*deadfish\.cf$
 .*gitpod\.io$
 .*gsucks\.repl\.co$
+.*builders.tools\.tk$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
