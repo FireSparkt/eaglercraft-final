@@ -22,10 +22,9 @@
 .*gitpod\.io$
 .*gsucks\.repl\.co$
 .*builders.tools\.tk$
+.*nowisnottheti\.me$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
-
-# ayuncraft has not been removed because ayunami is removing the flyhack
 
 # snitch other domains out at https://g.eags.us/eaglercraft/report.html
 # or join the discord server at https://discord.com/invite/KMQW9Uvjyq and ping @Moderator with the domain and name of the client
