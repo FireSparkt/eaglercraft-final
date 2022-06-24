@@ -15,7 +15,7 @@
 .*tfe4rless\.repl\.co$
 .*webhostapp\.com$
 .*eaglercrafthax.*
-.*insertdecentign\.repl\.co$
+.*nsert.*\.repl\.co$
 .*arilmao\.repl\.co$
 .*habanero2020\.repl\.co$
 .*deadfish\.cf$
