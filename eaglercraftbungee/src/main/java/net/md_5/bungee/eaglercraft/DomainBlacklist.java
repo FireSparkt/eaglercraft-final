@@ -14,6 +14,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -25,10 +26,13 @@ public class DomainBlacklist {
 	public static final Collection<Pattern> regexBlacklist = new ArrayList();
 	public static final Collection<Pattern> regexLocalBlacklist = new ArrayList();
 	public static final Collection<Pattern> regexBlacklistReplit = new ArrayList();
+	public static final Collection<String> simpleWhitelist = new ArrayList();
 	public static final File localBlacklist = new File("origin_blacklist.txt");
 	private static Collection<String> blacklistSubscriptions = null;
 	private static boolean blockOfflineDownload = false;
 	private static boolean blockAllReplits = false;
+	private static boolean localWhitelistMode = false;
+	private static boolean simpleWhitelistMode = false;
 	private static final HashSet<String> brokenURLs = new HashSet();
 	private static final HashSet<String> brokenRegex = new HashSet();
 
@@ -51,30 +55,49 @@ public class DomainBlacklist {
 			if(blockOfflineDownload && origin.equalsIgnoreCase("null")) {
 				return true;
 			}
-			if(blockAllReplits) {
-				for(Pattern m : regexBlacklistReplitInternal) {
+			if(simpleWhitelistMode) {
+				for(String st : simpleWhitelist) {
+					if(origin.equalsIgnoreCase(st)) {
+						return false;
+					}
+				}
+			}
+			if(localWhitelistMode || simpleWhitelistMode) {
+				if(!blockOfflineDownload && origin.equalsIgnoreCase("null")) {
+					return false;
+				}
+				for(Pattern m : regexLocalBlacklist) {
+					if(m.matcher(origin).matches()) {
+						return false;
+					}
+				}
+				return true;
+			}else {
+				if(blockAllReplits) {
+					for(Pattern m : regexBlacklistReplitInternal) {
+						if(m.matcher(origin).matches()) {
+							return true;
+						}
+					}
+					for(Pattern m : regexBlacklistReplit) {
+						if(m.matcher(origin).matches()) {
+							return true;
+						}
+					}
+				}
+				for(Pattern m : regexBlacklist) {
 					if(m.matcher(origin).matches()) {
 						return true;
 					}
 				}
-				for(Pattern m : regexBlacklistReplit) {
+				for(Pattern m : regexLocalBlacklist) {
 					if(m.matcher(origin).matches()) {
 						return true;
 					}
 				}
-			}
-			for(Pattern m : regexBlacklist) {
-				if(m.matcher(origin).matches()) {
-					return true;
-				}
-			}
-			for(Pattern m : regexLocalBlacklist) {
-				if(m.matcher(origin).matches()) {
-					return true;
-				}
+				return false;
 			}
 		}
-		return false;
 	}
 	
 	public static void init(BungeeCord bg) {
@@ -84,10 +107,13 @@ public class DomainBlacklist {
 			regexBlacklist.clear();
 			regexLocalBlacklist.clear();
 			regexBlacklistReplit.clear();
+			simpleWhitelist.clear();
 			ConfigurationAdapter cfg = bg.getConfigurationAdapter();
 			blacklistSubscriptions = cfg.getBlacklistURLs();
 			blockOfflineDownload = cfg.getBlacklistOfflineDownload();
 			blockAllReplits = cfg.getBlacklistReplits();
+			simpleWhitelistMode = cfg.getSimpleWhitelistEnabled();
+			simpleWhitelist.addAll(cfg.getBlacklistSimpleWhitelist());
 			lastLocalUpdate = 0l;
 			lastUpdate = System.currentTimeMillis() - updateRate - 1000l;
 			update();
@@ -199,21 +225,48 @@ public class DomainBlacklist {
 					try {
 						BufferedReader is = new BufferedReader(new FileReader(localBlacklist));
 						regexLocalBlacklist.clear();
+						localWhitelistMode = false;
+						boolean foundWhitelistStatement = false;
 						String ss;
 						while((ss = is.readLine()) != null) {
 							try {
 								if((ss = ss.trim()).length() > 0) {
-									regexLocalBlacklist.add(Pattern.compile(ss));
+									if(!ss.startsWith("#")) {
+										regexLocalBlacklist.add(Pattern.compile(ss));
+									}else {
+										String st = ss.substring(1).trim();
+										if(st.startsWith("whitelistMode:")) {
+											foundWhitelistStatement = true;
+											String str = st.substring(14).trim().toLowerCase();
+											localWhitelistMode = str.equals("true") || str.equals("on") || str.equals("1");
+										}
+									}
 								}
 							}catch(PatternSyntaxException shit) {
-								System.err.println("ERROR: the local blacklist regex '" + ss + "' is invalid");
+								System.err.println("ERROR: the local " + (localWhitelistMode ? "whitelist" : "blacklist") + " regex '" + ss + "' is invalid");
 							}
 						}
 						is.close();
+						if(!foundWhitelistStatement) {
+							List<String> newLines = new ArrayList();
+							newLines.add("#whitelistMode: false");
+							newLines.add("");
+							BufferedReader is2 = new BufferedReader(new FileReader(localBlacklist));
+							while((ss = is2.readLine()) != null) {
+								newLines.add(ss);
+							}
+							is2.close();
+							PrintWriter os = new PrintWriter(new FileWriter(localBlacklist));
+							for(String str : newLines) {
+								os.println(str);
+							}
+							os.close();
+							lastLocalUpdate = localBlacklist.lastModified();
+						}
 						System.out.println("Reloaded '" + localBlacklist.getName() + "'.");
 					}catch(IOException ex) {
 						regexLocalBlacklist.clear();
-						System.err.println("ERROR: failed to read local blacklist file '" + localBlacklist.getName() + "'");
+						System.err.println("ERROR: failed to read local " + (localWhitelistMode ? "whitelist" : "blacklist") + " file '" + localBlacklist.getName() + "'");
 						ex.printStackTrace();
 					}
 				}
@@ -244,6 +297,10 @@ public class DomainBlacklist {
 			}catch(IOException ex) {
 				// ?
 			}
+		}
+		if(lines.isEmpty()) {
+			lines.add("#whitelist false");
+			lines.add("");
 		}
 		if(!lines.contains(p)) {
 			lines.add(p);

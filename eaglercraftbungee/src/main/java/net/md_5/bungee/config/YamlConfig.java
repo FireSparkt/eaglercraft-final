@@ -319,5 +319,23 @@ public class YamlConfig implements ConfigurationAdapter {
 	public boolean getBlacklistOriginless() {
 		return this.getBoolean("origin_blacklist_block_missing_origin_header", false);
 	}
+
+	@Override
+	public boolean getSimpleWhitelistEnabled() {
+		return this.getBoolean("origin_blacklist_use_simple_whitelist", false);
+	}
+
+	@Override
+	public Collection<String> getBlacklistSimpleWhitelist() {
+		Collection<String> c = this.get("origin_blacklist_simple_whitelist", null);
+		if(c == null) {
+			c = new ArrayList();
+			c.add("type the name of your client's domain here");
+			c.add("(if 'origin_blacklist_use_simple_whitelist' is true)");
+			c.add("g.eags.us");
+			c = this.get("origin_blacklist_simple_whitelist", c);
+		}
+		return c;
+	}
 	
 }

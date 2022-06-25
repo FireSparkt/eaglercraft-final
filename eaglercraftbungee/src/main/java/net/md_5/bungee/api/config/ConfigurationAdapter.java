@@ -32,6 +32,10 @@ public interface ConfigurationAdapter {
 	
 	boolean getBlacklistOriginless();
 	
+	boolean getSimpleWhitelistEnabled();
+	
+	Collection<String> getBlacklistSimpleWhitelist();
+	
 	AuthServiceInfo getAuthSettings();
 
 	Map<String, Object> getMap();
