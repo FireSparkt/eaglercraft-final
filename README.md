@@ -129,7 +129,26 @@ origin_blacklist_block_missing_origin_header: true
 
 **To add your own blacklisted domains**, create a file called `origin_blacklist.txt` in your bungeecord directory and put the regular expressions inside, one on each line. There 's also a `domain` command in the console to view a player's domain, and a `block-domain` and `block-domain-name` and `unblock-domain` command to manage the local `origin_blacklist.txt` from the bungee console (if you don't know how to edit a file on your own). The list reloads automatically when changes to the file are detected.
 
-**Enable** `forward_ip` **and pass a X-Real-IP header from your proxy to use rate limiting and IP bans on a URL**
+### To configure bungee to block connections from all clients except your own, set this option:
+
+```yaml
+origin_blacklist_use_simple_whitelist: true
+```
+
+### Then, add your domain to `origin_blacklist_simple_whitelist` like this:
+
+```yaml
+origin_blacklist_simple_whitelist:
+- type the name of your client's domain here
+```
+
+### Then, unless still you want it as an option for your players, disable the offline download so hackers don't use it to bypass the whitelist, as it is not blocked in whitelist mode by default:
+
+```yaml
+origin_blacklist_block_offline_download: true
+```
+
+**To use IP bans and rate limiting, enable** `forward_ip` **and pass a X-Real-IP header from your proxy to the bungeecord's websocket port**
 
 Nginx example: add `proxy_set_header X-Real-IP $remote_addr` to your proxy configuration
 
@@ -153,6 +172,8 @@ ratelimit:
 - `limit_lockout` and `lockout_duration` set the number of requests (`limit_lockout`) that can be made in (`period`) seconds before the IP is blocked for `lockout_duration` number of seconds
 
 - `exceptions` a list of IP addresses that should never get rate limited. **Local IPs like 127.0.0.1 and 192.168.\*.\* and such are set as exceptions by default**
+
+**you need `forward_ip` configured to use rate limiting, otherwise it will be disabled by defualt**
 
 **To develop a plugin, download [stable-download/java/bungee_command/bungee_dist.jar](https://github.com/LAX1DUDE/eaglercraft/blob/main/stable-download/java/bungee_command/bungee-dist.jar) and add it to the Build Path of your Java IDE. Develop the plugin just like a regular BungeeCord plugin, see [EaglerMOTD](https://github.com/LAX1DUDE/eaglercraft-motd/) for an example.**
 
