@@ -22,7 +22,6 @@
 .*gitpod\.io$
 .*gsucks\.repl\.co$
 .*builders.tools\.tk$
-.*nowisnottheti\.me$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
