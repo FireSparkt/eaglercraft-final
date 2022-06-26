@@ -5,6 +5,8 @@
 package net.md_5.bungee.connection;
 
 import java.beans.ConstructorProperties;
+import java.net.InetAddress;
+
 import net.md_5.bungee.api.event.ServerKickEvent;
 import java.util.Objects;
 import net.md_5.bungee.protocol.packet.PacketFFKick;
@@ -27,6 +29,7 @@ import net.md_5.bungee.api.score.Objective;
 import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
 import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EntityMap;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.netty.ChannelWrapper;
@@ -201,8 +204,14 @@ public class DownstreamBridge extends PacketHandler {
 			}
 			if (subChannel.equals("IP")) {
 				out.writeUTF("IP");
-				out.writeUTF(this.con.getAddress().getHostString());
-				out.writeInt(this.con.getAddress().getPort());
+				Object ob = this.con.getAttachment().get("remoteAddr");
+				if(ob != null && (ob instanceof InetAddress)) {
+					out.writeUTF(((InetAddress)ob).getHostAddress());
+					out.writeInt(this.con.getAddress().getPort());
+				}else {
+					out.writeUTF(this.con.getAddress().getHostString());
+					out.writeInt(this.con.getAddress().getPort());
+				}
 			}
 			if (subChannel.equals("PlayerCount")) {
 				final String target = in.readUTF();
@@ -245,6 +254,26 @@ public class DownstreamBridge extends PacketHandler {
 			if (subChannel.equals("GetServer")) {
 				out.writeUTF("GetServer");
 				out.writeUTF(this.server.getInfo().getName());
+			}
+			if (subChannel.equals("EAG|GetDomain")) {
+				out.writeUTF("EAG|GetDomain");
+				Object ob = this.con.getAttachment().get("origin");
+				if(ob != null && (ob instanceof String)) {
+					out.writeBoolean(true);
+					out.writeUTF((String)ob);
+				}else {
+					out.writeBoolean(false);
+					out.writeUTF("");
+				}
+			}
+			if (subChannel.equals("EAG|ConsoleCommand")) {
+				if(BungeeCord.getInstance().config.shouldAcceptBukkitConsoleCommandPacket()) {
+					String cmd = in.readUTF();
+					bungee.getLogger().info("Connection [" + this.con.getName() + "] <-> [" + this.server.getInfo().getName() + "] executed bungee console command: " + cmd);
+					bungee.getPluginManager().dispatchCommand(bungee.getConsole(), cmd);
+				}else {
+					bungee.getLogger().info("Connection [" + this.con.getName() + "] <-> [" + this.server.getInfo().getName() + "] tried executing a bungee console command but \"accept_bukkit_console_command_packets\" is set to false in config.yml");
+				}
 			}
 			if (out != null) {
 				final byte[] b = out.toByteArray();

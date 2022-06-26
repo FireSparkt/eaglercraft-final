@@ -58,7 +58,7 @@ public class WebSocketListener extends WebSocketServer {
 		this.info = info;
 		this.bungeeProxy = sock;
 		this.bungeeCord = bungeeCord;
-		this.blockOriginless = bungeeCord.getConfigurationAdapter().getBlacklistOriginless();
+		this.blockOriginless = ((BungeeCord)bungeeCord).config.shouldBlacklistOriginless();
 		this.ratelimitIP = info.getRateLimitIP();
 		this.ratelimitLogin = info.getRateLimitLogin();
 		this.ratelimitMOTD = info.getRateLimitMOTD();

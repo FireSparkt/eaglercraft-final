@@ -20,6 +20,7 @@ import java.util.regex.PatternSyntaxException;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
+import net.md_5.bungee.config.Configuration;
 
 public class DomainBlacklist {
 
@@ -108,12 +109,13 @@ public class DomainBlacklist {
 			regexLocalBlacklist.clear();
 			regexBlacklistReplit.clear();
 			simpleWhitelist.clear();
-			ConfigurationAdapter cfg = bg.getConfigurationAdapter();
-			blacklistSubscriptions = cfg.getBlacklistURLs();
-			blockOfflineDownload = cfg.getBlacklistOfflineDownload();
-			blockAllReplits = cfg.getBlacklistReplits();
-			simpleWhitelistMode = cfg.getSimpleWhitelistEnabled();
-			simpleWhitelist.addAll(cfg.getBlacklistSimpleWhitelist());
+			ConfigurationAdapter cfg2 = bg.getConfigurationAdapter();
+			Configuration cfg = bg.config;
+			blacklistSubscriptions = cfg2.getBlacklistURLs();
+			blockOfflineDownload = cfg.shouldBlacklistOfflineDownload();
+			blockAllReplits = cfg.shouldBlacklistReplits();
+			simpleWhitelistMode = cfg.isSimpleWhitelistEnabled();
+			simpleWhitelist.addAll(cfg2.getBlacklistSimpleWhitelist());
 			lastLocalUpdate = 0l;
 			lastUpdate = System.currentTimeMillis() - updateRate - 1000l;
 			update();

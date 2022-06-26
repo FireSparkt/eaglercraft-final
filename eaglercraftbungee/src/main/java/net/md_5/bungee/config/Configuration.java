@@ -27,6 +27,11 @@ public class Configuration {
 	private int playerLimit;
 	private String name;
 	private boolean showBanType;
+	private boolean blacklistOfflineDownload;
+	private boolean blacklistReplits;
+	private boolean blacklistOriginless;
+	private boolean simpleWhitelistEnabled;
+	private boolean acceptBukkitConsoleCommandPacket;
 
 	public Configuration() {
 		this.timeout = 30000;
@@ -53,6 +58,11 @@ public class Configuration {
 		this.playerLimit = adapter.getInt("player_limit", this.playerLimit);
 		this.name = adapter.getString("server_name", EaglercraftBungee.name + " Server");
 		this.showBanType = adapter.getBoolean("display_ban_type_on_kick", false);
+		this.blacklistOfflineDownload = adapter.getBoolean("origin_blacklist_block_offline_download", false);
+		this.blacklistReplits = adapter.getBoolean("origin_blacklist_block_replit_clients", false);
+		this.blacklistOriginless = adapter.getBoolean("origin_blacklist_block_missing_origin_header", false);
+		this.simpleWhitelistEnabled = adapter.getBoolean("origin_blacklist_use_simple_whitelist", false);
+		this.acceptBukkitConsoleCommandPacket = adapter.getBoolean("accept_bukkit_console_command_packets", false);
 		Preconditions.checkArgument(this.listeners != null && !this.listeners.isEmpty(), (Object) "No listeners defined.");
 		final Map<String, ServerInfo> newServers = adapter.getServers();
 		Preconditions.checkArgument(newServers != null && !newServers.isEmpty(), (Object) "No servers defined");
@@ -107,6 +117,26 @@ public class Configuration {
 
 	public boolean shouldShowBanType() {
 		return this.showBanType;
+	}
+
+	public boolean shouldBlacklistOfflineDownload() {
+		return blacklistOfflineDownload;
+	}
+
+	public boolean shouldBlacklistReplits() {
+		return blacklistReplits;
+	}
+
+	public boolean shouldBlacklistOriginless() {
+		return blacklistOriginless;
+	}
+
+	public boolean isSimpleWhitelistEnabled() {
+		return simpleWhitelistEnabled;
+	}
+
+	public boolean shouldAcceptBukkitConsoleCommandPacket() {
+		return acceptBukkitConsoleCommandPacket;
 	}
 	
 }

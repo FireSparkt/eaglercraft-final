@@ -17,7 +17,6 @@ import net.md_5.bungee.api.config.MOTDCacheConfiguration;
 
 import java.util.Collection;
 import java.net.InetSocketAddress;
-import java.util.Iterator;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.config.ServerInfo;
 import java.util.logging.Level;
@@ -303,26 +302,6 @@ public class YamlConfig implements ConfigurationAdapter {
 			c = this.get("origin_blacklist_subscriptions", c);
 		}
 		return c;
-	}
-
-	@Override
-	public boolean getBlacklistOfflineDownload() {
-		return this.getBoolean("origin_blacklist_block_offline_download", false);
-	}
-
-	@Override
-	public boolean getBlacklistReplits() {
-		return this.getBoolean("origin_blacklist_block_replit_clients", false);
-	}
-
-	@Override
-	public boolean getBlacklistOriginless() {
-		return this.getBoolean("origin_blacklist_block_missing_origin_header", false);
-	}
-
-	@Override
-	public boolean getSimpleWhitelistEnabled() {
-		return this.getBoolean("origin_blacklist_use_simple_whitelist", false);
 	}
 
 	@Override
