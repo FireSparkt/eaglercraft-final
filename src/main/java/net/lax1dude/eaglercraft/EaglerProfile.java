@@ -21,17 +21,33 @@ public class EaglerProfile {
 			this.glTex = glTex;
 		}
 	}
+	
+	public static class EaglerProfileCape {
+		public String name;
+		public byte[] data;
+		public int glTex;
+		public EaglerProfileCape(String name, byte[] data, int glTex) {
+			this.name = name;
+			this.data = data;
+			this.glTex = glTex;
+		}
+	}
 
 	public static String username;
 	public static int presetSkinId;
 	public static int customSkinId;
+	public static int presetCapeId;
+	public static int customCapeId;
 	
 	public static int newSkinNotificationIndex = 0;
 	
 	public static String myChannel;
+
+	public static final int[] SKIN_DATA_SIZE = new int[] { 64*32*4, 64*64*4, -9, -9, 1, 64*64*4, -9 };
+	public static final int[] CAPE_DATA_SIZE = new int[] { 32*32*4, -9, 1 };
 	
-	public static final int[] SKIN_DATA_SIZE = new int[] { 64*32*4, 64*64*4, 128*64*4, 128*128*4, 2, 64*64*4, 128*128*4 };
 	public static ArrayList<EaglerProfileSkin> skins = new ArrayList();
+	public static ArrayList<EaglerProfileCape> capes = new ArrayList();
 	
 	public static final EaglercraftRandom rand;
 	
@@ -44,11 +60,27 @@ public class EaglerProfile {
 		return -1;
 	}
 	
+	public static int getCapeSize(int len) {
+		for(int i = 0; i < CAPE_DATA_SIZE.length; ++i) {
+			if(len == CAPE_DATA_SIZE[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public static byte[] getSkinPacket() {
 		if(presetSkinId == -1) {
 			byte[] d = skins.get(customSkinId).data;
+			if(d == null) {
+				return new byte[] { (byte)4, (byte)0 };
+			}
 			byte[] d2 = new byte[1 + d.length];
-			d2[0] = (byte) getSkinSize(d.length);
+			int sz = getSkinSize(d.length);
+			if(sz < 0) {
+				return new byte[] { (byte)4, (byte)0 };
+			}
+			d2[0] = (byte) sz;
 			if(d2[0] == (byte)1 && skins.get(customSkinId).slim) {
 				d2[0] = (byte)5;
 			}
@@ -59,6 +91,25 @@ public class EaglerProfile {
 			return d2;
 		}else {
 			return new byte[] { (byte)4, (byte)presetSkinId };
+		}
+	}
+	
+	public static byte[] getCapePacket() {
+		if(presetCapeId == -1) {
+			byte[] d = capes.get(customCapeId).data;
+			if(d == null) {
+				return new byte[] { (byte)2, (byte)0 };
+			}
+			byte[] d2 = new byte[1 + d.length];
+			int sz = getCapeSize(d.length);
+			if(sz < 0) {
+				return new byte[] { (byte)2, (byte)0 };
+			}
+			d2[0] = (byte) sz;
+			System.arraycopy(d, 0, d2, 1, d.length);
+			return d2;
+		}else {
+			return new byte[] { (byte)2, (byte)presetCapeId };
 		}
 	}
 	
@@ -96,15 +147,6 @@ public class EaglerProfile {
 			w = 64;
 			h = 64;
 			break;
-		case 2:
-			w = 128;
-			h = 64;
-			break;
-		case 3:
-		case 6:
-			w = 128;
-			h = 128;
-			break;
 		}
 		
 		int im = Minecraft.getMinecraft().renderEngine.setupTextureRaw(data, w, h);
@@ -115,6 +157,42 @@ public class EaglerProfile {
 			skins.get(i).glTex = im;
 			skins.get(i).data = data;
 			skins.get(i).slim = slim;
+		}
+		return i;
+		
+	}
+	
+	public static int addCape(String name, byte[] data) {
+		int i = -1;
+		for(int j = 0, l = capes.size(); j < l; ++j) {
+			if(capes.get(j).name.equalsIgnoreCase(name)) {
+				i = j;
+				break;
+			}
+		}
+		int t = getCapeSize(data.length);
+		
+		if(t == -1) {
+			return -1;
+		}
+		
+		int w, h;
+		
+		switch(t) {
+		default:
+		case 0:
+			w = 32;
+			h = 32;
+			break;
+		}
+		
+		int im = Minecraft.getMinecraft().renderEngine.setupTextureRaw(data, w, h);
+		if(i == -1) {
+			i = capes.size();
+			capes.add(new EaglerProfileCape(name, data, im));
+		}else {
+			capes.get(i).glTex = im;
+			capes.get(i).data = data;
 		}
 		return i;
 		
@@ -147,6 +225,8 @@ public class EaglerProfile {
 		if(!LocalStorageManager.profileSettingsStorage.hasNoTags()) {
 			presetSkinId = LocalStorageManager.profileSettingsStorage.getInteger("ps");
 			customSkinId = LocalStorageManager.profileSettingsStorage.getInteger("cs");
+			presetCapeId = LocalStorageManager.profileSettingsStorage.getInteger("pc");
+			customCapeId = LocalStorageManager.profileSettingsStorage.getInteger("cc");
 			username = LocalStorageManager.profileSettingsStorage.getString("name");
 			newSkinNotificationIndex = LocalStorageManager.profileSettingsStorage.getInteger("nsi");
 			if(newSkinNotificationIndex == 0) {
@@ -163,6 +243,13 @@ public class EaglerProfile {
 					addSkin(s2, ((NBTTagCompound)k).getByteArray("data"), ((NBTTagCompound)k).getBoolean("slim"));
 				}
 			}
+			n = LocalStorageManager.profileSettingsStorage.getCompoundTag("capes");
+			for(Object s : NBTTagCompound.getTagMap(n).keySet()) {
+				NBTTagCompound ct = n.getCompoundTag((String)s);
+				addCape((String)s, ct.getByteArray("data"));
+			}
+		}else {
+			newSkinNotificationIndex = GuiScreenEditProfile.newDefaultNotice;
 		}
 	}
 	

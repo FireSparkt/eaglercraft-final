@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import net.lax1dude.eaglercraft.EaglerProfile.EaglerProfileCape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityOtherPlayerMP;
@@ -58,6 +59,30 @@ public class DefaultSkinRenderer {
 			null, null, null, null, null
 	};
 	
+	public static final TextureLocation[] defaultVanillaCapes = new TextureLocation[] {
+			null,
+			new TextureLocation("/skins/c01.minecon_2011.png"),
+			new TextureLocation("/skins/c02.minecon_2012.png"),
+			new TextureLocation("/skins/c03.minecon_2013.png"),
+			new TextureLocation("/skins/c04.minecon_2015.png"),
+			new TextureLocation("/skins/c05.minecon_2016.png"),
+			new TextureLocation("/skins/c06.microsoft_account.png"),
+			new TextureLocation("/skins/c07.mapmaker.png"),
+			new TextureLocation("/skins/c08.mojang_old.png"),
+			new TextureLocation("/skins/c09.mojang_new.png"),
+			new TextureLocation("/skins/c10.jira_mod.png"),
+			new TextureLocation("/skins/c11.mojang_very_old.png"),
+			new TextureLocation("/skins/c12.scrolls.png"),
+			new TextureLocation("/skins/c13.cobalt.png"),
+			new TextureLocation("/skins/c14.translator.png"),
+			new TextureLocation("/skins/c15.millionth_account.png"),
+			new TextureLocation("/skins/c16.prismarine.png"),
+			new TextureLocation("/skins/c17.snowman.png"),
+			new TextureLocation("/skins/c18.spade.png"),
+			new TextureLocation("/skins/c19.birthday.png"),
+			new TextureLocation("/skins/c20.db.png")
+	};
+	
 	public static final HighPolySkin[] defaultHighPoly = new HighPolySkin[] {
 			null, null, null, null, null, null, null, null, null, null,
 			null, null, null, null, null, null, null, null, null, null,
@@ -81,6 +106,7 @@ public class DefaultSkinRenderer {
 
 	private static final HashMap<Integer,EntityOtherPlayerMP> skinCookies = new HashMap();
 	private static final HashMap<EntityOtherPlayerMP,Integer> skinGLUnits = new HashMap();
+	private static final HashMap<EntityOtherPlayerMP,Integer> capeGLUnits = new HashMap();
 	private static final HashMap<EntityOtherPlayerMP,Long> skinGLTimeout = new HashMap();
 	
 	private static long lastClean = 0l;
@@ -95,6 +121,9 @@ public class DefaultSkinRenderer {
 					itr.remove();
 					if(skinGLUnits.containsKey(ee.getKey())) {
 						Minecraft.getMinecraft().renderEngine.deleteTexture(skinGLUnits.remove(ee.getKey()));
+					}
+					if(capeGLUnits.containsKey(ee.getKey())) {
+						Minecraft.getMinecraft().renderEngine.deleteTexture(capeGLUnits.remove(ee.getKey()));
 					}
 				}
 			}
@@ -114,9 +143,10 @@ public class DefaultSkinRenderer {
 		}else if(p instanceof EntityOtherPlayerMP) {
 			EntityOtherPlayerMP pp = (EntityOtherPlayerMP) p;
 			if(pp.skinPacket != null) {
-				if(((int)pp.skinPacket[0] & 0xFF) != 4) {
+				int type = ((int)pp.skinPacket[0] & 0xFF);
+				if(type != 4 && type >= 0 && type < EaglerProfile.SKIN_DATA_SIZE.length) {
 					if(!skinGLUnits.containsKey(pp)) {
-						byte[] skinToLoad = new byte[pp.skinPacket.length - 1];
+						byte[] skinToLoad = new byte[EaglerProfile.SKIN_DATA_SIZE[type]];
 						System.arraycopy(pp.skinPacket, 1, skinToLoad, 0, skinToLoad.length);
 						int w, h;
 						
@@ -130,15 +160,6 @@ public class DefaultSkinRenderer {
 						case 5:
 							w = 64;
 							h = 64;
-							break;
-						case 2:
-							w = 128;
-							h = 64;
-							break;
-						case 3:
-						case 6:
-							w = 128;
-							h = 128;
 							break;
 						}
 						
@@ -160,20 +181,119 @@ public class DefaultSkinRenderer {
 				}
 				return true;
 			}else {
-				if(!skinCookies.containsValue(pp)) {
-					int cookie = (int)(System.nanoTime() % 65536);
-					skinCookies.put(cookie, pp);
-					byte[] n = pp.username.getBytes();
-					byte[] pkt = new byte[n.length + 2];
-					System.arraycopy(n, 0, pkt, 2, n.length);
-					pkt[0] = (byte)(cookie & 0xFF);
-					pkt[1] = (byte)((cookie >> 8) & 0xFF);
-					Minecraft.getMinecraft().getNetHandler().addToSendQueue(new Packet250CustomPayload("EAG|FetchSkin", pkt));
-				}
+				requestSkin(pp);
 			}
 			return false;
 		}else {
 			return false;
+		}
+	}
+	
+	public static boolean bindSyncedCape(EntityPlayer p) {
+		EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+		EaglerAdapter.glPushMatrix();
+		EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+		if(p instanceof EntityClientPlayerMP) {
+			if(EaglerProfile.presetCapeId < 0) {
+				EaglerProfileCape cp = EaglerProfile.capes.get(EaglerProfile.customCapeId);
+				if(cp != null) {
+					Minecraft.getMinecraft().renderEngine.bindTexture(cp.glTex);
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+					EaglerAdapter.glScalef(2.0f, 1.0f, 1.0f);
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+					return true;
+				}else {
+					return false;
+				}
+			}else {
+				if(EaglerProfile.presetCapeId < defaultVanillaCapes.length) {
+					TextureLocation loc = defaultVanillaCapes[EaglerProfile.presetCapeId];
+					if(loc == null) {
+						return false;
+					}else {
+						loc.bindTexture();
+						return true;
+					}
+				}else {
+					return false;
+				}
+			}
+		}else if(p instanceof EntityOtherPlayerMP) {
+			EntityOtherPlayerMP pp = (EntityOtherPlayerMP) p;
+			if(pp.skinPacket != null) {
+				int tp = ((int)pp.skinPacket[0] & 0xFF);
+				if(tp >= 0 && tp < EaglerProfile.SKIN_DATA_SIZE.length) {
+					int offset = 1 + EaglerProfile.SKIN_DATA_SIZE[tp];
+					if(pp.skinPacket.length > offset) {
+						int capeType = (int)pp.skinPacket[offset] & 0xFF;
+						if(capeType >= 0 && capeType < EaglerProfile.CAPE_DATA_SIZE.length) {
+							int len = EaglerProfile.CAPE_DATA_SIZE[capeType];
+							if(pp.skinPacket.length > offset + len) {
+								if(capeType != 2) {
+									if(!capeGLUnits.containsKey(pp)) {
+										byte[] dataToLoad = new byte[len];
+										System.arraycopy(pp.skinPacket, offset + 1, dataToLoad, 0, len);
+										int w, h;
+										switch(capeType) {
+										case 0:
+										default:
+											w = 32;
+											h = 32;
+											break;
+										}
+	
+										if(dataToLoad.length / 4 == w * h) {
+											capeGLUnits.put(pp, Minecraft.getMinecraft().renderEngine.setupTextureRaw(dataToLoad, w, h));
+										}
+									}
+									skinGLTimeout.put(pp, System.currentTimeMillis());
+									Integer i = capeGLUnits.get(pp);
+									if(i != null && i.intValue() > 0) {
+										EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+										EaglerAdapter.glScalef(2.0f, 1.0f, 1.0f);
+										EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+										Minecraft.getMinecraft().renderEngine.bindTexture(i.intValue());
+										return true;
+									}else {
+										return false;
+									}
+								}else {
+									int preset = (int)pp.skinPacket[offset + 1] & 0xFF;
+									if(preset < defaultVanillaCapes.length) {
+										TextureLocation loc = defaultVanillaCapes[preset];
+										if(loc == null) {
+											return false;
+										}else {
+											loc.bindTexture();
+											return true;
+										}
+									}else {
+										return false;
+									}
+								}
+							}
+						}
+						
+					}
+					
+				}
+			}else {
+				requestSkin(pp);
+			}
+		}
+		return false;
+	}
+	
+	private static void requestSkin(EntityOtherPlayerMP pp) {
+		if(!skinCookies.containsValue(pp)) {
+			int cookie = (int)(System.nanoTime() % 65536);
+			skinCookies.put(cookie, pp);
+			byte[] n = pp.username.getBytes();
+			byte[] pkt = new byte[n.length + 2];
+			System.arraycopy(n, 0, pkt, 2, n.length);
+			pkt[0] = (byte)(cookie & 0xFF);
+			pkt[1] = (byte)((cookie >> 8) & 0xFF);
+			Minecraft.getMinecraft().getNetHandler().addToSendQueue(new Packet250CustomPayload("EAG|FetchSkin", pkt));
 		}
 	}
 	
@@ -322,6 +442,10 @@ public class DefaultSkinRenderer {
 	public static ModelSkeleton skeletonRenderer = null;
 	
 	public static void renderPlayerPreview(int x, int y, int mx, int my, int id2) {
+		boolean capeMode = (id2 & 0x10000) == 0x10000;
+		if(capeMode) {
+			id2 -= 0x10000;
+		}
 		int id = id2 - EaglerProfile.skins.size();
 		boolean highPoly = isHighPoly(id);
 		
@@ -341,7 +465,13 @@ public class DefaultSkinRenderer {
 		EaglerAdapter.glScalef(1.0F, -1.0F, 1.0F);
 		RenderHelper.enableGUIStandardItemLighting();
 		EaglerAdapter.glTranslatef(0.0F, 1.0F, 0.0F);
-		EaglerAdapter.glRotatef(((y - my) * -0.06f), 1.0f, 0.0f, 0.0f);
+		if(capeMode) {
+			EaglerAdapter.glRotatef(140.0f, 0.0f, 1.0f, 0.0f);
+			mx = x - (x - mx) - 20;
+			EaglerAdapter.glRotatef(((y - my) * -0.02f), 1.0f, 0.0f, 0.0f);
+		}else {
+			EaglerAdapter.glRotatef(((y - my) * -0.06f), 1.0f, 0.0f, 0.0f);
+		}
 		EaglerAdapter.glRotatef(((x - mx) * 0.06f), 0.0f, 1.0f, 0.0f);
 		EaglerAdapter.glTranslatef(0.0F, -1.0F, 0.0F);
 		
@@ -425,6 +555,33 @@ public class DefaultSkinRenderer {
 					oldSkinRenderer.blockTransparentSkin = true;
 					oldSkinRenderer.render(null, 0.0f, 0.0f, (float)(System.currentTimeMillis() % 100000) / 50f, ((x - mx) * 0.06f), ((y - my) * -0.1f), 0.0625F);
 					oldSkinRenderer.blockTransparentSkin = false;
+				}
+				
+				if(capeMode && !(EaglerProfile.presetCapeId >= 0 && defaultVanillaCapes[EaglerProfile.presetCapeId] == null)) {
+					EaglerAdapter.glPushMatrix();
+					EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.150F);
+					EaglerAdapter.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+					EaglerAdapter.glRotatef(-6.0F, 1.0F, 0.0F, 0.0F);
+					
+					if(EaglerProfile.presetCapeId < 0) {
+						Minecraft.getMinecraft().renderEngine.bindTexture(EaglerProfile.capes.get(EaglerProfile.customCapeId).glTex);
+						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+						EaglerAdapter.glPushMatrix();
+						EaglerAdapter.glScalef(2.0f, 1.0f, 1.0f);
+						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+					}else {
+						defaultVanillaCapes[EaglerProfile.presetCapeId].bindTexture();
+					}
+					
+					oldSkinRenderer.bipedCloak.render(0.0625F);
+					
+					if(EaglerProfile.presetCapeId < 0) {
+						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+						EaglerAdapter.glPopMatrix();
+						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+					}
+					
+					EaglerAdapter.glPopMatrix();
 				}
 			}else if(isZombieModel(id)) {
 				if(zombieRenderer == null) zombieRenderer = new ModelZombie(0.0F, true);

@@ -77,6 +77,7 @@ public class GuiConnecting extends GuiScreen {
 				this.clientHandler = new NetClientHandler(this.mc, uri, 0);
 				this.clientHandler.addToSendQueue(new Packet2ClientProtocol(69, EaglerProfile.username, uria, port));
 				this.clientHandler.addToSendQueue(new Packet250CustomPayload("EAG|MySkin", EaglerProfile.getSkinPacket()));
+				this.clientHandler.addToSendQueue(new Packet250CustomPayload("EAG|MyCape", EaglerProfile.getCapePacket()));
 			} catch (IOException e) {
 				try {
 					this.clientHandler.disconnect();

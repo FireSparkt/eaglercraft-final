@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft;
 
 import net.lax1dude.eaglercraft.EaglerProfile.EaglerProfileSkin;
+import net.minecraft.src.EnumChatFormatting;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiTextField;
@@ -115,7 +116,6 @@ public class GuiScreenEditProfile extends GuiScreen {
 		if(cnt <= 0) {
 			this.drawString(this.fontRenderer, var1.translateKey("profile.playerSkin"), this.width / 2 - 20, this.height / 6 + 66, 10526880);
 		}
-		
 		mousex = mx;
 		mousey = my;
 		
@@ -126,6 +126,25 @@ public class GuiScreenEditProfile extends GuiScreen {
 		
 		drawRect(skinX, skinY, skinX + skinWidth, skinY + skinHeight, -6250336);
 		drawRect(skinX + 1, skinY + 1, skinX + skinWidth - 1, skinY + skinHeight - 1, 0xff000015);
+		
+		EaglerAdapter.glPushMatrix();
+		EaglerAdapter.glTranslatef(skinX + 2, skinY - 9, 0.0f);
+		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
+		
+		int skid = selectedSlot - EaglerProfile.skins.size();
+		if(skid < 0) {
+			skid = 0;
+		}
+		if(DefaultSkinRenderer.isStandardModel(skid) || DefaultSkinRenderer.isZombieModel(skid)) {
+			String capesText = var1.translateKey("profile.capes");
+			int color = 10526880;
+			if(mx > skinX - 10 && my > skinY - 16 && mx < skinX + (fontRenderer.getStringWidth(capesText) / 0.75f) + 10 && my < skinY + 7) {
+				color = 0xFFCCCC44;
+			}
+			this.drawString(this.fontRenderer, EnumChatFormatting.UNDERLINE + capesText, 0, 0, color);
+		}
+		
+		EaglerAdapter.glPopMatrix();
 		
 		this.username.drawTextBox();
 		if(dropDownOpen ||  newSkinWaitSteveOrAlex) {
@@ -298,9 +317,11 @@ public class GuiScreenEditProfile extends GuiScreen {
 		}else {
 			EaglerProfile.customSkinId = -1;
 		}
-		
+
 		LocalStorageManager.profileSettingsStorage.setInteger("ps", EaglerProfile.presetSkinId);
 		LocalStorageManager.profileSettingsStorage.setInteger("cs", EaglerProfile.customSkinId);
+		LocalStorageManager.profileSettingsStorage.setInteger("pc", EaglerProfile.presetCapeId);
+		LocalStorageManager.profileSettingsStorage.setInteger("cc", EaglerProfile.customCapeId);
 		LocalStorageManager.profileSettingsStorage.setInteger("nsi", EaglerProfile.newSkinNotificationIndex);
 		LocalStorageManager.profileSettingsStorage.setString("name", EaglerProfile.username);
 		
@@ -312,6 +333,14 @@ public class GuiScreenEditProfile extends GuiScreen {
 			skins.setTag(EaglerProfile.skins.get(i).name, nbt);
 		}
 		LocalStorageManager.profileSettingsStorage.setCompoundTag("skins", skins);
+		
+		NBTTagCompound capes = new NBTTagCompound();
+		for(int i = 0, l = EaglerProfile.capes.size(); i < l; i++) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setByteArray("data", EaglerProfile.capes.get(i).data);
+			capes.setTag(EaglerProfile.capes.get(i).name, nbt);
+		}
+		LocalStorageManager.profileSettingsStorage.setCompoundTag("capes", capes);
 		
 		LocalStorageManager.saveStorageP();
 	}
@@ -434,9 +463,9 @@ public class GuiScreenEditProfile extends GuiScreen {
 			return;
 		}else if(selectedSlot < EaglerProfile.skins.size()) {
 			int skinX = this.width / 2 - 120;
-			int skinY = this.height / 6 + 8;
+			int skinY = this.height / 6 + 18;
 			int skinWidth = 80;
-			int skinHeight = 130;
+			int skinHeight = 120;
 			if(par1 >= skinX && par2 >= skinY && par1 < skinX + skinWidth && par2 < skinY + skinHeight) {
 				if(selectedSlot < EaglerProfile.skins.size()) {
 					int type = EaglerProfile.getSkinSize(EaglerProfile.skins.get(selectedSlot).data.length);
@@ -449,7 +478,6 @@ public class GuiScreenEditProfile extends GuiScreen {
 		}
 		super.mouseClicked(par1, par2, par3);
 		this.username.mouseClicked(par1, par2, par3);
-		
 		if (par3 == 0) {
 			int skinX = this.width / 2 + 140 - 40;
 			int skinY = this.height / 6 + 82;
@@ -492,7 +520,21 @@ public class GuiScreenEditProfile extends GuiScreen {
 					}
 				}
 			}
-			
+
+			int skid = selectedSlot - EaglerProfile.skins.size();
+			if(skid < 0) {
+				skid = 0;
+			}
+			if(DefaultSkinRenderer.isStandardModel(skid) || DefaultSkinRenderer.isZombieModel(skid)) {
+				skinX = this.width / 2 - 120;
+				skinY = this.height / 6 + 8;
+				String capesText = StringTranslate.getInstance().translateKey("profile.capes");
+				if(par1 > skinX - 10 && par2 > skinY - 16 && par1 < skinX + (fontRenderer.getStringWidth(capesText) / 0.75f) + 10 && par2 < skinY + 7) {
+					save();
+					this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+					this.mc.displayGuiScreen(new GuiScreenEditCape(this, selectedSlot));
+				}
+			}
 		}
 	}
 	

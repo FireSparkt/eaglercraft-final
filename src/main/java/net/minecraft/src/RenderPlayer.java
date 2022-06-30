@@ -605,49 +605,55 @@ public class RenderPlayer extends RenderLiving {
 	
 			float var11;
 			
-			if (par1EntityPlayer.username.equalsIgnoreCase("LAX1DUDE") && !par1EntityPlayer.isInvisible() && !par1EntityPlayer.getHideCape() && renderType != 21) {
-				lax1dude_cape.bindTexture();
-				EaglerAdapter.glPushMatrix();
-				EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.125F);
-				double var21 = par1EntityPlayer.field_71091_bM + (par1EntityPlayer.field_71094_bP - par1EntityPlayer.field_71091_bM) * (double) par2
-						- (par1EntityPlayer.prevPosX + (par1EntityPlayer.posX - par1EntityPlayer.prevPosX) * (double) par2);
-				double var24 = par1EntityPlayer.field_71096_bN + (par1EntityPlayer.field_71095_bQ - par1EntityPlayer.field_71096_bN) * (double) par2
-						- (par1EntityPlayer.prevPosY + (par1EntityPlayer.posY - par1EntityPlayer.prevPosY) * (double) par2);
-				double var9 = par1EntityPlayer.field_71097_bO + (par1EntityPlayer.field_71085_bR - par1EntityPlayer.field_71097_bO) * (double) par2
-						- (par1EntityPlayer.prevPosZ + (par1EntityPlayer.posZ - par1EntityPlayer.prevPosZ) * (double) par2);
-				var11 = par1EntityPlayer.prevRenderYawOffset + (par1EntityPlayer.renderYawOffset - par1EntityPlayer.prevRenderYawOffset) * par2;
-				double var12 = (double) MathHelper.sin(var11 * (float) Math.PI / 180.0F);
-				double var14 = (double) (-MathHelper.cos(var11 * (float) Math.PI / 180.0F));
-				float var16 = (float) var24 * 10.0F;
-	
-				if (var16 < -6.0F) {
-					var16 = -6.0F;
+			if(DefaultSkinRenderer.isStandardModel(renderType) || DefaultSkinRenderer.isZombieModel(renderType)) {
+				if(!par1EntityPlayer.isInvisible() && !par1EntityPlayer.getHideCape()) {
+					if(DefaultSkinRenderer.bindSyncedCape(par1EntityPlayer)) {
+						EaglerAdapter.glPushMatrix();
+						EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.125F);
+						double var21 = par1EntityPlayer.field_71091_bM + (par1EntityPlayer.field_71094_bP - par1EntityPlayer.field_71091_bM) * (double) par2
+								- (par1EntityPlayer.prevPosX + (par1EntityPlayer.posX - par1EntityPlayer.prevPosX) * (double) par2);
+						double var24 = par1EntityPlayer.field_71096_bN + (par1EntityPlayer.field_71095_bQ - par1EntityPlayer.field_71096_bN) * (double) par2
+								- (par1EntityPlayer.prevPosY + (par1EntityPlayer.posY - par1EntityPlayer.prevPosY) * (double) par2);
+						double var9 = par1EntityPlayer.field_71097_bO + (par1EntityPlayer.field_71085_bR - par1EntityPlayer.field_71097_bO) * (double) par2
+								- (par1EntityPlayer.prevPosZ + (par1EntityPlayer.posZ - par1EntityPlayer.prevPosZ) * (double) par2);
+						var11 = par1EntityPlayer.prevRenderYawOffset + (par1EntityPlayer.renderYawOffset - par1EntityPlayer.prevRenderYawOffset) * par2;
+						double var12 = (double) MathHelper.sin(var11 * (float) Math.PI / 180.0F);
+						double var14 = (double) (-MathHelper.cos(var11 * (float) Math.PI / 180.0F));
+						float var16 = (float) var24 * 10.0F;
+			
+						if (var16 < -6.0F) {
+							var16 = -6.0F;
+						}
+			
+						if (var16 > 32.0F) {
+							var16 = 32.0F;
+						}
+			
+						float var17 = (float) (var21 * var12 + var9 * var14) * 100.0F;
+						float var18 = (float) (var21 * var14 - var9 * var12) * 100.0F;
+			
+						if (var17 < 0.0F) {
+							var17 = 0.0F;
+						}
+			
+						float var19 = par1EntityPlayer.prevCameraYaw + (par1EntityPlayer.cameraYaw - par1EntityPlayer.prevCameraYaw) * par2;
+						var16 += MathHelper.sin((par1EntityPlayer.prevDistanceWalkedModified + (par1EntityPlayer.distanceWalkedModified - par1EntityPlayer.prevDistanceWalkedModified) * par2) * 6.0F) * 32.0F * var19;
+			
+						if (par1EntityPlayer.isSneaking()) {
+							var16 += 25.0F;
+						}
+			
+						EaglerAdapter.glRotatef(6.0F + var17 / 2.0F + var16, 1.0F, 0.0F, 0.0F);
+						EaglerAdapter.glRotatef(var18 / 2.0F, 0.0F, 0.0F, 1.0F);
+						EaglerAdapter.glRotatef(-var18 / 2.0F, 0.0F, 1.0F, 0.0F);
+						EaglerAdapter.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+						this.modelBipedMain.renderCloak(0.0625F);
+						EaglerAdapter.glPopMatrix();
+					}
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+					EaglerAdapter.glPopMatrix();
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
 				}
-	
-				if (var16 > 32.0F) {
-					var16 = 32.0F;
-				}
-	
-				float var17 = (float) (var21 * var12 + var9 * var14) * 100.0F;
-				float var18 = (float) (var21 * var14 - var9 * var12) * 100.0F;
-	
-				if (var17 < 0.0F) {
-					var17 = 0.0F;
-				}
-	
-				float var19 = par1EntityPlayer.prevCameraYaw + (par1EntityPlayer.cameraYaw - par1EntityPlayer.prevCameraYaw) * par2;
-				var16 += MathHelper.sin((par1EntityPlayer.prevDistanceWalkedModified + (par1EntityPlayer.distanceWalkedModified - par1EntityPlayer.prevDistanceWalkedModified) * par2) * 6.0F) * 32.0F * var19;
-	
-				if (par1EntityPlayer.isSneaking()) {
-					var16 += 25.0F;
-				}
-	
-				EaglerAdapter.glRotatef(6.0F + var17 / 2.0F + var16, 1.0F, 0.0F, 0.0F);
-				EaglerAdapter.glRotatef(var18 / 2.0F, 0.0F, 0.0F, 1.0F);
-				EaglerAdapter.glRotatef(-var18 / 2.0F, 0.0F, 1.0F, 0.0F);
-				EaglerAdapter.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-				this.modelBipedMain.renderCloak(0.0625F);
-				EaglerAdapter.glPopMatrix();
 			}
 		}
 
