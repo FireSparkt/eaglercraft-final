@@ -20,7 +20,7 @@
 
 ### Play Minecraft Beta Singleplayer: [https://g.eags.us/eaglercraft/beta/](https://g.eags.us/eaglercraft/beta/)
 
-**For any questions you can join the discord server and hit me up there (DISCORD UNAVAILABLE CHECK BACK IN A DAY OR TWO)**
+**For any questions you can join the discord server and hit me up there [https://discord.gg/nuhVQz5S5Q](https://discord.gg/nuhVQz5S5Q)**
 
 ### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
 
