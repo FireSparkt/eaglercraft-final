@@ -20,7 +20,7 @@
 
 ### Play Minecraft Beta Singleplayer: [https://g.eags.us/eaglercraft/beta/](https://g.eags.us/eaglercraft/beta/)
 
-**For any questions you can join the discord server and hit me up there [https://discord.gg/KMQW9Uvjyq](https://discord.gg/KMQW9Uvjyq)**
+**For any questions you can join the discord server and hit me up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
 
 ### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
 
@@ -97,7 +97,7 @@ Eaglercraft uses the decompiled source code of the official build of Minecraft 1
 
 ## Issues?
 
-I got tired of closing duplicate 'how to maek sever' and 'add single player' issues almost every day so I disabled it because honestly I don't really care anymore, [join discord](https://discord.gg/KMQW9Uvjyq) if you've got an issue to report that you are confident can be backed up with source code
+I got tired of closing duplicate 'how to maek sever' and 'add single player' issues almost every day so I disabled it because honestly I don't really care anymore, [join discord](https://discord.gg/Ekzcgs3DKZ) if you've got an issue to report that you are confident can be backed up with source code
 
 ## EaglercraftBungee
 
