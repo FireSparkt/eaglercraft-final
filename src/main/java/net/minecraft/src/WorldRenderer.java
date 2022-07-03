@@ -14,6 +14,7 @@ public class WorldRenderer {
 	private int glRenderList = -1;
 	private static Tessellator tessellator = Tessellator.instance;
 	public static int chunksUpdated = 0;
+	public static int chunksGeometryUpdated = 0;
 	public int posX;
 	public int posY;
 	public int posZ;
@@ -72,6 +73,7 @@ public class WorldRenderer {
 	/** Is the chunk lit */
 	public boolean isChunkLit;
 	private boolean isInitialized = false;
+	public int hasOcclusionData = 0;
 
 	/** All the tile entities that have special rendering code for this chunk */
 	public List tileEntityRenderers = new ArrayList();
@@ -96,6 +98,7 @@ public class WorldRenderer {
 	public void setPosition(int par1, int par2, int par3) {
 		if (par1 != this.posX || par2 != this.posY || par3 != this.posZ) {
 			this.setDontDraw();
+			this.hasOcclusionData = 0;
 			this.posX = par1;
 			this.posY = par2;
 			this.posZ = par3;
@@ -224,6 +227,11 @@ public class WorldRenderer {
 						break;
 					}
 				}
+				
+				if(!(skipRenderPass[0] && skipRenderPass[1])) {
+					++chunksGeometryUpdated;
+				}
+				
 				EaglerAdapter.hintAnisotropicFix(false);
 			}
 
@@ -282,6 +290,10 @@ public class WorldRenderer {
 	 */
 	public void callOcclusionQueryList() {
 		EaglerAdapter.glCallList(this.glRenderList + 2);
+	}
+	
+	public boolean shouldTryOcclusionQuery() {
+		return !this.isInitialized ? true : !this.skipRenderPass[0] || !this.skipRenderPass[1];
 	}
 
 	/**

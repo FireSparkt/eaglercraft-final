@@ -135,6 +135,7 @@ public class GameSettings {
 	public boolean allowFNAWSkins = true;
 	public boolean showOtherCapes = true;
 	
+	public int chunkUpdatePerFrame = 0;
 
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
@@ -289,6 +290,10 @@ public class GameSettings {
 
 		if (par1EnumOptions == EnumOptions.FRAMERATE_LIMIT) {
 			this.limitFramerate = (this.limitFramerate + par2 + 3) % 3;
+		}
+
+		if (par1EnumOptions == EnumOptions.CHUNK_UPDATES) {
+			this.chunkUpdatePerFrame = (this.chunkUpdatePerFrame + par2) % 5;
 		}
 
 		if (par1EnumOptions == EnumOptions.DIFFICULTY) {
@@ -460,8 +465,9 @@ public class GameSettings {
 					: (par1EnumOptions == EnumOptions.FRAMERATE_LIMIT ? var3 + getTranslation(LIMIT_FRAMERATES, this.limitFramerate)
 					: (par1EnumOptions == EnumOptions.AMBIENT_OCCLUSION ? var3 + getTranslation(AMBIENT_OCCLUSIONS, this.ambientOcclusion)
 					: (par1EnumOptions == EnumOptions.ANTIALIASING ? var3 + getTranslation(ANTIALIASING, this.antialiasMode)
+					: (par1EnumOptions == EnumOptions.CHUNK_UPDATES ? var3 + (chunkUpdatePerFrame + 1)
 					: (par1EnumOptions == EnumOptions.GRAPHICS ? (this.fancyGraphics ? var3 + var2.translateKey("options.graphics.fancy") : var3 + var2.translateKey("options.graphics.fast"))
-							: var3))))))));
+							: var3)))))))));
 		}
 	}
 
@@ -519,6 +525,7 @@ public class GameSettings {
 			if(yee.hasKey("showSkinRightLeg")) showSkinRightLeg = yee.getBoolean("showSkinRightLeg");
 			if(yee.hasKey("allowFNAWSkins")) allowFNAWSkins = yee.getBoolean("allowFNAWSkins");
 			if(yee.hasKey("showOtherCapes")) showOtherCapes = yee.getBoolean("showOtherCapes");
+			if(yee.hasKey("chunkUpdates")) chunkUpdatePerFrame = yee.getInteger("chunkUpdates");
 			
 			for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 				if(yee.hasKey(keyBindings[var4].keyDescription)) this.keyBindings[var4].keyCode = yee.getInteger(keyBindings[var4].keyDescription);
@@ -581,6 +588,7 @@ public class GameSettings {
 		yee.setBoolean("showSkinRightLeg", showSkinRightLeg);
 		yee.setBoolean("allowFNAWSkins", allowFNAWSkins);
 		yee.setBoolean("showOtherCapes", showOtherCapes);
+		yee.setInteger("chunkUpdates", chunkUpdatePerFrame);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

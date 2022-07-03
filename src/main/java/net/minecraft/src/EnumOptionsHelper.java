@@ -87,5 +87,11 @@ class EnumOptionsHelper {
 		} catch (NoSuchFieldError var10) {
 			;
 		}
+
+		try {
+			enumOptionsMappingHelperArray[EnumOptions.CHUNK_UPDATES.ordinal()] = 16;
+		} catch (NoSuchFieldError var10) {
+			;
+		}
 	}
 }

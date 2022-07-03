@@ -17,7 +17,7 @@ public class GuiVideoSettings extends GuiScreen {
 
 	/** An array of all of EnumOption's video options. */
 	private static EnumOptions[] videoOptions = new EnumOptions[] { EnumOptions.GRAPHICS, EnumOptions.RENDER_DISTANCE, EnumOptions.AMBIENT_OCCLUSION, EnumOptions.FRAMERATE_LIMIT, EnumOptions.ANAGLYPH, EnumOptions.VIEW_BOBBING,
-			EnumOptions.GUI_SCALE, EnumOptions.GAMMA, EnumOptions.RENDER_CLOUDS, EnumOptions.ENABLE_FOG, EnumOptions.PARTICLES, EnumOptions.PATCH_ANGLE };
+			EnumOptions.GUI_SCALE, EnumOptions.GAMMA, EnumOptions.RENDER_CLOUDS, EnumOptions.ENABLE_FOG, EnumOptions.PARTICLES, EnumOptions.PATCH_ANGLE, EnumOptions.CHUNK_UPDATES };
 
 	public GuiVideoSettings(GuiScreen par1GuiScreen, GameSettings par2GameSettings) {
 		this.parentGuiScreen = par1GuiScreen;
@@ -31,7 +31,7 @@ public class GuiVideoSettings extends GuiScreen {
 		StringTranslate var1 = StringTranslate.getInstance();
 		this.screenTitle = var1.translateKey("options.videoTitle");
 		this.buttonList.clear();
-		this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, var1.translateKey("gui.done")));
+		this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 178, var1.translateKey("gui.done")));
 		this.is64bit = true;
 		/*
 		String[] var2 = new String[] { "sun.arch.data.model", "com.ibm.vm.bitmode", "os.arch" };

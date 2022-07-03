@@ -137,9 +137,11 @@ public class Minecraft implements Runnable {
 	/** The profiler instance */
 	public final Profiler mcProfiler = new Profiler();
 	private long field_83002_am = -1L;
-	
+
 	public int chunkUpdates = 0;
+	public int chunkGeometryUpdates = 0;
 	public static int debugChunkUpdates = 0;
+	public static int debugChunkGeometryUpdates = 0;
 
 	/**
 	 * Set to true to keep the game loop running. Set to false by shutdown() to
@@ -724,6 +726,8 @@ public class Minecraft implements Runnable {
 			fpsCounter = 0;
 			debugChunkUpdates = chunkUpdates;
 			chunkUpdates = 0;
+			debugChunkGeometryUpdates = chunkGeometryUpdates;
+			chunkGeometryUpdates = 0;
 			secondTimer = System.currentTimeMillis();
 		}
 		this.mcProfiler.startSection("syncDisplay");
