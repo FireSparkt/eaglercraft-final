@@ -1151,6 +1151,21 @@ public class NetClientHandler extends NetHandler {
 			}
 		}else if("EAG|UserSkin".equals(par1Packet250CustomPayload.channel)) {
 			DefaultSkinRenderer.skinResponse(par1Packet250CustomPayload.data);
+		}else if("EAG|SkinLayers".equals(par1Packet250CustomPayload.channel)) {
+			DataInputStream var8 = new DataInputStream(new ByteArrayInputStream(par1Packet250CustomPayload.data));
+			try {
+				int var9 = var8.read();
+				String user = var8.readUTF();
+				EntityPlayer pp = mc.theWorld.getPlayerEntityByName(user);
+				if(pp != null && (pp instanceof EntityOtherPlayerMP)) {
+					byte[] pkt = ((EntityOtherPlayerMP)pp).skinPacket;
+					if(pkt != null) {
+						DefaultSkinRenderer.updateSkinLayerByte(var9, pkt);
+					}
+				}
+			} catch (IOException var7) {
+				var7.printStackTrace();
+			}
 		}
 	}
 

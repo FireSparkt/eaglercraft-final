@@ -316,5 +316,10 @@ public class YamlConfig implements ConfigurationAdapter {
 		}
 		return c;
 	}
+
+	@Override
+	public Collection<String> getDisabledCommands() {
+		return this.get("disabled_commands", new ArrayList());
+	}
 	
 }

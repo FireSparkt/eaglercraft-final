@@ -112,7 +112,9 @@ public class RenderPlayer extends RenderLiving {
 	private final Matrix4f tmpMatrix = new Matrix4f();
 
 	public void renderPlayer(EntityPlayer par1EntityPlayer, double par2, double par4, double par6, float par8, float par9) {
-		if(DefaultSkinRenderer.isPlayerHighPoly(par1EntityPlayer)) {
+		boolean isHiPoly = DefaultSkinRenderer.isPlayerHighPoly(par1EntityPlayer);
+		boolean fnawEnabled = Minecraft.getMinecraft().gameSettings.allowFNAWSkins;
+		if(isHiPoly && fnawEnabled) {
 			HighPolySkin msh = DefaultSkinRenderer.defaultHighPoly[DefaultSkinRenderer.getPlayerRenderer(par1EntityPlayer)];
 			EaglerAdapter.flipLightMatrix();
 			EaglerAdapter.glPushMatrix();
@@ -296,6 +298,7 @@ public class RenderPlayer extends RenderLiving {
 						// shear matrix
 						tmpMatrix.setIdentity();
 						tmpMatrix.m21 = swing2;
+						tmpMatrix.m23 = swing2 * -0.2f;
 						EaglerAdapter.glMultMatrixf(tmpMatrix);
 					}
 					
@@ -310,13 +313,15 @@ public class RenderPlayer extends RenderLiving {
 					if(i == 0) {
 						EaglerAdapter.glPushMatrix();
 						EaglerAdapter.flipLightMatrix();
+
+						EaglerAdapter.glTranslatef(-0.287f, 0.05f, 0.0f);
 						
 						if(msh == HighPolySkin.LONG_ARMS) {
 							EaglerAdapter.glTranslatef(1.72f, 2.05f, -0.24f);
 							ItemStack stk = par1EntityPlayer.getHeldItem();
 							if(stk != null) {
 								if(stk.itemID == Item.bow.itemID) {
-									EaglerAdapter.glTranslatef(-0.22f, 0.9f, 0.7f);
+									EaglerAdapter.glTranslatef(-0.22f, 0.8f, 0.6f);
 									EaglerAdapter.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 								}else if(stk.itemID < 256 && !(Item.itemsList[stk.itemID] != null && Item.itemsList[stk.itemID] instanceof ItemBlock && 
 										!Block.blocksList[((ItemBlock)Item.itemsList[stk.itemID]).getBlockID()].renderAsNormalBlock())) {
@@ -419,7 +424,7 @@ public class RenderPlayer extends RenderLiving {
 			EaglerAdapter.glPopMatrix();
 			EaglerAdapter.flipLightMatrix();
 			passSpecialRender(par1EntityPlayer, par2, par4, par6);
-		}else if(DefaultSkinRenderer.isPlayerStandard(par1EntityPlayer)) {
+		}else if(DefaultSkinRenderer.isPlayerStandard(par1EntityPlayer) || (isHiPoly && !fnawEnabled)) {
 			float var10 = 1.0F;
 			EaglerAdapter.glColor3f(var10, var10, var10);
 			ItemStack var11 = par1EntityPlayer.inventory.getCurrentItem();
@@ -442,7 +447,17 @@ public class RenderPlayer extends RenderLiving {
 				var14 -= 0.125D;
 			}
 			
-			this.mainModel = (DefaultSkinRenderer.isPlayerNewSkin(par1EntityPlayer) ? (DefaultSkinRenderer.isPlayerNewSkinSlim(par1EntityPlayer) ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain);
+			this.mainModel = ((!isHiPoly && DefaultSkinRenderer.isPlayerNewSkin(par1EntityPlayer)) ? (DefaultSkinRenderer.isPlayerNewSkinSlim(par1EntityPlayer) ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain);
+			int skinLayersByte = DefaultSkinRenderer.getSkinLayerByte(par1EntityPlayer);
+			if(this.mainModel instanceof ModelBipedNewSkins) {
+				ModelBipedNewSkins md = (ModelBipedNewSkins)this.mainModel;
+				md.field_178730_v.isHidden = (skinLayersByte & 1) != 1;
+				md.field_178734_a.isHidden = (skinLayersByte & 4) != 4;
+				md.field_178732_b.isHidden = (skinLayersByte & 8) != 8;
+				md.field_178733_c.isHidden = (skinLayersByte & 16) != 16;
+				md.field_178731_d.isHidden = (skinLayersByte & 32) != 32;
+			}
+			((ModelBiped)this.mainModel).bipedHeadwear.isHidden = isHiPoly || (skinLayersByte & 2) != 2;
 			this.mainModel.isChild = false;
 			((ModelBiped)this.mainModel).blockTransparentSkin = true;
 			super.doRenderLiving(par1EntityPlayer, par2, var14, par6, par8, par9);
@@ -548,8 +563,9 @@ public class RenderPlayer extends RenderLiving {
 		boolean isNew = DefaultSkinRenderer.isPlayerNewSkin(par1EntityPlayer);
 		boolean isSlim = DefaultSkinRenderer.isPlayerNewSkinSlim(par1EntityPlayer);
 		int renderType = DefaultSkinRenderer.getPlayerRenderer(par1EntityPlayer);
+		boolean allowFNAW = Minecraft.getMinecraft().gameSettings.allowFNAWSkins;
 
-		if(!DefaultSkinRenderer.isPlayerHighPoly(par1EntityPlayer)) {
+		if(!allowFNAW || !DefaultSkinRenderer.isHighPoly(renderType)) {
 			if (var4 != null) {
 				EaglerAdapter.glPushMatrix();
 				(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).bipedHead.postRender(0.0625F);
@@ -605,7 +621,7 @@ public class RenderPlayer extends RenderLiving {
 	
 			float var11;
 			
-			if(DefaultSkinRenderer.isStandardModel(renderType) || DefaultSkinRenderer.isZombieModel(renderType)) {
+			if(DefaultSkinRenderer.isStandardModel(renderType) || DefaultSkinRenderer.isZombieModel(renderType) || (!allowFNAW && DefaultSkinRenderer.isHighPoly(renderType))) {
 				if(!par1EntityPlayer.isInvisible() && !par1EntityPlayer.getHideCape()) {
 					if(DefaultSkinRenderer.bindSyncedCape(par1EntityPlayer)) {
 						EaglerAdapter.glPushMatrix();
@@ -662,10 +678,12 @@ public class RenderPlayer extends RenderLiving {
 		if (var22 != null) {
 			EaglerAdapter.glPushMatrix();
 			
-			if(DefaultSkinRenderer.isZombieModel(renderType) || renderType == 20) {
-				((ModelBiped)this.mainModel).bipedRightArm.postRender(0.0625F);
-			}else {
-				(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).bipedRightArm.postRender(0.0625F);
+			if(!allowFNAW || !DefaultSkinRenderer.isHighPoly(renderType)) {
+				if(DefaultSkinRenderer.isZombieModel(renderType) || renderType == 20) {
+					((ModelBiped)this.mainModel).bipedRightArm.postRender(0.0625F);
+				}else {
+					(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).bipedRightArm.postRender(0.0625F);
+				}
 			}
 			
 			EaglerAdapter.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
@@ -787,6 +805,13 @@ public class RenderPlayer extends RenderLiving {
 			(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).onGround = 0.0F;
 			(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F, par1EntityPlayer);
 			(isNew ? (isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin) : this.modelBipedMain).bipedRightArm.render(0.0625F);
+			if(isNew) {
+				ModelBipedNewSkins mdl = (ModelBipedNewSkins)(isSlim ? this.modelBipedMainNewSkinSlim : this.modelBipedMainNewSkin);
+				mdl.field_178732_b.isHidden = !Minecraft.getMinecraft().gameSettings.showSkinRightArm;
+				if(!mdl.field_178732_b.isHidden) {
+					mdl.field_178732_b.render(0.0625F);
+				}
+			}
 		}
 	}
 
@@ -844,7 +869,8 @@ public class RenderPlayer extends RenderLiving {
 		if(!renderPass2) {
 			EntityPlayer p = (EntityPlayer) par1EntityLiving;
 			int renderType = DefaultSkinRenderer.getPlayerRenderer(p);
-			if(DefaultSkinRenderer.isPlayerStandard(p) || DefaultSkinRenderer.isZombieModel(renderType) || renderType == 20) {
+			if(DefaultSkinRenderer.isPlayerStandard(p) || DefaultSkinRenderer.isZombieModel(renderType) || renderType == 20 ||
+					(DefaultSkinRenderer.isHighPoly(renderType) && !Minecraft.getMinecraft().gameSettings.allowFNAWSkins)) {
 				this.renderSpecials(p, par2);
 			}else {
 				if(renderType == 19) {
@@ -915,7 +941,11 @@ public class RenderPlayer extends RenderLiving {
 					if(DefaultSkinRenderer.defaultHighPoly[EaglerProfile.presetSkinId] == null) {
 						tx = entityTexture;
 					}else {
-						tx = DefaultSkinRenderer.defaultHighPoly[EaglerProfile.presetSkinId].texture;
+						if(Minecraft.getMinecraft().gameSettings.allowFNAWSkins) {
+							tx = DefaultSkinRenderer.defaultHighPoly[EaglerProfile.presetSkinId].texture;
+						}else {
+							tx = DefaultSkinRenderer.defaultHighPoly[EaglerProfile.presetSkinId].fallbackTexture;
+						}
 					}
 				}else {
 					tx = DefaultSkinRenderer.defaultVanillaSkins[EaglerProfile.presetSkinId];

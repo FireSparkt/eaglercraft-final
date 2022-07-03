@@ -31,7 +31,8 @@ menu.convertingLevel=Converting world
 menu.simulating=Simulating the world for a bit
 menu.respawning=Respawning
 menu.shareToLan=Open to LAN
-menu.skinCapeSettings=Skins/Capes Settings...
+
+menu.skinCapeSettings=Skins/Capes Settings
 menu.skinCapeSettingsNote0=I put the button up here so
 menu.skinCapeSettingsNote1=lazy people can find it
 menu.skinCapeSettings.skinCustomization=Skin Customization
@@ -42,12 +43,11 @@ menu.skinCapeSettings.skinCustomization.leftArm=Left Sleeve
 menu.skinCapeSettings.skinCustomization.rightArm=Right Sleeve
 menu.skinCapeSettings.skinCustomization.leftPants=Left Pants Leg
 menu.skinCapeSettings.skinCustomization.rightPants=Right Pants Leg
-menu.skinCapeSettings.skinCustomization.allOff=All Off
-menu.skinCapeSettings.skinCustomization.allOn=All On
-menu.skinCapeSettings.skinCustomization.otherPlayers=Other Players
+menu.skinCapeSettings.skinCustomization.otherPlayers=Other Player Skins
 menu.skinCapeSettings.skinCustomization.showErasersOn=Eraser Skins: Enable
 menu.skinCapeSettings.skinCustomization.showErasersOff=Eraser Skins: Disable
 menu.skinCapeSettings.skinCustomization.showOtherCapes=Show Capes
+menu.skinCapeSettings.skinCustomization.apply=Save Options and Return to Game
 
 profile.title=Edit Profile
 profile.capeTitle=Select Cape
@@ -345,6 +345,7 @@ options.framebufferAntialias.fxaa=FXAA
 options.framebufferAntialias.msaa4=MSAA4
 options.framebufferAntialias.msaa8=MSAA8
 options.patchAnisotropic=Fix ANGLE bug #4994
+options.chunkUpdates=Chunk Update per FPS
 
 performance.max=Max FPS
 performance.balanced=Balanced

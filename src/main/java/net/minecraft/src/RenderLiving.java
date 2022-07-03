@@ -378,7 +378,21 @@ public abstract class RenderLiving extends Render {
 					EaglerAdapter.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
 					EaglerAdapter.glScalef(-var9, -var9, var9);
 					EaglerAdapter.glDisable(EaglerAdapter.GL_LIGHTING);
-					EaglerAdapter.glTranslatef(0.0F, 0.25F / var9, 0.0F);
+					
+					if(par1EntityLiving instanceof EntityOtherPlayerMP) {
+						int renderType = DefaultSkinRenderer.getPlayerRenderer((EntityOtherPlayerMP)par1EntityLiving);
+						if(renderType == 19) {
+							EaglerAdapter.glTranslatef(0.0F, -32.0f, 0.0F);
+						}else if(DefaultSkinRenderer.isHighPoly(renderType) && Minecraft.getMinecraft().gameSettings.allowFNAWSkins) {
+							EaglerAdapter.glTranslatef(0.0F, 7.0f, 0.0F);
+							if(renderType == 37) {
+								EaglerAdapter.glTranslatef(0.0F, 28.0f, 0.0F);
+							}
+						}
+					}else {
+						EaglerAdapter.glTranslatef(0.0F, 0.25F / var9, 0.0F);
+					}
+					
 					EaglerAdapter.glDepthMask(false);
 					EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 					EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
@@ -442,16 +456,23 @@ public abstract class RenderLiving extends Render {
 			Tessellator var15 = Tessellator.instance;
 			byte var16 = 0;
 
-			if (par2Str.equals("deadmau5")) {
-				var16 = -10;
-			}
-			
+			//if (par2Str.equals("deadmau5")) {
+			//	var16 = -10;
+			//}
+
 			if(par1EntityLiving instanceof EntityOtherPlayerMP) {
-				if(DefaultSkinRenderer.getPlayerRenderer((EntityOtherPlayerMP)par1EntityLiving) == 19) {
-					var16 = -32;
+				if(((EntityOtherPlayerMP)par1EntityLiving).isPlayerSleeping()) {
+					var16 = -60;
+				}else {
+					int renderType = DefaultSkinRenderer.getPlayerRenderer((EntityOtherPlayerMP)par1EntityLiving);
+					if(renderType == 19) {
+						var16 = -32;
+					}else if(renderType == 37 && Minecraft.getMinecraft().gameSettings.allowFNAWSkins) {
+						var16 = 30;
+					}
 				}
 			}
-
+			
 			EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
 			EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
 			var15.startDrawingQuads();

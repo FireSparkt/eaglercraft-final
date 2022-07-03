@@ -172,4 +172,8 @@ public class EntityOtherPlayerMP extends EntityPlayer {
 	public ChunkCoordinates getPlayerCoordinates() {
 		return new ChunkCoordinates(MathHelper.floor_double(this.posX + 0.5D), MathHelper.floor_double(this.posY + 0.5D), MathHelper.floor_double(this.posZ + 0.5D));
 	}
+	
+	public boolean getHideCape() {
+		return !Minecraft.getMinecraft().gameSettings.showOtherCapes || super.getHideCape();
+	}
 }

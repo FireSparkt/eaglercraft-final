@@ -28,6 +28,8 @@ public interface ConfigurationAdapter {
 	
 	Collection<String> getBlacklistSimpleWhitelist();
 	
+	Collection<String> getDisabledCommands();
+	
 	AuthServiceInfo getAuthSettings();
 
 	Map<String, Object> getMap();

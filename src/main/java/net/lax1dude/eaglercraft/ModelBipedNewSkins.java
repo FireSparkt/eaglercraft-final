@@ -5,10 +5,25 @@ import net.minecraft.src.ModelBiped;
 import net.minecraft.src.ModelRenderer;
 
 public class ModelBipedNewSkins extends ModelBiped {
+	/**
+	 * left arm
+	 */
 	public ModelRenderer field_178734_a;
+	/**
+	 * right arm
+	 */
 	public ModelRenderer field_178732_b;
+	/**
+	 * left leg
+	 */
 	public ModelRenderer field_178733_c;
+	/**
+	 * right leg
+	 */
 	public ModelRenderer field_178731_d;
+	/**
+	 * jacket
+	 */
 	public ModelRenderer field_178730_v;
 	private ModelRenderer field_178729_w;
 	private ModelRenderer field_178736_x;

@@ -125,6 +125,17 @@ public class GameSettings {
 	/** Game settings language */
 	public String language;
 
+	public boolean showSkinJacket = true;
+	public boolean showSkinHat = true;
+	public boolean showSkinLeftArm = true;
+	public boolean showSkinRightArm = true;
+	public boolean showSkinLeftLeg = true;
+	public boolean showSkinRightLeg = true;
+
+	public boolean allowFNAWSkins = true;
+	public boolean showOtherCapes = true;
+	
+
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
 				this.keyBindChat, this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindSprint, this.keyBindZoom, this.keyBindFunction };
@@ -500,6 +511,14 @@ public class GameSettings {
 			if(yee.hasKey("chatWidth")) this.chatWidth = yee.getFloat("chatWidth");
 			if(yee.hasKey("patchAnisotropic")) this.patchAnisotropic = yee.getBoolean("patchAnisotropic");
 			if(yee.hasKey("showCoordinates")) this.showCoordinates = yee.getBoolean("showCoordinates");
+			if(yee.hasKey("showSkinJacket")) showSkinJacket = yee.getBoolean("showSkinJacket");
+			if(yee.hasKey("showSkinHat")) showSkinHat = yee.getBoolean("showSkinHat");
+			if(yee.hasKey("showSkinLeftArm")) showSkinLeftArm = yee.getBoolean("showSkinLeftArm");
+			if(yee.hasKey("showSkinRightArm")) showSkinRightArm = yee.getBoolean("showSkinRightArm");
+			if(yee.hasKey("showSkinLeftLeg")) showSkinLeftLeg = yee.getBoolean("showSkinLeftLeg");
+			if(yee.hasKey("showSkinRightLeg")) showSkinRightLeg = yee.getBoolean("showSkinRightLeg");
+			if(yee.hasKey("allowFNAWSkins")) allowFNAWSkins = yee.getBoolean("allowFNAWSkins");
+			if(yee.hasKey("showOtherCapes")) showOtherCapes = yee.getBoolean("showOtherCapes");
 			
 			for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 				if(yee.hasKey(keyBindings[var4].keyDescription)) this.keyBindings[var4].keyCode = yee.getInteger(keyBindings[var4].keyDescription);
@@ -554,6 +573,14 @@ public class GameSettings {
 		yee.setFloat("chatWidth", this.chatWidth);
 		yee.setBoolean("patchAnisotropic", this.patchAnisotropic);
 		yee.setBoolean("showCoordinates", this.showCoordinates);
+		yee.setBoolean("showSkinJacket", showSkinJacket);
+		yee.setBoolean("showSkinHat", showSkinHat);
+		yee.setBoolean("showSkinLeftArm", showSkinLeftArm);
+		yee.setBoolean("showSkinRightArm", showSkinRightArm);
+		yee.setBoolean("showSkinLeftLeg", showSkinLeftLeg);
+		yee.setBoolean("showSkinRightLeg", showSkinRightLeg);
+		yee.setBoolean("allowFNAWSkins", allowFNAWSkins);
+		yee.setBoolean("showOtherCapes", showOtherCapes);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);
@@ -570,7 +597,19 @@ public class GameSettings {
 	public void sendSettingsToServer() {
 		if (this.mc.thePlayer != null) {
 			this.mc.thePlayer.sendQueue.addToSendQueue(new Packet204ClientInfo(this.language, this.renderDistance, this.chatVisibility, this.chatColours, this.difficulty, this.showCape));
+			this.mc.thePlayer.sendQueue.addToSendQueue(new Packet250CustomPayload("EAG|SkinLayers", new byte[] { (byte)getSkinLayers() }));
 		}
+	}
+	
+	public int getSkinLayers() {
+		int skinLayersByte = 0;
+		if(showSkinJacket) skinLayersByte |= 1;
+		if(showSkinHat) skinLayersByte |= 2;
+		if(showSkinLeftArm) skinLayersByte |= 4;
+		if(showSkinRightArm) skinLayersByte |= 8;
+		if(showSkinLeftLeg) skinLayersByte |= 16;
+		if(showSkinRightLeg) skinLayersByte |= 32;
+		return skinLayersByte;
 	}
 
 	/**

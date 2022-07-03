@@ -175,8 +175,19 @@ public class DefaultSkinRenderer {
 						defaultVanillaSkins[0].bindTexture();
 					}
 				}else {
-					if(((int)pp.skinPacket[1] & 0xFF) < defaultVanillaSkins.length) {
-						defaultVanillaSkins[(int)pp.skinPacket[1] & 0xFF].bindTexture();
+					int type2 = (int)pp.skinPacket[1] & 0xFF;
+					if(type2 < defaultVanillaSkins.length) {
+						TextureLocation loc = defaultVanillaSkins[type2];
+						if(loc != null) {
+							loc.bindTexture();
+						}else {
+							if(defaultHighPoly[type2] != null) {
+								defaultHighPoly[type2].fallbackTexture.bindTexture();
+								return true;
+							}else {
+								return false;
+							}
+						}
 					}
 				}
 				return true;
@@ -224,15 +235,15 @@ public class DefaultSkinRenderer {
 				int tp = ((int)pp.skinPacket[0] & 0xFF);
 				if(tp >= 0 && tp < EaglerProfile.SKIN_DATA_SIZE.length) {
 					int offset = 1 + EaglerProfile.SKIN_DATA_SIZE[tp];
-					if(pp.skinPacket.length > offset) {
+					if(pp.skinPacket.length > offset + 1) {
 						int capeType = (int)pp.skinPacket[offset] & 0xFF;
 						if(capeType >= 0 && capeType < EaglerProfile.CAPE_DATA_SIZE.length) {
 							int len = EaglerProfile.CAPE_DATA_SIZE[capeType];
-							if(pp.skinPacket.length > offset + len) {
+							if(pp.skinPacket.length > offset + len + 1) {
 								if(capeType != 2) {
 									if(!capeGLUnits.containsKey(pp)) {
 										byte[] dataToLoad = new byte[len];
-										System.arraycopy(pp.skinPacket, offset + 1, dataToLoad, 0, len);
+										System.arraycopy(pp.skinPacket, offset + 2, dataToLoad, 0, len);
 										int w, h;
 										switch(capeType) {
 										case 0:
@@ -258,7 +269,7 @@ public class DefaultSkinRenderer {
 										return false;
 									}
 								}else {
-									int preset = (int)pp.skinPacket[offset + 1] & 0xFF;
+									int preset = (int)pp.skinPacket[offset + 2] & 0xFF;
 									if(preset < defaultVanillaCapes.length) {
 										TextureLocation loc = defaultVanillaCapes[preset];
 										if(loc == null) {
@@ -282,6 +293,36 @@ public class DefaultSkinRenderer {
 			}
 		}
 		return false;
+	}
+	
+	public static int getSkinLayerByte(EntityPlayer p) {
+		if(p instanceof EntityClientPlayerMP) {
+			return Minecraft.getMinecraft().gameSettings.getSkinLayers();
+		}else if(p instanceof EntityOtherPlayerMP) {
+			EntityOtherPlayerMP pp = (EntityOtherPlayerMP) p;
+			if(pp.skinPacket != null) {
+				int tp = ((int)pp.skinPacket[0] & 0xFF);
+				if(tp >= 0 && tp < EaglerProfile.SKIN_DATA_SIZE.length) {
+					int offset = 1 + EaglerProfile.SKIN_DATA_SIZE[tp];
+					if(pp.skinPacket.length > offset + 1) {
+						return (int)pp.skinPacket[offset + 1] & 0xFF;
+					}
+				}
+			}
+		}
+		return 0xFF;
+	}
+	
+	public static void updateSkinLayerByte(int skinFlags, byte[] pkt) {
+		if(pkt.length > 0) {
+			int tp = ((int)pkt[0] & 0xFF);
+			if(tp >= 0 && tp < EaglerProfile.SKIN_DATA_SIZE.length) {
+				int offset = 1 + EaglerProfile.SKIN_DATA_SIZE[tp];
+				if(pkt.length > offset + 1) {
+					pkt[offset + 1] = (byte)skinFlags;
+				}
+			}
+		}
 	}
 	
 	private static void requestSkin(EntityOtherPlayerMP pp) {
@@ -529,6 +570,7 @@ public class DefaultSkinRenderer {
 				defaultVanillaSkins[id].bindTexture();
 			}
 			
+			boolean gonnaShowCape = false;
 			if(isStandardModel(id) || id < 0) {
 				if(oldSkinRenderer == null) oldSkinRenderer = new ModelBiped(0.0F, 0.0F, 64, 32);
 				if(newSkinRenderer == null) newSkinRenderer = new ModelBipedNewSkins(0.0F, false);
@@ -556,37 +598,12 @@ public class DefaultSkinRenderer {
 					oldSkinRenderer.render(null, 0.0f, 0.0f, (float)(System.currentTimeMillis() % 100000) / 50f, ((x - mx) * 0.06f), ((y - my) * -0.1f), 0.0625F);
 					oldSkinRenderer.blockTransparentSkin = false;
 				}
-				
-				if(capeMode && !(EaglerProfile.presetCapeId >= 0 && defaultVanillaCapes[EaglerProfile.presetCapeId] == null)) {
-					EaglerAdapter.glPushMatrix();
-					EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.150F);
-					EaglerAdapter.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-					EaglerAdapter.glRotatef(-6.0F, 1.0F, 0.0F, 0.0F);
-					
-					if(EaglerProfile.presetCapeId < 0) {
-						Minecraft.getMinecraft().renderEngine.bindTexture(EaglerProfile.capes.get(EaglerProfile.customCapeId).glTex);
-						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
-						EaglerAdapter.glPushMatrix();
-						EaglerAdapter.glScalef(2.0f, 1.0f, 1.0f);
-						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
-					}else {
-						defaultVanillaCapes[EaglerProfile.presetCapeId].bindTexture();
-					}
-					
-					oldSkinRenderer.bipedCloak.render(0.0625F);
-					
-					if(EaglerProfile.presetCapeId < 0) {
-						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
-						EaglerAdapter.glPopMatrix();
-						EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
-					}
-					
-					EaglerAdapter.glPopMatrix();
-				}
+				gonnaShowCape = capeMode;
 			}else if(isZombieModel(id)) {
 				if(zombieRenderer == null) zombieRenderer = new ModelZombie(0.0F, true);
 				zombieRenderer.isChild = false;
 				zombieRenderer.render(null, 0.0f, 0.0f, (float)(System.currentTimeMillis() % 100000) / 50f, ((x - mx) * 0.06f), ((y - my) * -0.1f), 0.0625F);
+				gonnaShowCape = capeMode;
 			}else if(id == 32) {
 				if(villagerRenderer == null) villagerRenderer = new ModelVillager(0.0F);
 				villagerRenderer.isChild = false;
@@ -618,6 +635,33 @@ public class DefaultSkinRenderer {
 				blazeRenderer.isChild = false;
 				EaglerAdapter.glColor4f(1.5f, 1.5f, 1.5f, 1.0f);
 				blazeRenderer.render(null, 0.0f, 0.0f, (float)(System.currentTimeMillis() % 100000) / 50f, ((x - mx) * 0.06f), ((y - my) * -0.1f), 0.0625F);
+			}
+			if(gonnaShowCape && !(EaglerProfile.presetCapeId >= 0 && defaultVanillaCapes[EaglerProfile.presetCapeId] == null)) {
+				EaglerAdapter.glPushMatrix();
+				EaglerAdapter.glTranslatef(0.0F, 0.0F, 0.150F);
+				EaglerAdapter.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+				EaglerAdapter.glRotatef(-6.0F, 1.0F, 0.0F, 0.0F);
+				
+				if(EaglerProfile.presetCapeId < 0) {
+					Minecraft.getMinecraft().renderEngine.bindTexture(EaglerProfile.capes.get(EaglerProfile.customCapeId).glTex);
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+					EaglerAdapter.glPushMatrix();
+					EaglerAdapter.glScalef(2.0f, 1.0f, 1.0f);
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+				}else {
+					defaultVanillaCapes[EaglerProfile.presetCapeId].bindTexture();
+				}
+
+				if(oldSkinRenderer == null) oldSkinRenderer = new ModelBiped(0.0F, 0.0F, 64, 32);
+				oldSkinRenderer.bipedCloak.render(0.0625F);
+				
+				if(EaglerProfile.presetCapeId < 0) {
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_TEXTURE);
+					EaglerAdapter.glPopMatrix();
+					EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
+				}
+				
+				EaglerAdapter.glPopMatrix();
 			}
 		}
 		

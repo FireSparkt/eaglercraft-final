@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.Collection;
 import java.util.logging.Level;
+
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import java.util.Arrays;
 import net.md_5.bungee.api.CommandSender;
@@ -30,6 +32,8 @@ import java.util.Map;
 import net.md_5.bungee.event.EventBus;
 import org.yaml.snakeyaml.Yaml;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.command.ConsoleCommandSender;
+
 import java.util.regex.Pattern;
 
 public class PluginManager {
@@ -65,6 +69,9 @@ public class PluginManager {
 		final String[] split = PluginManager.argsSplit.split(commandLine);
 		final Command command = this.commandMap.get(split[0].toLowerCase());
 		if (command == null) {
+			return false;
+		}
+		if(!(sender instanceof ConsoleCommandSender) && ((BungeeCord)proxy).config.getDisabledCommands().contains(command.getName())) {
 			return false;
 		}
 		final String permission = command.getPermission();

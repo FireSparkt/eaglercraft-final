@@ -13,7 +13,8 @@ public enum HighPolySkin {
 			new float[] {
 				1.325f
 			},
-			0.0f
+			0.0f,
+			new TextureLocation("/mesh/longarms.fallback.png")
 	),
 	
 	WEIRD_CLIMBER_DUDE(
@@ -27,7 +28,8 @@ public enum HighPolySkin {
 			new float[] {
 				2.62f
 			},
-			-90.0f
+			-90.0f,
+			new TextureLocation("/mesh/weirdclimber.fallback.png")
 	),
 	
 	LAXATIVE_DUDE(
@@ -42,7 +44,8 @@ public enum HighPolySkin {
 			new float[] {
 				2.04f
 			},
-			0.0f
+			0.0f,
+			new TextureLocation("/mesh/laxativedude.fallback.png")
 	),
 	
 	BABY_CHARLES(
@@ -52,7 +55,8 @@ public enum HighPolySkin {
 			new ModelLocation("/mesh/charles2.mdl"),
 			new ModelLocation[] {},
 			new float[] {},
-			0.0f
+			0.0f,
+			new TextureLocation("/mesh/charles.fallback.png")
 	),
 	
 	BABY_WINSTON(
@@ -62,7 +66,8 @@ public enum HighPolySkin {
 			new ModelLocation("/mesh/winston1.mdl"),
 			new ModelLocation[] {},
 			new float[] {},
-			0.0f
+			0.0f,
+			new TextureLocation("/mesh/winston.fallback.png")
 	);
 	
 	public static float highPolyScale = 0.5f;
@@ -74,9 +79,10 @@ public enum HighPolySkin {
 	public final ModelLocation[] limbsModel;
 	public final float[] limbsOffset;
 	public final float limbsInitialRotation;
+	public final TextureLocation fallbackTexture;
 	
-	HighPolySkin(TextureLocation texture, ModelLocation bodyModel, ModelLocation headModel,
-			ModelLocation eyesModel, ModelLocation[] limbsModel, float[] limbsOffset, float limbsInitialRotation) {
+	HighPolySkin(TextureLocation texture, ModelLocation bodyModel, ModelLocation headModel, ModelLocation eyesModel,
+			ModelLocation[] limbsModel, float[] limbsOffset, float limbsInitialRotation, TextureLocation fallbackTexture) {
 		this.texture = texture;
 		this.bodyModel = bodyModel;
 		this.headModel = headModel;
@@ -84,8 +90,7 @@ public enum HighPolySkin {
 		this.limbsModel = limbsModel;
 		this.limbsOffset = limbsOffset;
 		this.limbsInitialRotation = limbsInitialRotation;
+		this.fallbackTexture = fallbackTexture;
 	}
-	
-	
 
 }

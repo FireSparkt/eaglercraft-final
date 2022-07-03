@@ -8,6 +8,7 @@ import java.util.List;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.HighPolySkin;
+import net.minecraft.client.Minecraft;
 
 
 
@@ -2170,7 +2171,8 @@ public abstract class EntityLiving extends Entity {
 	private int getArmSwingAnimationEnd() {
 		int ret = this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) * 1
 				: (this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6);
-		if(this instanceof EntityPlayer && DefaultSkinRenderer.isPlayerHighPoly((EntityPlayer)this)) {
+		if(this instanceof EntityPlayer && !((this instanceof EntityClientPlayerMP) && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0) 
+				&& DefaultSkinRenderer.isPlayerHighPoly((EntityPlayer)this)) {
 			HighPolySkin msh = DefaultSkinRenderer.defaultHighPoly[DefaultSkinRenderer.getPlayerRenderer((EntityPlayer)this)];
 			if(msh == HighPolySkin.WEIRD_CLIMBER_DUDE) {
 				ret *= 2;

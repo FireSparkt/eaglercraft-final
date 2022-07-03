@@ -95,21 +95,23 @@ public class EaglerProfile {
 	}
 	
 	public static byte[] getCapePacket() {
+		int sf = Minecraft.getMinecraft().gameSettings.getSkinLayers();
 		if(presetCapeId == -1) {
 			byte[] d = capes.get(customCapeId).data;
 			if(d == null) {
-				return new byte[] { (byte)2, (byte)0 };
+				return new byte[] { (byte)2, (byte)sf, (byte)0 };
 			}
-			byte[] d2 = new byte[1 + d.length];
+			byte[] d2 = new byte[2 + d.length];
 			int sz = getCapeSize(d.length);
 			if(sz < 0) {
-				return new byte[] { (byte)2, (byte)0 };
+				return new byte[] { (byte)2, (byte)sf, (byte)0 };
 			}
 			d2[0] = (byte) sz;
-			System.arraycopy(d, 0, d2, 1, d.length);
+			d2[1] = (byte) sf;
+			System.arraycopy(d, 0, d2, 2, d.length);
 			return d2;
 		}else {
-			return new byte[] { (byte)2, (byte)presetCapeId };
+			return new byte[] { (byte)2, (byte)sf, (byte)presetCapeId };
 		}
 	}
 	

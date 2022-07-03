@@ -3043,7 +3043,7 @@ public abstract class World implements IBlockAccess {
 	 */
 	public EntityPlayer getPlayerEntityByName(String par1Str) {
 		for (int var2 = 0; var2 < this.playerEntities.size(); ++var2) {
-			if (par1Str.equals(((EntityPlayer) this.playerEntities.get(var2)).username)) {
+			if (par1Str.equalsIgnoreCase(((EntityPlayer) this.playerEntities.get(var2)).username)) {
 				return (EntityPlayer) this.playerEntities.get(var2);
 			}
 		}

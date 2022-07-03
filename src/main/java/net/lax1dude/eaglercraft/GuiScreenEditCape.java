@@ -204,13 +204,11 @@ public class GuiScreenEditCape extends GuiScreen {
 		if((b = EaglerAdapter.getFileChooserResult()) != null && b.length > 0) {
 			EaglerImage img = EaglerImage.loadImage(b);
 			
-			if(!((img.w == 32 && img.h == 32) || (img.w == 64 && img.h == 64) || (img.w == 64 && img.h == 32) || (img.w == 64 && img.h == 128))) return;
+			if(!((img.w == 32 && img.h == 32) || (img.w == 64 && img.h == 32))) return;
 			
 			int[] loadSkin = img.data;
 			if(img.w == 64 && img.h == 32) {
 				loadSkin = grabPiece(loadSkin, 32, 32, 64);
-			}else if(img.w == 128 && img.h == 64) {
-				loadSkin = grabPiece(loadSkin, 64, 64, 128);
 			}
 			
 			byte[] rawSkin = new byte[loadSkin.length * 4];
@@ -250,6 +248,9 @@ public class GuiScreenEditCape extends GuiScreen {
 			}
 			if(var1 > 0) {
 				scrollPos -= 3;
+				if(scrollPos < 0) {
+					scrollPos = 0;
+				}
 			}
 		}
 	}

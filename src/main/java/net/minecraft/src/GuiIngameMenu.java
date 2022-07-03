@@ -1,19 +1,15 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.GuiScreenSkinCapeSettings;
 import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 
 public class GuiIngameMenu extends GuiScreen {
-	/** Also counts the number of updates, not certain as to why yet. */
-	private int updateCounter2 = 0;
-
-	/** Counts the number of screen updates. */
-	private int updateCounter = 0;
 
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
 	 */
 	public void initGui() {
-		this.updateCounter2 = 0;
 		this.buttonList.clear();
 		byte var1 = -16;
 		this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + var1, StatCollector.translateToLocal("menu.returnToMenu")));
@@ -28,6 +24,7 @@ public class GuiIngameMenu extends GuiScreen {
 		GuiButton var3;
 		this.buttonList.add(var3 = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.shareToLan")));
 		var3.enabled = false;
+		this.buttonList.add(new GuiButton(8, 3, 3, 120, 20, StatCollector.translateToLocal("menu.skinCapeSettings")));
 	}
 
 	/**
@@ -60,6 +57,10 @@ public class GuiIngameMenu extends GuiScreen {
 		case 5:
 			this.mc.displayGuiScreen(new GuiScreenVoiceChannel(this));
 			break;
+			
+		case 8:
+			this.mc.displayGuiScreen(new GuiScreenSkinCapeSettings(this));
+			break;
 		}
 	}
 
@@ -68,7 +69,6 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	public void updateScreen() {
 		super.updateScreen();
-		++this.updateCounter;
 	}
 
 	/**
@@ -78,5 +78,15 @@ public class GuiIngameMenu extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, "Game menu", this.width / 2, 40, 16777215);
 		super.drawScreen(par1, par2, par3);
+		if(par1 >= 3 && par1 < 123 && par2 >= 3 && par2 < 23) {
+			int c = 0xCCCC66;
+			StringTranslate var1 = StringTranslate.getInstance();
+			EaglerAdapter.glPushMatrix();
+			EaglerAdapter.glTranslatef(126.0f, 6.0f, 0.0f);
+			EaglerAdapter.glScalef(0.8f, 0.8f, 0.8f);
+			this.drawString(fontRenderer, var1.translateKey("menu.skinCapeSettingsNote0"), 0, 0, c);
+			this.drawString(fontRenderer, var1.translateKey("menu.skinCapeSettingsNote1"), 0, 9, c);
+			EaglerAdapter.glPopMatrix();
+		}
 	}
 }

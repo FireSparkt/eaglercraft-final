@@ -112,6 +112,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		this.drawCenteredString(this.fontRenderer, this.screenTitle, this.width / 2, 15, 16777215);
 		this.drawString(this.fontRenderer, var1.translateKey("profile.screenname"), this.width / 2 - 20, this.height / 6 + 8, 10526880);
 		
+		newSkinNotificationIndexCurrent = 23948923;
 		int cnt = defaultOptions.length - newSkinNotificationIndexCurrent;
 		if(cnt <= 0) {
 			this.drawString(this.fontRenderer, var1.translateKey("profile.playerSkin"), this.width / 2 - 20, this.height / 6 + 66, 10526880);
@@ -304,6 +305,9 @@ public class GuiScreenEditProfile extends GuiScreen {
 			}
 			if(var1 > 0) {
 				scrollPos -= 3;
+				if(scrollPos < 0) {
+					scrollPos = 0;
+				}
 			}
 		}
 	}
@@ -389,7 +393,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		byte[] b;
 		if((b = EaglerAdapter.getFileChooserResult()) != null && b.length > 0) {
 			EaglerImage img = EaglerImage.loadImage(b);
-			if(!((img.w == 64 && img.h == 32) || (img.w == 64 && img.h == 64) || (img.w == 128 && img.h == 64) || (img.w == 128 && img.h == 128))) return;
+			if(!((img.w == 64 && img.h == 32) || (img.w == 64 && img.h == 64))) return;
 			byte[] rawSkin = new byte[img.data.length * 4];
 			for(int i = 0; i < img.data.length; i++) {
 				int i2 = i * 4; int i3 = img.data[i];
@@ -402,7 +406,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 			if(name.length() > 32) {
 				name = name.substring(0, 32);
 			}
-			if((img.w == 64 && img.h == 64) || (img.w == 128 && img.h == 128)) {
+			if(img.w == 64 && img.h == 64) {
 				newSkinWaitSteveOrAlex = true;
 			}
 			int k;
@@ -485,7 +489,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 			if(par1 >= skinX && par1 < (skinX + 20) && par2 >= skinY && par2 < (skinY + 22)) {
 				dropDownOpen = !dropDownOpen;
 				if(!dropDownOpen) {
-					newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+					//newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
 				}
 			}
 			
@@ -498,7 +502,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 				dropDownOpen = false;
 				dragging = false;
 				if(!dropDownOpen) {
-					newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+					//newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
 				}
 			}
 			
@@ -513,7 +517,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 								dropDownOpen = false;
 								dragging = false;
 								if(!dropDownOpen) {
-									newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
+									//newSkinNotificationIndexCurrent = EaglerProfile.newSkinNotificationIndex;
 								}
 							}
 						}

@@ -1,10 +1,13 @@
 package net.md_5.bungee.eaglercraft;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -16,6 +19,7 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 
 	private final HashMap<String,byte[]> skinCollection = new HashMap();
 	private final HashMap<String,byte[]> capeCollection = new HashMap();
+	private final HashMap<String,Long> lastSkinLayerUpdate = new HashMap();
 
 	private static final int[] SKIN_DATA_SIZE = new int[] { 64*32*4, 64*64*4, -9, -9, 1, 64*64*4, -9 }; // 128 pixel skins crash clients
 	private static final int[] CAPE_DATA_SIZE = new int[] { 32*32*4, -9, 1 };
@@ -43,14 +47,18 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 			byte[] msg = event.getData();
 			try {
 				if("EAG|MySkin".equals(event.getTag())) {
-					int t = (int)msg[0] & 0xFF;
-					if(t >= 0 && t < SKIN_DATA_SIZE.length && msg.length == (SKIN_DATA_SIZE[t] + 1)) {
-						skinCollection.put(user, msg);
+					if(!skinCollection.containsKey(user)) {
+						int t = (int)msg[0] & 0xFF;
+						if(t >= 0 && t < SKIN_DATA_SIZE.length && msg.length == (SKIN_DATA_SIZE[t] + 1)) {
+							skinCollection.put(user, msg);
+						}
 					}
 				}else if("EAG|MyCape".equals(event.getTag())) {
-					int t = (int)msg[0] & 0xFF;
-					if(t >= 0 && t < CAPE_DATA_SIZE.length && msg.length == (CAPE_DATA_SIZE[t] + 1)) {
-						capeCollection.put(user, msg);
+					if(!capeCollection.containsKey(user)) {
+						int t = (int)msg[0] & 0xFF;
+						if(t >= 0 && t < CAPE_DATA_SIZE.length && msg.length == (CAPE_DATA_SIZE[t] + 2)) {
+							capeCollection.put(user, msg);
+						}
 					}
 				}else if("EAG|FetchSkin".equals(event.getTag())) {
 					if(msg.length > 2) {
@@ -69,6 +77,30 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 							((UserConnection)event.getSender()).sendData("EAG|UserSkin", conc);
 						}
 					}
+				}else if("EAG|SkinLayers".equals(event.getTag())) {
+					long millis = System.currentTimeMillis();
+					Long lsu = lastSkinLayerUpdate.get(user);
+					if(lsu != null && millis - lsu.longValue() < 700l) { // DoS protection
+						return;
+					}
+					lastSkinLayerUpdate.put(user, millis);
+					byte[] data;
+					if((data = capeCollection.get(user)) != null) {
+						data[1] = msg[0];
+					}else {
+						data = new byte[] { (byte)2, msg[0], (byte)0 };
+						capeCollection.put(user, data);
+					}
+					ByteArrayOutputStream bao = new ByteArrayOutputStream();
+					DataOutputStream dd = new DataOutputStream(bao);
+					dd.write(msg[0]);
+					dd.writeUTF(user);
+					byte[] bpacket = bao.toByteArray();
+					for(ProxiedPlayer pl : getProxy().getPlayers()) {
+						if(!pl.equals(user)) {
+							pl.sendData("EAG|SkinLayers", bpacket);
+						}
+					}
 				}
 			}catch(Throwable t) {
 				// hacker
@@ -78,8 +110,10 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 
 	@EventHandler
 	public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-		skinCollection.remove(event.getPlayer().getName());
-		capeCollection.remove(event.getPlayer().getName());
+		String nm = event.getPlayer().getName();
+		skinCollection.remove(nm);
+		capeCollection.remove(nm);
+		lastSkinLayerUpdate.remove(nm);
 	}
 
 }
