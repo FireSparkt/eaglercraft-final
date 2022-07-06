@@ -22,7 +22,7 @@
 .*gitpod\.io$
 .*gsucks\.repl\.co$
 .*builders.tools\.tk$
-.*bootyy\.flapx\..*$
+.*lapx\..*$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
