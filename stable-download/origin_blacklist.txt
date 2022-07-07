@@ -24,6 +24,10 @@
 .*builders.tools\.tk$
 .*lapx\..*$
 
+# block ambiguous domains (excuse the regex skill issues)
+^(?!g\.eags\.us).*eags\.us$
+^(?!g\.lax1dude\.net).*lax1dude\.net$
+
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
 # snitch other domains out at https://g.eags.us/eaglercraft/report.html
