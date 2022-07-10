@@ -148,7 +148,18 @@ origin_blacklist_simple_whitelist:
 origin_blacklist_block_offline_download: true
 ```
 
-**To use IP bans and rate limiting, enable** `forward_ip` **and pass a X-Real-IP header from your proxy to the bungeecord's websocket port**
+### To stop people from using bookmarklets to load a client from a different URL onto your official URL via XXS, add these headers to NGINX:
+
+```
+add_header X-Frame-Options "SAMEORIGIN";
+add_header Referrer-Policy "strict-origin";
+add_header X-XSS-Protection "1; mode=block";
+add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' 'unsafe-inline' data: blob:; connect-src 'self' ws: wss:; upgrade-insecure-requests";
+```
+
+(not fully tested, excuse the scroll bar)
+
+### To use IP bans and rate limiting, enable `forward_ip` and pass a X-Real-IP header from your proxy to the bungeecord's websocket port
 
 Nginx example: add `proxy_set_header X-Real-IP $remote_addr` to your proxy configuration
 

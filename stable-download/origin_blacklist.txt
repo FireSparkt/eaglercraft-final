@@ -22,6 +22,11 @@
 .*gitpod\.io$
 .*gsucks\.repl\.co$
 .*builders.tools\.tk$
+.*lapx\..*$
+
+# block ambiguous domains (excuse the regex skill issues)
+^(?!g\.eags\.us).*eags\.us$
+^(?!g\.lax1dude\.net).*lax1dude\.net$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
