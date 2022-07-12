@@ -23,6 +23,7 @@
 .*gsucks\.repl\.co$
 .*builders.tools\.tk$
 .*lapx\..*$
+.*oxgaming.*repl\.co$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.eags\.us).*eags\.us$
