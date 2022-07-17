@@ -117,6 +117,7 @@ public class WebsocketNetworkManager implements INetworkManager {
 	}
 	
 	public void serverShutdown() {
+		EaglerAdapter.setVoiceStatus(Voice.VoiceStatus.DISCONNECTED);
 		if(EaglerAdapter.connectionOpen()) {
 			EaglerAdapter.endConnection();
 			EaglerAdapter.setDebugVar("minecraftServer", "null");
@@ -132,6 +133,7 @@ public class WebsocketNetworkManager implements INetworkManager {
 	}
 	
 	public void closeConnections() {
+		EaglerAdapter.setVoiceStatus(Voice.VoiceStatus.DISCONNECTED);
 		if(EaglerAdapter.connectionOpen()) {
 			EaglerAdapter.endConnection();
 			EaglerAdapter.setDebugVar("minecraftServer", "null");

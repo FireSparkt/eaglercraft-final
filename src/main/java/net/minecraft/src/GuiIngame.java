@@ -464,12 +464,15 @@ public class GuiIngame extends Gui {
 				var8.drawStringWithShadow("x: "+MathHelper.floor_double(this.mc.thePlayer.posX)+", y: "+MathHelper.floor_double(this.mc.thePlayer.posY)+", z: "+MathHelper.floor_double(this.mc.thePlayer.posZ), 2, 12, 16777215);
 			}
 			
-			int offset = this.mc.isChatOpen() ? 135 : 0;
-			int offset2 = this.mc.isChatOpen() ? 4 : 0;
-			String str = "not using an xbox live account";
-			var8.drawStringWithShadow(str, (var6 * 4 / 3) - 2 - var8.getStringWidth(str) - offset, 2 + offset2, 0xFFDDDD);
-			str = "eaglercraft: " + ConfigConstants.version;
-			var8.drawStringWithShadow(str, (var6 * 4 / 3) - 2 - var8.getStringWidth(str) - offset, 12 + offset2, 14737632);
+			if(mc.currentScreen == null || !(mc.currentScreen instanceof GuiIngameMenu)) {
+				int offset = this.mc.isChatOpen() ? 135 : 0;
+				int offset2 = this.mc.isChatOpen() ? 4 : 0;
+				String str = "not using an xbox live account";
+				var8.drawStringWithShadow(str, (var6 * 4 / 3) - 2 - var8.getStringWidth(str) - offset, 2 + offset2, 0xFFDDDD);
+				str = "eaglercraft: " + ConfigConstants.version;
+				var8.drawStringWithShadow(str, (var6 * 4 / 3) - 2 - var8.getStringWidth(str) - offset, 12 + offset2, 14737632);
+			}
+			
 			EaglerAdapter.glPopMatrix();
 		}
 

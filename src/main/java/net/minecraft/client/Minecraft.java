@@ -11,7 +11,7 @@ import net.lax1dude.eaglercraft.EaglerProfile;
 
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenLicense;
-import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
+import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
@@ -165,6 +165,8 @@ public class Minecraft implements Runnable {
 
 	/** Profiler currently displayed in the debug screen pie chart */
 	private String debugProfilerName = "root";
+	
+	public GuiVoiceOverlay voiceOverlay;
 
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
@@ -240,6 +242,7 @@ public class Minecraft implements Runnable {
 		this.checkGLError("Post startup");
 		this.guiAchievement = new GuiAchievement(this);
 		this.ingameGUI = new GuiIngame(this);
+		this.voiceOverlay = new GuiVoiceOverlay(this);
 
 		//if (this.serverName != null) {
 		//	this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
@@ -443,7 +446,6 @@ public class Minecraft implements Runnable {
 			e.printStackTrace();
 		}
 		
-		GuiScreenVoiceChannel.fadeInTimer = System.currentTimeMillis();
 		EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 		EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
@@ -1039,12 +1041,15 @@ public class Minecraft implements Runnable {
 		this.displayWidth = par1 <= 0 ? 1 : par1;
 		this.displayHeight = par2 <= 0 ? 1 : par2;
 
+		ScaledResolution var3 = new ScaledResolution(this.gameSettings, par1, par2);
+		int var4 = var3.getScaledWidth();
+		int var5 = var3.getScaledHeight();
+		
 		if (this.currentScreen != null) {
-			ScaledResolution var3 = new ScaledResolution(this.gameSettings, par1, par2);
-			int var4 = var3.getScaledWidth();
-			int var5 = var3.getScaledHeight();
 			this.currentScreen.setWorldAndResolution(this, var4, var5);
 		}
+		
+		this.voiceOverlay.setResolution(var4, var5);
 	}
 
 	/**
@@ -1104,7 +1109,7 @@ public class Minecraft implements Runnable {
 		}
 		
 		GuiMultiplayer.tickRefreshCooldown();
-		GuiScreenVoiceChannel.tickVoiceConnection();
+		EaglerAdapter.tickVoice();
 
 		if (this.currentScreen == null || this.currentScreen.allowUserInput) {
 			this.mcProfiler.endStartSection("mouse");

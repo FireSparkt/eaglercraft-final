@@ -90,6 +90,7 @@ public class GuiVideoSettings extends GuiScreen {
 				int var4 = var3.getScaledWidth();
 				int var5 = var3.getScaledHeight();
 				this.setWorldAndResolution(this.mc, var4, var5);
+				this.mc.voiceOverlay.setResolution(var4, var5);
 			}
 		}
 	}

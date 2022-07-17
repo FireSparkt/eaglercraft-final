@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
-import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
@@ -876,7 +875,7 @@ public class EntityRenderer {
 				}
 			}
 			
-			GuiScreenVoiceChannel.drawOverlay();
+			mc.voiceOverlay.drawOverlay();
 		}
 		
 	}

@@ -19,7 +19,6 @@ public class Client {
 	public static HTMLElement rootElement = null;
 	public static Minecraft instance = null;
     public static void main(String[] args) {
-    	registerErrorHandler();
     	//try {
 	    	String[] e = getOpts();
 	    	try {
@@ -30,6 +29,7 @@ public class Client {
 	    		showCrashScreen(s.toString());
 	    		return;
 	    	}
+	    	registerErrorHandler();
 	    	LocalStorageManager.loadStorage();
 	    	if(e.length > 2 && e[2].length() > 0) {
 	    		ServerList.loadDefaultServers(e[2]);

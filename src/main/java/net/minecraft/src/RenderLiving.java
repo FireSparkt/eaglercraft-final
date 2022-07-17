@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
@@ -431,6 +432,8 @@ public abstract class RenderLiving extends Render {
 			this.renderLivingLabel(par1EntityLiving, par8Str, par2, par4, par6, 64);
 		}
 	}
+	
+	private static final TextureLocation voiceGuiIcons = new TextureLocation("/gui/voice.png");
 
 	/**
 	 * Draws the debug or playername text above a living
@@ -494,6 +497,86 @@ public abstract class RenderLiving extends Render {
 			EaglerAdapter.glEnable(EaglerAdapter.GL_LIGHTING);
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+			
+			if(par1EntityLiving instanceof EntityOtherPlayerMP) {
+				if(EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTED) {
+					
+					String nm = ((EntityOtherPlayerMP) par1EntityLiving).username;
+					boolean mute = EaglerAdapter.getVoiceMuted().contains(nm);
+					if(mute || EaglerAdapter.getVoiceSpeaking().contains(nm)) {
+						
+						EaglerAdapter.glDisable(EaglerAdapter.GL_LIGHTING);
+						EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
+						EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
+						EaglerAdapter.glDepthMask(false);
+						EaglerAdapter.glDisable(EaglerAdapter.GL_DEPTH_TEST);
+						EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
+						
+						EaglerAdapter.glPushMatrix();
+						EaglerAdapter.glTranslatef(-8.0f, -18.0f, 0.0f);
+						
+						EaglerAdapter.glScalef(16.0f, 16.0f, 16.0f);
+
+						var15.startDrawingQuads();
+						var15.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+						var15.addVertex(-0.02, -0.02, 0.0);
+						var15.addVertex(-0.02, 1.02, 0.0);
+						var15.addVertex(1.02, 1.02, 0.0);
+						var15.addVertex(1.02, -0.02, 0.0);
+						var15.draw();
+						
+						EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
+						EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
+						EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.02f);
+						
+						voiceGuiIcons.bindTexture();
+						
+						int u = 0;
+						int v = mute ? 160 : 128;
+						
+						float var7 = 0.00390625F;
+						float var8 = 0.00390625F;
+
+						if(mute) {
+							EaglerAdapter.glColor4f(0.9F, 0.3F, 0.3F, 0.125F);
+						}else {
+							EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 0.125F);
+						}
+						
+						var15.startDrawingQuads();
+						var15.addVertexWithUV(0, 1.0, 0, (double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8));
+						var15.addVertexWithUV(1.0, 1.0, 0, (double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8));
+						var15.addVertexWithUV(1.0, 0, 0, (double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8));
+						var15.addVertexWithUV(0, 0, 0, (double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8));
+						var15.draw();
+						
+						EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1f);
+						EaglerAdapter.glEnable(EaglerAdapter.GL_DEPTH_TEST);
+						EaglerAdapter.glDepthMask(true);
+
+						if(mute) {
+							EaglerAdapter.glColor4f(0.9F, 0.3F, 0.3F, 1.0F);
+						}else {
+							EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+						}
+						
+						var15.startDrawingQuads();
+						var15.addVertexWithUV(0, 1.0, 0, (double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8));
+						var15.addVertexWithUV(1.0, 1.0, 0, (double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8));
+						var15.addVertexWithUV(1.0, 0, 0, (double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8));
+						var15.addVertexWithUV(0, 0, 0, (double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8));
+						var15.draw();
+						
+						EaglerAdapter.glEnable(EaglerAdapter.GL_LIGHTING);
+						EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
+						EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+						EaglerAdapter.glPopMatrix();
+						
+					}
+				}
+			}
+			
 			EaglerAdapter.glPopMatrix();
 		}
 	}

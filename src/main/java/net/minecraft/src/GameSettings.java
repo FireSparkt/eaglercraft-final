@@ -134,8 +134,13 @@ public class GameSettings {
 
 	public boolean allowFNAWSkins = true;
 	public boolean showOtherCapes = true;
-	
+
 	public int chunkUpdatePerFrame = 0;
+
+	public int voiceListenRadius = 16;
+	public float voiceListenVolume = 0.5f;
+	public float voiceSpeakVolume = 0.5f;
+	public int voicePTTKey = 47;
 
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
@@ -526,6 +531,17 @@ public class GameSettings {
 			if(yee.hasKey("allowFNAWSkins")) allowFNAWSkins = yee.getBoolean("allowFNAWSkins");
 			if(yee.hasKey("showOtherCapes")) showOtherCapes = yee.getBoolean("showOtherCapes");
 			if(yee.hasKey("chunkUpdates")) chunkUpdatePerFrame = yee.getInteger("chunkUpdates");
+			if(yee.hasKey("voiceListenVolume")) voiceListenVolume = yee.getFloat("voiceListenVolume");
+			if(yee.hasKey("voiceSpeakVolume")) voiceSpeakVolume = yee.getFloat("voiceSpeakVolume");
+			if(yee.hasKey("voicePTTKey")) voicePTTKey = yee.getInteger("voicePTTKey");
+			if(yee.hasKey("voiceListenRadius")) voiceListenRadius = yee.getInteger("voiceListenRadius");
+			
+			if(voiceListenRadius < 5) voiceListenRadius = 5;
+			else if(voiceListenRadius > 22) voiceListenRadius = 22;
+
+			EaglerAdapter.setVoiceListenVolume(voiceListenVolume);
+			EaglerAdapter.setVoiceSpeakVolume(voiceSpeakVolume);
+			EaglerAdapter.setVoiceProximity(voiceListenRadius);
 			
 			for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 				if(yee.hasKey(keyBindings[var4].keyDescription)) this.keyBindings[var4].keyCode = yee.getInteger(keyBindings[var4].keyDescription);
@@ -589,6 +605,10 @@ public class GameSettings {
 		yee.setBoolean("allowFNAWSkins", allowFNAWSkins);
 		yee.setBoolean("showOtherCapes", showOtherCapes);
 		yee.setInteger("chunkUpdates", chunkUpdatePerFrame);
+		yee.setFloat("voiceListenVolume", voiceListenVolume);
+		yee.setFloat("voiceSpeakVolume", voiceSpeakVolume);
+		yee.setInteger("voicePTTKey", voicePTTKey);
+		yee.setInteger("voiceListenRadius", voiceListenRadius);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

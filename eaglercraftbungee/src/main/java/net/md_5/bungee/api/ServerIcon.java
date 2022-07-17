@@ -19,7 +19,7 @@ public class ServerIcon {
 			Graphics2D g = (Graphics2D) icon.getGraphics();
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, (awtIcon.getWidth() < 64 || awtIcon.getHeight() < 64) ?
 					RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR : RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g.setBackground(Color.BLACK);
+			g.setBackground(new Color(0, true));
 			g.clearRect(0, 0, 64, 64);
 			int ow = awtIcon.getWidth();
 			int oh = awtIcon.getHeight();
