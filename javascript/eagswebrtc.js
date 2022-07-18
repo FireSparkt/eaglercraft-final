@@ -142,11 +142,12 @@ window.initializeVoiceClient = (() => {
 
 		setICEServers(urls) {
 			this.ICEServers.length = 0;
-			if (urls.length == 0) {
-				this.ICEServers = [ { urls: "stun:openrelay.metered.ca:80" }, { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" }, { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject", }, { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" } ];
-			} else {
-				for(var i = 0; i < urls.length; ++i) {
-					this.ICEServers.push({ urls: urls[i] });
+			for(var i = 0; i < urls.length; ++i) {
+				var etr = urls[i].split(";");
+				if(etr.length == 1) {
+					this.ICEServers.push({ urls: etr[0] });
+				}else if(etr.length == 3) {
+					this.ICEServers.push({ urls: etr[0], username: etr[1], credential: etr[2] });
 				}
 			}
 		}

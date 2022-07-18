@@ -27,8 +27,10 @@ public interface ConfigurationAdapter {
 	Collection<String> getBlacklistURLs();
 	
 	Collection<String> getBlacklistSimpleWhitelist();
-	
+
 	Collection<String> getDisabledCommands();
+	
+	Collection<String> getICEServers();
 	
 	AuthServiceInfo getAuthSettings();
 

@@ -35,6 +35,8 @@ import java.io.FileInputStream;
 import org.yaml.snakeyaml.DumperOptions;
 import java.io.File;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import org.yaml.snakeyaml.Yaml;
 
 import net.md_5.bungee.api.config.AuthServiceInfo;
@@ -320,6 +322,53 @@ public class YamlConfig implements ConfigurationAdapter {
 	@Override
 	public Collection<String> getDisabledCommands() {
 		return this.get("disabled_commands", new ArrayList());
+	}
+
+	@Override
+	public Collection<String> getICEServers() {
+		Collection<String> ret = new ArrayList();
+		
+		Collection<String> c = this.get("voice_stun_servers", null);
+		if(c == null) {
+			c = new ArrayList();
+			c.add("stun:openrelay.metered.ca:80");
+			c = this.get("voice_stun_servers", c);
+		}
+		
+		ret.addAll(c);
+		
+		Map<String, Object> turnServerList = this.get("voice_turn_servers", null);
+		if(turnServerList == null) {
+			turnServerList = new HashMap();
+			HashMap<String, Object> n = new HashMap();
+			n.put("url", "turn:openrelay.metered.ca:80");
+			n.put("username", "openrelayproject");
+			n.put("password", "openrelayproject");
+			turnServerList.put("openrelay1", n);
+			
+			n = new HashMap();
+			n.put("url", "turn:openrelay.metered.ca:443");
+			n.put("username", "openrelayproject");
+			n.put("password", "openrelayproject");
+			turnServerList.put("openrelay2", n);
+			
+			n = new HashMap();
+			n.put("url", "turn:openrelay.metered.ca:443?transport=tcp");
+			n.put("username", "openrelayproject");
+			n.put("password", "openrelayproject");
+			turnServerList.put("openrelay3", n);
+			turnServerList = this.get("voice_turn_servers", turnServerList);
+		}
+		
+		for(Entry<String, Object> trn : turnServerList.entrySet()) {
+			Object o = trn.getValue();
+			if(o instanceof Map) {
+				Map<String, Object> o2 = (Map<String, Object>) o;
+				ret.add("" + o2.get("url") + ";" + o2.get("username") + ";" + o2.get("password"));
+			}
+		}
+		
+		return ret;
 	}
 	
 }

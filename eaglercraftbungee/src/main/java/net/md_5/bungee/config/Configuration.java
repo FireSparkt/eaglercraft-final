@@ -34,6 +34,7 @@ public class Configuration {
 	private boolean simpleWhitelistEnabled;
 	private boolean acceptBukkitConsoleCommandPacket;
 	private Collection<String> disabledCommands;
+	private Collection<String> iceServers;
 
 	public Configuration() {
 		this.timeout = 30000;
@@ -67,6 +68,7 @@ public class Configuration {
 		this.simpleWhitelistEnabled = adapter.getBoolean("origin_blacklist_use_simple_whitelist", false);
 		this.acceptBukkitConsoleCommandPacket = adapter.getBoolean("accept_bukkit_console_command_packets", false);
 		this.disabledCommands = adapter.getDisabledCommands();
+		this.iceServers = adapter.getICEServers();
 		Preconditions.checkArgument(this.listeners != null && !this.listeners.isEmpty(), (Object) "No listeners defined.");
 		final Map<String, ServerInfo> newServers = adapter.getServers();
 		Preconditions.checkArgument(newServers != null && !newServers.isEmpty(), (Object) "No servers defined");
@@ -149,6 +151,10 @@ public class Configuration {
 	
 	public Collection<String> getDisabledCommands() {
 		return disabledCommands;
+	}
+	
+	public Collection<String> getICEServers() {
+		return iceServers;
 	}
 	
 }

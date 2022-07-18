@@ -1,5 +1,6 @@
 package net.md_5.bungee.eaglercraft;
 
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
 import java.util.Collections;
 
 public class PluginEaglerVoice extends Plugin implements Listener {
@@ -165,8 +167,11 @@ public class PluginEaglerVoice extends Plugin implements Listener {
             DataOutputStream dos = new DataOutputStream(baos);
             dos.write(VOICE_SIGNAL_ALLOWED);
             dos.writeBoolean(voiceEnabled);
-            dos.write(0);
-            //dos.writeUTF("\"stun:stun.l.google.com:19302\""); // todo: add config controls for ICE servers!
+            Collection<String> servs = BungeeCord.getInstance().config.getICEServers();
+            dos.write(servs.size());
+            for(String str : servs) {
+            	dos.writeUTF(str);
+            }
             event.getPlayer().sendData("EAG|Voice", baos.toByteArray());
             sendVoicePlayers(event.getPlayer().getName());
         } catch (IOException ignored) {  }

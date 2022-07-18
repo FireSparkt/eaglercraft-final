@@ -19,7 +19,7 @@ public class Team {
 	private Set<String> players;
 
 	public Collection<String> getPlayers() {
-		return (Collection<String>) (Collection) Collections.unmodifiableSet((Set<?>) this.players);
+		return (Collection<String>) Collections.unmodifiableSet((Set<?>) this.players);
 	}
 
 	public void addPlayer(final String name) {
