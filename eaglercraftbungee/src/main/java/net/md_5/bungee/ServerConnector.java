@@ -74,12 +74,12 @@ public class ServerConnector extends PacketHandler
     @Override
     public void connected(final ChannelWrapper channel) throws Exception {
         this.ch = channel;
+        channel.write(this.user.getPendingConnection().getHandshake());
         final ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Login");
         out.writeUTF(this.user.getAddress().getHostString());
         out.writeInt(this.user.getAddress().getPort());
         channel.write(new PacketFAPluginMessage("BungeeCord", out.toByteArray()));
-        channel.write(this.user.getPendingConnection().getHandshake());
         if (this.user.getPendingConnection().getForgeLogin() == null) {
             channel.write(PacketConstants.CLIENT_LOGIN);
         }
@@ -92,7 +92,8 @@ public class ServerConnector extends PacketHandler
     
     @Override
     public void handle(final Packet1Login login) throws Exception {
-        Preconditions.checkState(this.thisState == State.LOGIN, (Object)"Not exepcting LOGIN");
+        Preconditions.checkState(this.thisState == State.LOGIN || this.thisState == State.ENCRYPT_REQUEST, (Object)"Not expecting LOGIN/ENCRYPT_REQUEST");
+        if (this.thisState == State.ENCRYPT_REQUEST) this.thisState = State.LOGIN;
         final ServerConnection server = new ServerConnection(this.ch, this.target);
         final ServerConnectedEvent event = new ServerConnectedEvent(this.user, server);
         this.bungee.getPluginManager().callEvent(event);
