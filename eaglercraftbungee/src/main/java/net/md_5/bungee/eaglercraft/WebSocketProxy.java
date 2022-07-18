@@ -102,7 +102,11 @@ public class WebSocketProxy extends SimpleChannelInboundHandler<ByteBuf> {
     	ByteBuffer toSend = ByteBuffer.allocateDirect(buffer.capacity());
     	toSend.put(buffer.nioBuffer());
     	toSend.flip();
-    	client.send(toSend);
+		if (client.isOpen()) {
+			client.send(toSend);
+		} else {
+			killConnection();
+		}
 	}
 
     @Override

@@ -1,14 +1,10 @@
 package net.lax1dude.eaglercraft.adapter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import net.lax1dude.eaglercraft.*;
 import org.json.JSONObject;
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
@@ -40,11 +37,7 @@ import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MessageEvent;
 import org.teavm.jso.dom.events.MouseEvent;
 import org.teavm.jso.dom.events.WheelEvent;
-import org.teavm.jso.dom.html.HTMLCanvasElement;
-import org.teavm.jso.dom.html.HTMLDocument;
-import org.teavm.jso.dom.html.HTMLElement;
-import org.teavm.jso.dom.html.HTMLVideoElement;
-import org.teavm.jso.dom.html.HTMLImageElement;
+import org.teavm.jso.dom.html.*;
 import org.teavm.jso.media.MediaError;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 import org.teavm.jso.typedarrays.DataView;
@@ -52,16 +45,7 @@ import org.teavm.jso.typedarrays.Float32Array;
 import org.teavm.jso.typedarrays.Int32Array;
 import org.teavm.jso.typedarrays.Uint8Array;
 import org.teavm.jso.typedarrays.Uint8ClampedArray;
-import org.teavm.jso.webaudio.AudioBuffer;
-import org.teavm.jso.webaudio.AudioBufferSourceNode;
-import org.teavm.jso.webaudio.AudioContext;
-import org.teavm.jso.webaudio.AudioListener;
-import org.teavm.jso.webaudio.DecodeErrorCallback;
-import org.teavm.jso.webaudio.DecodeSuccessCallback;
-import org.teavm.jso.webaudio.GainNode;
-import org.teavm.jso.webaudio.MediaElementAudioSourceNode;
-import org.teavm.jso.webaudio.MediaEvent;
-import org.teavm.jso.webaudio.PannerNode;
+import org.teavm.jso.webaudio.*;
 import org.teavm.jso.webgl.WebGLBuffer;
 import org.teavm.jso.webgl.WebGLFramebuffer;
 import org.teavm.jso.webgl.WebGLProgram;
@@ -72,13 +56,6 @@ import org.teavm.jso.webgl.WebGLUniformLocation;
 import org.teavm.jso.websocket.CloseEvent;
 import org.teavm.jso.websocket.WebSocket;
 
-import net.lax1dude.eaglercraft.AssetRepository;
-import net.lax1dude.eaglercraft.Base64;
-import net.lax1dude.eaglercraft.EaglerImage;
-import net.lax1dude.eaglercraft.EarlyLoadScreen;
-import net.lax1dude.eaglercraft.LocalStorageManager;
-import net.lax1dude.eaglercraft.ServerQuery;
-import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
 import net.minecraft.src.MathHelper;
@@ -1769,13 +1746,15 @@ public class EaglerAdapterImpl2 {
 	
 	public static final boolean startConnection(String uri) {
 		String res = connectWebSocket(uri);
-		return "fail".equals(res) ? false : true;
+		return !"fail".equals(res);
 	}
 	public static final void endConnection() {
 		if(sock == null || sock.getReadyState() == 3) {
 			sockIsConnecting = false;
 		}
 		if(sock != null && !sockIsConnecting) sock.close();
+
+		enableVoice(Voice.VoiceChannel.NONE);
 	}
 	public static final boolean connectionOpen() {
 		if(sock == null || sock.getReadyState() == 3) {
@@ -2010,60 +1989,94 @@ public class EaglerAdapterImpl2 {
 	public static final void openConsole() {
 		
 	}
-	
-	
-	//TODO: voice start =======================================================================
 
-	// implementation notes - DO NOT access any net.minecraft.* classes from EaglerAdapterImpl2 this time
-	// implementation notes - Tick all the "for (Object playerObject : Minecraft.getMinecraft().theWorld.playerEntities)" in net.minecraft.client.Minecraft.runTick() or similar
-	
 	// implementation notes - try to only connect to client in GLOBAL or LOCAL not both
-	// implementation notes - try to only connect to nearby clients, and disconnect once they've been out of range for more then 5-10 seconds
-	
-	// implementation notes - AGAIN, don't access net.minecraft.* classes from this file
-	
-	// to ayunami - this is initialized at startup, right before downloadAssetPack
+
 	private static EaglercraftVoiceClient voiceClient = null;
 	
 	private static boolean voiceAvailableStat = false;
 	private static boolean voiceSignalHandlersInitialized = false;
-	
-	// to ayunami - use this as a callback to send packets on the voice signal channel
+
 	private static Consumer<byte[]> returnSignalHandler = null;
-	
-	// to ayunami - call this before joining a new server
+
+	private static final HashMap<String, AnalyserNode> voiceAnalysers = new HashMap<>();
+	private static final HashMap<String, GainNode> voiceGains = new HashMap<>();
+	private static final HashMap<String, PannerNode> voicePanners = new HashMap<>();
+	private static final HashSet<String> nearbyPlayers = new HashSet<>();
+
 	public static void clearVoiceAvailableStatus() {
 		voiceAvailableStat = false;
 	}
-	
-	// to ayunami - use this to set returnSignalHandler when a new NetworkManager is created
+
 	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) {
 		returnSignalHandler = signalHandler;
 	}
-	
-	public static final int VOICE_SIGNAL_ALLOWED_CLIENTBOUND = 0;
-	public static final int VOICE_SIGNAL_ICE_SERVERBOUND = 1;
-	public static final int VOICE_SIGNAL_DESC_SERVERBOUND = 2;
-	
-	// to ayunami - use this to pass voice signal packets 
+
+	public static final int VOICE_SIGNAL_ALLOWED = 0;
+	public static final int VOICE_SIGNAL_REQUEST = 0;
+	public static final int VOICE_SIGNAL_CONNECT = 1;
+	public static final int VOICE_SIGNAL_DISCONNECT = 2;
+	public static final int VOICE_SIGNAL_ICE = 3;
+	public static final int VOICE_SIGNAL_DESC = 4;
+	public static final int VOICE_SIGNAL_GLOBAL = 5;
+
 	public static void handleVoiceSignal(byte[] data) {
 		try {
 			DataInputStream streamIn = new DataInputStream(new ByteArrayInputStream(data));
 			int sig = streamIn.read();
 			switch(sig) {
-			case VOICE_SIGNAL_ALLOWED_CLIENTBOUND:
-				voiceAvailableStat = streamIn.readBoolean();
-				String[] servs = new String[streamIn.read()];
-				for(int i = 0; i < servs.length; ++i) {
-					servs[i] = streamIn.readUTF();
-				}
-				voiceClient.setICEServers(servs);
-				break;
-			default:
-				System.err.println("Unknown voice signal packet '" + sig + "'!");
-				break;
+				case VOICE_SIGNAL_GLOBAL:
+					if (enabledChannel != Voice.VoiceChannel.GLOBAL) return;
+					String[] voicePlayers = new String[streamIn.readInt()];
+					for(int i = 0; i < voicePlayers.length; i++) voicePlayers[i] = streamIn.readUTF();
+					for (String username : voicePlayers) {
+						// notice that literally everyone except for those already connected using voice chat will receive the request; however, ones using proximity will simply ignore it.
+						if (!voiceGains.containsKey(username)) addNearbyPlayer(username);
+					}
+					break;
+				case VOICE_SIGNAL_ALLOWED:
+					voiceAvailableStat = streamIn.readBoolean();
+					String[] servs = new String[streamIn.read()];
+					for(int i = 0; i < servs.length; i++) {
+						servs[i] = streamIn.readUTF();
+					}
+					voiceClient.setICEServers(servs);
+					break;
+				case VOICE_SIGNAL_CONNECT:
+					String peerId = streamIn.readUTF();
+					try {
+						boolean offer = streamIn.readBoolean();
+						voiceClient.signalConnect(peerId, offer);
+					} catch (EOFException e) { // this is actually a connect ANNOUNCE, not an absolute "yes please connect" situation
+						if (enabledChannel == Voice.VoiceChannel.PROXIMITY && !nearbyPlayers.contains(peerId)) return;
+						// send request to peerId
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						DataOutputStream dos = new DataOutputStream(baos);
+						dos.write(VOICE_SIGNAL_REQUEST);
+						dos.writeUTF(peerId);
+						returnSignalHandler.accept(baos.toByteArray());
+					}
+					break;
+				case VOICE_SIGNAL_DISCONNECT:
+					String peerId2 = streamIn.readUTF();
+					voiceClient.signalDisconnect(peerId2, true);
+					break;
+				case VOICE_SIGNAL_ICE:
+					String peerId3 = streamIn.readUTF();
+					String candidate = streamIn.readUTF();
+					voiceClient.signalICECandidate(peerId3, candidate);
+					break;
+				case VOICE_SIGNAL_DESC:
+					String peerId4 = streamIn.readUTF();
+					String descJSON = streamIn.readUTF();
+					voiceClient.signalDescription(peerId4, descJSON);
+					break;
+				default:
+					System.err.println("Unknown voice signal packet '" + sig + "'!");
+					break;
 			}
 		}catch(IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 	
@@ -2077,24 +2090,75 @@ public class EaglerAdapterImpl2 {
 		return false;
 	}
 	private static Voice.VoiceChannel enabledChannel = Voice.VoiceChannel.NONE;
-	
-	// to ayunami - use this to switch channel modes or disable voice
+
+	public static final void addNearbyPlayer(String username) {
+		recentlyNearbyPlayers.remove(username);
+		if (nearbyPlayers.add(username)) {
+			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
+			try {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(baos);
+				dos.write(VOICE_SIGNAL_REQUEST);
+				dos.writeUTF(username);
+				returnSignalHandler.accept(baos.toByteArray());
+			} catch (IOException ignored) {  }
+		}
+	}
+
+	private static final ExpiringSet<String> recentlyNearbyPlayers = new ExpiringSet<>(5000, new ExpiringSet.ExpiringEvent<String>() {
+		@Override
+		public void onExpiration(String username) {
+			if (!nearbyPlayers.contains(username)) voiceClient.signalDisconnect(username, false);
+		}
+	});
+
+	public static final void removeNearbyPlayer(String username) {
+		// todo: add 5-10s disconnect delay
+		if (nearbyPlayers.remove(username)) {
+			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
+			recentlyNearbyPlayers.add(username);
+		}
+	}
+
+	public static final void updateVoicePosition(String username, double x, double y, double z) {
+		if (voicePanners.containsKey(username)) voicePanners.get(username).setPosition((float) x, (float) y, (float) z);
+	}
+
+	public static final void sendInitialVoice() {
+		returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_CONNECT });
+		for (String username : nearbyPlayers) {
+			try {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(baos);
+				dos.write(VOICE_SIGNAL_REQUEST);
+				dos.writeUTF(username);
+				returnSignalHandler.accept(baos.toByteArray());
+			} catch (IOException ignored) {  }
+		}
+	}
+
 	public static final void enableVoice(Voice.VoiceChannel enable) {
+		if (enabledChannel == enable) return;
+		if (enabledChannel != Voice.VoiceChannel.NONE) {
+			for (String username : nearbyPlayers) voiceClient.signalDisconnect(username, false);
+			for (String username : recentlyNearbyPlayers) voiceClient.signalDisconnect(username, false);
+			nearbyPlayers.clear();
+			returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_DISCONNECT });
+		}
 		enabledChannel = enable;
-		if(enable == Voice.VoiceChannel.NONE) { 
+		if(enable == Voice.VoiceChannel.NONE) {
 			talkStatus = false;
 		}else {
 			if(!voiceSignalHandlersInitialized) {
 				voiceSignalHandlersInitialized = true;
 				voiceClient.setICECandidateHandler(new EaglercraftVoiceClient.ICECandidateHandler() {
 					@Override
-					public void call(String peerId, String sdpMLineIndex, String candidate) {
+					public void call(String peerId, String candidate) {
 						try {
 							ByteArrayOutputStream bos = new ByteArrayOutputStream();
 							DataOutputStream dat = new DataOutputStream(bos);
-							dat.write(VOICE_SIGNAL_ICE_SERVERBOUND);
+							dat.write(VOICE_SIGNAL_ICE);
 							dat.writeUTF(peerId);
-							dat.writeUTF(sdpMLineIndex);
 							dat.writeUTF(candidate);
 							returnSignalHandler.accept(bos.toByteArray());
 						}catch(IOException ex) {
@@ -2107,7 +2171,7 @@ public class EaglerAdapterImpl2 {
 						try {
 							ByteArrayOutputStream bos = new ByteArrayOutputStream();
 							DataOutputStream dat = new DataOutputStream(bos);
-							dat.write(VOICE_SIGNAL_DESC_SERVERBOUND);
+							dat.write(VOICE_SIGNAL_DESC);
 							dat.writeUTF(peerId);
 							dat.writeUTF(candidate);
 							returnSignalHandler.accept(bos.toByteArray());
@@ -2115,8 +2179,74 @@ public class EaglerAdapterImpl2 {
 						}
 					}
 				});
+				voiceClient.setPeerTrackHandler(new EaglercraftVoiceClient.PeerTrackHandler() {
+					@Override
+					public void call(String peerId, MediaStream audioStream) {
+						if (enabledChannel == Voice.VoiceChannel.NONE) return;
+						MediaStreamAudioSourceNode audioNode = audioctx.createMediaStreamSource(audioStream);
+						AnalyserNode analyser = audioctx.createAnalyser();
+						analyser.setSmoothingTimeConstant(0f);
+						analyser.setFftSize(32);
+						audioNode.connect(analyser);
+						voiceAnalysers.put(peerId, analyser);
+						if (enabledChannel == Voice.VoiceChannel.GLOBAL) {
+							GainNode gain = audioctx.createGain();
+							gain.getGain().setValue(getVoiceListenVolume());
+							analyser.connect(gain);
+							gain.connect(audioctx.getDestination());
+							voiceGains.put(peerId, gain);
+						} else if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
+							PannerNode panner = audioctx.createPanner();
+							panner.setRolloffFactor(1f);
+							panner.setDistanceModel("linear");
+							panner.setPanningModel("HRTF");
+							panner.setConeInnerAngle(360f);
+							panner.setConeOuterAngle(0f);
+							panner.setConeOuterGain(0f);
+							panner.setOrientation(0f, 1f, 0f);
+							panner.setPosition(0, 0, 0);
+							float vol = getVoiceListenVolume();
+							panner.setMaxDistance(vol * getVoiceProximity() + 0.1f);
+							GainNode gain = audioctx.createGain();
+							gain.getGain().setValue(vol);
+							analyser.connect(gain);
+							gain.connect(panner);
+							panner.connect(audioctx.getDestination());
+							voiceGains.put(peerId, gain);
+							voicePanners.put(peerId, panner);
+						}
+					}
+				});
+				voiceClient.setPeerDisconnectHandler(new EaglercraftVoiceClient.PeerDisconnectHandler() {
+					@Override
+					public void call(String peerId, boolean quiet) {
+						if (voiceAnalysers.containsKey(peerId)) {
+							voiceAnalysers.get(peerId).disconnect();
+							voiceAnalysers.remove(peerId);
+						}
+						if (voiceGains.containsKey(peerId)) {
+							voiceGains.get(peerId).disconnect();
+							voiceGains.remove(peerId);
+						}
+						if (voicePanners.containsKey(peerId)) {
+							voicePanners.get(peerId).disconnect();
+							voicePanners.remove(peerId);
+						}
+						if (!quiet) {
+							try {
+								ByteArrayOutputStream bos = new ByteArrayOutputStream();
+								DataOutputStream dat = new DataOutputStream(bos);
+								dat.write(VOICE_SIGNAL_DISCONNECT);
+								dat.writeUTF(peerId);
+								returnSignalHandler.accept(bos.toByteArray());
+							} catch (IOException ex) {
+							}
+						}
+					}
+				});
 				voiceClient.initializeDevices();
 			}
+			sendInitialVoice();
 		}
 	}
 	public static final Voice.VoiceChannel getVoiceChannel() {
@@ -2127,8 +2257,7 @@ public class EaglerAdapterImpl2 {
 			(voiceClient.getReadyState() != EaglercraftVoiceClient.READYSTATE_DEVICE_INITIALIZED ?
 					Voice.VoiceStatus.CONNECTING : Voice.VoiceStatus.CONNECTED);
 	}
-	
-	// to ayunami - push to talk in the JS works afaik
+
 	private static boolean talkStatus = false;
 	public static final void activateVoice(boolean talk) {
 		if(talkStatus != talk) {
@@ -2136,8 +2265,7 @@ public class EaglerAdapterImpl2 {
 		}
 		talkStatus = talk;
 	}
-	
-	// to ayunami - not currently used in the javascript but is used by GUI and gameSettings
+
 	private static int proximity = 16;
 	public static final void setVoiceProximity(int prox) {
 		proximity = prox;
@@ -2145,17 +2273,22 @@ public class EaglerAdapterImpl2 {
 	public static final int getVoiceProximity() {
 		return proximity;
 	}
-	
-	// to ayunami - iterate all AudioNodes from PeerTrackHandler players and adjust their gain here
+
 	private static float volumeListen = 0.5f;
 	public static final void setVoiceListenVolume(float f) {
+		for (GainNode gain : voiceGains.values()) {
+			float val = f;
+			if(val > 0.5) val = 0.5f + (val - 0.5f) * 2.0f;
+			if(val > 1.5) val = 1.5f;
+			if(val < 0.0) val = 0.0f;
+			gain.getGain().setValue(val * 3.0f);
+		}
 		volumeListen = f;
 	}
 	public static final float getVoiceListenVolume() {
 		return volumeListen;
 	}
-	
-	// to ayunami - this is already implemented
+
 	private static float volumeSpeak = 0.5f;
 	public static final void setVoiceSpeakVolume(float f) {
 		if(volumeSpeak != f) {
@@ -2166,20 +2299,17 @@ public class EaglerAdapterImpl2 {
 	public static final float getVoiceSpeakVolume() {
 		return volumeSpeak;
 	}
-	
-	// to ayunami - this is used to make the ingame GUI display who is speaking
-	// I also already programmed a speaker icon above player name tags of players in "getVoiceSpeaking()"
-	
+
 	private static final Set<String> mutedSet = new HashSet();
-	private static final Set<String> emptySet = new HashSet();
-	private static final List<String> emptyLst = new ArrayList();
+	private static final Set<String> speakingSet = new HashSet();
 	public static final Set<String> getVoiceListening() {
-		return emptySet;
+		return voiceGains.keySet();
 	}
 	public static final Set<String> getVoiceSpeaking() {
-		return emptySet;
+		return speakingSet;
 	}
 	public static final void setVoiceMuted(String username, boolean mute) {
+		voiceClient.mutePeer(username, mute);
 		if(mute) {
 			mutedSet.add(username);
 		}else {
@@ -2190,16 +2320,25 @@ public class EaglerAdapterImpl2 {
 		return mutedSet;
 	}
 	public static final List<String> getVoiceRecent() {
-		return emptyLst;
+		return new ArrayList<>(voiceGains.keySet());
 	}
-	
-	// to ayunami - use this to clean up that ExpiringSet class you made
+
 	public static final void tickVoice() {
-		
+		recentlyNearbyPlayers.checkForExpirations();
+		for (String username : voiceAnalysers.keySet()) {
+			AnalyserNode analyser = voiceAnalysers.get(username);
+			Uint8Array array = Uint8Array.create(analyser.getFrequencyBinCount());
+			analyser.getByteFrequencyData(array);
+			int len = array.getLength();
+			speakingSet.remove(username);
+			for (int i = 0; i < len; i++) {
+				if (array.get(i) >= 0.1f) {
+					speakingSet.add(username);
+					break;
+				}
+			}
+		}
 	}
-	
-	
-	//TODO: voice end ========================================================
 	
 	
 	public static final void doJavascriptCoroutines() {

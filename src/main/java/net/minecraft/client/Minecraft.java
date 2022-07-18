@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
 
-import net.minecraft.src.*;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerProfile;
@@ -13,6 +12,9 @@ import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenLicense;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.LocalStorageManager;
+import net.lax1dude.eaglercraft.Voice;
+import net.minecraft.src.*;
+
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
@@ -243,6 +245,11 @@ public class Minecraft implements Runnable {
 		this.guiAchievement = new GuiAchievement(this);
 		this.ingameGUI = new GuiIngame(this);
 		this.voiceOverlay = new GuiVoiceOverlay(this);
+
+		ScaledResolution var2 = new ScaledResolution(this.gameSettings, this.displayWidth, this.displayHeight);
+		int var3 = var2.getScaledWidth();
+		int var4 = var2.getScaledHeight();
+		this.voiceOverlay.setResolution(var3, var4);
 
 		//if (this.serverName != null) {
 		//	this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
@@ -1110,6 +1117,25 @@ public class Minecraft implements Runnable {
 		
 		GuiMultiplayer.tickRefreshCooldown();
 		EaglerAdapter.tickVoice();
+		EaglerAdapter.activateVoice(EaglerAdapter.isKeyDown(gameSettings.voicePTTKey));
+		if (EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTING || EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTED) {
+			if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
+				if (this.theWorld != null && this.thePlayer != null) {
+					for (Object playerObject : this.theWorld.playerEntities) {
+						EntityPlayer player = (EntityPlayer) playerObject;
+						if (player == this.thePlayer) continue;
+						EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
+						int prox = EaglerAdapter.getVoiceProximity();
+						// cube
+						if (Math.abs(thePlayer.posX - player.posX) < prox && Math.abs(thePlayer.posY - player.posY) < prox && Math.abs(thePlayer.posZ - player.posZ) < prox) {
+							EaglerAdapter.addNearbyPlayer(player.username);
+						} else {
+							EaglerAdapter.removeNearbyPlayer(player.username);
+						}
+					}
+				}
+			}
+		}
 
 		if (this.currentScreen == null || this.currentScreen.allowUserInput) {
 			this.mcProfiler.endStartSection("mouse");

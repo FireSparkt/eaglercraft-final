@@ -1,9 +1,13 @@
 .gradle
 .settings
+.idea
 build
 bin
+eaglercraftbungee/.idea
 eaglercraftbungee/bin
 eaglercraftbungee/rundir
+eaglercraftbungee/test
+eaglercraftbungee/minecrafthtml5bungee.iml
 epkcompiler/bin
 spigot-server/world*
 eaglercraftbungee/rundir

@@ -8,11 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import net.lax1dude.eaglercraft.DefaultSkinRenderer;
-import net.lax1dude.eaglercraft.EaglerAdapter;
-import net.lax1dude.eaglercraft.EaglercraftRandom;
-import net.lax1dude.eaglercraft.WebsocketNetworkManager;
+import net.lax1dude.eaglercraft.*;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
 
@@ -52,6 +50,14 @@ public class NetClientHandler extends NetHandler {
 	public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = new WebsocketNetworkManager(par2Str, null, this);
+		EaglerAdapter.clearVoiceAvailableStatus();
+		EaglerAdapter.setVoiceSignalHandler(new Consumer<byte[]>() {
+			@Override
+			public void accept(byte[] bytes) {
+				NetClientHandler.this.addToSendQueue(new Packet250CustomPayload("EAG|Voice", bytes));
+			}
+		});
+		if (EaglerAdapter.getVoiceChannel() != Voice.VoiceChannel.NONE) EaglerAdapter.sendInitialVoice();
 	}
 
 	//public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3, GuiScreen par4GuiScreen) throws IOException {
@@ -1166,6 +1172,8 @@ public class NetClientHandler extends NetHandler {
 			} catch (IOException var7) {
 				var7.printStackTrace();
 			}
+		}else if("EAG|Voice".equals(par1Packet250CustomPayload.channel)) {
+			EaglerAdapter.handleVoiceSignal(par1Packet250CustomPayload.data);
 		}
 	}
 

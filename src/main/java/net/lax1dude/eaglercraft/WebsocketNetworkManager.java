@@ -30,7 +30,7 @@ public class WebsocketNetworkManager implements INetworkManager {
 	public void setNetHandler(NetHandler netHandler) {
 		this.netHandler = netHandler;
 	}
-	
+
 	private ByteArrayOutputStream sendBuffer = new ByteArrayOutputStream();
 	
 	public void addToSendQueue(Packet var1) {
@@ -95,7 +95,6 @@ public class WebsocketNetworkManager implements INetworkManager {
 				stream.mark();
 				try {
 					Packet pkt = Packet.readPacket(packetStream, false);
-					//System.out.println(pkt.toString());
 					pkt.processPacket(this.netHandler);
 				} catch (EOFException e) {
 					stream.reset();
@@ -117,7 +116,6 @@ public class WebsocketNetworkManager implements INetworkManager {
 	}
 	
 	public void serverShutdown() {
-		EaglerAdapter.setVoiceStatus(Voice.VoiceStatus.DISCONNECTED);
 		if(EaglerAdapter.connectionOpen()) {
 			EaglerAdapter.endConnection();
 			EaglerAdapter.setDebugVar("minecraftServer", "null");
@@ -133,7 +131,6 @@ public class WebsocketNetworkManager implements INetworkManager {
 	}
 	
 	public void closeConnections() {
-		EaglerAdapter.setVoiceStatus(Voice.VoiceStatus.DISCONNECTED);
 		if(EaglerAdapter.connectionOpen()) {
 			EaglerAdapter.endConnection();
 			EaglerAdapter.setDebugVar("minecraftServer", "null");

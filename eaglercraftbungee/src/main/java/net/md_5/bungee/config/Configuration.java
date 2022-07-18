@@ -24,6 +24,7 @@ public class Configuration {
 	private TMap<String, ServerInfo> servers;
 	private AuthServiceInfo authInfo;
 	private boolean onlineMode;
+	private boolean voiceEnabled;
 	private int playerLimit;
 	private String name;
 	private boolean showBanType;
@@ -56,6 +57,7 @@ public class Configuration {
 		}
 		this.authInfo = adapter.getAuthSettings();
 		this.onlineMode = false;
+		this.voiceEnabled = adapter.getBoolean("voice_enabled", true);
 		this.playerLimit = adapter.getInt("player_limit", this.playerLimit);
 		this.name = adapter.getString("server_name", EaglercraftBungee.name + " Server");
 		this.showBanType = adapter.getBoolean("display_ban_type_on_kick", false);
@@ -111,6 +113,10 @@ public class Configuration {
 	
 	public AuthServiceInfo getAuthInfo() {
 		return authInfo;
+	}
+
+	public boolean getVoiceEnabled() {
+		return voiceEnabled;
 	}
 
 	public String getServerName() {

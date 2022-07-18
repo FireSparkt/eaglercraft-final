@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.io.IOException;
 import jline.UnsupportedTerminal;
-import java.io.OutputStream;
 import net.md_5.bungee.log.LoggingOutputStream;
 import java.util.logging.Level;
 import net.md_5.bungee.log.BungeeLogger;
@@ -78,6 +77,7 @@ import net.md_5.bungee.config.YamlConfig;
 import net.md_5.bungee.eaglercraft.BanList;
 import net.md_5.bungee.eaglercraft.DomainBlacklist;
 import net.md_5.bungee.eaglercraft.PluginEaglerSkins;
+import net.md_5.bungee.eaglercraft.PluginEaglerVoice;
 import net.md_5.bungee.eaglercraft.WebSocketListener;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -233,6 +233,7 @@ public class BungeeCord extends ProxyServer {
 		this.config.load();
 		this.pluginManager.detectPlugins(this.pluginsFolder);
 		this.pluginManager.addInternalPlugin(new PluginEaglerSkins());
+		this.pluginManager.addInternalPlugin(new PluginEaglerVoice(this.config.getVoiceEnabled()));
 		//if(this.config.getAuthInfo().isEnabled()) this.pluginManager.addInternalPlugin(new PluginEaglerAuth());
 		if (this.reconnectHandler == null) {
 			this.reconnectHandler = new SQLReconnectHandler();
