@@ -1461,6 +1461,9 @@ public class Minecraft implements Runnable {
 	 */
 	public void loadWorld(WorldClient par1WorldClient, String par2Str) {
 		if (par1WorldClient == null) {
+			
+			EaglerAdapter.enableVoice(Voice.VoiceChannel.NONE);
+			
 			NetClientHandler var3 = this.getNetHandler();
 
 			if (var3 != null) {
