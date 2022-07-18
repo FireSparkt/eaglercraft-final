@@ -360,4 +360,8 @@ public class GuiScreenBook extends GuiScreen {
 
 		super.drawScreen(par1, par2, par3);
 	}
+	
+	public boolean blockHotKeys() {
+		return this.bookIsUnsigned;
+	}
 }

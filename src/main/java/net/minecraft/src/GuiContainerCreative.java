@@ -687,4 +687,8 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	static InventoryBasic getInventory() {
 		return inventory;
 	}
+
+	public boolean blockHotKeys() {
+		return this.searchField.isFocused();
+	}
 }

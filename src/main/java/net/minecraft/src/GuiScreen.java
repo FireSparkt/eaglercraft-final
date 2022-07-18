@@ -264,4 +264,8 @@ public class GuiScreen extends Gui {
 	public static boolean isShiftKeyDown() {
 		return EaglerAdapter.isKeyDown(42) || EaglerAdapter.isKeyDown(54);
 	}
+	
+	public boolean blockHotKeys() {
+		return false;
+	}
 }

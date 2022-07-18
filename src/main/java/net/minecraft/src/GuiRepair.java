@@ -162,4 +162,8 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 */
 	public void sendProgressBarUpdate(Container par1Container, int par2, int par3) {
 	}
+	
+	public boolean blockHotKeys() {
+		return itemNameField.isFocused();
+	}
 }

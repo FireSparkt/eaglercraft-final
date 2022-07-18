@@ -2278,10 +2278,10 @@ public class EaglerAdapterImpl2 {
 	public static final void setVoiceListenVolume(float f) {
 		for (GainNode gain : voiceGains.values()) {
 			float val = f;
-			if(val > 0.5) val = 0.5f + (val - 0.5f) * 2.0f;
-			if(val > 1.5) val = 1.5f;
-			if(val < 0.0) val = 0.0f;
-			gain.getGain().setValue(val * 3.0f);
+			if(val > 0.5f) val = 0.5f + (val - 0.5f) * 3.0f;
+			if(val > 2.0f) val = 2.0f;
+			if(val < 0.0f) val = 0.0f;
+			gain.getGain().setValue(val * 2.0f);
 		}
 		volumeListen = f;
 	}
