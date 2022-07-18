@@ -9,11 +9,22 @@ import java.util.Map;
 
 public class ExpiringSet<T> extends HashSet<T> {
     private final long expiration;
+    private final ExpiringEvent<T> event;
 
     private final Map<T, Long> timestamps = new HashMap<>();
 
     public ExpiringSet(long expiration) {
         this.expiration = expiration;
+        this.event = null;
+    }
+
+    public ExpiringSet(long expiration, ExpiringEvent<T> event) {
+        this.expiration = expiration;
+        this.event = event;
+    }
+
+    public interface ExpiringEvent<T> {
+        void onExpiration(T item);
     }
 
     public void checkForExpirations() {
@@ -23,6 +34,7 @@ public class ExpiringSet<T> extends HashSet<T> {
             T element = iterator.next();
             if (super.contains(element)) {
                 if (this.timestamps.get(element) + this.expiration < now) {
+                    if (this.event != null) this.event.onExpiration(element);
                     iterator.remove();
                     super.remove(element);
                 }

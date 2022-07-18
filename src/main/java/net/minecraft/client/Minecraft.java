@@ -1125,18 +1125,19 @@ public class Minecraft implements Runnable {
 			
 			if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
 				if (this.theWorld != null && this.thePlayer != null) {
+					HashSet<String> seenPlayers = new HashSet<>();
 					for (Object playerObject : this.theWorld.playerEntities) {
 						EntityPlayer player = (EntityPlayer) playerObject;
 						if (player == this.thePlayer) continue;
 						EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
 						int prox = EaglerAdapter.getVoiceProximity();
 						// cube
-						if (Math.abs(thePlayer.posX - player.posX) < prox && Math.abs(thePlayer.posY - player.posY) < prox && Math.abs(thePlayer.posZ - player.posZ) < prox) {
+						if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
 							EaglerAdapter.addNearbyPlayer(player.username);
-						} else {
-							EaglerAdapter.removeNearbyPlayer(player.username);
+							seenPlayers.add(player.username);
 						}
 					}
+					EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
 				}
 			}
 		}

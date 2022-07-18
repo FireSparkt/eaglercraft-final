@@ -132,7 +132,7 @@ window.initializeVoiceClient = (() => {
 			this.descriptionHandler = null;
 			this.peerTrackHandler = null;
 			this.peerDisconnectHandler = null;
-			this.microphoneVolumeAudioContext = new AudioContext();
+			this.microphoneVolumeAudioContext = null;
 		}
 
 		voiceClientSupported() {
@@ -177,6 +177,7 @@ window.initializeVoiceClient = (() => {
 				this.taskState = TASKSTATE_LOADING;
 				const self = this;
 				navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then((stream) => {
+					self.microphoneVolumeAudioContext = new AudioContext();
 					self.localRawMediaStream = stream;
 					self.localRawMediaStream.getAudioTracks()[0].enabled = false;
 					self.localMediaStream = self.microphoneVolumeAudioContext.createMediaStreamDestination();

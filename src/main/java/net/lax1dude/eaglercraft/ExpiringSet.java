@@ -13,6 +13,11 @@ public class ExpiringSet<T> extends HashSet<T> {
 
     private final Map<T, Long> timestamps = new HashMap<>();
 
+    public ExpiringSet(long expiration) {
+        this.expiration = expiration;
+        this.event = null;
+    }
+
     public ExpiringSet(long expiration, ExpiringEvent<T> event) {
         this.expiration = expiration;
         this.event = event;
@@ -29,7 +34,7 @@ public class ExpiringSet<T> extends HashSet<T> {
             T element = iterator.next();
             if (super.contains(element)) {
                 if (this.timestamps.get(element) + this.expiration < now) {
-                    this.event.onExpiration(element);
+                    if (this.event != null) this.event.onExpiration(element);
                     iterator.remove();
                     super.remove(element);
                 }

@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import net.lax1dude.eaglercraft.*;
 import org.json.JSONObject;
@@ -2118,11 +2118,14 @@ public class EaglerAdapterImpl2 {
 	});
 
 	public static final void removeNearbyPlayer(String username) {
-		// todo: add 5-10s disconnect delay
 		if (nearbyPlayers.remove(username)) {
 			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
 			recentlyNearbyPlayers.add(username);
 		}
+	}
+
+	public static final void cleanupNearbyPlayers(HashSet<String> existingPlayers) {
+		nearbyPlayers.stream().filter(un -> !existingPlayers.contains(un)).collect(Collectors.toSet()).forEach(EaglerAdapterImpl2::removeNearbyPlayer);
 	}
 
 	public static final void updateVoicePosition(String username, double x, double y, double z) {
