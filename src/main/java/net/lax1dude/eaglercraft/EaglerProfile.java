@@ -40,8 +40,6 @@ public class EaglerProfile {
 	public static int customCapeId;
 	
 	public static int newSkinNotificationIndex = 0;
-	
-	public static String myChannel;
 
 	public static final int[] SKIN_DATA_SIZE = new int[] { 64*32*4, 64*64*4, -9, -9, 1, 64*64*4, -9 };
 	public static final int[] CAPE_DATA_SIZE = new int[] { 32*32*4, -9, 1 };
@@ -219,7 +217,6 @@ public class EaglerProfile {
 		}while(username.length() > 16);
 		
 		presetSkinId = rand.nextInt(GuiScreenEditProfile.defaultOptions.length);
-		myChannel = username + "_" + (100 + rand.nextInt(900));
 		customSkinId = -1;
 	}
 
@@ -234,7 +231,6 @@ public class EaglerProfile {
 			if(newSkinNotificationIndex == 0) {
 				newSkinNotificationIndex = GuiScreenEditProfile.newDefaultNotice;
 			}
-			myChannel = username + "_" + (100 + rand.nextInt(900));
 			NBTTagCompound n = LocalStorageManager.profileSettingsStorage.getCompoundTag("skins");
 			for(Object s : NBTTagCompound.getTagMap(n).keySet()) {
 				String s2 = (String)s;
