@@ -114,6 +114,11 @@ public class GuiScreenBook extends GuiScreen {
 		if (this.bookIsUnsigned && this.bookModified) {
 			if (this.bookPages != null) {
 				while (this.bookPages.tagCount() > 1) {
+					int i;
+					while((i = this.bookPages.tagCount()) > 51) {
+						this.bookPages.removeTag(i - 1);
+					}
+					
 					NBTTagString var2 = (NBTTagString) this.bookPages.tagAt(this.bookPages.tagCount() - 1);
 
 					if (var2.data != null && var2.data.length() != 0) {
@@ -237,7 +242,13 @@ public class GuiScreenBook extends GuiScreen {
 				return;
 
 			default:
-				if (ChatAllowedCharacters.isAllowedCharacter(par1)) {
+				boolean ctrl = GuiScreen.isCtrlKeyDown();
+				if(ctrl && (par1 == 'v' || par1 == 'V')) {
+					String s4 = GuiScreen.getClipboardString();
+					if(s4 != null && s4.length() > 0) {
+						this.func_74160_b(s4);
+					}
+				}else if (ChatAllowedCharacters.isAllowedCharacter(par1)) {
 					this.func_74160_b(Character.toString(par1));
 				}
 			}
