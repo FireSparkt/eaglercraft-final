@@ -1995,8 +1995,6 @@ public class EaglerAdapterImpl2 {
 		
 	}
 
-	// implementation notes - try to only connect to client in GLOBAL or LOCAL not both
-
 	private static EaglercraftVoiceClient voiceClient = null;
 	
 	private static boolean voiceAvailableStat = false;
@@ -2144,6 +2142,7 @@ public class EaglerAdapterImpl2 {
 
 	public static final void enableVoice(Voice.VoiceChannel enable) {
 		if (enabledChannel == enable) return;
+		voiceClient.resetPeerStates();
 		if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
 			for (String username : nearbyPlayers) voiceClient.signalDisconnect(username, false);
 			for (String username : recentlyNearbyPlayers) voiceClient.signalDisconnect(username, false);
@@ -2262,10 +2261,13 @@ public class EaglerAdapterImpl2 {
 	public static final Voice.VoiceChannel getVoiceChannel() {
 		return enabledChannel;
 	}
+	public static final boolean voicePeerErrored() {
+		return voiceClient.getPeerState() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateConnect() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateInitial() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateDesc() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateIce() == EaglercraftVoiceClient.PEERSTATE_FAILED;
+	}
 	public static final Voice.VoiceStatus getVoiceStatus() {
 		return (!voiceAvailable() || !voiceAllowed()) ? Voice.VoiceStatus.UNAVAILABLE :
 			(voiceClient.getReadyState() != EaglercraftVoiceClient.READYSTATE_DEVICE_INITIALIZED ?
-					Voice.VoiceStatus.CONNECTING : Voice.VoiceStatus.CONNECTED);
+					Voice.VoiceStatus.CONNECTING : (voicePeerErrored() ? Voice.VoiceStatus.UNAVAILABLE : Voice.VoiceStatus.CONNECTED));
 	}
 
 	private static boolean talkStatus = false;

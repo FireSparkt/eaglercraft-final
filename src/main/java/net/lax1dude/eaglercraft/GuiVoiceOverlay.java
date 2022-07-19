@@ -56,7 +56,7 @@ public class GuiVoiceOverlay extends Gui {
 			
 			voiceGuiIcons.bindTexture();
 			
-			if(EaglerAdapter.isKeyDown(mc.gameSettings.voicePTTKey)) {
+			if((mc.currentScreen == null || !mc.currentScreen.blockHotKeys()) && EaglerAdapter.isKeyDown(mc.gameSettings.voicePTTKey)) {
 				long millis = System.currentTimeMillis();
 				if(pttTimer == 0l) {
 					pttTimer = millis;
