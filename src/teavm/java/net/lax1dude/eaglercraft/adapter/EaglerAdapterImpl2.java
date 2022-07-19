@@ -2036,7 +2036,7 @@ public class EaglerAdapterImpl2 {
 					for(int i = 0; i < voicePlayers.length; i++) voicePlayers[i] = streamIn.readUTF();
 					for (String username : voicePlayers) {
 						// notice that literally everyone except for those already connected using voice chat will receive the request; however, ones using proximity will simply ignore it.
-						if (!voiceGains.containsKey(username)) addNearbyPlayer(username);
+						sendVoiceRequestIfNeeded(username);
 					}
 					break;
 				case VOICE_SIGNAL_ALLOWED:
@@ -2055,11 +2055,7 @@ public class EaglerAdapterImpl2 {
 					} catch (EOFException e) { // this is actually a connect ANNOUNCE, not an absolute "yes please connect" situation
 						if (enabledChannel == Voice.VoiceChannel.PROXIMITY && !nearbyPlayers.contains(peerId)) return;
 						// send request to peerId
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						DataOutputStream dos = new DataOutputStream(baos);
-						dos.write(VOICE_SIGNAL_REQUEST);
-						dos.writeUTF(peerId);
-						returnSignalHandler.accept(baos.toByteArray());
+						sendVoiceRequest(peerId);
 					}
 					break;
 				case VOICE_SIGNAL_DISCONNECT:
@@ -2100,14 +2096,23 @@ public class EaglerAdapterImpl2 {
 		recentlyNearbyPlayers.remove(username);
 		if (nearbyPlayers.add(username)) {
 			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
-			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				DataOutputStream dos = new DataOutputStream(baos);
-				dos.write(VOICE_SIGNAL_REQUEST);
-				dos.writeUTF(username);
-				returnSignalHandler.accept(baos.toByteArray());
-			} catch (IOException ignored) {  }
+			sendVoiceRequest(username);
 		}
+	}
+
+	private static final void sendVoiceRequest(String username) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(baos);
+			dos.write(VOICE_SIGNAL_REQUEST);
+			dos.writeUTF(username);
+			returnSignalHandler.accept(baos.toByteArray());
+		} catch (IOException ignored) {  }
+	}
+
+	public static final void sendVoiceRequestIfNeeded(String username) {
+		if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
+		if (!voiceGains.containsKey(username)) sendVoiceRequest(username);
 	}
 
 	private static final ExpiringSet<String> recentlyNearbyPlayers = new ExpiringSet<>(5000, new ExpiringSet.ExpiringEvent<String>() {
@@ -2134,23 +2139,20 @@ public class EaglerAdapterImpl2 {
 
 	public static final void sendInitialVoice() {
 		returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_CONNECT });
-		for (String username : nearbyPlayers) {
-			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				DataOutputStream dos = new DataOutputStream(baos);
-				dos.write(VOICE_SIGNAL_REQUEST);
-				dos.writeUTF(username);
-				returnSignalHandler.accept(baos.toByteArray());
-			} catch (IOException ignored) {  }
-		}
+		for (String username : nearbyPlayers) sendVoiceRequest(username);
 	}
 
 	public static final void enableVoice(Voice.VoiceChannel enable) {
 		if (enabledChannel == enable) return;
-		if (enabledChannel != Voice.VoiceChannel.NONE) {
+		if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
 			for (String username : nearbyPlayers) voiceClient.signalDisconnect(username, false);
 			for (String username : recentlyNearbyPlayers) voiceClient.signalDisconnect(username, false);
 			nearbyPlayers.clear();
+			recentlyNearbyPlayers.clear();
+			returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_DISCONNECT });
+		} else if(enabledChannel == Voice.VoiceChannel.GLOBAL) {
+			Set<String> antiConcurrentModificationUsernames = new HashSet<>(voiceGains.keySet());
+			for (String username : antiConcurrentModificationUsernames) voiceClient.signalDisconnect(username, false);
 			returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_DISCONNECT });
 		}
 		enabledChannel = enable;

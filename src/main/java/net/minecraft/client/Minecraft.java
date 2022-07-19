@@ -1122,23 +1122,25 @@ public class Minecraft implements Runnable {
 			if(this.currentScreen == null || !this.currentScreen.blockHotKeys()) {
 				EaglerAdapter.activateVoice(EaglerAdapter.isKeyDown(gameSettings.voicePTTKey));
 			}
-			
-			if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
-				if (this.theWorld != null && this.thePlayer != null) {
-					HashSet<String> seenPlayers = new HashSet<>();
-					for (Object playerObject : this.theWorld.playerEntities) {
-						EntityPlayer player = (EntityPlayer) playerObject;
-						if (player == this.thePlayer) continue;
-						EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
-						int prox = EaglerAdapter.getVoiceProximity();
-						// cube
-						if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
+
+			if (this.theWorld != null && this.thePlayer != null) {
+				HashSet<String> seenPlayers = new HashSet<>();
+				for (Object playerObject : this.theWorld.playerEntities) {
+					EntityPlayer player = (EntityPlayer) playerObject;
+					if (player == this.thePlayer) continue;
+					if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
+					int prox = EaglerAdapter.getVoiceProximity();
+					// cube
+					if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
+						if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
 							EaglerAdapter.addNearbyPlayer(player.username);
 							seenPlayers.add(player.username);
+						} else if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.GLOBAL) {
+							EaglerAdapter.sendVoiceRequestIfNeeded(player.username);
 						}
 					}
-					EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
 				}
+				if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
 			}
 		}
 
