@@ -56,6 +56,7 @@ public class SoundManager {
 	 */
 	public void loadSoundSettings(GameSettings par1GameSettings) {
 		this.options = par1GameSettings;
+		EaglerAdapter.setMasterVolume(options.soundVolume);
 		if(this.sounddefinitions == null) {
 			this.sounddefinitions = new HashMap();
 			try {

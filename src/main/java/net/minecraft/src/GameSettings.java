@@ -548,7 +548,6 @@ public class GameSettings {
 			}
 	
 			KeyBinding.resetKeyBindingArrayAndHash();
-			mc.sndManager.onSoundOptionsChanged();
 		}
 	}
 
