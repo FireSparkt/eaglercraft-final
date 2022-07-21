@@ -265,7 +265,7 @@ public class GuiVoiceMenu extends GuiScreen  {
 				EaglerAdapter.glPushMatrix();
 				EaglerAdapter.glTranslatef(-104.0f, 56.5f, 0.0f);
 				EaglerAdapter.glScalef(0.7f, 0.7f, 0.7f);
-				if(EaglerAdapter.isKeyDown(mc.gameSettings.voicePTTKey)) {
+				if((mc.currentScreen == null || !mc.currentScreen.blockHotKeys()) && EaglerAdapter.isKeyDown(mc.gameSettings.voicePTTKey)) {
 					EaglerAdapter.glColor4f(0.9f, 0.4f, 0.4f, 1.0f);
 					drawTexturedModalRect(0, 0, 64, 32, 16, 16);
 				}else {

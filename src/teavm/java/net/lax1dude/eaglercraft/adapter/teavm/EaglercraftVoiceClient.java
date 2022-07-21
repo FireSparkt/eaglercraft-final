@@ -10,10 +10,9 @@ public interface EaglercraftVoiceClient extends JSObject {
 	int READYSTATE_ABORTED = -1;
 	int READYSTATE_DEVICE_INITIALIZED = 1;
 
-	int TASKSTATE_NONE = -1;
-	int TASKSTATE_LOADING = 0;
-	int TASKSTATE_COMPLETE = 1;
-	int TASKSTATE_FAILED = 2;
+	int PEERSTATE_FAILED = 0;
+	int PEERSTATE_SUCCESS = 1;
+	int PEERSTATE_LOADING = 2;
 
 	boolean voiceClientSupported();
 	
@@ -34,8 +33,18 @@ public interface EaglercraftVoiceClient extends JSObject {
 	void setMicVolume(float volume);
 
 	void mutePeer(String peerId, boolean muted);
-	
-	int getTaskState();
+
+	void resetPeerStates();
+
+	int getPeerState();
+
+	int getPeerStateConnect();
+
+	int getPeerStateInitial();
+
+	int getPeerStateDesc();
+
+	int getPeerStateIce();
 	
 	int getReadyState();
 	

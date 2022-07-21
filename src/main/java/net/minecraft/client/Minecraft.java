@@ -1118,10 +1118,8 @@ public class Minecraft implements Runnable {
 		GuiMultiplayer.tickRefreshCooldown();
 		EaglerAdapter.tickVoice();
 		if (EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTING || EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTED) {
-			
-			if(this.currentScreen == null || !this.currentScreen.blockHotKeys()) {
-				EaglerAdapter.activateVoice(EaglerAdapter.isKeyDown(gameSettings.voicePTTKey));
-			}
+
+			EaglerAdapter.activateVoice((this.currentScreen == null || !this.currentScreen.blockHotKeys()) && EaglerAdapter.isKeyDown(gameSettings.voicePTTKey));
 
 			if (this.theWorld != null && this.thePlayer != null) {
 				HashSet<String> seenPlayers = new HashSet<>();

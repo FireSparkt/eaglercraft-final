@@ -16,10 +16,9 @@ window.initializeVoiceClient = (() => {
 	const READYSTATE_ABORTED = -1;
 	const READYSTATE_DEVICE_INITIALIZED = 1;
 
-	const TASKSTATE_NONE = -1;
-	const TASKSTATE_LOADING = 0;
-	const TASKSTATE_COMPLETE = 1;
-	const TASKSTATE_FAILED = 2;
+	const PEERSTATE_FAILED = 0;
+	const PEERSTATE_SUCCESS = 1;
+	const PEERSTATE_LOADING = 2;
 
 	class EaglercraftVoicePeer {
 
@@ -54,18 +53,26 @@ window.initializeVoiceClient = (() => {
 					const selfDesc = desc;
 					self.peerConnection.setLocalDescription(selfDesc, () => {
 						self.client.descriptionHandler(self.peerId, JSON.stringify(selfDesc));
+						if (self.client.peerStateInitial != PEERSTATE_SUCCESS) self.client.peerStateInitial = PEERSTATE_SUCCESS;
 					}, (err) => {
 						console.error("Failed to set local description for \"" + self.peerId + "\"! " + err);
+						if (self.client.peerStateInitial == PEERSTATE_LOADING) self.client.peerStateInitial = PEERSTATE_FAILED;
 						self.client.signalDisconnect(self.peerId);
 					});
 				}, (err) => {
 					console.error("Failed to set create offer for \"" + self.peerId + "\"! " + err);
+					if (self.client.peerStateInitial == PEERSTATE_LOADING) self.client.peerStateInitial = PEERSTATE_FAILED;
 					self.client.signalDisconnect(self.peerId);
 				});
 			}
 			
 			this.peerConnection.addEventListener("connectionstatechange", (evt) => {
 				if(evt.connectionState === 'disconnected') {
+					self.client.signalDisconnect(self.peerId);
+				} else if (evt.connectionState === 'connected') {
+					if (self.client.peerState != PEERSTATE_SUCCESS) self.client.peerState = PEERSTATE_SUCCESS;
+				} else if (evt.connectionState === 'failed') {
+					if (self.client.peerState == PEERSTATE_LOADING) self.client.peerState = PEERSTATE_FAILED;
 					self.client.signalDisconnect(self.peerId);
 				}
 			});
@@ -90,21 +97,26 @@ window.initializeVoiceClient = (() => {
 							const selfDesc = desc;
 							self.peerConnection.setLocalDescription(selfDesc, () => {
 								self.client.descriptionHandler(self.peerId, JSON.stringify(selfDesc));
+								if (self.client.peerStateDesc != PEERSTATE_SUCCESS) self.client.peerStateDesc = PEERSTATE_SUCCESS;
 							}, (err) => {
 								console.error("Failed to set local description for \"" + self.peerId + "\"! " + err);
+								if (self.client.peerStateDesc == PEERSTATE_LOADING) self.client.peerStateDesc = PEERSTATE_FAILED;
 								self.client.signalDisconnect(self.peerId);
 							});
 						}, (err) => {
 							console.error("Failed to create answer for \"" + self.peerId + "\"! " + err);
+							if (self.client.peerStateDesc == PEERSTATE_LOADING) self.client.peerStateDesc = PEERSTATE_FAILED;
 							self.client.signalDisconnect(self.peerId);
 						});
 					}
 				}, (err) => {
 					console.error("Failed to set remote description for \"" + self.peerId + "\"! " + err);
+					if (self.client.peerStateDesc == PEERSTATE_LOADING) self.client.peerStateDesc = PEERSTATE_FAILED;
 					self.client.signalDisconnect(self.peerId);
 				});
 			} catch (err) {
 				console.error("Failed to parse remote description for \"" + self.peerId + "\"! " + err);
+				if (self.client.peerStateDesc == PEERSTATE_LOADING) self.client.peerStateDesc = PEERSTATE_FAILED;
 				self.client.signalDisconnect(self.peerId);
 			}
 		}
@@ -112,9 +124,11 @@ window.initializeVoiceClient = (() => {
 		addICECandidate(candidate) {
 			try {
 				this.peerConnection.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
+				if (this.client.peerStateIce != PEERSTATE_SUCCESS) this.client.peerStateIce = PEERSTATE_SUCCESS;
 			} catch (err) {
-				console.error("Failed to parse ice candidate for \"" + self.peerId + "\"! " + err);
-				self.client.signalDisconnect(self.peerId);
+				console.error("Failed to parse ice candidate for \"" + this.peerId + "\"! " + err);
+				if (this.client.peerStateIce == PEERSTATE_LOADING) this.client.peerStateIce = PEERSTATE_FAILED;
+				this.client.signalDisconnect(this.peerId);
 			}
 		}
 
@@ -127,7 +141,11 @@ window.initializeVoiceClient = (() => {
 			this.hasInit = false;
 			this.peerList = new Map();
 			this.readyState = READYSTATE_NONE;
-			this.taskState = TASKSTATE_NONE;
+			this.peerState = PEERSTATE_LOADING;
+			this.peerStateConnect = PEERSTATE_LOADING;
+			this.peerStateInitial = PEERSTATE_LOADING;
+			this.peerStateDesc = PEERSTATE_LOADING;
+			this.peerStateIce = PEERSTATE_LOADING;
 			this.iceCandidateHandler = null;
 			this.descriptionHandler = null;
 			this.peerTrackHandler = null;
@@ -174,7 +192,6 @@ window.initializeVoiceClient = (() => {
 		
 		initializeDevices() {
 			if(!this.hasInit) {
-				this.taskState = TASKSTATE_LOADING;
 				const self = this;
 				navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then((stream) => {
 					self.microphoneVolumeAudioContext = new AudioContext();
@@ -187,16 +204,13 @@ window.initializeVoiceClient = (() => {
 					self.localMediaStreamGain.connect(self.localMediaStream);
 					self.localMediaStreamGain.gain.value = 1.0;
 					self.readyState = READYSTATE_DEVICE_INITIALIZED;
-					self.taskState = TASKSTATE_COMPLETE;
 					this.hasInit = true;
 				}).catch((err) => {
 					console.error(err);
 					self.readyState = READYSTATE_ABORTED;
-					self.taskState = TASKSTATE_FAILED;
 				});
 			}else {
-				self.readyState = READYSTATE_DEVICE_INITIALIZED;
-				self.taskState = TASKSTATE_COMPLETE;
+				this.readyState = READYSTATE_DEVICE_INITIALIZED;
 			}
 		}
 		
@@ -208,9 +222,29 @@ window.initializeVoiceClient = (() => {
 				this.localMediaStreamGain.gain.value = val * 2.0;
 			}
 		}
+		
+		resetPeerStates() {
+			this.peerState = this.peerStateConnect = this.peerStateInitial = this.peerStateDesc = this.peerStateIce = PEERSTATE_LOADING;
+		}
 
-		getTaskState() {
-			return this.taskState;
+		getPeerState() {
+			return this.peerState;
+		}
+
+		getPeerStateConnect() {
+			return this.peerStateConnect;
+		}
+
+		getPeerStateInitial() {
+			return this.peerStateInitial;
+		}
+
+		getPeerStateDesc() {
+			return this.peerStateDesc;
+		}
+
+		getPeerStateIce() {
+			return this.peerStateIce;
 		}
 
 		getReadyState() {
@@ -219,9 +253,14 @@ window.initializeVoiceClient = (() => {
 
 		signalConnect(peerId, offer) {
 			if (!this.hasInit) initializeDevices();
-			const peerConnection = new RTCPeerConnection({ iceServers: this.ICEServers, optional: [ { DtlsSrtpKeyAgreement: true } ] });
-			const peerInstance = new EaglercraftVoicePeer(this, peerId, peerConnection, offer);
-			this.peerList.set(peerId, peerInstance);
+			try {
+					const peerConnection = new RTCPeerConnection({ iceServers: this.ICEServers, optional: [ { DtlsSrtpKeyAgreement: true } ] });
+					const peerInstance = new EaglercraftVoicePeer(this, peerId, peerConnection, offer);
+					this.peerList.set(peerId, peerInstance);
+					if (this.peerStateConnect != PEERSTATE_SUCCESS) this.peerStateConnect = PEERSTATE_SUCCESS;
+			} catch (e) {
+				if (this.peerStateConnect == PEERSTATE_LOADING) this.peerStateConnect = PEERSTATE_FAILED;
+			}
 		}
 		
 		signalDescription(peerId, descJSON) {
