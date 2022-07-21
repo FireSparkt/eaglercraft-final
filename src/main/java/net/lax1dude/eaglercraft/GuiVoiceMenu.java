@@ -65,6 +65,16 @@ public class GuiVoiceMenu extends GuiScreen  {
 
 	protected GuiButton applyRadiusButton = null;
 	protected GuiButton applyVolumeButton = null;
+	protected GuiButton noticeContinueButton = null;
+	protected GuiButton noticeCancelButton = null;
+
+	protected static boolean showingCompatWarning = false;
+	protected static boolean showCompatWarning = true;
+	
+	protected static boolean showingTrackingWarning = false;
+	protected static boolean showTrackingWarning = true;
+	
+	protected static Voice.VoiceChannel continueChannel = null;
 	
 	public GuiVoiceMenu(GuiScreen parent) {
 		this.parent = parent;
@@ -93,7 +103,9 @@ public class GuiVoiceMenu extends GuiScreen  {
 		this.buttonList.clear();
 		this.buttonList.add(applyRadiusButton = new GuiButton(2, (width - 150) / 2, height / 3 + 49, 150, 20, ts.translateKey("voice.apply")));
 		this.buttonList.add(applyVolumeButton = new GuiButton(3, (width - 150) / 2, height / 3 + 90, 150, 20, ts.translateKey("voice.apply")));
-		applyRadiusButton.drawButton = applyVolumeButton.drawButton = false;
+		this.buttonList.add(noticeContinueButton = new GuiButton(5, (width - 150) / 2, height / 3 + 60, 150, 20, ts.translateKey("voice.unsupportedWarning10")));
+		this.buttonList.add(noticeCancelButton = new GuiButton(6, (width - 150) / 2, height / 3 + 90, 150, 20, ts.translateKey("voice.unsupportedWarning11")));
+		applyRadiusButton.drawButton = applyVolumeButton.drawButton = noticeContinueButton.drawButton = noticeCancelButton.drawButton = false;
 	}
 	
 	private static final TextureLocation voiceGuiIcons = new TextureLocation("/gui/voice.png");
@@ -425,7 +437,75 @@ public class GuiVoiceMenu extends GuiScreen  {
 		
 		EaglerAdapter.glPopMatrix();
 		
+		if(showingCompatWarning) {
+			
+			drawNotice(ts.translateKey("voice.unsupportedWarning1"), false, ts.translateKey("voice.unsupportedWarning2"), ts.translateKey("voice.unsupportedWarning3"),
+					"", ts.translateKey("voice.unsupportedWarning4"), ts.translateKey("voice.unsupportedWarning5"), ts.translateKey("voice.unsupportedWarning6"),
+					ts.translateKey("voice.unsupportedWarning7"), ts.translateKey("voice.unsupportedWarning8"), ts.translateKey("voice.unsupportedWarning9"));
+			
+			noticeContinueButton.drawButton = true;
+			noticeCancelButton.drawButton = false;
+		}else if(showingTrackingWarning) {
+			
+			drawNotice(ts.translateKey("voice.ipGrabWarning1"), true, ts.translateKey("voice.ipGrabWarning2"), ts.translateKey("voice.ipGrabWarning3"),
+					ts.translateKey("voice.ipGrabWarning4"), "", ts.translateKey("voice.ipGrabWarning5"), ts.translateKey("voice.ipGrabWarning6"),
+					ts.translateKey("voice.ipGrabWarning7"), ts.translateKey("voice.ipGrabWarning8"), ts.translateKey("voice.ipGrabWarning9"),
+					ts.translateKey("voice.ipGrabWarning10"), ts.translateKey("voice.ipGrabWarning11"), ts.translateKey("voice.ipGrabWarning12"));
+			
+			noticeContinueButton.drawButton = true;
+			noticeCancelButton.drawButton = true;
+		}else {
+			noticeContinueButton.drawButton = false;
+			noticeCancelButton.drawButton = false;
+		}
+		
 		super.drawScreen(mx, my, partialTicks);
+
+		if(showingCompatWarning || showingTrackingWarning) {
+			throw new AbortedException();
+		}
+	}
+	
+	private void drawNotice(String title, boolean showCancel, String... lines) {
+		
+		int widthAccum = 0;
+		
+		for(int i = 0; i < lines.length; ++i) {
+			int w = fontRenderer.getStringWidth(lines[i]);
+			if(widthAccum < w) {
+				widthAccum = w;
+			}
+		}
+		
+		int margin = 15;
+		
+		int x = (width - widthAccum) / 2;
+		int y = (height - lines.length * 10 - 60 - margin) / 2;
+
+		drawRect(x - margin - 1, y - margin - 1, x + widthAccum + margin + 1,
+				y + lines.length * 10 + 49 + margin, 0xFFCCCCCC);
+		drawRect(x - margin, y - margin, x + widthAccum + margin,
+				y + lines.length * 10 + 48 + margin, 0xFF111111);
+		
+		drawCenteredString(fontRenderer, EnumChatFormatting.BOLD + title, width / 2, y, 0xFF7766);
+		
+		for(int i = 0; i < lines.length; ++i) {
+			drawString(fontRenderer, lines[i], x, y + i * 10 + 18, 0xDDAAAA);
+		}
+		
+		if(!showCancel) {
+			noticeContinueButton.width = 150;
+			noticeContinueButton.xPosition = (width - 150) / 2;
+			noticeContinueButton.yPosition = y + lines.length * 10 + 29;
+		}else {
+			noticeContinueButton.width = widthAccum / 2 - 10;
+			noticeContinueButton.xPosition = (width - widthAccum) / 2 + widthAccum / 2 + 3;
+			noticeContinueButton.yPosition = y + lines.length * 10 + 28;
+			noticeCancelButton.width = widthAccum / 2 - 10;
+			noticeCancelButton.xPosition = (width - widthAccum) / 2 + 4;
+			noticeCancelButton.yPosition = y + lines.length * 10 + 28;
+		}
+		
 	}
 	
 	public static int attenuate(int cin, float f) {
@@ -495,7 +575,7 @@ public class GuiVoiceMenu extends GuiScreen  {
 	}
 	
 	public void mouseClicked(int mx, int my, int button) {
-		if(showSliderBlocks || showSliderVolume || showPTTKeyConfig) {
+		if(showSliderBlocks || showSliderVolume || showPTTKeyConfig || showingCompatWarning || showingTrackingWarning) {
 			if(showSliderBlocks) {
 				sliderBlocks.mousePressed(mc, mx, my);
 			}else if(showSliderVolume) {
@@ -517,11 +597,34 @@ public class GuiVoiceMenu extends GuiScreen  {
 					this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
 				}else if(mx >= voiceScreenButtonRADIUSposX && my >= voiceScreenButtonRADIUSposY && mx < voiceScreenButtonRADIUSposX +
 						voiceScreenButtonRADIUSposW && my < voiceScreenButtonRADIUSposY + voiceScreenButtonRADIUSposH) {
-					EaglerAdapter.enableVoice(Voice.VoiceChannel.PROXIMITY);
+					
+					if(showCompatWarning) {
+						continueChannel = Voice.VoiceChannel.PROXIMITY;
+						showingCompatWarning = true;
+					}else if(showTrackingWarning) {
+						continueChannel = Voice.VoiceChannel.PROXIMITY;
+						showingTrackingWarning = true;
+					}else {
+						EaglerAdapter.enableVoice(Voice.VoiceChannel.PROXIMITY);
+					}
+					
 					this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+					
 				}else if(mx >= voiceScreenButtonGLOBALposX && my >= voiceScreenButtonGLOBALposY && mx < voiceScreenButtonGLOBALposX +
 						voiceScreenButtonGLOBALposW && my < voiceScreenButtonGLOBALposY + voiceScreenButtonGLOBALposH) {
-					EaglerAdapter.enableVoice(Voice.VoiceChannel.GLOBAL);
+					
+					if(showCompatWarning) {
+						continueChannel = Voice.VoiceChannel.GLOBAL;
+						showingCompatWarning = true;
+					}else if(showTrackingWarning) {
+						continueChannel = Voice.VoiceChannel.GLOBAL;
+						showingTrackingWarning = true;
+					}else {
+						EaglerAdapter.enableVoice(Voice.VoiceChannel.GLOBAL);
+					}
+					
+					this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+					
 					this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
 				}else if(channel == Voice.VoiceChannel.PROXIMITY && status == Voice.VoiceStatus.CONNECTED && mx >= voiceScreenButtonChangeRadiusposX &&
 						my >= voiceScreenButtonChangeRadiusposY && mx < voiceScreenButtonChangeRadiusposX + voiceScreenButtonChangeRadiusposW &&
@@ -575,6 +678,25 @@ public class GuiVoiceMenu extends GuiScreen  {
 		}else if(btn.id == 4) {
 			showPTTKeyConfig = false;
 			mc.gameSettings.saveOptions();
+		}else if(btn.id == 5) {
+			if(showingCompatWarning) {
+				showingCompatWarning = false;
+				showCompatWarning = false;
+				if(showTrackingWarning) {
+					showingTrackingWarning = true;
+				}else {
+					EaglerAdapter.enableVoice(continueChannel);
+				}
+			}else if(showingTrackingWarning) {
+				showingTrackingWarning = false;
+				showTrackingWarning = false;
+				EaglerAdapter.enableVoice(continueChannel);
+			}
+		}else if(btn.id == 6) {
+			if(showingTrackingWarning) {
+				showingTrackingWarning = false;
+				EaglerAdapter.enableVoice(Voice.VoiceChannel.NONE);
+			}
 		}
 	}
 	
@@ -589,7 +711,7 @@ public class GuiVoiceMenu extends GuiScreen  {
 	}
 
 	public boolean isBlockingInput() {
-		return showSliderBlocks || showSliderVolume || showPTTKeyConfig;
+		return showSliderBlocks || showSliderVolume || showPTTKeyConfig || showingCompatWarning || showingTrackingWarning;
 	}
 		
 }

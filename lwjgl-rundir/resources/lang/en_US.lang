@@ -93,6 +93,31 @@ voice.warning1=§cWarning:§r your network does not support the STUN
 voice.warning2=connection procedure, a TURN relay will be used as
 voice.warning3=fallback, which will greatly impact the audio quality
 
+voice.unsupportedWarning1=Voice Warning
+voice.unsupportedWarning2=Your network's firewall may not support
+voice.unsupportedWarning3=eaglercraft's voice chat.
+voice.unsupportedWarning4=If your game doesn't work it's your issue
+voice.unsupportedWarning5=to solve, not ayunami2000's or lax1dude's.
+voice.unsupportedWarning6=Don't ask them to 'fix' it for you because
+voice.unsupportedWarning7=they won't help you fix a problem that only
+voice.unsupportedWarning8=you or your network's administrator has the
+voice.unsupportedWarning9=ability to correctly resolve.
+voice.unsupportedWarning10=Continue
+voice.unsupportedWarning11=Cancel
+
+voice.ipGrabWarning1=IP Logger Warning
+voice.ipGrabWarning2=Using Eaglercraft voice chat may allow your
+voice.ipGrabWarning3=IP address to be logged by other players
+voice.ipGrabWarning4=also using voice on the server.
+voice.ipGrabWarning5=This issue will not be fixed, it is an
+voice.ipGrabWarning6=internal browser issue, not a mistake in the
+voice.ipGrabWarning7=game. Fortunately, this can only be done if
+voice.ipGrabWarning8=the other player uses a hacked web browser
+voice.ipGrabWarning9=or has Wireshark to capture the voice
+voice.ipGrabWarning10=packets, as there exists no real javascript
+voice.ipGrabWarning11=method to log IPs using a normal skidded
+voice.ipGrabWarning12=eaglercraft hacked client.
+
 selectWorld.title=Select World
 selectWorld.empty=empty
 selectWorld.world=World

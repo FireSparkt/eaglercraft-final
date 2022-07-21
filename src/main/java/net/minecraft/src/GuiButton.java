@@ -6,10 +6,10 @@ import net.lax1dude.eaglercraft.TextureLocation;
 
 public class GuiButton extends Gui {
 	/** Button width in pixels */
-	protected int width;
+	public int width;
 
 	/** Button height in pixels */
-	protected int height;
+	public int height;
 
 	/** The x position of this control. */
 	public int xPosition;

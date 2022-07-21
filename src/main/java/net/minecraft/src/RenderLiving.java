@@ -385,9 +385,9 @@ public abstract class RenderLiving extends Render {
 						if(renderType == 19) {
 							EaglerAdapter.glTranslatef(0.0F, -32.0f, 0.0F);
 						}else if(DefaultSkinRenderer.isHighPoly(renderType) && Minecraft.getMinecraft().gameSettings.allowFNAWSkins) {
-							EaglerAdapter.glTranslatef(0.0F, 7.0f, 0.0F);
+							EaglerAdapter.glTranslatef(0.0F, 2.0f, 0.0F);
 							if(renderType == 37) {
-								EaglerAdapter.glTranslatef(0.0F, 28.0f, 0.0F);
+								EaglerAdapter.glTranslatef(0.0F, 30.0f, 0.0F);
 							}
 						}
 					}else {
@@ -513,7 +513,7 @@ public abstract class RenderLiving extends Render {
 						EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 						
 						EaglerAdapter.glPushMatrix();
-						EaglerAdapter.glTranslatef(-8.0f, -18.0f, 0.0f);
+						EaglerAdapter.glTranslatef(-8.0f, -18.0f + var16, 0.0f);
 						
 						EaglerAdapter.glScalef(16.0f, 16.0f, 16.0f);
 

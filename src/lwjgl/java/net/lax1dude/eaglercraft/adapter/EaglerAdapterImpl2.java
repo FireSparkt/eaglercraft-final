@@ -30,10 +30,13 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -70,6 +73,7 @@ import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.ServerQuery;
+import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.lwjgl.GameWindowListener;
@@ -1333,27 +1337,95 @@ public class EaglerAdapterImpl2 {
 			
 		});
 	}
-	private static boolean connected = false;
-	public static final void voiceConnect(String channel) {
-		connected = true;
-	}
-	public static final void voiceVolume(float volume) {
+	public static void clearVoiceAvailableStatus() {
 		
 	}
-	public static final boolean voiceActive() {
-		return connected;
+	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) {
+		
+	}
+	public static void handleVoiceSignal(byte[] data) {
+		
+	}
+	public static final boolean voiceAvailable() {
+		return true;
+	}
+	public static final boolean voiceAllowed() {
+		return true;
 	}
 	public static final boolean voiceRelayed() {
-		return connected;
+		return false;
 	}
-	public static final String[] voiceUsers() {
-		return new String[0];
+	public static final void addNearbyPlayer(String username) {
+		
 	}
-	public static final String[] voiceUsersTalking() {
-		return new String[0];
+	public static final void removeNearbyPlayer(String username) {
+		
 	}
-	public static final void voiceEnd() {
-		connected = false;
+	public static final void updateVoicePosition(String username, double x, double y, double z) {
+		
+	}
+	public static final void sendInitialVoice() {
+		
+	}
+	public static final void sendVoiceRequestIfNeeded(String str) {
+		
+	}
+	public static final void cleanupNearbyPlayers(Set<String> players) {
+		
+	}
+	private static Voice.VoiceChannel enabledChannel = Voice.VoiceChannel.NONE;
+	public static final void enableVoice(Voice.VoiceChannel enable) {
+		enabledChannel = enable;
+	}
+	public static final Voice.VoiceChannel getVoiceChannel() {
+		return enabledChannel;
+	}
+	public static final Voice.VoiceStatus getVoiceStatus() {
+		return enabledChannel == Voice.VoiceChannel.NONE ? Voice.VoiceStatus.DISCONNECTED : Voice.VoiceStatus.CONNECTED;
+	}
+	public static final void activateVoice(boolean talk) {
+		
+	}
+	private static int proximity = 16;
+	public static final void setVoiceProximity(int prox) {
+		proximity = prox;
+	}
+	public static final int getVoiceProximity() {
+		return proximity;
+	}
+	private static float volumeListen = 0.5f;
+	public static final void setVoiceListenVolume(float f) {
+		volumeListen = f;
+	}
+	public static final float getVoiceListenVolume() {
+		return volumeListen;
+	}
+	private static float volumeSpeak = 0.5f;
+	public static final void setVoiceSpeakVolume(float f) {
+		volumeSpeak = f;
+	}
+	public static final float getVoiceSpeakVolume() {
+		return volumeSpeak;
+	}
+	private static final Set<String> emptySet = new HashSet();
+	public static final Set<String> getVoiceListening() {
+		return emptySet;
+	}
+	public static final Set<String> getVoiceSpeaking() {
+		return emptySet;
+	}
+	public static final void setVoiceMuted(String username, boolean mute) {
+		
+	}
+	public static final Set<String> getVoiceMuted() {
+		return emptySet;
+	}
+	private static final List<String> emptyList = new ArrayList();
+	public static final List<String> getVoiceRecent() {
+		return emptyList;
+	}
+	public static final void tickVoice() {
+		
 	}
 	public static final void doJavascriptCoroutines() {
 		
