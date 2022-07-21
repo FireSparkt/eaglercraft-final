@@ -2223,7 +2223,7 @@ public class EaglerAdapterImpl2 {
 							panner.setOrientation(0f, 1f, 0f);
 							panner.setPosition(0, 0, 0);
 							float vol = getVoiceListenVolume();
-							panner.setMaxDistance(vol * getVoiceProximity() + 0.1f);
+							panner.setMaxDistance(vol * 2 * getVoiceProximity() + 0.1f);
 							GainNode gain = audioctx.createGain();
 							gain.getGain().setValue(vol);
 							analyser.connect(gain);
@@ -2288,6 +2288,7 @@ public class EaglerAdapterImpl2 {
 
 	private static int proximity = 16;
 	public static final void setVoiceProximity(int prox) {
+		for (PannerNode panner : voicePanners.values()) panner.setMaxDistance(getVoiceListenVolume() * 2 * prox + 0.1f);
 		proximity = prox;
 	}
 	public static final int getVoiceProximity() {
@@ -2296,12 +2297,14 @@ public class EaglerAdapterImpl2 {
 
 	private static float volumeListen = 0.5f;
 	public static final void setVoiceListenVolume(float f) {
-		for (GainNode gain : voiceGains.values()) {
+		for (String username : voiceGains.keySet()) {
+			GainNode gain = voiceGains.get(username);
 			float val = f;
 			if(val > 0.5f) val = 0.5f + (val - 0.5f) * 3.0f;
 			if(val > 2.0f) val = 2.0f;
 			if(val < 0.0f) val = 0.0f;
 			gain.getGain().setValue(val * 2.0f);
+			if (voicePanners.containsKey(username)) voicePanners.get(username).setMaxDistance(f * 2 * getVoiceProximity() + 0.1f);
 		}
 		volumeListen = f;
 	}
