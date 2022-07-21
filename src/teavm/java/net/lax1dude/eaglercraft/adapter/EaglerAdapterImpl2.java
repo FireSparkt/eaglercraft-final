@@ -326,6 +326,9 @@ public class EaglerAdapterImpl2 {
 		}
 		
 		audioctx = AudioContext.create();
+		masterVolumeNode = audioctx.createGain();
+		masterVolumeNode.getGain().setValue(1.0f);
+		masterVolumeNode.connect(audioctx.getDestination());
 		
 		mouseEvents.clear();
 		keyEvents.clear();
@@ -1053,7 +1056,7 @@ public class EaglerAdapterImpl2 {
 		currentVideoAudioSource = audioctx.createMediaElementSource(currentVideo);
 		
 		if(currentVideoAudioGainValue < 0.0f) {
-			currentVideoAudioSource.connect(audioctx.getDestination());
+			currentVideoAudioSource.connect(masterVolumeNode);
 		}else {
 			if(currentVideoAudioGain == null) {
 				currentVideoAudioGain = audioctx.createGain();
@@ -1151,7 +1154,7 @@ public class EaglerAdapterImpl2 {
 		if(v < 0.0f) {
 			if(currentVideoAudioGainValue >= 0.0f && currentVideoAudioSource != null) {
 				currentVideoAudioSource.disconnect();
-				currentVideoAudioSource.connect(audioctx.getDestination());
+				currentVideoAudioSource.connect(masterVolumeNode);
 			}
 			currentVideoAudioGainValue = v;
 		}else {
@@ -1848,10 +1851,15 @@ public class EaglerAdapterImpl2 {
 	private static int playbackId = 0;
 	private static final HashMap<String,AudioBufferX> loadedSoundFiles = new HashMap();
 	private static AudioContext audioctx = null;
+	private static GainNode masterVolumeNode = null;
 	private static float playbackOffsetDelay = 0.03f;
 	
 	public static final void setPlaybackOffsetDelay(float f) {
 		playbackOffsetDelay = f;
+	}
+	
+	public static final void setMasterVolume(float f) {
+		masterVolumeNode.getGain().setValue(f);
 	}
 	
 	@Async
@@ -1924,7 +1932,7 @@ public class EaglerAdapterImpl2 {
 		g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
 		s.connect(g);
 		g.connect(p);
-		p.connect(audioctx.getDestination());
+		p.connect(masterVolumeNode);
 		s.start(0.0d, playbackOffsetDelay);
 		final int theId = ++playbackId;
 		activeSoundEffects.put(theId, new AudioBufferSourceNodeX(s, p, g));
@@ -1947,7 +1955,7 @@ public class EaglerAdapterImpl2 {
 		GainNode g = audioctx.createGain();
 		g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
 		s.connect(g);
-		g.connect(audioctx.getDestination());
+		g.connect(masterVolumeNode);
 		s.start(0.0d, playbackOffsetDelay);
 		final int theId = ++playbackId;
 		activeSoundEffects.put(theId, new AudioBufferSourceNodeX(s, null, g));

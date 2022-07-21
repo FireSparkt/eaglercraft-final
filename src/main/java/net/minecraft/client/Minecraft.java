@@ -1127,7 +1127,7 @@ public class Minecraft implements Runnable {
 					EntityPlayer player = (EntityPlayer) playerObject;
 					if (player == this.thePlayer) continue;
 					if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
-					int prox = EaglerAdapter.getVoiceProximity();
+					int prox = 22;
 					// cube
 					if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
 						if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
