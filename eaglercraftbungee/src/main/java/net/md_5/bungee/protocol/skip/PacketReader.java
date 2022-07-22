@@ -4,10 +4,11 @@
 
 package net.md_5.bungee.protocol.skip;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.OpCode;
-import java.util.List;
-import java.util.ArrayList;
 import net.md_5.bungee.protocol.Protocol;
 
 public class PacketReader {

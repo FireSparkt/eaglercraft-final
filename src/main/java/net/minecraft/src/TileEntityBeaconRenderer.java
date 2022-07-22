@@ -1,10 +1,8 @@
 package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.minecraft.client.Minecraft;
 
 public class TileEntityBeaconRenderer extends TileEntitySpecialRenderer {
 	

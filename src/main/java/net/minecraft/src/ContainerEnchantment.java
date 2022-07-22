@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import java.util.List;
-
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 
 public class ContainerEnchantment extends Container {

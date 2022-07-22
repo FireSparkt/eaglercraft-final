@@ -5,12 +5,13 @@
 package net.md_5.bungee.netty;
 
 import java.beans.ConstructorProperties;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import io.netty.channel.MessageList;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.md_5.bungee.protocol.Protocol;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.ReplayingDecoder;
+import net.md_5.bungee.protocol.Protocol;
+import net.md_5.bungee.protocol.packet.DefinedPacket;
 
 public class PacketDecoder extends ReplayingDecoder<Void> {
 	private Protocol protocol;

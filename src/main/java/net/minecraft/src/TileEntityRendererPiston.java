@@ -1,9 +1,9 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
 
 public class TileEntityRendererPiston extends TileEntitySpecialRenderer {
 	/** instance of RenderBlocks used to draw the piston base and extension. */

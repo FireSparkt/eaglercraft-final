@@ -2,9 +2,10 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiParticle extends Gui {
 	private List particles = new ArrayList();

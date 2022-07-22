@@ -3,14 +3,13 @@ package net.minecraft.src;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.EffectPipelineFXAA;
+import net.minecraft.client.Minecraft;
 
 public class EntityRenderer {
 	public static boolean anaglyphEnable = false;

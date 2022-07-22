@@ -4,14 +4,15 @@
 
 package net.md_5.bungee.reconnect;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Level;
+
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.DriverManager;
-import java.sql.Connection;
 
 public class SQLReconnectHandler extends AbstractReconnectManager {
 	private final Connection connection;

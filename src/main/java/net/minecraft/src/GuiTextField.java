@@ -1,7 +1,6 @@
 package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 
 public class GuiTextField extends Gui {

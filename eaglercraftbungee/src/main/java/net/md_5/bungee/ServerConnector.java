@@ -5,50 +5,48 @@
 package net.md_5.bungee;
 
 import java.beans.ConstructorProperties;
-import com.google.common.io.ByteArrayDataInput;
-import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.event.ServerKickEvent;
-import java.util.Objects;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
-import net.md_5.bungee.netty.CipherDecoder;
-import javax.crypto.Cipher;
 import java.security.PublicKey;
-import io.netty.channel.ChannelHandler;
-import net.md_5.bungee.netty.CipherEncoder;
-import net.md_5.bungee.netty.PipelineUtils;
-import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
-import java.security.Key;
-import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
-import net.md_5.bungee.api.score.Scoreboard;
-import java.util.Iterator;
+import java.util.Objects;
 import java.util.Queue;
-import net.md_5.bungee.connection.CancelSendSignal;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
-import net.md_5.bungee.connection.DownstreamBridge;
-import net.md_5.bungee.netty.HandlerBoss;
-import net.md_5.bungee.protocol.packet.Packet9Respawn;
-import net.md_5.bungee.protocol.packet.PacketD1Team;
-import net.md_5.bungee.api.score.Team;
-import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
-import net.md_5.bungee.api.score.Objective;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.protocol.packet.forge.Forge1Login;
-import net.md_5.bungee.protocol.Forge;
-import net.md_5.bungee.netty.PacketDecoder;
-import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import com.google.common.base.Preconditions;
-import net.md_5.bungee.protocol.packet.Packet1Login;
-import com.google.common.io.ByteArrayDataOutput;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import com.google.common.io.ByteStreams;
-import net.md_5.bungee.api.ChatColor;
+
+import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
-import net.md_5.bungee.netty.ChannelWrapper;
+
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+
+import io.netty.channel.ChannelHandler;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerKickEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.score.Objective;
+import net.md_5.bungee.api.score.Scoreboard;
+import net.md_5.bungee.api.score.Team;
+import net.md_5.bungee.connection.CancelSendSignal;
+import net.md_5.bungee.connection.DownstreamBridge;
+import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.netty.CipherDecoder;
+import net.md_5.bungee.netty.CipherEncoder;
+import net.md_5.bungee.netty.HandlerBoss;
+import net.md_5.bungee.netty.PacketDecoder;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.netty.PipelineUtils;
+import net.md_5.bungee.protocol.Forge;
+import net.md_5.bungee.protocol.packet.DefinedPacket;
+import net.md_5.bungee.protocol.packet.Packet1Login;
+import net.md_5.bungee.protocol.packet.Packet9Respawn;
+import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
+import net.md_5.bungee.protocol.packet.PacketD1Team;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
+import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
+import net.md_5.bungee.protocol.packet.forge.Forge1Login;
 
 public class ServerConnector extends PacketHandler
 {

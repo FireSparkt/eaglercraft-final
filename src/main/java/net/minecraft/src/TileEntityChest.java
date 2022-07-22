@@ -1,8 +1,5 @@
 package net.minecraft.src;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class TileEntityChest extends TileEntity implements IInventory {
 	private ItemStack[] chestContents = new ItemStack[36];
 

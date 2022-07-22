@@ -5,9 +5,9 @@
 package net.md_5.bungee.api.score;
 
 import java.beans.ConstructorProperties;
-import java.util.HashSet;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Team {

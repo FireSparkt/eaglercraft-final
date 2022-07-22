@@ -1,9 +1,5 @@
 package net.minecraft.src;
 
-import java.util.List;
-
-
-
 public class EntityBoat extends Entity {
 	private boolean field_70279_a;
 	private double speedMultiplier;

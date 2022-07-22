@@ -4,13 +4,12 @@
 
 package net.md_5.bungee.log;
 
-import java.io.Writer;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.LogRecord;
-import java.text.SimpleDateFormat;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 public class ConciseFormatter extends Formatter {
 	private final DateFormat date;

@@ -5,6 +5,7 @@
 package net.md_5.bungee.api.scheduler;
 
 import java.util.concurrent.TimeUnit;
+
 import net.md_5.bungee.api.plugin.Plugin;
 
 public interface ScheduledTask {

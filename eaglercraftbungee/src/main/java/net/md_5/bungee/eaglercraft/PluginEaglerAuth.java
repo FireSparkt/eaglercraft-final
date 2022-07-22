@@ -3,7 +3,6 @@ package net.md_5.bungee.eaglercraft;
 import java.util.Collections;
 import java.util.HashSet;
 
-import net.md_5.bungee.PacketConstants;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -11,8 +10,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.protocol.packet.Packet1Login;
-import net.md_5.bungee.protocol.packet.Packet9Respawn;
 
 public class PluginEaglerAuth extends Plugin implements Listener {
 	

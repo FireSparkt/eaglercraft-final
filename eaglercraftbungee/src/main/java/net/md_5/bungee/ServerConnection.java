@@ -7,12 +7,13 @@ package net.md_5.bungee;
 import java.beans.ConstructorProperties;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
+
+import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
 
 public class ServerConnection implements Server {
 	private final ChannelWrapper ch;

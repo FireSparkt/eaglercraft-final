@@ -3,7 +3,6 @@ package net.minecraft.src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
 import java.util.IllegalFormatException;
 import java.util.Properties;
 import java.util.TreeMap;

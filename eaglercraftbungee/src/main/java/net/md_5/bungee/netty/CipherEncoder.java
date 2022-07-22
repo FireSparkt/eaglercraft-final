@@ -4,9 +4,10 @@
 
 package net.md_5.bungee.netty;
 
-import io.netty.channel.ChannelHandlerContext;
 import javax.crypto.Cipher;
+
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 public class CipherEncoder extends MessageToByteEncoder<ByteBuf> {

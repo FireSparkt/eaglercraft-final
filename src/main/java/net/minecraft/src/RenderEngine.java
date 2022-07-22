@@ -1,18 +1,16 @@
 package net.minecraft.src;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.TextureTerrainMap;
+import net.minecraft.client.Minecraft;
 
 public class RenderEngine {
 	private HashMap textureMap = new HashMap();

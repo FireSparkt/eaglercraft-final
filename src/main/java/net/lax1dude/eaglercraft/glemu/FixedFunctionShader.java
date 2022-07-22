@@ -1,11 +1,48 @@
 package net.lax1dude.eaglercraft.glemu;
 
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_VERTEX_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wgetShaderHeader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglAttachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindAttributeLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCompileShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDetachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramLinked;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderCompiled;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglLinkProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglShaderSource;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1i;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform2f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform3f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform4f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniformMat4fv;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUseProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.fileContents;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferArrayGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ShaderGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.UniformGL;
 import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector2f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
-
-import static net.lax1dude.eaglercraft.glemu.EaglerAdapterGL30.*;
 
 public class FixedFunctionShader {
 	

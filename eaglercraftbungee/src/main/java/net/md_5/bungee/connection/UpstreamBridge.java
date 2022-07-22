@@ -4,25 +4,21 @@
 
 package net.md_5.bungee.connection;
 
-import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.protocol.packet.PacketCCSettings;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.api.event.ChatEvent;
-import net.md_5.bungee.protocol.packet.Packet3Chat;
-import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
-import net.md_5.bungee.EntityMap;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.Util;
-import net.md_5.bungee.api.config.TexturePackInfo;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.EntityMap;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.TexturePackInfo;
+import net.md_5.bungee.api.event.ChatEvent;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
+import net.md_5.bungee.protocol.packet.Packet3Chat;
+import net.md_5.bungee.protocol.packet.PacketCCSettings;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
 
 public class UpstreamBridge extends PacketHandler {
 	private final ProxyServer bungee;

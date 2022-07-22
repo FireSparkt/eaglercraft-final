@@ -1,7 +1,6 @@
 package net.md_5.bungee.command;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;

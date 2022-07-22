@@ -1,8 +1,5 @@
 package net.minecraft.src;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class TileEntityBeacon extends TileEntity implements IInventory {
 	/** List of effects that Beacon can apply */
 	public static final Potion[][] effectsList = new Potion[][] { { Potion.moveSpeed, Potion.digSpeed }, { Potion.resistance, Potion.jump }, { Potion.damageBoost }, { Potion.regeneration } };

@@ -1,8 +1,8 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiButtonLanguage extends GuiButton {
 	public GuiButtonLanguage(int par1, int par2, int par3) {

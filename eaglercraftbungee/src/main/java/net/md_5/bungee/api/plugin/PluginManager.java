@@ -5,36 +5,35 @@
 package net.md_5.bungee.api.plugin;
 
 import java.beans.ConstructorProperties;
-import java.lang.reflect.Method;
-import java.io.InputStream;
-import java.util.jar.JarEntry;
-import java.util.zip.ZipEntry;
-import java.util.jar.JarFile;
-import com.google.common.base.Preconditions;
 import java.io.File;
-import java.net.URLClassLoader;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.Collection;
-import java.util.logging.Level;
-
-import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.api.ChatColor;
-import java.util.Arrays;
-import net.md_5.bungee.api.CommandSender;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import net.md_5.bungee.event.EventHandler;
-import com.google.common.eventbus.Subscribe;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.md_5.bungee.event.EventBus;
+import java.util.Stack;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
 import org.yaml.snakeyaml.Yaml;
+
+import com.google.common.base.Preconditions;
+import com.google.common.eventbus.Subscribe;
+
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.command.ConsoleCommandSender;
-
-import java.util.regex.Pattern;
+import net.md_5.bungee.event.EventBus;
+import net.md_5.bungee.event.EventHandler;
 
 public class PluginManager {
 	private static final Pattern argsSplit;

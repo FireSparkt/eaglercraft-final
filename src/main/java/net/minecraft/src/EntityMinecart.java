@@ -1,9 +1,5 @@
 package net.minecraft.src;
 
-import java.util.List;
-
-
-
 public abstract class EntityMinecart extends Entity {
 	private boolean isInReverse;
 	private IUpdatePlayerListBox field_82344_g;

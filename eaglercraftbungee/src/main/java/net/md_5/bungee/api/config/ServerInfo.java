@@ -4,12 +4,13 @@
 
 package net.md_5.bungee.api.config;
 
-import net.md_5.bungee.api.ServerPing;
+import java.net.InetSocketAddress;
+import java.util.Collection;
+
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import java.util.Collection;
-import java.net.InetSocketAddress;
 
 public interface ServerInfo {
 	String getName();

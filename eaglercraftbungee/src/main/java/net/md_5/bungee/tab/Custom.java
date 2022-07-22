@@ -4,14 +4,16 @@
 
 package net.md_5.bungee.tab;
 
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
-import net.md_5.bungee.api.ChatColor;
-import com.google.common.base.Preconditions;
-import java.util.HashSet;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.Collection;
+import java.util.HashSet;
+
+import com.google.common.base.Preconditions;
+
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.tab.CustomTabList;
 import net.md_5.bungee.api.tab.TabListAdapter;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 
 public class Custom extends TabListAdapter implements CustomTabList {
 	private static final int ROWS = 20;

@@ -5,10 +5,10 @@
 package net.md_5.bungee.log;
 
 import java.beans.ConstructorProperties;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.ByteArrayOutputStream;
 
 public class LoggingOutputStream extends ByteArrayOutputStream {
 	private static final String separator;

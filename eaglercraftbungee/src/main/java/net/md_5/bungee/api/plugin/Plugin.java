@@ -4,9 +4,10 @@
 
 package net.md_5.bungee.api.plugin;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.logging.Logger;
-import java.io.File;
+
 import net.md_5.bungee.api.ProxyServer;
 
 public class Plugin {

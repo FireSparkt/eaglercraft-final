@@ -5,13 +5,12 @@
 package net.md_5.bungee.api.config;
 
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.util.Map;
 
 import net.md_5.bungee.api.ServerIcon;
 import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.eaglercraft.WebSocketRateLimiter;
-
-import java.util.Map;
-import java.net.InetSocketAddress;
 
 public class ListenerInfo {
 	private final String hostString;

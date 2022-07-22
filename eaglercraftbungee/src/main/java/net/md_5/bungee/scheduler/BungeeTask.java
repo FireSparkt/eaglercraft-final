@@ -5,8 +5,9 @@
 package net.md_5.bungee.scheduler;
 
 import java.beans.ConstructorProperties;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 

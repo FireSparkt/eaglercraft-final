@@ -5,18 +5,18 @@
 package net.md_5.bungee.netty;
 
 import java.io.IOException;
-import io.netty.handler.timeout.ReadTimeoutException;
-import java.util.Iterator;
-import net.md_5.bungee.connection.CancelSendSignal;
-import net.md_5.bungee.protocol.packet.AbstractPacketHandler;
-import io.netty.channel.MessageList;
 import java.util.logging.Level;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.connection.PingHandler;
-import net.md_5.bungee.connection.InitialHandler;
-import io.netty.channel.ChannelHandlerContext;
+
 import com.google.common.base.Preconditions;
+
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
+import io.netty.handler.timeout.ReadTimeoutException;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.connection.CancelSendSignal;
+import net.md_5.bungee.connection.InitialHandler;
+import net.md_5.bungee.connection.PingHandler;
 
 public class HandlerBoss extends ChannelInboundHandlerAdapter {
 	private ChannelWrapper channel;

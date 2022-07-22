@@ -4,11 +4,10 @@
 
 package net.md_5.bungee.api.plugin;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.net.URL;
-import java.util.Set;
 import java.net.URLClassLoader;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PluginClassloader extends URLClassLoader {
 	private static final Set<PluginClassloader> allLoaders;

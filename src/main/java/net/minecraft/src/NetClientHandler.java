@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import net.lax1dude.eaglercraft.*;
+import net.lax1dude.eaglercraft.DefaultSkinRenderer;
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.WebsocketNetworkManager;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
 

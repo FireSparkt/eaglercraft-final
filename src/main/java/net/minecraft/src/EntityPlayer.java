@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
-
 import net.minecraft.client.Minecraft;
 
 public abstract class EntityPlayer extends EntityLiving implements ICommandSender {

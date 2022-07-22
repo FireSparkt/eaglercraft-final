@@ -1,9 +1,5 @@
 package net.minecraft.src;
 
-import java.util.List;
-
-
-
 public abstract class EntityThrowable extends Entity implements IProjectile {
 	private int xTile = -1;
 	private int yTile = -1;

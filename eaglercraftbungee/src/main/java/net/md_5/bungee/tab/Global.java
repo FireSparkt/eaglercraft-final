@@ -4,13 +4,11 @@
 
 package net.md_5.bungee.tab;
 
-import java.util.Iterator;
 import net.md_5.bungee.BungeeCord;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.tab.TabListAdapter;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 
 public class Global extends TabListAdapter {
 	private boolean sentPing;

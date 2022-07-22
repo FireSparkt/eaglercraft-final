@@ -4,24 +4,24 @@
 
 package net.md_5.bungee.netty;
 
-import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.protocol.Vanilla;
-import io.netty.channel.ChannelHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.BungeeCord;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelOption;
-import net.md_5.bungee.ServerConnector;
-import net.md_5.bungee.connection.InitialHandler;
-import net.md_5.bungee.api.ProxyServer;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
+
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import net.md_5.bungee.BungeeServerInfo;
-import net.md_5.bungee.UserConnection;
-import net.md_5.bungee.api.config.ListenerInfo;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.BungeeServerInfo;
+import net.md_5.bungee.ServerConnector;
+import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.connection.InitialHandler;
+import net.md_5.bungee.protocol.Vanilla;
 
 public class PipelineUtils {
 	public static final AttributeKey<ListenerInfo> LISTENER;

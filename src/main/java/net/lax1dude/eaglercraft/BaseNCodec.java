@@ -3,8 +3,6 @@ package net.lax1dude.eaglercraft;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import net.lax1dude.eaglercraft.BaseNCodec.CodecPolicy;
-
 public abstract class BaseNCodec {
 	
     static enum CodecPolicy {

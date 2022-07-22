@@ -5,10 +5,12 @@
 package net.md_5.bungee.netty;
 
 import java.beans.ConstructorProperties;
-import javax.crypto.ShortBufferException;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.buffer.ByteBuf;
+
 import javax.crypto.Cipher;
+import javax.crypto.ShortBufferException;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 public class CipherBase {
 	private final Cipher cipher;

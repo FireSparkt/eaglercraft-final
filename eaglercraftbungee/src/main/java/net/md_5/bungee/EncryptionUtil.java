@@ -4,22 +4,24 @@
 
 package net.md_5.bungee;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.KeyPairGenerator;
-import java.security.spec.X509EncodedKeySpec;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Arrays;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
+import java.util.Random;
+
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
 import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
-import javax.crypto.SecretKey;
-import java.security.KeyPair;
-import java.util.Random;
 
 public class EncryptionUtil
 {

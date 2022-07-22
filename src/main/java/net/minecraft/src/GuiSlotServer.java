@@ -1,9 +1,9 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
 
 class GuiSlotServer extends GuiSlot {
 	/** Instance to the GUI this list is on. */

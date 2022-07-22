@@ -4,10 +4,10 @@
 
 package net.md_5.bungee.protocol;
 
-import net.md_5.bungee.protocol.packet.DefinedPacket;
 import io.netty.buffer.ByteBuf;
-import net.md_5.bungee.protocol.skip.PacketReader;
+import net.md_5.bungee.protocol.packet.DefinedPacket;
 import net.md_5.bungee.protocol.packet.forge.Forge1Login;
+import net.md_5.bungee.protocol.skip.PacketReader;
 
 public class Forge extends Vanilla {
 	private static final Forge instance;

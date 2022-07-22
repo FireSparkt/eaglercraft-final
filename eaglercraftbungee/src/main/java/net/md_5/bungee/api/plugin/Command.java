@@ -5,8 +5,10 @@
 package net.md_5.bungee.api.plugin;
 
 import java.util.Arrays;
-import net.md_5.bungee.api.CommandSender;
+
 import com.google.common.base.Preconditions;
+
+import net.md_5.bungee.api.CommandSender;
 
 public abstract class Command {
 	private final String name;

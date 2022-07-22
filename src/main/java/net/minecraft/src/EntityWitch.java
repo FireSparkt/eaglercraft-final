@@ -1,8 +1,5 @@
 package net.minecraft.src;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/** List of items a witch should drop on death. */
 	private static final int[] witchDrops = new int[] { Item.lightStoneDust.itemID, Item.sugar.itemID, Item.redstone.itemID, Item.spiderEye.itemID, Item.glassBottle.itemID, Item.gunpowder.itemID, Item.stick.itemID, Item.stick.itemID };

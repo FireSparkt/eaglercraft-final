@@ -1,8 +1,8 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiAchievement extends Gui {
 	/** Holds the instance of the game (Minecraft) */

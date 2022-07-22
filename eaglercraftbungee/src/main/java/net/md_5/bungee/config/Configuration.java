@@ -4,18 +4,20 @@
 
 package net.md_5.bungee.config;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+
+import com.google.common.base.Preconditions;
+
+import gnu.trove.map.TMap;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.AuthServiceInfo;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
-import java.util.Map;
-import net.md_5.bungee.util.CaseInsensitiveMap;
-import com.google.common.base.Preconditions;
-import net.md_5.bungee.api.ProxyServer;
-import java.util.UUID;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.eaglercraft.EaglercraftBungee;
-import gnu.trove.map.TMap;
-import net.md_5.bungee.api.config.ListenerInfo;
-import java.util.Collection;
+import net.md_5.bungee.util.CaseInsensitiveMap;
 
 public class Configuration {
 	private int timeout;

@@ -4,8 +4,9 @@
 
 package net.md_5.bungee.api.connection;
 
-import net.md_5.bungee.protocol.packet.DefinedPacket;
 import java.net.InetSocketAddress;
+
+import net.md_5.bungee.protocol.packet.DefinedPacket;
 
 public interface Connection {
 	InetSocketAddress getAddress();

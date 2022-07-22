@@ -1,7 +1,5 @@
 package net.minecraft.src;
 
-import java.util.List;
-
 public class EntityLightningBolt extends EntityWeatherEffect {
 	/**
 	 * Declares which state the lightning bolt is in. Whether it's in the air, hit

@@ -1,10 +1,5 @@
 package net.minecraft.src;
 
-import java.util.Iterator;
-import java.util.List;
-
-
-
 public class EntityPotion extends EntityThrowable {
 	/**
 	 * The damage value of the thrown potion that this EntityPotion represents.

@@ -4,43 +4,42 @@
 
 package net.md_5.bungee.config;
 
-import net.md_5.bungee.tab.ServerUnique;
-import net.md_5.bungee.tab.GlobalPing;
-import net.md_5.bungee.tab.Global;
-import net.md_5.bungee.api.tab.TabListHandler;
-import net.md_5.bungee.eaglercraft.WebSocketRateLimiter;
-import net.md_5.bungee.api.config.TexturePackInfo;
-import net.md_5.bungee.api.ChatColor;
-import java.util.HashSet;
-import net.md_5.bungee.api.config.ListenerInfo;
-import net.md_5.bungee.api.config.MOTDCacheConfiguration;
-
-import java.util.Collection;
-import java.net.InetSocketAddress;
-import net.md_5.bungee.Util;
-import net.md_5.bungee.api.config.ServerInfo;
-import java.util.logging.Level;
-import net.md_5.bungee.api.ProxyServer;
-import java.io.Writer;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.util.LinkedHashMap;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
+import java.io.Writer;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.io.IOException;
-import net.md_5.bungee.util.CaseInsensitiveMap;
-import java.io.FileInputStream;
-import org.yaml.snakeyaml.DumperOptions;
-import java.io.File;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import net.md_5.bungee.Util;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.AuthServiceInfo;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
+import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.MOTDCacheConfiguration;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.config.TexturePackInfo;
+import net.md_5.bungee.api.tab.TabListHandler;
+import net.md_5.bungee.eaglercraft.WebSocketRateLimiter;
+import net.md_5.bungee.tab.Global;
+import net.md_5.bungee.tab.GlobalPing;
+import net.md_5.bungee.tab.ServerUnique;
+import net.md_5.bungee.util.CaseInsensitiveMap;
 
 public class YamlConfig implements ConfigurationAdapter {
 	private Yaml yaml;

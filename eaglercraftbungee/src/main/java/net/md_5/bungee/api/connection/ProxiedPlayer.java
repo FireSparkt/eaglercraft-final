@@ -4,10 +4,10 @@
 
 package net.md_5.bungee.api.connection;
 
-import net.md_5.bungee.api.tab.TabListHandler;
-import net.md_5.bungee.api.config.TexturePackInfo;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.config.TexturePackInfo;
+import net.md_5.bungee.api.tab.TabListHandler;
 
 public interface ProxiedPlayer extends Connection, CommandSender {
 	String getDisplayName();

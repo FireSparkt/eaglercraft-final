@@ -4,28 +4,29 @@
 
 package net.md_5.bungee.protocol;
 
-import java.lang.reflect.InvocationTargetException;
-import io.netty.buffer.ByteBuf;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
-import net.md_5.bungee.protocol.packet.PacketFEPing;
-import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
-import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.protocol.packet.PacketD1Team;
-import net.md_5.bungee.protocol.packet.PacketD0DisplayScoreboard;
-import net.md_5.bungee.protocol.packet.PacketCFScoreboardScore;
-import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
-import net.md_5.bungee.protocol.packet.PacketCDClientStatus;
-import net.md_5.bungee.protocol.packet.PacketCCSettings;
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
-import net.md_5.bungee.protocol.packet.Packet9Respawn;
-import net.md_5.bungee.protocol.packet.Packet3Chat;
-import net.md_5.bungee.protocol.packet.Packet2Handshake;
-import net.md_5.bungee.protocol.packet.Packet1Login;
-import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
-import net.md_5.bungee.protocol.skip.PacketReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.packet.DefinedPacket;
+import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
+import net.md_5.bungee.protocol.packet.Packet1Login;
+import net.md_5.bungee.protocol.packet.Packet2Handshake;
+import net.md_5.bungee.protocol.packet.Packet3Chat;
+import net.md_5.bungee.protocol.packet.Packet9Respawn;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
+import net.md_5.bungee.protocol.packet.PacketCCSettings;
+import net.md_5.bungee.protocol.packet.PacketCDClientStatus;
+import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
+import net.md_5.bungee.protocol.packet.PacketCFScoreboardScore;
+import net.md_5.bungee.protocol.packet.PacketD0DisplayScoreboard;
+import net.md_5.bungee.protocol.packet.PacketD1Team;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
+import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
+import net.md_5.bungee.protocol.packet.PacketFEPing;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
+import net.md_5.bungee.protocol.skip.PacketReader;
 
 public class Vanilla implements Protocol {
 	public static final byte PROTOCOL_VERSION = 61;

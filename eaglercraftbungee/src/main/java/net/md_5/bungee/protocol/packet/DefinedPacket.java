@@ -5,6 +5,7 @@
 package net.md_5.bungee.protocol.packet;
 
 import java.beans.ConstructorProperties;
+
 import io.netty.buffer.ByteBuf;
 
 public abstract class DefinedPacket {

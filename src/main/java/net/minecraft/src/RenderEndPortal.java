@@ -1,11 +1,12 @@
 package net.minecraft.src;
 
 import java.nio.FloatBuffer;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
 
 public class RenderEndPortal extends TileEntitySpecialRenderer {
 	FloatBuffer field_76908_a = GLAllocation.createDirectFloatBuffer(16);

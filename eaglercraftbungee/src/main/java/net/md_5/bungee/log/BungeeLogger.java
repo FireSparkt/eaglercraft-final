@@ -4,13 +4,13 @@
 
 package net.md_5.bungee.log;
 
-import java.util.logging.LogRecord;
 import java.io.IOException;
-import java.util.logging.Handler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
-import net.md_5.bungee.BungeeCord;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import net.md_5.bungee.BungeeCord;
 
 public class BungeeLogger extends Logger {
 	private final BungeeCord bungee;

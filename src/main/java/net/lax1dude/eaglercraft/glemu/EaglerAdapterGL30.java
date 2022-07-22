@@ -8,7 +8,6 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2;
 import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector3f;

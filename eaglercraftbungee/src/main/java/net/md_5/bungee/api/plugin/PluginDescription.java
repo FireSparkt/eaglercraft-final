@@ -5,8 +5,8 @@
 package net.md_5.bungee.api.plugin;
 
 import java.beans.ConstructorProperties;
-import java.util.HashSet;
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
 public class PluginDescription {
