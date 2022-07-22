@@ -274,13 +274,12 @@ public class BungeeCord extends ProxyServer {
 		for (final ListenerInfo info : this.config.getListeners()) {
 			InetSocketAddress sock = info.getHost();
 			if(info.isWebsocket()) {
-				int port = 0;
 				try {
 					ServerSocket s = new ServerSocket(0, 0, InetAddress.getByName("127.11.0.1"));
 					sock = new InetSocketAddress("127.11.0.1", s.getLocalPort());
 					s.close();
 				} catch(IOException e) {
-					port = (int) (System.nanoTime() % 64000L + 1025L);
+					sock = new InetSocketAddress("127.11.0.1",(int) (System.nanoTime() % 64000L + 1025L));
 				}
 				try {
 					this.wsListeners.add(new WebSocketListener(info, sock, this));

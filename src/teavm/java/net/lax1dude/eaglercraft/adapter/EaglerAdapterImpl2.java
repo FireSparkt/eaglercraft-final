@@ -2046,7 +2046,7 @@ public class EaglerAdapterImpl2 {
 					}
 					break;
 				case VOICE_SIGNAL_ALLOWED:
-					voiceAvailableStat = streamIn.readBoolean();
+					voiceAvailableStat = streamIn.read() == 1;
 					String[] servs = new String[streamIn.read()];
 					for(int i = 0; i < servs.length; i++) {
 						servs[i] = streamIn.readUTF();
