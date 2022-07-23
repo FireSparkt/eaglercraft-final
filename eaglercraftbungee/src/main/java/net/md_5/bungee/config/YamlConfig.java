@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -301,6 +302,12 @@ public class YamlConfig implements ConfigurationAdapter {
 			c.add("https://g.lax1dude.net/eaglercraft/origin_blacklist.txt");
 			c.add("https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt");
 			c = this.get("origin_blacklist_subscriptions", c);
+		}else {
+			if(c.remove("https://g.eags.us/eaglercraft/origin_blacklist.txt")) {
+				c.add("https://g.lax1dude.net/eaglercraft/origin_blacklist.txt");
+				this.save();
+				BungeeCord.getInstance().getLogger().warning("Your origin blacklist has been patched to use g.lax1dude.net instead");
+			}
 		}
 		return c;
 	}
