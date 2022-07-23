@@ -908,7 +908,9 @@ public class EntityRenderer {
 		EffectPipelineFXAA.displayWidth = this.mc.displayWidth;
 		EffectPipelineFXAA.displayHeight = this.mc.displayHeight;
 		EffectPipelineFXAA.beginPipelineRender();
-
+		
+		RenderManager.instance.voiceTagsDrawnThisFrame.clear();
+		
 		for (int var13 = 0; var13 < 2; ++var13) {
 			if (this.mc.gameSettings.anaglyph) {
 				anaglyphField = var13;

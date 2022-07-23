@@ -503,7 +503,7 @@ public abstract class RenderLiving extends Render {
 					
 					String nm = ((EntityOtherPlayerMP) par1EntityLiving).username;
 					boolean mute = EaglerAdapter.getVoiceMuted().contains(nm);
-					if(mute || EaglerAdapter.getVoiceSpeaking().contains(nm)) {
+					if((mute || EaglerAdapter.getVoiceSpeaking().contains(nm)) && renderManager.voiceTagsDrawnThisFrame.add(nm)) {
 						
 						EaglerAdapter.glDisable(EaglerAdapter.GL_LIGHTING);
 						EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);

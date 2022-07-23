@@ -1253,6 +1253,9 @@ public class EaglerAdapterImpl2 {
 	public static final void setPlaybackOffsetDelay(float f) {
 		// nah
 	}
+	public static final void setMasterVolume(float v) {
+		ss.setMasterVolume(v);
+	}
 	private static int playbackId = 0;
 	public static final int beginPlayback(String fileName, float x, float y, float z, float volume, float pitch) {
 		int id = ++playbackId;

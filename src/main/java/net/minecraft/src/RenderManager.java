@@ -1,8 +1,10 @@
 package net.minecraft.src;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
@@ -37,6 +39,8 @@ public class RenderManager {
 	public double viewerPosY;
 	public double viewerPosZ;
 	public static boolean field_85095_o = false;
+	
+	public final Set<String> voiceTagsDrawnThisFrame = new HashSet();
 
 	public RenderManager() {
 		this.entityRenderMap.put(EntitySpider.class, new RenderSpider());

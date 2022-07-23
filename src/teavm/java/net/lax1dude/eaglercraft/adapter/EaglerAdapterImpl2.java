@@ -2466,12 +2466,12 @@ public class EaglerAdapterImpl2 {
 
 	public static final void tickVoice() {
 		recentlyNearbyPlayers.checkForExpirations();
+		speakingSet.clear();
 		for (String username : voiceAnalysers.keySet()) {
 			AnalyserNode analyser = voiceAnalysers.get(username);
 			Uint8Array array = Uint8Array.create(analyser.getFrequencyBinCount());
 			analyser.getByteFrequencyData(array);
 			int len = array.getLength();
-			speakingSet.remove(username);
 			for (int i = 0; i < len; i++) {
 				if (array.get(i) >= 0.1f) {
 					speakingSet.add(username);

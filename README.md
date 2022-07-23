@@ -1,10 +1,10 @@
 # Eaglercraft
 
-### Client: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
+### Note: someone got eags.us suspended for copyright infringement, use [https://eaglercraft.us/](https://eaglercraft.us/) for now (until it gets deleted too)
+
+### Client: [https://eaglercraft.us/](https://eaglercraft.us/)
 
 ### Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
-
-**Scroll down for the 'secure client', if it is required for a server**
 
 ### Minecraft Beta: [https://github.com/LAX1DUDE/eaglercraft-beta/](https://github.com/LAX1DUDE/eaglercraft-beta/)
 
@@ -12,19 +12,15 @@
 
 ![eaglercraft](https://cdn.discordapp.com/attachments/378764518081429506/964047481849643018/new_github_screenshot.png)
 
-### Official Demo URL: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
+### Official Demo URL: [https://eaglercraft.us/](https://eaglercraft.us/)
 
 ### Download Locally: [stable-download/Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
 (right click the link and press 'Save link as...' to download the file)
 
-### Play Minecraft Beta Singleplayer: [https://g.eags.us/eaglercraft/beta/](https://g.eags.us/eaglercraft/beta/)
+### Play Minecraft Beta Singleplayer: use [https://eaglercraft.us/beta/](https://eaglercraft.us/beta/) for now until I fix eags.us
 
 **For any questions you can join the discord server and hit me up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
-
-### 'Secure' Client: [https://g.eags.us/eaglercraft/secure.html](https://g.eags.us/eaglercraft/secure.html)
-
-**'Secure' Offline Download: [Offline_Download_Version_SECURE.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version_SECURE.html)**  
 
 ## What is Eaglercraft?
 
@@ -70,20 +66,21 @@ Keep both the first and second terminal window you opened, just minimize them do
 26. To add some bukkit plugins, download the plugin's JAR file for CraftBukkit 1.5.2 and place it in `java/bukkit_command/plugins`
 27. To add some bungee plugins, download the plugin's JAR file and place it in `java/bungee_command/plugins`
 28. See [https://github.com/LAX1DUDE/eaglercraft-plugins/](https://github.com/LAX1DUDE/eaglercraft-plugins/) to download some supported plugins
-29. To add `/login` and `/register`, install [AuthMe](https://github.com/LAX1DUDE/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
-30. **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
-31. **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
-32. To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
-33. To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
-34. **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
-35. To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
-36. **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
-37. To connect to your server through a `ws://` or `wss://` URL instead of `ip:port`, set up [nginx](https://nginx.org/) as a reverse proxy to the `ip:port` of you EaglercraftBungee server you want the URL to connect to. Use a location URL template with the `proxy_pass` directive.
-38. Eaglercraft uses port 80 for IP connections by default, typing `127.0.0.1` is the same as typing `ws://127.0.0.1:80/`
-39. To forward a client's remote IP address from a request on nginx to EaglercraftBungee for enforcing IP bans, set the `X-Real-IP` header on the request to websocket when it is proxied
-40. To make a custom resource pack for your site, clone this repository and edit the files in [lwjgl-rundir/resources](https://github.com/LAX1DUDE/eaglercraft/tree/main/lwjgl-rundir/resources).
-41. When you are done, navigate to [epkcompiler/](https://github.com/LAX1DUDE/eaglercraft/tree/main/epkcompiler) and double-click `run.bat`. Wait for the window to say `Press any key to continue...` and close it. Then, go to `../javascript` in the repository and copy `javascript/assets.epk` to the `assets.epk` on your website
-42. If you're on mac or linux, navigate to the epkcompiler folder via `cd` and run `chmod +x run_unix.sh` and then `./run_unix.sh` to do this, then copy the same `javascript/assets.epk` to the `assets.epk` on your website
+29. **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
+30. To add `/login` and `/register`, install [AuthMe](https://github.com/LAX1DUDE/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
+31. **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
+32. **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
+33. To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
+34. To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
+35. **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
+36. To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
+37. **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
+38. To connect to your server through a `ws://` or `wss://` URL instead of `ip:port`, set up [nginx](https://nginx.org/) as a reverse proxy to the `ip:port` of you EaglercraftBungee server you want the URL to connect to. Use a location URL template with the `proxy_pass` directive.
+39. Eaglercraft uses port 80 for IP connections by default, typing `127.0.0.1` is the same as typing `ws://127.0.0.1:80/`
+40. To forward a client's remote IP address from a request on nginx to EaglercraftBungee for enforcing IP bans, set the `X-Real-IP` header on the request to websocket when it is proxied
+41. To make a custom resource pack for your site, clone this repository and edit the files in [lwjgl-rundir/resources](https://github.com/LAX1DUDE/eaglercraft/tree/main/lwjgl-rundir/resources).
+42. When you are done, navigate to [epkcompiler/](https://github.com/LAX1DUDE/eaglercraft/tree/main/epkcompiler) and double-click `run.bat`. Wait for the window to say `Press any key to continue...` and close it. Then, go to `../javascript` in the repository and copy `javascript/assets.epk` to the `assets.epk` on your website
+43. If you're on mac or linux, navigate to the epkcompiler folder via `cd` and run `chmod +x run_unix.sh` and then `./run_unix.sh` to do this, then copy the same `javascript/assets.epk` to the `assets.epk` on your website
 
 ## Singleplayer?
 
@@ -102,6 +99,8 @@ I got tired of closing duplicate 'how to maek sever' and 'add single player' iss
 ## EaglercraftBungee
 
 EaglercraftBungee translates WebSockets to a raw Minecraft 1.5.2 TCP connection. It is just regular BungeeCord with more `config.yml` options, and a built in plugin for syncing people's custom skins between clients so people can see each other's skins
+
+### If voice chat causes moderation problems, set `voice_enabled: false` in config.yml
 
 **EaglercraftBungee has a built in domain blacklist that updates automatically, you can disable it by setting this in config.yml:**
 
@@ -154,7 +153,7 @@ origin_blacklist_block_offline_download: true
 add_header X-Frame-Options "SAMEORIGIN";
 add_header Referrer-Policy "strict-origin";
 add_header X-XSS-Protection "1; mode=block";
-add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' 'unsafe-inline' data: blob:; connect-src 'self' ws: wss:; upgrade-insecure-requests";
+add_header Content-Security-Policy "default-src 'self' 'unsafe-inline'; img-src 'self' 'unsafe-inline' data: blob:; connect-src 'self' ws: wss:; upgrade-insecure-requests";
 ```
 
 (not fully tested, excuse the scroll bar)
@@ -198,7 +197,7 @@ ratelimit:
 
 **Register event handlers using the standard BungeeCord** `@EventHandler` **annotation in your** `Listener` **class**
 
-## Installing (detailed)
+## Installing (outdated guide, detailed)
 
 If you want to use this project but don't want to compile it from scratch, download [stable-download/stable-download-new.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download-new.zip) and extract
 
