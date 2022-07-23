@@ -18,6 +18,7 @@ import org.teavm.jso.dom.xml.NodeList;
 public class SelfDefence {
 	
 	private static HTMLCanvasElement canvas = null;
+	private static boolean ignoreNextWindow = false;
 	
 	@JSFunctor
 	private static interface NewWindowCallback extends JSObject {
@@ -48,11 +49,19 @@ public class SelfDefence {
 		injectWindowCapture(new NewWindowCallback() {
 			@Override
 			public void call(Window newWindow) {
-				capturedChildWindows.add(newWindow);
+				if(!ignoreNextWindow) {
+					capturedChildWindows.add(newWindow);
+				}
+				ignoreNextWindow = false;
 			}
 		});
 	}
 
+	public static void openWindowIgnore(String url, String name) {
+		ignoreNextWindow = true;
+		Window.current().open(url, name);
+	}
+	
 	private static void run(Window win) {
 		try {
 			run0(win);

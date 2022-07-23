@@ -1927,7 +1927,7 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 	public static final void openLink(String url) {
-		win.open(url, "_blank");
+		SelfDefence.openWindowIgnore(url, "_blank");
 	}
 	public static final void redirectTo(String url) {
 		Window.current().getLocation().setFullURL(url);
