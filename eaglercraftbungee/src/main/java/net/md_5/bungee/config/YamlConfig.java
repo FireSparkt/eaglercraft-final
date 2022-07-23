@@ -298,7 +298,7 @@ public class YamlConfig implements ConfigurationAdapter {
 		Collection<String> c = this.get("origin_blacklist_subscriptions", null);
 		if(c == null) {
 			c = new ArrayList();
-			c.add("https://g.eags.us/eaglercraft/origin_blacklist.txt");
+			c.add("https://g.lax1dude.net/eaglercraft/origin_blacklist.txt");
 			c.add("https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt");
 			c = this.get("origin_blacklist_subscriptions", c);
 		}
@@ -312,7 +312,7 @@ public class YamlConfig implements ConfigurationAdapter {
 			c = new ArrayList();
 			c.add("type the name of your client's domain here");
 			c.add("(if 'origin_blacklist_use_simple_whitelist' is true)");
-			c.add("g.eags.us");
+			c.add("g.lax1dude.net");
 			c = this.get("origin_blacklist_simple_whitelist", c);
 		}
 		return c;

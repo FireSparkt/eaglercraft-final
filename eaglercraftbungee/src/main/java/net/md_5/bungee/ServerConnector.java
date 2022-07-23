@@ -57,6 +57,7 @@ public class ServerConnector extends PacketHandler
     private State thisState;
     private SecretKey secretkey;
     private boolean sentMessages;
+    private boolean protocolSupport = BungeeCord.getInstance().config.getProtocolSupport();
     
     @Override
     public void exception(final Throwable t) throws Exception {
@@ -73,13 +74,15 @@ public class ServerConnector extends PacketHandler
     public void connected(final ChannelWrapper channel) throws Exception {
         this.ch = channel;
         channel.write(this.user.getPendingConnection().getHandshake());
-        final ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Login");
-        out.writeUTF(this.user.getAddress().getHostString());
-        out.writeInt(this.user.getAddress().getPort());
-        channel.write(new PacketFAPluginMessage("BungeeCord", out.toByteArray()));
-        if (this.user.getPendingConnection().getForgeLogin() == null) {
-            channel.write(PacketConstants.CLIENT_LOGIN);
+        if (!protocolSupport) {
+            final ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("Login");
+            out.writeUTF(this.user.getAddress().getHostString());
+            out.writeInt(this.user.getAddress().getPort());
+            channel.write(new PacketFAPluginMessage("BungeeCord", out.toByteArray()));
+            if (this.user.getPendingConnection().getForgeLogin() == null) {
+                channel.write(PacketConstants.CLIENT_LOGIN);
+            }
         }
     }
     
@@ -160,6 +163,16 @@ public class ServerConnector extends PacketHandler
     @Override
     public void handle(final PacketFDEncryptionRequest encryptRequest) throws Exception {
         Preconditions.checkState(this.thisState == State.ENCRYPT_REQUEST, (Object)"Not expecting ENCRYPT_REQUEST");
+        if (protocolSupport) {
+            final ByteArrayDataOutput out = ByteStreams.newDataOutput();
+            out.writeUTF("Login");
+            out.writeUTF(this.user.getAddress().getHostString());
+            out.writeInt(this.user.getAddress().getPort());
+            this.user.unsafe().sendPacket(new PacketFAPluginMessage("BungeeCord", out.toByteArray()));
+            if (this.user.getPendingConnection().getForgeLogin() == null) {
+                this.user.unsafe().sendPacket(PacketConstants.CLIENT_LOGIN);
+            }
+        }
         if (this.user.getPendingConnection().getForgeLogin() != null) {
             final PublicKey publickey = EncryptionUtil.getPubkey(encryptRequest);
             this.secretkey = EncryptionUtil.getSecret();

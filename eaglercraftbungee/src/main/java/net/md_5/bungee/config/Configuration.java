@@ -27,6 +27,7 @@ public class Configuration {
 	private AuthServiceInfo authInfo;
 	private boolean onlineMode;
 	private boolean voiceEnabled;
+	private boolean protocolSupport;
 	private int playerLimit;
 	private String name;
 	private boolean showBanType;
@@ -61,6 +62,7 @@ public class Configuration {
 		this.authInfo = adapter.getAuthSettings();
 		this.onlineMode = false;
 		this.voiceEnabled = adapter.getBoolean("voice_enabled", true);
+		this.protocolSupport = adapter.getBoolean("protocol_support_fix", false);
 		this.playerLimit = adapter.getInt("player_limit", this.playerLimit);
 		this.name = adapter.getString("server_name", EaglercraftBungee.name + " Server");
 		this.showBanType = adapter.getBoolean("display_ban_type_on_kick", false);
@@ -121,6 +123,10 @@ public class Configuration {
 
 	public boolean getVoiceEnabled() {
 		return voiceEnabled;
+	}
+
+	public boolean getProtocolSupport() {
+		return protocolSupport;
 	}
 
 	public String getServerName() {
