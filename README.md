@@ -102,6 +102,31 @@ EaglercraftBungee translates WebSockets to a raw Minecraft 1.5.2 TCP connection.
 
 ### If voice chat causes moderation problems, set `voice_enabled: false` in config.yml
 
+**To enable the /login and /register commands in EaglercraftBungee, you can edit this portion of config.yml**
+
+```yaml
+authservice:
+  enabled: false
+  register_enabled: true
+  authfile: auths.db
+  ip_limit: 0
+  join_messages:
+  - '&3Welcome to my &aEaglercraftBungee &3server!'
+  login_timeout: 30
+```
+
+- `enable` Turns login commands on and off
+
+- `register_enabled` Turns register command on and off
+
+- `authfile` Sets the authentication database file, which is **compatible with AuthMe**
+
+- `ip_limit` Sets the max number of registrations per IP, 0 = unlimited
+
+- `join_messages` List of messages to show the player when they join
+
+- `login_timeout` Sets how many seconds players have to log in before they are kicked
+
 **EaglercraftBungee has a built in domain blacklist that updates automatically, you can disable it by setting this in config.yml:**
 
 ```yaml
