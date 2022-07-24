@@ -139,7 +139,7 @@ public class DomainBlacklist {
 								u = new URL(str);
 							}catch(MalformedURLException e) {
 								if(brokenURLs.add(str)) {
-									System.err.println("ERROR: the blacklist subscription URL '" + str + "' is invalid");
+									BungeeCord.getInstance().getLogger().severe("The blacklist subscription URL '" + str + "' is invalid");
 								}
 								continue;
 							}
@@ -172,7 +172,7 @@ public class DomainBlacklist {
 													newReplitBlacklist.add(Pattern.compile(ss));
 												}catch(PatternSyntaxException shit) {
 													if(brokenRegex.add(ss)) {
-														System.err.println("ERROR: the blacklist replit wildcard regex '" + ss + "' is invalid");
+														BungeeCord.getInstance().getLogger().severe("the blacklist replit wildcard regex '" + ss + "' is invalid");
 														continue;
 													}
 												}
@@ -186,7 +186,7 @@ public class DomainBlacklist {
 											newBlacklist.add(Pattern.compile(ss));
 										}catch(PatternSyntaxException shit) {
 											if(brokenRegex.add(ss)) {
-												System.err.println("ERROR: the blacklist regex '" + ss + "' is invalid");
+												BungeeCord.getInstance().getLogger().severe("the blacklist regex '" + ss + "' is invalid");
 												continue;
 											}
 										}
@@ -198,7 +198,7 @@ public class DomainBlacklist {
 							brokenURLs.remove(str);
 						}catch(Throwable t) {
 							if(brokenURLs.add(str)) {
-								System.err.println("ERROR: the blacklist subscription URL '" + str + "' is invalid");
+								BungeeCord.getInstance().getLogger().severe("the blacklist subscription URL '" + str + "' is invalid");
 							}
 							t.printStackTrace();
 						}
@@ -245,7 +245,7 @@ public class DomainBlacklist {
 									}
 								}
 							}catch(PatternSyntaxException shit) {
-								System.err.println("ERROR: the local " + (localWhitelistMode ? "whitelist" : "blacklist") + " regex '" + ss + "' is invalid");
+								BungeeCord.getInstance().getLogger().severe("the local " + (localWhitelistMode ? "whitelist" : "blacklist") + " regex '" + ss + "' is invalid");
 							}
 						}
 						is.close();
@@ -265,10 +265,10 @@ public class DomainBlacklist {
 							os.close();
 							lastLocalUpdate = localBlacklist.lastModified();
 						}
-						System.out.println("Reloaded '" + localBlacklist.getName() + "'.");
+						BungeeCord.getInstance().getLogger().info("Reloaded '" + localBlacklist.getName() + "'.");
 					}catch(IOException ex) {
 						regexLocalBlacklist.clear();
-						System.err.println("ERROR: failed to read local " + (localWhitelistMode ? "whitelist" : "blacklist") + " file '" + localBlacklist.getName() + "'");
+						BungeeCord.getInstance().getLogger().severe("failed to read local " + (localWhitelistMode ? "whitelist" : "blacklist") + " file '" + localBlacklist.getName() + "'");
 						ex.printStackTrace();
 					}
 				}
@@ -276,7 +276,7 @@ public class DomainBlacklist {
 		}else {
 			synchronized(regexBlacklist) {
 				if(!regexLocalBlacklist.isEmpty()) {
-					System.err.println("WARNING: the blacklist file '" + localBlacklist.getName() + "' has been deleted");
+					BungeeCord.getInstance().getLogger().warning("the blacklist file '" + localBlacklist.getName() + "' has been deleted");
 				}
 				regexLocalBlacklist.clear();
 			}
@@ -349,7 +349,7 @@ public class DomainBlacklist {
 				update();
 				return true;
 			}catch(IOException ex) {
-				System.err.println("Failed to save '" + localBlacklist.getName() + "'");
+				BungeeCord.getInstance().getLogger().severe("Failed to save '" + localBlacklist.getName() + "'");
 				ex.printStackTrace();
 			}
 		}

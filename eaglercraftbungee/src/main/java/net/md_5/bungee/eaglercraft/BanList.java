@@ -205,31 +205,31 @@ public class BanList {
 		try {
 			blockedBans.add(constructIpBan("127.0.0.0/8"));
 		}catch(UnknownHostException e) {
-			System.err.println("Error: could not whitelist '127.0.0.0/8'");
+			BungeeCord.getInstance().getLogger().severe("Error: could not whitelist '127.0.0.0/8'");
 			e.printStackTrace();
 		}
 		try {
 			blockedBans.add(constructIpBan("10.0.0.0/8"));
 		}catch(UnknownHostException e) {
-			System.err.println("Error: could not whitelist '10.0.0.0/8'");
+			BungeeCord.getInstance().getLogger().severe("Error: could not whitelist '10.0.0.0/8'");
 			e.printStackTrace();
 		}
 		try {
 			blockedBans.add(constructIpBan("172.24.0.0/14"));
 		}catch(UnknownHostException e) {
-			System.err.println("Error: could not whitelist '172.24.0.0/14'");
+			BungeeCord.getInstance().getLogger().severe("Error: could not whitelist '172.24.0.0/14'");
 			e.printStackTrace();
 		}
 		try {
 			blockedBans.add(constructIpBan("192.168.0.0/16"));
 		}catch(UnknownHostException e) {
-			System.err.println("Error: could not whitelist '192.168.0.0/16'");
+			BungeeCord.getInstance().getLogger().severe("Error: could not whitelist '192.168.0.0/16'");
 			e.printStackTrace();
 		}
 		try {
 			blockedBans.add(constructIpBan("::1/128"));
 		}catch(UnknownHostException e) {
-			System.err.println("Error: could not whitelist '::1/128'");
+			BungeeCord.getInstance().getLogger().severe("Error: could not whitelist '::1/128'");
 			e.printStackTrace();
 		}
 	}
@@ -314,7 +314,7 @@ public class BanList {
 			pf.close();
 			lastListLoad = lastListTest = System.currentTimeMillis();
 		}catch(Throwable t) {
-			System.err.println("ERROR: the ban list could not be saved to file '" + bansFile.getName() + "', please fix this or you will lose all your bans next time this server restarts");
+			BungeeCord.getInstance().getLogger().severe("ERROR: the ban list could not be saved to file '" + bansFile.getName() + "', please fix this or you will lose all your bans next time this server restarts");
 			t.printStackTrace();
 		}
 	}
@@ -704,7 +704,7 @@ public class BanList {
 					p.println("# end of file");
 					p.println();
 					p.close();
-					System.out.println("Wrote a new bans.txt to: " + bansFile.getAbsolutePath());
+					BungeeCord.getInstance().getLogger().info("Wrote a new bans.txt to: " + bansFile.getAbsolutePath());
 					lastListLoad = 0l;
 				}catch(Throwable t) {
 					fileIsBroken = true;
@@ -712,8 +712,8 @@ public class BanList {
 						cs.sendMessage(banChatMessagePrefix + ChatColor.RED + "Could not create blank 'bans.txt' list file");
 						cs.sendMessage(banChatMessagePrefix + ChatColor.RED + "(Reason: " + t.toString() + ")");
 					}
-					System.err.println("Could not create blank 'bans.txt' list file");
-					System.err.println("(Reason: " + t.toString() + ")");
+					BungeeCord.getInstance().getLogger().severe("Could not create blank 'bans.txt' list file");
+					BungeeCord.getInstance().getLogger().severe("(Reason: " + t.toString() + ")");
 					t.printStackTrace();
 				}
 				return;
@@ -736,7 +736,7 @@ public class BanList {
 					}
 					r.close();
 					lastListLoad = lastEdit;
-					System.out.println("Server bans.txt changed, it will be reloaded automatically");
+					BungeeCord.getInstance().getLogger().info("Server bans.txt changed, it will be reloaded automatically");
 					if(cs == null) {
 						for(ProxiedPlayer pp : BungeeCord.getInstance().getPlayers()) {
 							if(pp.hasPermission("bungeecord.command.eag.reloadban")) {
@@ -746,14 +746,14 @@ public class BanList {
 						}
 					}
 					parseListFrom();
-					System.out.println("Reload complete");
+					BungeeCord.getInstance().getLogger().info("Reload complete");
 				}catch(Throwable t) {
 					if(cs != null) {
 						cs.sendMessage(banChatMessagePrefix + ChatColor.RED + "Could not reload 'bans.txt' list file");
 						cs.sendMessage(banChatMessagePrefix + ChatColor.RED + "(Reason: " + t.toString() + ")");
 					}
-					System.err.println("Could not reload 'bans.txt' list file");
-					System.err.println("(Reason: " + t.toString() + ")");
+					BungeeCord.getInstance().getLogger().severe("Could not reload 'bans.txt' list file");
+					BungeeCord.getInstance().getLogger().severe("(Reason: " + t.toString() + ")");
 				}
 			}
 		}
@@ -801,9 +801,9 @@ public class BanList {
 					boolean we = s.endsWith("*");
 					if(!ws && !we) {
 						if(s.contains("*")) {
-							System.err.println("Error: wildcard '" + s + "' contains a '*' not at the start/end of the string");
+							BungeeCord.getInstance().getLogger().severe("wildcard '" + s + "' contains a '*' not at the start/end of the string");
 						}else {
-							System.err.println("Error: wildcard '" + s + "' does not contain a '*' wildcard character");
+							BungeeCord.getInstance().getLogger().severe("wildcard '" + s + "' does not contain a '*' wildcard character");
 						}
 					}else {
 						int total = (ws ? 1 : 0) + (we ? 1 : 0);
@@ -812,7 +812,7 @@ public class BanList {
 							if(c == '*') ++t2;
 						}
 						if(total != t2) {
-							System.err.println("Error: wildcard '" + s + "' contains a '*' not at the start/end of the string");
+							BungeeCord.getInstance().getLogger().severe("wildcard '" + s + "' contains a '*' not at the start/end of the string");
 						}
 					}
 					wildcardBans.add(s.toLowerCase());
@@ -821,8 +821,8 @@ public class BanList {
 					try {
 						p = Pattern.compile(s);
 					}catch(Throwable t) {
-						System.err.println("Error: the regex " + s.toLowerCase() + " is invalid");
-						System.err.println("Reason: " + t.getClass().getSimpleName() + ": " + t.getLocalizedMessage());
+						BungeeCord.getInstance().getLogger().severe("the regex " + s.toLowerCase() + " is invalid");
+						BungeeCord.getInstance().getLogger().severe("Reason: " + t.getClass().getSimpleName() + ": " + t.getLocalizedMessage());
 					}
 					if(p != null) {
 						regexBans.add(new RegexBan(s, p));
@@ -837,7 +837,7 @@ public class BanList {
 						try {
 							subnet = Integer.parseInt(s2);
 						}catch(Throwable t) {
-							System.err.println("Error: the subnet '"+ s2 +"' for IP ban address " + s + " was invalid");
+							BungeeCord.getInstance().getLogger().severe("the subnet '"+ s2 +"' for IP ban address " + s + " was invalid");
 							subnet = -2;
 						}
 					}
@@ -858,7 +858,7 @@ public class BanList {
 								throw new UnknownHostException("Only ipv4 and ipv6 addresses allowed in Eaglercraft");
 							}
 						}catch(Throwable t) {
-							System.err.println("Error: the IP ban address " + s + " could not be parsed");
+							BungeeCord.getInstance().getLogger().severe("the IP ban address " + s + " could not be parsed");
 							t.printStackTrace();
 						}
 					}
