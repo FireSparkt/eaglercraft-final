@@ -46,7 +46,7 @@ public class AuthHandler extends PacketHandler {
             this.con.disconnect("You did not login in time!");
         }).start();
 
-        this.con.unsafe().sendPacket(new Packet1Login(0, "END", (byte) 2, 1, (byte) 0, (byte) 0, (byte) 1));
+        this.con.unsafe().sendPacket(new Packet1Login(0, "END", (byte) 2, 1, (byte) 0, (byte) 0, (byte) this.con.getPendingConnection().getListener().getTabListSize()));
         this.con.unsafe().sendPacket(new Packet9Respawn(1, (byte) 0, (byte) 2, (short) 255, "END"));
         this.con.unsafe().sendPacket(new Packet0DPositionAndLook(0, 0, 0, 0, 0f, 0f, true));
 
