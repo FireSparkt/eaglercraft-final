@@ -100,7 +100,7 @@ public class AuthSystem {
                 if (lines.length == 1 && lines[0].isEmpty()) return;
                 for (String line : lines) {
                     String[] pieces = line.split("\u0000");
-                    cache.put(pieces[0], new AuthData(pieces[2], new HashSet<>(Arrays.asList(pieces[1].split("§")))));
+                    cache.put(pieces[0], new AuthData(pieces[2], new HashSet<>(Arrays.asList(pieces[1].split("\u00A7")))));
                 }
 
                 database.clear();
@@ -120,7 +120,7 @@ public class AuthSystem {
                 AuthData entry = database.get(username);
                 out.append(username);
                 out.append("\u0000");
-                out.append(String.join("§", entry.ips));
+                out.append(String.join("\u00A7", entry.ips));
                 out.append("\u0000");
                 out.append(entry.passHash);
                 out.append("\n");
