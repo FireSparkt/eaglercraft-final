@@ -1,5 +1,9 @@
 package net.md_5.bungee.eaglercraft;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
@@ -26,29 +30,21 @@ public class AuthHandler extends PacketHandler {
 	private final HandlerBoss handlerBoss;
 	private final String username;
 
+	private static final Collection<AuthHandler> openHandlers = new LinkedList();
 	private boolean loggedIn = false;
+	private long startTime;
 
 	public AuthHandler(final ProxyServer bungee, final UserConnection con, final HandlerBoss handlerBoss) {
 		this.bungee = bungee;
 		this.con = con;
 		this.handlerBoss = handlerBoss;
-
 		this.username = this.con.getName();
+		this.startTime = System.currentTimeMillis();
 
-		new Thread(() -> {
-			for (int i = 0; i < 120; i++) {
-				if (this.loggedIn)
-					break;
-				try {
-					Thread.sleep(250);
-				} catch (InterruptedException ignored) {
-				}
-			}
-			if (this.loggedIn)
-				return;
-			this.con.disconnect("You did not login in time!");
-		}).start();
-
+		synchronized(openHandlers) {
+			openHandlers.add(this);
+		}
+		
 		this.con.unsafe().sendPacket(new Packet1Login(0, "END", (byte) 2, 1, (byte) 0, (byte) 0,
 				(byte) this.con.getPendingConnection().getListener().getTabListSize()));
 		this.con.unsafe().sendPacket(new Packet9Respawn(1, (byte) 0, (byte) 2, (short) 255, "END"));
@@ -102,18 +98,22 @@ public class AuthHandler extends PacketHandler {
 				break;
 			case "register":
 			case "reg":
-				if (args.length == 1 || args.length == 2) {
-					this.con.sendMessage("\u00A7cUsage: /" + args[0].toLowerCase() + " <password> <confirmPassword>");
-				} else if (!args[1].equals(args[2])) {
-					this.con.sendMessage("\u00A7cThose passwords do not match!");
-				} else if (authSystem.isRegistered(this.username)) {
-					this.con.sendMessage("\u00A7cThis username is already registered!");
-				} else if (authSystem.register(this.username, args[1],
-						this.con.getAddress().getAddress().getHostAddress())) {
-					this.con.sendMessage("\u00A7cSuccessfully registered and logging in...");
-					this.onLogin();
-				} else {
-					this.con.sendMessage("\u00A7cUnable to register...");
+				if(BungeeCord.getInstance().config.getAuthInfo().isRegisterEnabled()) {
+					if (args.length == 1 || args.length == 2) {
+						this.con.sendMessage("\u00A7cUsage: /" + args[0].toLowerCase() + " <password> <confirmPassword>");
+					} else if (!args[1].equals(args[2])) {
+						this.con.sendMessage("\u00A7cThose passwords do not match!");
+					} else if (authSystem.isRegistered(this.username)) {
+						this.con.sendMessage("\u00A7cThis username is already registered!");
+					} else if (authSystem.register(this.username, args[1],
+							this.con.getAddress().getAddress().getHostAddress())) {
+						this.con.sendMessage("\u00A7cSuccessfully registered and logging in...");
+						this.onLogin();
+					} else {
+						this.con.sendMessage("\u00A7cUnable to register...");
+					}
+				}else {
+					this.con.disconnect("Registration is not enabled!");
 				}
 				break;
 			case "changepassword":
@@ -155,4 +155,24 @@ public class AuthHandler extends PacketHandler {
 	public String toString() {
 		return "[" + this.con.getName() + "] -> AuthHandler";
 	}
+	
+	public static void closeInactive(int timeout) {
+		synchronized(openHandlers) {
+			long millis = System.currentTimeMillis();
+			timeout *= 1000;
+			Iterator<AuthHandler> handlers = openHandlers.iterator();
+			while(handlers.hasNext()) {
+				AuthHandler h = handlers.next();
+				if(!h.loggedIn) {
+					if(millis - h.startTime > timeout) {
+						h.con.disconnect("You did not login in time you eagler!");
+						handlers.remove();
+					}
+				}else {
+					handlers.remove();
+				}
+			}
+		}
+	}
+	
 }

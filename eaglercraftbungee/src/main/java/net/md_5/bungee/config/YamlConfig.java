@@ -281,7 +281,8 @@ public class YamlConfig implements ConfigurationAdapter {
 		final Map<String, Object> auth = this.get("authservice", new HashMap<String, Object>());
 		final List<String> defaultJoinMessages = new ArrayList<String>();
 		defaultJoinMessages.add("&3Welcome to my &aEaglercraftBungee &3server!");
-		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auths.db", auth), this.get("ip_limit", 0, auth), this.get("join_messages", defaultJoinMessages, auth));
+		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("register_enabled", true, auth), this.get("authfile", "auths.db", auth),
+				this.get("ip_limit", 0, auth), this.get("join_messages", defaultJoinMessages, auth), this.get("login_timeout", 30, auth));
 	}
 	
 	@Override

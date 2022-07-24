@@ -88,6 +88,7 @@ import net.md_5.bungee.command.CommandServer;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.YamlConfig;
+import net.md_5.bungee.eaglercraft.AuthHandler;
 import net.md_5.bungee.eaglercraft.AuthSystem;
 import net.md_5.bungee.eaglercraft.BanList;
 import net.md_5.bungee.eaglercraft.DomainBlacklist;
@@ -115,6 +116,7 @@ public class BungeeCord extends ProxyServer {
 	private final Timer saveThread;
 	private final Timer reloadBanThread;
 	private final Timer closeInactiveSockets;
+	private final Timer authTimeoutTimer;
 	private Collection<Channel> listeners;
 	private Collection<WebSocketListener> wsListeners;
 	private final Map<String, UserConnection> connections;
@@ -141,7 +143,8 @@ public class BungeeCord extends ProxyServer {
 		this.eventLoops = (MultithreadEventLoopGroup) new NioEventLoopGroup(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Netty IO Thread #%1$d").build());
 		this.saveThread = new Timer("Reconnect Saver");
 		this.reloadBanThread = new Timer("Ban List Reload");
-		this.closeInactiveSockets = new Timer("close Inactive WebSockets");
+		this.closeInactiveSockets = new Timer("Close Inactive WebSockets");
+		this.authTimeoutTimer = new Timer("Auth Timeout");
 		this.listeners = new HashSet<Channel>();
 		this.wsListeners = new HashSet<WebSocketListener>();
 		this.connections = (Map<String, UserConnection>) new CaseInsensitiveMap();
@@ -274,6 +277,13 @@ public class BungeeCord extends ProxyServer {
 				}
 			}
 		}, 0L, TimeUnit.SECONDS.toMillis(10L));
+		final int authTimeout = this.config.getAuthInfo().getLoginTimeout();
+		this.authTimeoutTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				AuthHandler.closeInactive(authTimeout);
+			}
+		}, 0L, TimeUnit.SECONDS.toMillis(2L));
 	}
 
 	public void startListeners() {
@@ -362,6 +372,9 @@ public class BungeeCord extends ProxyServer {
 				BungeeCord.this.reconnectHandler.save();
 				BungeeCord.this.reconnectHandler.close();
 				BungeeCord.this.saveThread.cancel();
+				BungeeCord.this.reloadBanThread.cancel();
+				BungeeCord.this.closeInactiveSockets.cancel();
+				BungeeCord.this.authTimeoutTimer.cancel();
 				BungeeCord.this.getLogger().info("Disabling plugins");
 				for (final Plugin plugin : BungeeCord.this.pluginManager.getPlugins()) {
 					plugin.onDisable();
