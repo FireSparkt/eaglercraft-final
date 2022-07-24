@@ -1,17 +1,18 @@
 package net.md_5.bungee.eaglercraft;
 
-import com.google.common.hash.Hashing;
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.config.AuthServiceInfo;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class AuthSystem {
     private final String authFileName;
@@ -25,12 +26,16 @@ public class AuthSystem {
     }
 
     private static class AuthData {
-        public String passHash;
-        public Set<String> ips;
+        public String salt;
+        public String hash;
+        public String ip;
+        public long timestamp;
 
-        public AuthData(String p, Set<String> i) {
-            passHash = p;
-            ips = i;
+        public AuthData(String salt, String hash, String ip, long timestamp) {
+            this.salt = salt;
+            this.hash = hash;
+            this.ip = ip;
+            this.timestamp = timestamp;
         }
     }
 
@@ -41,10 +46,9 @@ public class AuthSystem {
             AuthData authData = database.get(username);
             if (authData != null) return false;
             if (isIpAtTheLimit(ip)) return false;
-            String hash = Hashing.sha256().hashString(password).toString();
-            Set<String> initIps = new HashSet<>();
-            initIps.add(ip);
-            database.put(username, new AuthData(hash, initIps));
+            String salt = createSalt(16);
+            String hash = getSaltedHash(password, salt);
+            database.put(username, new AuthData(salt, hash, ip, System.currentTimeMillis()));
             writeDatabase();
             return true;
         }
@@ -59,7 +63,8 @@ public class AuthSystem {
     public boolean changePass(String username, String password) {
         synchronized (database) {
             AuthData authData = database.get(username);
-            authData.passHash = Hashing.sha256().hashString(password).toString();
+            authData.salt = createSalt(16);
+            authData.hash = getSaltedHash(password, authData.salt);
             writeDatabase();
             return true;
         }
@@ -69,7 +74,7 @@ public class AuthSystem {
         synchronized (database) {
             AuthData authData = database.get(username);
             if (authData == null) return false;
-            return authData.passHash.equals(Hashing.sha256().hashString(password).toString());
+            return authData.hash.equals(getSaltedHash(password, authData.salt));
         }
     }
 
@@ -78,7 +83,7 @@ public class AuthSystem {
             if (this.ipLimit <= 0) return false;
             int num = 0;
             for (AuthData authData : database.values()) {
-                if (authData.ips.contains(ip)) num++;
+                if (authData.ip.equals(ip)) num++;
                 if (num >= this.ipLimit) {
                     return true;
                 }
@@ -94,18 +99,24 @@ public class AuthSystem {
                 File authFile = new File(this.authFileName);
                 if (!authFile.exists()) authFile.createNewFile();
 
-                Map<String, AuthData> cache = new HashMap<>();
+                database.clear();
 
                 String[] lines = new String(Files.readAllBytes(authFile.toPath())).trim().split("\n");
                 if (lines.length == 1 && lines[0].isEmpty()) return;
+                boolean alreadyLogged = false;
                 for (String line : lines) {
-                    String[] pieces = line.split("\u0000");
-                    cache.put(pieces[0], new AuthData(pieces[2], new HashSet<>(Arrays.asList(pieces[1].split("\u00A7")))));
+                    String[] pieces = line.split(":");
+                    if (!pieces[1].startsWith("$SHA$")) {
+                        if (!alreadyLogged) {
+                            alreadyLogged = true;
+                            BungeeCord.getInstance().getLogger().warning("One or more entries in the auth file are hashed in an unsupported format! (not SHA-256!)");
+                        }
+                        // continue;
+                    }
+                    String[] saltHash = pieces[1].substring(pieces[1].substring(1).indexOf('$') + 2).split("\\$");
+                    database.put(pieces[0], new AuthData(saltHash[0], saltHash[1], pieces[2], Long.parseLong(pieces[3])));
                 }
 
-                database.clear();
-                database.putAll(cache);
-                cache.clear();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -119,10 +130,14 @@ public class AuthSystem {
             for (String username : database.keySet()) {
                 AuthData entry = database.get(username);
                 out.append(username);
-                out.append("\u0000");
-                out.append(String.join("\u00A7", entry.ips));
-                out.append("\u0000");
-                out.append(entry.passHash);
+                out.append(":$SHA$");
+                out.append(entry.salt);
+                out.append("$");
+                out.append(entry.hash);
+                out.append(":");
+                out.append(entry.ip);
+                out.append(":");
+                out.append(entry.timestamp);
                 out.append("\n");
             }
 
@@ -131,6 +146,39 @@ public class AuthSystem {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    // hashing used is based on hashing from AuthMe
+
+    private static final SecureRandom rnd = new SecureRandom();
+
+    private static String getSHA256(String message) {
+        try {
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            sha256.reset();
+            sha256.update(message.getBytes());
+            byte[] digest = sha256.digest();
+            return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1, digest));
+        } catch (NoSuchAlgorithmException e) {
+            return "";
+        }
+    }
+
+    private static String getSaltedHash(String message, String salt) {
+        return getSHA256(getSHA256(message) + salt);
+    }
+
+    private static String createSalt(int length) {
+        try {
+            byte[] msg = new byte[40];
+            rnd.nextBytes(msg);
+            MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+            sha1.reset();
+            byte[] digest = sha1.digest(msg);
+            return String.format("%0" + (digest.length << 1) + "x", new BigInteger(1, digest)).substring(0, length);
+        } catch (NoSuchAlgorithmException e) {
+            return "";
         }
     }
 }

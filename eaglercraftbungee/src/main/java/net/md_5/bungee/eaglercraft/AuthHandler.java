@@ -63,7 +63,7 @@ public class AuthHandler extends PacketHandler {
     }
 
     @Override
-    public void disconnected(final ChannelWrapper channel) throws Exception {
+    public void disconnected(final ChannelWrapper channel) {
         this.loggedIn = true;
     }
 
@@ -88,6 +88,7 @@ public class AuthHandler extends PacketHandler {
                     } else if (!authSystem.isRegistered(this.username)) {
                         this.con.sendMessage("\u00A7cThis username is not registered on this server!");
                     } else if (authSystem.login(this.username, args[1])) {
+                        this.con.sendMessage("\u00A7cLogging in...");
                         this.onLogin();
                     } else {
                         this.con.sendMessage("\u00A7cThat password is invalid!");
@@ -101,7 +102,8 @@ public class AuthHandler extends PacketHandler {
                         this.con.sendMessage("\u00A7cThose passwords do not match!");
                     } else if (authSystem.isRegistered(this.username)) {
                         this.con.sendMessage("\u00A7cThis username is already registered!");
-                    } else if (authSystem.register(this.username, args[1], this.con.getAddress().toString())) {
+                    } else if (authSystem.register(this.username, args[1], this.con.getAddress().getAddress().getHostAddress())) {
+                        this.con.sendMessage("\u00A7cSuccessfully registered and logging in...");
                         this.onLogin();
                     } else {
                         this.con.sendMessage("\u00A7cUnable to register...");

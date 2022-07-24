@@ -275,7 +275,7 @@ public class YamlConfig implements ConfigurationAdapter {
 	@Override
 	public AuthServiceInfo getAuthSettings() {
 		final Map<String, Object> auth = this.get("authservice", new HashMap<String, Object>());
-		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auth.uwu", auth), this.get("ip_limit", 0, auth));
+		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auths.db", auth), this.get("ip_limit", 0, auth));
 	}
 	
 	@Override
