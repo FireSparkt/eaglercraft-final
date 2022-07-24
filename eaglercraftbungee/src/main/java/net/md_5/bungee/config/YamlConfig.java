@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -68,13 +69,15 @@ public class YamlConfig implements ConfigurationAdapter {
 		} catch (IOException ex) {
 			throw new RuntimeException("Could not load configuration!", ex);
 		}
-		final Map<String, Object> permissions = this.get("permissions", new HashMap<String, Object>());
+		final Map<String, List<String>> permissions = this.get("permissions", new HashMap<String, List<String>>());
 		if (permissions.isEmpty()) {
 			permissions.put("default", Arrays.asList("bungeecord.command.server", "bungeecord.command.list", "bungeecord.command.eag.domain", "bungeecord.command.eag.changepassword"));
 			permissions.put("admin", Arrays.asList("bungeecord.command.alert", "bungeecord.command.end", "bungeecord.command.ip", "bungeecord.command.reload",
 			"bungeecord.command.eag.ban", "bungeecord.command.eag.banwildcard", "bungeecord.command.eag.banip", "bungeecord.command.eag.banregex",
 			"bungeecord.command.eag.reloadban", "bungeecord.command.eag.banned", "bungeecord.command.eag.banlist", "bungeecord.command.eag.unban", "bungeecord.command.eag.ratelimit",
 			"bungeecord.command.eag.blockdomain", "bungeecord.command.eag.blockdomainname", "bungeecord.command.eag.unblockdomain"));
+		} else if (this.get("authservice", new HashMap<String, Object>()).isEmpty() && permissions.containsKey("default") && !permissions.get("default").contains("bungeecord.command.eag.changepassword")) {
+			permissions.get("default").add("bungeecord.command.eag.changepassword");
 		}
 		this.get("groups", new HashMap<String, Object>());
 	}
@@ -275,7 +278,9 @@ public class YamlConfig implements ConfigurationAdapter {
 	@Override
 	public AuthServiceInfo getAuthSettings() {
 		final Map<String, Object> auth = this.get("authservice", new HashMap<String, Object>());
-		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auths.db", auth), this.get("ip_limit", 0, auth));
+		final List<String> defaultJoinMessages = new ArrayList<String>();
+		defaultJoinMessages.add("&3Welcome to my &aEaglercraftBungee &3server!");
+		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auths.db", auth), this.get("ip_limit", 0, auth), this.get("join_messages", defaultJoinMessages, auth));
 	}
 	
 	@Override

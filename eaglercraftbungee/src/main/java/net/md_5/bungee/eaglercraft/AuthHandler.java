@@ -50,6 +50,8 @@ public class AuthHandler extends PacketHandler {
         this.con.unsafe().sendPacket(new Packet9Respawn(1, (byte) 0, (byte) 2, (short) 255, "END"));
         this.con.unsafe().sendPacket(new Packet0DPositionAndLook(0, 0, 0, 0, 0f, 0f, true));
 
+        this.con.sendMessages(authSystem.joinMessages);
+
         if (authSystem.isRegistered(this.username)) {
             this.con.sendMessage("\u00A7cPlease login to continue! /login <password>");
         } else {

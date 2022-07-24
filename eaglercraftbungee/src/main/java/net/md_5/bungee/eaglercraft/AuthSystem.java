@@ -1,6 +1,7 @@
 package net.md_5.bungee.eaglercraft;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.config.AuthServiceInfo;
 
 import java.io.File;
@@ -12,15 +13,23 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AuthSystem {
     private final String authFileName;
     private final int ipLimit;
+    public final String[] joinMessages;
 
     public AuthSystem(AuthServiceInfo authInfo) {
         this.authFileName = authInfo.getAuthfile();
         this.ipLimit = authInfo.getIpLimit();
+        List<String> listJoinMessages = authInfo.getJoinMessages();
+        String[] arrayJoinMessages = new String[listJoinMessages.size()];
+        for (int i = 0; i < listJoinMessages.size(); i++) {
+            arrayJoinMessages[i] = ChatColor.translateAlternateColorCodes('&', listJoinMessages.get(i));
+        }
+        this.joinMessages = arrayJoinMessages;
 
         this.readDatabase();
     }
