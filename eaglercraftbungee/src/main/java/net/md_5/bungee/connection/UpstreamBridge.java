@@ -55,7 +55,7 @@ public class UpstreamBridge extends PacketHandler {
 	@Override
 	public void handle(final byte[] buf) throws Exception {
 		EntityMap.rewrite(buf, this.con.getClientEntityId(), this.con.getServerEntityId());
-		if (this.con.getServer() != null) {
+		if (this.con.getServer() != null && this.con.getServer().getCh() != null) {
 			this.con.getServer().getCh().write(buf);
 		}
 	}

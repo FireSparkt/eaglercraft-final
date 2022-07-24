@@ -70,7 +70,7 @@ public class YamlConfig implements ConfigurationAdapter {
 		}
 		final Map<String, Object> permissions = this.get("permissions", new HashMap<String, Object>());
 		if (permissions.isEmpty()) {
-			permissions.put("default", Arrays.asList("bungeecord.command.server", "bungeecord.command.list", "bungeecord.command.eag.domain"));
+			permissions.put("default", Arrays.asList("bungeecord.command.server", "bungeecord.command.list", "bungeecord.command.eag.domain", "bungeecord.command.eag.changepassword"));
 			permissions.put("admin", Arrays.asList("bungeecord.command.alert", "bungeecord.command.end", "bungeecord.command.ip", "bungeecord.command.reload",
 			"bungeecord.command.eag.ban", "bungeecord.command.eag.banwildcard", "bungeecord.command.eag.banip", "bungeecord.command.eag.banregex",
 			"bungeecord.command.eag.reloadban", "bungeecord.command.eag.banned", "bungeecord.command.eag.banlist", "bungeecord.command.eag.unban", "bungeecord.command.eag.ratelimit",
@@ -274,9 +274,8 @@ public class YamlConfig implements ConfigurationAdapter {
 
 	@Override
 	public AuthServiceInfo getAuthSettings() {
-		//final Map<String, Object> auth = this.get("authservice", new HashMap<String, Object>());
-		//return new AuthServiceInfo(this.get("enabled", true, auth), this.get("limbo", "lobby", auth), new File(this.get("authfile", "passwords.yml", auth)), this.get("timeout", 30, auth));
-		return null;
+		final Map<String, Object> auth = this.get("authservice", new HashMap<String, Object>());
+		return new AuthServiceInfo(this.get("enabled", false, auth), this.get("authfile", "auth.uwu", auth), this.get("ip_limit", 0, auth));
 	}
 	
 	@Override
