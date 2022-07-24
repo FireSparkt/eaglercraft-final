@@ -35,6 +35,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ProxyPingEvent;
+import net.md_5.bungee.eaglercraft.AuthHandler;
 import net.md_5.bungee.eaglercraft.BanList;
 import net.md_5.bungee.eaglercraft.BanList.BanCheck;
 import net.md_5.bungee.eaglercraft.BanList.BanState;
@@ -47,15 +48,7 @@ import net.md_5.bungee.netty.PacketDecoder;
 import net.md_5.bungee.netty.PacketHandler;
 import net.md_5.bungee.netty.PipelineUtils;
 import net.md_5.bungee.protocol.Forge;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.protocol.packet.Packet1Login;
-import net.md_5.bungee.protocol.packet.Packet2Handshake;
-import net.md_5.bungee.protocol.packet.PacketCDClientStatus;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
-import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
-import net.md_5.bungee.protocol.packet.PacketFEPing;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
+import net.md_5.bungee.protocol.packet.*;
 
 public class InitialHandler extends PacketHandler implements PendingConnection {
 	private final ProxyServer bungee;
@@ -259,10 +252,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			userCon.getAttachment().put("origin", origin);
 		}
 		userCon.init();
-		this.bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));
-		((HandlerBoss) this.ch.getHandle().pipeline().get((Class) HandlerBoss.class)).setHandler(new UpstreamBridge(this.bungee, userCon));
-		final ServerInfo server = this.bungee.getReconnectHandler().getServer(userCon);
-		userCon.connect(server, true);
+		HandlerBoss handlerBoss = ((HandlerBoss) this.ch.getHandle().pipeline().get((Class) HandlerBoss.class));
+		if (BungeeCord.getInstance().config.getAuthInfo().isEnabled()) {
+			handlerBoss.setHandler(new AuthHandler(this.bungee, userCon, handlerBoss));
+		} else {
+			this.bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));
+			handlerBoss.setHandler(new UpstreamBridge(this.bungee, userCon));
+			final ServerInfo server = this.bungee.getReconnectHandler().getServer(userCon);
+			userCon.connect(server, true);
+		}
 		this.thisState = State.FINISHED;
 		throw new CancelSendSignal();
 	}

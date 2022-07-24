@@ -55,4 +55,7 @@ public abstract class AbstractPacketHandler {
 
 	public void handle(final PacketFFKick kick) throws Exception {
 	}
+
+	public void handle(final Packet0DPositionAndLook positionAndLook) throws Exception {
+	}
 }

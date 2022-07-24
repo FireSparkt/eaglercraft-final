@@ -62,6 +62,7 @@ import net.md_5.bungee.api.scheduler.TaskScheduler;
 import net.md_5.bungee.api.tab.CustomTabList;
 import net.md_5.bungee.command.CommandAlert;
 import net.md_5.bungee.command.CommandBungee;
+import net.md_5.bungee.command.CommandChangePassword;
 import net.md_5.bungee.command.CommandClearRatelimit;
 import net.md_5.bungee.command.CommandConfirmCode;
 import net.md_5.bungee.command.CommandDomain;
@@ -87,6 +88,7 @@ import net.md_5.bungee.command.CommandServer;
 import net.md_5.bungee.command.ConsoleCommandSender;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.YamlConfig;
+import net.md_5.bungee.eaglercraft.AuthSystem;
 import net.md_5.bungee.eaglercraft.BanList;
 import net.md_5.bungee.eaglercraft.DomainBlacklist;
 import net.md_5.bungee.eaglercraft.PluginEaglerSkins;
@@ -126,6 +128,7 @@ public class BungeeCord extends ProxyServer {
 	private ConsoleReader consoleReader;
 	private final Logger logger;
 	private Collection<Command> banCommands;
+	public AuthSystem authSystem;
 
 	public static BungeeCord getInstance() {
 		return (BungeeCord) ProxyServer.getInstance();
@@ -234,7 +237,10 @@ public class BungeeCord extends ProxyServer {
 		this.pluginManager.detectPlugins(this.pluginsFolder);
 		this.pluginManager.addInternalPlugin(new PluginEaglerSkins());
 		this.pluginManager.addInternalPlugin(new PluginEaglerVoice(this.config.getVoiceEnabled()));
-		//if(this.config.getAuthInfo().isEnabled()) this.pluginManager.addInternalPlugin(new PluginEaglerAuth());
+		if (this.config.getAuthInfo().isEnabled()) {
+			this.authSystem = new AuthSystem(this.config.getAuthInfo());
+			this.getPluginManager().registerCommand(null, new CommandChangePassword(this.authSystem));
+		}
 		if (this.reconnectHandler == null) {
 			this.reconnectHandler = new SQLReconnectHandler();
 		}
