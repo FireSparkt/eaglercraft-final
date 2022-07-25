@@ -66,6 +66,7 @@ public class PluginEaglerVoice extends Plugin implements Listener {
                 byte[] msg = event.getData();
                 try {
                     if (!("EAG|Voice".equals(event.getTag()))) return;
+                    event.setCancelled(true);
                     DataInputStream streamIn = new DataInputStream(new ByteArrayInputStream(msg));
                     int sig = streamIn.read();
                     switch (sig) {

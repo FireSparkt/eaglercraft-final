@@ -46,17 +46,18 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 			String user = ((UserConnection)event.getSender()).getName();
 			byte[] msg = event.getData();
 			try {
+				event.setCancelled(true);
 				if("EAG|MySkin".equals(event.getTag())) {
 					if(!skinCollection.containsKey(user)) {
 						int t = (int)msg[0] & 0xFF;
-						if(t >= 0 && t < SKIN_DATA_SIZE.length && msg.length == (SKIN_DATA_SIZE[t] + 1)) {
+						if(t < SKIN_DATA_SIZE.length && msg.length == (SKIN_DATA_SIZE[t] + 1)) {
 							skinCollection.put(user, msg);
 						}
 					}
 				}else if("EAG|MyCape".equals(event.getTag())) {
 					if(!capeCollection.containsKey(user)) {
 						int t = (int)msg[0] & 0xFF;
-						if(t >= 0 && t < CAPE_DATA_SIZE.length && msg.length == (CAPE_DATA_SIZE[t] + 2)) {
+						if(t < CAPE_DATA_SIZE.length && msg.length == (CAPE_DATA_SIZE[t] + 2)) {
 							capeCollection.put(user, msg);
 						}
 					}
@@ -80,7 +81,7 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 				}else if("EAG|SkinLayers".equals(event.getTag())) {
 					long millis = System.currentTimeMillis();
 					Long lsu = lastSkinLayerUpdate.get(user);
-					if(lsu != null && millis - lsu.longValue() < 700l) { // DoS protection
+					if(lsu != null && millis - lsu < 700L) { // DoS protection
 						return;
 					}
 					lastSkinLayerUpdate.put(user, millis);
@@ -97,10 +98,12 @@ public class PluginEaglerSkins extends Plugin implements Listener {
 					dd.writeUTF(user);
 					byte[] bpacket = bao.toByteArray();
 					for(ProxiedPlayer pl : getProxy().getPlayers()) {
-						if(!pl.equals(user)) {
+						if(!pl.getName().equals(user)) {
 							pl.sendData("EAG|SkinLayers", bpacket);
 						}
 					}
+				}else {
+					event.setCancelled(false);
 				}
 			}catch(Throwable t) {
 				// hacker
