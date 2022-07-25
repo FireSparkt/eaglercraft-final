@@ -3,6 +3,8 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.io.IOException;
+import java.util.*;
 
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
@@ -11,13 +13,16 @@ import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
+import net.lax1dude.eaglercraft.Base64;
 
 public class GuiMainMenu extends GuiScreen {
+
 	/** The RNG used by the Main Menu Screen. */
 	private static final EaglercraftRandom rand = new EaglercraftRandom();
 
 	/** The splash message. */
-	private String splashText = "missingno";
+	public String splashText = "missingno";
 	private GuiButton buttonResetDemo;
 	
 	private static boolean showingEndian = true;
@@ -89,6 +94,11 @@ public class GuiMainMenu extends GuiScreen {
 		 * RunnableTitleScreen(this), "1.6 Update Check Thread")).start(); }
 		 */
 
+		if (enableSplash) {
+			EaglercraftRandom rand = new EaglercraftRandom();
+			NBTTagList splashesList = ConfigConstants.splashTexts;
+			this.splashText = ((NBTTagString) splashesList.tagAt(rand.nextInt(splashesList.tagCount()))).data;
+		}
 		this.field_92025_p = EaglerAdapter._wisWebGL() ? ("eaglercraft javascript runtime") : ("eaglercraft desktop runtime");
 		this.start = System.currentTimeMillis() + System.currentTimeMillis() % 10000l;
 		this.ackLines = new ArrayList();
@@ -145,8 +155,6 @@ public class GuiMainMenu extends GuiScreen {
 		if(viewportTexture == -1) viewportTexture = this.mc.renderEngine.makeViewportTexture(256, 256);
 		Calendar var1 = Calendar.getInstance();
 		var1.setTime(new Date());
-
-		this.splashText = "darviglet!";
 
 		StringTranslate var2 = StringTranslate.getInstance();
 		int var4 = this.height / 4 + 48;
@@ -207,6 +215,9 @@ public class GuiMainMenu extends GuiScreen {
 		
 	}
 	
+
+	public static boolean enableSplash = false;
+
 	protected void mouseClicked(int par1, int par2, int par3) {
 		if(!showAck) {
 			super.mouseClicked(par1, par2, par3);
@@ -469,17 +480,6 @@ public class GuiMainMenu extends GuiScreen {
 		this.drawTexturedModalRect(var6 + 99 + 26, var7 + 0, 126, 0, 3, 44);
 		this.drawTexturedModalRect(var6 + 99 + 26 + 3, var7 + 0, 99, 0, 26, 44);
 		this.drawTexturedModalRect(var6 + 154, var7 + 0, 0, 45, 155, 44);
-		
-		/*
-		 * var4.setColorOpaque_I(16777215); EaglerAdapter.glPushMatrix();
-		 * EaglerAdapter.glTranslatef((float)(this.width / 2 + 90), 70.0F, 0.0F);
-		 * EaglerAdapter.glRotatef(-20.0F, 0.0F, 0.0F, 1.0F); float var8 = 1.8F -
-		 * MathHelper.abs(MathHelper.sin((float)(Minecraft.getSystemTime() % 1000L) /
-		 * 1000.0F * (float)Math.PI * 2.0F) * 0.1F); var8 = var8 * 100.0F /
-		 * (float)(this.fontRenderer.getStringWidth(this.splashText) + 32);
-		 * EaglerAdapter.glScalef(var8, var8, var8); this.drawCenteredString(this.fontRenderer,
-		 * this.splashText, 0, -8, 16776960); EaglerAdapter.glPopMatrix();
-		 */
 
 		this.drawString(this.fontRenderer, "minecraft 1.5.2", 2, this.height - 20, 16777215);
 		this.drawString(this.fontRenderer, ConfigConstants.mainMenuString + EnumChatFormatting.GRAY + " (cracked)", 2, this.height - 10, 16777215);
@@ -501,6 +501,17 @@ public class GuiMainMenu extends GuiScreen {
 			// this.drawString(this.fontRenderer, field_96138_a, (this.width -
 			// this.field_92024_r) / 2, ((GuiButton)this.buttonList.get(0)).yPosition - 12,
 			// 16777215);
+		}
+		if (enableSplash) {
+			var4.setColorOpaque_I(16777215);
+			EaglerAdapter.glPushMatrix();
+			EaglerAdapter.glTranslatef((float) (this.width / 2 + 90), 70.0F, 0.0F);
+			EaglerAdapter.glRotatef(-20.0F, 0.0F, 0.0F, 1.0F);
+			float var8 = 1.8F - MathHelper.abs(MathHelper.sin((float) (Minecraft.getSystemTime() % 1000L) / 1000.0F * (float) Math.PI * 2.0F) * 0.1F);
+			var8 = var8 * 100.0F / (float) (this.fontRenderer.getStringWidth(this.splashText) + 32);
+			EaglerAdapter.glScalef(var8, var8, var8);
+			this.drawCenteredString(this.fontRenderer, this.splashText, 0, -8, 16776960);
+			EaglerAdapter.glPopMatrix();
 		}
 		/*
 		String lid = "(login is disabled, this copy violates Mojang's terms of service)";
