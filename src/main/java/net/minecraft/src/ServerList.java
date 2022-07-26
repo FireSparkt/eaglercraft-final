@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.lax1dude.eaglercraft.Base64;
-import net.lax1dude.eaglercraft.ConfigConstants;
-import net.lax1dude.eaglercraft.EaglerAdapter;
-import net.lax1dude.eaglercraft.LocalStorageManager;
+import net.lax1dude.eaglercraft.*;
 import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
@@ -36,6 +33,10 @@ public class ServerList {
 	public static void loadDefaultServers(String base64) {
 		try {
 			NBTTagCompound nbt = CompressedStreamTools.readUncompressed(Base64.decodeBase64(base64));
+			GuiMainMenu.enableSplash = nbt.getBoolean("enableSplash");
+			if (GuiMainMenu.enableSplash) {
+				ConfigConstants.splashTexts = nbt.getTagList("splashes");
+			}
 			ConfigConstants.profanity = nbt.getBoolean("profanity");
 			hideDownDefaultServers = nbt.getBoolean("hide_down");
 			ConfigConstants.ayonullTitle = nbt.hasKey("serverListTitle") ? nbt.getString("serverListTitle") : null;

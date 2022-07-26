@@ -1,5 +1,7 @@
 package net.lax1dude.eaglercraft;
 
+import net.minecraft.src.NBTTagList;
+
 public class ConfigConstants {
 	
 	public static boolean profanity = false;
@@ -18,5 +20,6 @@ public class ConfigConstants {
 	public static String mainMenuItemLine1 = null;
 	public static String mainMenuItemLine2 = null;
 	public static String mainMenuItemLink = null;
+	public static NBTTagList splashTexts = null;
 	
 }
