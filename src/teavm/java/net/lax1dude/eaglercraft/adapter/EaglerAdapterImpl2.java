@@ -2219,8 +2219,7 @@ public class EaglerAdapterImpl2 {
 	public static final void addNearbyPlayer(String username) {
 		recentlyNearbyPlayers.remove(username);
 		if (nearbyPlayers.add(username)) {
-			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
-			sendVoiceRequest(username);
+			sendVoiceRequestIfNeeded(username);
 		}
 	}
 
@@ -2234,7 +2233,7 @@ public class EaglerAdapterImpl2 {
 		} catch (IOException ignored) {  }
 	}
 
-	public static final void sendVoiceRequestIfNeeded(String username) {
+	private static final void sendVoiceRequestIfNeeded(String username) {
 		if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
 		if (!voiceGains.containsKey(username)) sendVoiceRequest(username);
 	}
@@ -2249,7 +2248,7 @@ public class EaglerAdapterImpl2 {
 	public static final void removeNearbyPlayer(String username) {
 		if (nearbyPlayers.remove(username)) {
 			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
-			recentlyNearbyPlayers.add(username);
+			if (enabledChannel == Voice.VoiceChannel.PROXIMITY) recentlyNearbyPlayers.add(username);
 		}
 	}
 

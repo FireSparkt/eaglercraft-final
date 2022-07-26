@@ -1190,15 +1190,11 @@ public class Minecraft implements Runnable {
 					int prox = 22;
 					// cube
 					if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
-						if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) {
-							EaglerAdapter.addNearbyPlayer(player.username);
-							seenPlayers.add(player.username);
-						} else if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.GLOBAL) {
-							EaglerAdapter.sendVoiceRequestIfNeeded(player.username);
-						}
+						EaglerAdapter.addNearbyPlayer(player.username);
+						seenPlayers.add(player.username);
 					}
 				}
-				if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
+				EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
 			}
 		}
 
