@@ -3,8 +3,6 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.io.IOException;
-import java.util.*;
 
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
@@ -14,7 +12,6 @@ import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.minecraft.client.Minecraft;
-import net.lax1dude.eaglercraft.Base64;
 
 public class GuiMainMenu extends GuiScreen {
 
@@ -22,7 +19,7 @@ public class GuiMainMenu extends GuiScreen {
 	private static final EaglercraftRandom rand = new EaglercraftRandom();
 
 	/** The splash message. */
-	public String splashText = "missingno";
+	public String splashText = null;
 	private GuiButton buttonResetDemo;
 	
 	private static boolean showingEndian = true;
@@ -76,28 +73,14 @@ public class GuiMainMenu extends GuiScreen {
 	public boolean showAck = false;
 
 	public GuiMainMenu() {
-		/*
-		 * this.field_92025_p = ""; String var14 =
-		 * System.getProperty("os_architecture"); var3 =
-		 * System.getProperty("java_version");
-		 * 
-		 * if ("ppc".equalsIgnoreCase(var14)) { this.field_92025_p = "" +
-		 * EnumChatFormatting.BOLD + "Notice!" + EnumChatFormatting.RESET +
-		 * " PowerPC compatibility will be dropped in Minecraft 1.6";
-		 * this.field_104024_v = "http://tinyurl.com/javappc"; } else if (var3 != null
-		 * && var3.startsWith("1.5")) { this.field_92025_p = "" +
-		 * EnumChatFormatting.BOLD + "Notice!" + EnumChatFormatting.RESET +
-		 * " Java 1.5 compatibility will be dropped in Minecraft 1.6";
-		 * this.field_104024_v = "http://tinyurl.com/javappc"; }
-		 * 
-		 * if (this.field_92025_p.length() == 0) { (new Thread(new
-		 * RunnableTitleScreen(this), "1.6 Update Check Thread")).start(); }
-		 */
-
-		if (enableSplash) {
-			EaglercraftRandom rand = new EaglercraftRandom();
+		if (ConfigConstants.enableSplash) {
 			NBTTagList splashesList = ConfigConstants.splashTexts;
-			this.splashText = ((NBTTagString) splashesList.tagAt(rand.nextInt(splashesList.tagCount()))).data;
+			if(splashesList.tagCount() > 0) {
+				EaglercraftRandom rand = new EaglercraftRandom();
+				this.splashText = ((NBTTagString) splashesList.tagAt(rand.nextInt(splashesList.tagCount()))).data;
+			}else {
+				this.splashText = "missingno";
+			}
 		}
 		this.field_92025_p = EaglerAdapter._wisWebGL() ? ("eaglercraft javascript runtime") : ("eaglercraft desktop runtime");
 		this.start = System.currentTimeMillis() + System.currentTimeMillis() % 10000l;
@@ -115,7 +98,6 @@ public class GuiMainMenu extends GuiScreen {
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
-	
 
 	public void handleMouseInput() {
 		super.handleMouseInput();
@@ -214,9 +196,6 @@ public class GuiMainMenu extends GuiScreen {
 		}
 		
 	}
-	
-
-	public static boolean enableSplash = false;
 
 	protected void mouseClicked(int par1, int par2, int par3) {
 		if(!showAck) {
@@ -502,7 +481,7 @@ public class GuiMainMenu extends GuiScreen {
 			// this.field_92024_r) / 2, ((GuiButton)this.buttonList.get(0)).yPosition - 12,
 			// 16777215);
 		}
-		if (enableSplash) {
+		if (this.splashText != null) {
 			var4.setColorOpaque_I(16777215);
 			EaglerAdapter.glPushMatrix();
 			EaglerAdapter.glTranslatef((float) (this.width / 2 + 90), 70.0F, 0.0F);

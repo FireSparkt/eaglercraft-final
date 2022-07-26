@@ -20,6 +20,8 @@ public class ConfigConstants {
 	public static String mainMenuItemLine1 = null;
 	public static String mainMenuItemLine2 = null;
 	public static String mainMenuItemLink = null;
+
+	public static boolean enableSplash = false;
 	public static NBTTagList splashTexts = null;
 	
 }

@@ -33,8 +33,8 @@ public class ServerList {
 	public static void loadDefaultServers(String base64) {
 		try {
 			NBTTagCompound nbt = CompressedStreamTools.readUncompressed(Base64.decodeBase64(base64));
-			GuiMainMenu.enableSplash = nbt.getBoolean("enableSplash");
-			if (GuiMainMenu.enableSplash) {
+			ConfigConstants.enableSplash = nbt.getBoolean("enableSplash");
+			if (ConfigConstants.enableSplash) {
 				ConfigConstants.splashTexts = nbt.getTagList("splashes");
 			}
 			ConfigConstants.profanity = nbt.getBoolean("profanity");
