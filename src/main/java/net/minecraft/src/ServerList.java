@@ -33,10 +33,6 @@ public class ServerList {
 	public static void loadDefaultServers(String base64) {
 		try {
 			NBTTagCompound nbt = CompressedStreamTools.readUncompressed(Base64.decodeBase64(base64));
-			ConfigConstants.enableSplash = nbt.getBoolean("enableSplash");
-			if (ConfigConstants.enableSplash) {
-				ConfigConstants.splashTexts = nbt.getTagList("splashes");
-			}
 			ConfigConstants.profanity = nbt.getBoolean("profanity");
 			hideDownDefaultServers = nbt.getBoolean("hide_down");
 			ConfigConstants.ayonullTitle = nbt.hasKey("serverListTitle") ? nbt.getString("serverListTitle") : null;
@@ -48,6 +44,13 @@ public class ServerList {
 					ConfigConstants.mainMenuItemLine0 = cmp.getStringOrNull("itemLine0");
 					ConfigConstants.mainMenuItemLine1 = cmp.getStringOrNull("itemLine1");
 					ConfigConstants.mainMenuItemLine2 = cmp.getStringOrNull("itemLine2");
+				}
+				if(cmp.hasKey("splashes")) {
+					ConfigConstants.splashTexts = new ArrayList();
+					NBTTagList t = cmp.getTagList("splashes");
+					for(int i = 0, l = t.tagCount(); i < l; ++i) {
+						ConfigConstants.splashTexts.add(((NBTTagString)t.tagAt(i)).data);
+					}
 				}
 			}
 			forcedServers.clear();

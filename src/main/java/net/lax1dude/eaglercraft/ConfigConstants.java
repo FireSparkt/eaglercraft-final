@@ -1,12 +1,12 @@
 package net.lax1dude.eaglercraft;
 
-import net.minecraft.src.NBTTagList;
+import java.util.List;
 
 public class ConfigConstants {
 	
 	public static boolean profanity = false;
 
-	public static final String version = "22w29b";
+	public static final String version = "22w30a";
 	public static final String mainMenuString = "eaglercraft " + version;
 	
 	public static final String forkMe = "https://github.com/LAX1DUDE/eaglercraft";
@@ -21,7 +21,6 @@ public class ConfigConstants {
 	public static String mainMenuItemLine2 = null;
 	public static String mainMenuItemLink = null;
 
-	public static boolean enableSplash = false;
-	public static NBTTagList splashTexts = null;
+	public static List<String> splashTexts = null;
 	
 }

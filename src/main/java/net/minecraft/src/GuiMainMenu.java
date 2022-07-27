@@ -3,6 +3,7 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
@@ -73,11 +74,11 @@ public class GuiMainMenu extends GuiScreen {
 	public boolean showAck = false;
 
 	public GuiMainMenu() {
-		if (ConfigConstants.enableSplash) {
-			NBTTagList splashesList = ConfigConstants.splashTexts;
-			if(splashesList.tagCount() > 0) {
+		List<String> lst = ConfigConstants.splashTexts;
+		if (lst != null) {
+			if(lst.size() > 0) {
 				EaglercraftRandom rand = new EaglercraftRandom();
-				this.splashText = ((NBTTagString) splashesList.tagAt(rand.nextInt(splashesList.tagCount()))).data;
+				this.splashText = lst.get(rand.nextInt(lst.size()));
 			}else {
 				this.splashText = "missingno";
 			}
