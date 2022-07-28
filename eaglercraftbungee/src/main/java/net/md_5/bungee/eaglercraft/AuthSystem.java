@@ -51,6 +51,7 @@ public class AuthSystem {
 	private final Map<String, AuthData> database = new HashMap<>();
 
 	public boolean register(String username, String password, String ip) {
+		username = username.toLowerCase();
 		synchronized (database) {
 			AuthData authData = database.get(username);
 			if (authData != null)
@@ -66,12 +67,14 @@ public class AuthSystem {
 	}
 
 	public boolean isRegistered(String username) {
+		username = username.toLowerCase();
 		synchronized (database) {
 			return database.containsKey(username);
 		}
 	}
 
 	public boolean changePass(String username, String password) {
+		username = username.toLowerCase();
 		synchronized (database) {
 			AuthData authData = database.get(username);
 			authData.salt = createSalt(16);
@@ -82,6 +85,7 @@ public class AuthSystem {
 	}
 
 	public boolean login(String username, String password) {
+		username = username.toLowerCase();
 		synchronized (database) {
 			AuthData authData = database.get(username);
 			if (authData == null)
