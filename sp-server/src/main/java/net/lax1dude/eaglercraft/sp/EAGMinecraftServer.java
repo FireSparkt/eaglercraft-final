@@ -66,9 +66,9 @@ public class EAGMinecraftServer extends MinecraftServer {
 					}
 				}
 				delta -= 50L;
+				lastTick = System.currentTimeMillis();
 				this.tick();
 				mustYield = true;
-				lastTick = System.currentTimeMillis();
 			}
 		}
 		

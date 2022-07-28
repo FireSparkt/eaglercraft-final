@@ -334,7 +334,7 @@ public class WorldServer extends World {
 					}
 				}
 			}
-
+			
 			this.theProfiler.endStartSection("tickTiles");
 			ExtendedBlockStorage[] var19 = var7.getBlockStorageArray();
 			var9 = var19.length;
