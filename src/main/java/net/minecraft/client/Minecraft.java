@@ -10,7 +10,6 @@ import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
-import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.GuiScreenLicense;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
@@ -82,6 +81,7 @@ import net.minecraft.src.TextureManager;
 import net.minecraft.src.TexturePackList;
 import net.minecraft.src.Timer;
 import net.minecraft.src.WorldClient;
+import net.minecraft.src.WorldSettings;
 
 public class Minecraft implements Runnable {
 	

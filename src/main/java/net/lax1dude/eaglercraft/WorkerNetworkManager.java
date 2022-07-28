@@ -114,4 +114,9 @@ public class WorkerNetworkManager implements INetworkManager {
 		}
 	}
 
+	@Override
+	public String getServerURI() {
+		return "[integrated]";
+	}
+
 }
