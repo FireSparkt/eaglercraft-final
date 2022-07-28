@@ -115,4 +115,8 @@ public class GuiCommandBlock extends GuiScreen {
 		this.commandTextField.drawTextBox();
 		super.drawScreen(par1, par2, par3);
 	}
+
+	public boolean blockHotKeys() {
+		return commandTextField.isFocused();
+	}
 }

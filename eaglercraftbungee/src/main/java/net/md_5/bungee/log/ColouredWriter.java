@@ -5,11 +5,13 @@
 package net.md_5.bungee.log;
 
 import java.io.IOException;
-import org.fusesource.jansi.Ansi;
 import java.util.EnumMap;
+import java.util.Map;
+
+import org.fusesource.jansi.Ansi;
+
 import jline.console.ConsoleReader;
 import net.md_5.bungee.api.ChatColor;
-import java.util.Map;
 
 public class ColouredWriter {
 	private final Map<ChatColor, String> replacements;

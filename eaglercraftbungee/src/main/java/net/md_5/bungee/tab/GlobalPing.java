@@ -4,9 +4,8 @@
 
 package net.md_5.bungee.tab;
 
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 
 public class GlobalPing extends Global {
 	private static final int PING_THRESHOLD = 20;

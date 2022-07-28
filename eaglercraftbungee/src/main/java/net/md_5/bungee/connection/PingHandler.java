@@ -5,12 +5,13 @@
 package net.md_5.bungee.connection;
 
 import java.beans.ConstructorProperties;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.api.ServerPing;
+
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
 
 public class PingHandler extends PacketHandler {
 	private final ServerInfo target;

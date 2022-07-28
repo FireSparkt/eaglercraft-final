@@ -5,16 +5,17 @@
 package net.md_5.bungee.api.event;
 
 import java.beans.ConstructorProperties;
-import java.util.Map;
 import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
-import com.google.common.base.Preconditions;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicBoolean;
-import net.md_5.bungee.api.plugin.Plugin;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.base.Preconditions;
+
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.plugin.Event;
+import net.md_5.bungee.api.plugin.Plugin;
 
 public class AsyncEvent<T> extends Event {
 	private final Callback<T> done;

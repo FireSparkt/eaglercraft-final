@@ -144,4 +144,8 @@ public class GuiEditSign extends GuiScreen {
 		EaglerAdapter.glPopMatrix();
 		super.drawScreen(par1, par2, par3);
 	}
+	
+	public boolean blockHotKeys() {
+		return true;
+	}
 }

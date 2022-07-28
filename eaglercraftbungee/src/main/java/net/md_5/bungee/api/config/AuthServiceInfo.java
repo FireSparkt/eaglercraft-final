@@ -1,35 +1,48 @@
 package net.md_5.bungee.api.config;
 
-import java.io.File;
+import java.util.List;
 
 public class AuthServiceInfo {
 
 	private final boolean enabled;
-	private final String limbo;
-	private final File authfile;
-	private final int timeout;
+	private final boolean registerEnabled;
+	private final String authfile;
+	private final int ipLimit;
+	private final List<String> joinMessages;
+	private final int loginTimeout;
 	
-	public AuthServiceInfo(boolean enabled, String limbo, File authfile, int timeout) {
+	public AuthServiceInfo(boolean enabled, boolean registerEnabled, String authfile,
+			int timeout, List<String> joinMessages, int loginTimeout) {
 		this.enabled = enabled;
-		this.limbo = limbo;
+		this.registerEnabled = registerEnabled;
 		this.authfile = authfile;
-		this.timeout = timeout;
+		this.ipLimit = timeout;
+		this.joinMessages = joinMessages;
+		this.loginTimeout = loginTimeout;
 	}
 
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public String getLimbo() {
-		return limbo;
+	public boolean isRegisterEnabled() {
+		return registerEnabled;
 	}
 
-	public File getAuthfile() {
+	public String getAuthfile() {
 		return authfile;
 	}
 
-	public int getTimeout() {
-		return timeout;
+	public int getIpLimit() {
+		return ipLimit;
+	}
+
+	public List<String> getJoinMessages() {
+		return joinMessages;
+	}
+
+	public int getLoginTimeout() {
+		return loginTimeout;
 	}
 
 }

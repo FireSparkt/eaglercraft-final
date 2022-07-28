@@ -5,38 +5,39 @@
 package net.md_5.bungee.connection;
 
 import java.beans.ConstructorProperties;
-import net.md_5.bungee.api.event.ServerKickEvent;
+import java.net.InetAddress;
 import java.util.Objects;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
-import java.util.Iterator;
-import com.google.common.io.ByteArrayDataOutput;
+
 import com.google.common.io.ByteArrayDataInput;
-import java.util.Collection;
-import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.api.event.PluginMessageEvent;
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.api.score.Team;
-import net.md_5.bungee.protocol.packet.PacketD1Team;
-import net.md_5.bungee.api.score.Position;
-import net.md_5.bungee.protocol.packet.PacketD0DisplayScoreboard;
-import net.md_5.bungee.api.score.Score;
-import net.md_5.bungee.protocol.packet.PacketCFScoreboardScore;
-import net.md_5.bungee.api.score.Scoreboard;
-import net.md_5.bungee.api.score.Objective;
-import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
-import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
+
+import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.EntityMap;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.Util;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.Util;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerKickEvent;
+import net.md_5.bungee.api.score.Objective;
+import net.md_5.bungee.api.score.Position;
+import net.md_5.bungee.api.score.Score;
+import net.md_5.bungee.api.score.Scoreboard;
+import net.md_5.bungee.api.score.Team;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
+import net.md_5.bungee.protocol.packet.PacketCEScoreboardObjective;
+import net.md_5.bungee.protocol.packet.PacketCFScoreboardScore;
+import net.md_5.bungee.protocol.packet.PacketD0DisplayScoreboard;
+import net.md_5.bungee.protocol.packet.PacketD1Team;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
 
 public class DownstreamBridge extends PacketHandler {
 	private final ProxyServer bungee;
@@ -201,8 +202,14 @@ public class DownstreamBridge extends PacketHandler {
 			}
 			if (subChannel.equals("IP")) {
 				out.writeUTF("IP");
-				out.writeUTF(this.con.getAddress().getHostString());
-				out.writeInt(this.con.getAddress().getPort());
+				Object ob = this.con.getAttachment().get("remoteAddr");
+				if(ob != null && (ob instanceof InetAddress)) {
+					out.writeUTF(((InetAddress)ob).getHostAddress());
+					out.writeInt(this.con.getAddress().getPort());
+				}else {
+					out.writeUTF(this.con.getAddress().getHostString());
+					out.writeInt(this.con.getAddress().getPort());
+				}
 			}
 			if (subChannel.equals("PlayerCount")) {
 				final String target = in.readUTF();
@@ -245,6 +252,26 @@ public class DownstreamBridge extends PacketHandler {
 			if (subChannel.equals("GetServer")) {
 				out.writeUTF("GetServer");
 				out.writeUTF(this.server.getInfo().getName());
+			}
+			if (subChannel.equals("EAG|GetDomain")) {
+				out.writeUTF("EAG|GetDomain");
+				Object ob = this.con.getAttachment().get("origin");
+				if(ob != null && (ob instanceof String)) {
+					out.writeBoolean(true);
+					out.writeUTF((String)ob);
+				}else {
+					out.writeBoolean(false);
+					out.writeUTF("");
+				}
+			}
+			if (subChannel.equals("EAG|ConsoleCommand")) {
+				if(BungeeCord.getInstance().config.shouldAcceptBukkitConsoleCommandPacket()) {
+					String cmd = in.readUTF();
+					bungee.getLogger().info("Connection [" + this.con.getName() + "] <-> [" + this.server.getInfo().getName() + "] executed bungee console command: " + cmd);
+					bungee.getPluginManager().dispatchCommand(bungee.getConsole(), cmd);
+				}else {
+					bungee.getLogger().info("Connection [" + this.con.getName() + "] <-> [" + this.server.getInfo().getName() + "] tried executing a bungee console command but \"accept_bukkit_console_command_packets\" is set to false in config.yml");
+				}
 			}
 			if (out != null) {
 				final byte[] b = out.toByteArray();

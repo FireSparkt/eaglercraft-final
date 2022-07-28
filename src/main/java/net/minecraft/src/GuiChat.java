@@ -296,4 +296,8 @@ public class GuiChat extends GuiScreen {
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
+
+	public boolean blockHotKeys() {
+		return true;
+	}
 }

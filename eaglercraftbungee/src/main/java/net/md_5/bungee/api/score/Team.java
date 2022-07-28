@@ -5,9 +5,9 @@
 package net.md_5.bungee.api.score;
 
 import java.beans.ConstructorProperties;
-import java.util.HashSet;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Team {
@@ -19,7 +19,7 @@ public class Team {
 	private Set<String> players;
 
 	public Collection<String> getPlayers() {
-		return (Collection<String>) Collections.unmodifiableSet((Set<?>) this.players);
+		return (Collection<String>) (Collection<?>) Collections.unmodifiableSet((Set<?>) this.players);
 	}
 
 	public void addPlayer(final String name) {

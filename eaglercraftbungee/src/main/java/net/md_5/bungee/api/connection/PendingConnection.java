@@ -4,8 +4,9 @@
 
 package net.md_5.bungee.api.connection;
 
-import net.md_5.bungee.api.config.ListenerInfo;
 import java.net.InetSocketAddress;
+
+import net.md_5.bungee.api.config.ListenerInfo;
 
 public interface PendingConnection extends Connection {
 	String getName();

@@ -2,12 +2,28 @@
 <html>
 <head>
 <title>eagler</title>
+<meta charset="UTF-8" />
+<script type="text/javascript" src="eagswebrtc.js"></script>
 <script type="text/javascript" src="classes.js"></script>
 <script type="text/javascript">
-window.addEventListener("load", function(){ window.minecraftOpts = [
+if(document.location.href.startsWith("file:")) {
+alert("You're not supposed to 'open' this file in your browser. Please upload this folder to your HTTP(s) server and access it via the internet. This is not a bug, please read the documentation");
+}else {
+window.addEventListener("load", function(){
+window.minecraftOpts = [
 "game_frame","assets.epk",
-"CgAACQAHc2VydmVycwoAAAABCAACaXAAFXdzOi8vMTI3LjAuMC4xOjI1NTY1LwgABG5hbWUAC3Rlc3Qgc2VydmVyAQALaGlkZUFkZHJlc3MACAAKZm9yY2VkTU9URAAabG9jYWwgc2VydmVyIG9uIHBvcnQgMjU1NjUAAA=="
-]; main(); });
+"CgAACQAHc2VydmVycwoAAAABCAAEbmFtZQAMbG9jYWwgc2VydmVyCAACaXAAD2xvY2FsaG9zdDoyNTU2NQEAC2hpZGVBZGRyZXNzAAAKAAhtYWluTWVudQkACHNwbGFzaGVzCAAAAAoACkRhcnZpZ2xldCEADkRhcnZpZ2xvcGhpbGUhAAtZb3UgRWFnbGVyIQALWWVlZWVlZWVlZSEAC1lvdSBZZWVsZXIhAA1FRUVFRUVFRUVFRUUhAAtZb3UgRGFydmlnIQAJWW91IFZpZ2chAAI6PgACfD4AAA=="
+];
+(function(){
+var q = window.location.search;
+if(typeof q === 'string' && q.startsWith("?")) {
+	q = new URLSearchParams(q);
+	var s = q.get("server");
+	if(s) window.minecraftOpts.push(s);
+}
+})();
+main();
+});}
 </script>
 </head>
 <body style="margin:0px;width:100vw;height:100vh;" id="game_frame">

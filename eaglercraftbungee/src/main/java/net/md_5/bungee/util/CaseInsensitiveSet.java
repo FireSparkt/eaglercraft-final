@@ -5,8 +5,9 @@
 package net.md_5.bungee.util;
 
 import java.util.Collection;
-import gnu.trove.strategy.HashingStrategy;
+
 import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 public class CaseInsensitiveSet extends TCustomHashSet<String> {
 	public CaseInsensitiveSet() {

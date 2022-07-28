@@ -95,6 +95,8 @@ public class GameSettings {
 	/** true if debug info should be displayed instead of version */
 	public boolean showDebugInfo;
 	public boolean showDebugProfilerChart;
+	
+	public boolean showCoordinates;
 
 	/** The lastServer string. */
 	public String lastServer;
@@ -123,6 +125,23 @@ public class GameSettings {
 	/** Game settings language */
 	public String language;
 
+	public boolean showSkinJacket = true;
+	public boolean showSkinHat = true;
+	public boolean showSkinLeftArm = true;
+	public boolean showSkinRightArm = true;
+	public boolean showSkinLeftLeg = true;
+	public boolean showSkinRightLeg = true;
+
+	public boolean allowFNAWSkins = true;
+	public boolean showOtherCapes = true;
+
+	public int chunkUpdatePerFrame = 0;
+
+	public int voiceListenRadius = 16;
+	public float voiceListenVolume = 0.5f;
+	public float voiceSpeakVolume = 0.5f;
+	public int voicePTTKey = 47;
+
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
 				this.keyBindChat, this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindSprint, this.keyBindZoom, this.keyBindFunction };
@@ -131,6 +150,7 @@ public class GameSettings {
 		this.thirdPersonView = 0;
 		this.showDebugInfo = false;
 		this.showDebugProfilerChart = true;
+		this.showCoordinates = true;
 		this.lastServer = "";
 		this.noclip = false;
 		this.smoothCamera = false;
@@ -278,6 +298,10 @@ public class GameSettings {
 
 		if (par1EnumOptions == EnumOptions.FRAMERATE_LIMIT) {
 			this.limitFramerate = (this.limitFramerate + par2 + 3) % 3;
+		}
+
+		if (par1EnumOptions == EnumOptions.CHUNK_UPDATES) {
+			this.chunkUpdatePerFrame = (this.chunkUpdatePerFrame + par2) % 5;
 		}
 
 		if (par1EnumOptions == EnumOptions.DIFFICULTY) {
@@ -449,8 +473,9 @@ public class GameSettings {
 					: (par1EnumOptions == EnumOptions.FRAMERATE_LIMIT ? var3 + getTranslation(LIMIT_FRAMERATES, this.limitFramerate)
 					: (par1EnumOptions == EnumOptions.AMBIENT_OCCLUSION ? var3 + getTranslation(AMBIENT_OCCLUSIONS, this.ambientOcclusion)
 					: (par1EnumOptions == EnumOptions.ANTIALIASING ? var3 + getTranslation(ANTIALIASING, this.antialiasMode)
+					: (par1EnumOptions == EnumOptions.CHUNK_UPDATES ? var3 + (chunkUpdatePerFrame + 1)
 					: (par1EnumOptions == EnumOptions.GRAPHICS ? (this.fancyGraphics ? var3 + var2.translateKey("options.graphics.fancy") : var3 + var2.translateKey("options.graphics.fast"))
-							: var3))))))));
+							: var3)))))))));
 		}
 	}
 
@@ -499,6 +524,27 @@ public class GameSettings {
 			if(yee.hasKey("chatScale")) this.chatScale = yee.getFloat("chatScale");
 			if(yee.hasKey("chatWidth")) this.chatWidth = yee.getFloat("chatWidth");
 			if(yee.hasKey("patchAnisotropic")) this.patchAnisotropic = yee.getBoolean("patchAnisotropic");
+			if(yee.hasKey("showCoordinates")) this.showCoordinates = yee.getBoolean("showCoordinates");
+			if(yee.hasKey("showSkinJacket")) showSkinJacket = yee.getBoolean("showSkinJacket");
+			if(yee.hasKey("showSkinHat")) showSkinHat = yee.getBoolean("showSkinHat");
+			if(yee.hasKey("showSkinLeftArm")) showSkinLeftArm = yee.getBoolean("showSkinLeftArm");
+			if(yee.hasKey("showSkinRightArm")) showSkinRightArm = yee.getBoolean("showSkinRightArm");
+			if(yee.hasKey("showSkinLeftLeg")) showSkinLeftLeg = yee.getBoolean("showSkinLeftLeg");
+			if(yee.hasKey("showSkinRightLeg")) showSkinRightLeg = yee.getBoolean("showSkinRightLeg");
+			if(yee.hasKey("allowFNAWSkins")) allowFNAWSkins = yee.getBoolean("allowFNAWSkins");
+			if(yee.hasKey("showOtherCapes")) showOtherCapes = yee.getBoolean("showOtherCapes");
+			if(yee.hasKey("chunkUpdates")) chunkUpdatePerFrame = yee.getInteger("chunkUpdates");
+			if(yee.hasKey("voiceListenVolume")) voiceListenVolume = yee.getFloat("voiceListenVolume");
+			if(yee.hasKey("voiceSpeakVolume")) voiceSpeakVolume = yee.getFloat("voiceSpeakVolume");
+			if(yee.hasKey("voicePTTKey")) voicePTTKey = yee.getInteger("voicePTTKey");
+			if(yee.hasKey("voiceListenRadius")) voiceListenRadius = yee.getInteger("voiceListenRadius");
+			
+			if(voiceListenRadius < 5) voiceListenRadius = 5;
+			else if(voiceListenRadius > 22) voiceListenRadius = 22;
+
+			EaglerAdapter.setVoiceListenVolume(voiceListenVolume);
+			EaglerAdapter.setVoiceSpeakVolume(voiceSpeakVolume);
+			EaglerAdapter.setVoiceProximity(voiceListenRadius);
 			
 			for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 				if(yee.hasKey(keyBindings[var4].keyDescription)) this.keyBindings[var4].keyCode = yee.getInteger(keyBindings[var4].keyDescription);
@@ -552,6 +598,20 @@ public class GameSettings {
 		yee.setFloat("chatScale", this.chatScale);
 		yee.setFloat("chatWidth", this.chatWidth);
 		yee.setBoolean("patchAnisotropic", this.patchAnisotropic);
+		yee.setBoolean("showCoordinates", this.showCoordinates);
+		yee.setBoolean("showSkinJacket", showSkinJacket);
+		yee.setBoolean("showSkinHat", showSkinHat);
+		yee.setBoolean("showSkinLeftArm", showSkinLeftArm);
+		yee.setBoolean("showSkinRightArm", showSkinRightArm);
+		yee.setBoolean("showSkinLeftLeg", showSkinLeftLeg);
+		yee.setBoolean("showSkinRightLeg", showSkinRightLeg);
+		yee.setBoolean("allowFNAWSkins", allowFNAWSkins);
+		yee.setBoolean("showOtherCapes", showOtherCapes);
+		yee.setInteger("chunkUpdates", chunkUpdatePerFrame);
+		yee.setFloat("voiceListenVolume", voiceListenVolume);
+		yee.setFloat("voiceSpeakVolume", voiceSpeakVolume);
+		yee.setInteger("voicePTTKey", voicePTTKey);
+		yee.setInteger("voiceListenRadius", voiceListenRadius);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);
@@ -568,7 +628,19 @@ public class GameSettings {
 	public void sendSettingsToServer() {
 		if (this.mc.thePlayer != null) {
 			this.mc.thePlayer.sendQueue.addToSendQueue(new Packet204ClientInfo(this.language, this.renderDistance, this.chatVisibility, this.chatColours, this.difficulty, this.showCape));
+			this.mc.thePlayer.sendQueue.addToSendQueue(new Packet250CustomPayload("EAG|SkinLayers", new byte[] { (byte)getSkinLayers() }));
 		}
+	}
+	
+	public int getSkinLayers() {
+		int skinLayersByte = 0;
+		if(showSkinJacket) skinLayersByte |= 1;
+		if(showSkinHat) skinLayersByte |= 2;
+		if(showSkinLeftArm) skinLayersByte |= 4;
+		if(showSkinRightArm) skinLayersByte |= 8;
+		if(showSkinLeftLeg) skinLayersByte |= 16;
+		if(showSkinRightLeg) skinLayersByte |= 32;
+		return skinLayersByte;
 	}
 
 	/**

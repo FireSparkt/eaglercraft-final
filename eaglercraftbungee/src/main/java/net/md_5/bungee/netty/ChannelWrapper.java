@@ -4,8 +4,8 @@
 
 package net.md_5.bungee.netty;
 
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
 public class ChannelWrapper {
 	private final Channel ch;

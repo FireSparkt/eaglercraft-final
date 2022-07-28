@@ -4,9 +4,8 @@
 
 package net.md_5.bungee;
 
-import java.util.Iterator;
-import java.util.Collection;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 
 public class Util {
 	private static final int DEFAULT_PORT = 25565;

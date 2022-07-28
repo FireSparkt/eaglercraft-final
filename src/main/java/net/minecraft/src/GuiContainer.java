@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public abstract class GuiContainer extends GuiScreen {
 	/** Stacks renderer. Icons, stack size, health, etc... */

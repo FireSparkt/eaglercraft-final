@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
-import net.minecraft.client.Minecraft;
+import net.lax1dude.eaglercraft.EaglercraftRandom;
 
 public class SoundManager {
 	
@@ -43,13 +42,13 @@ public class SoundManager {
 	private ArrayList<EntitySoundEvent> soundevents;
 	private ArrayList<QueuedSoundEvent> queuedsoundevents;
 	private HashMap<String,Integer> sounddefinitions;
-	private Random soundrandom;
+	private EaglercraftRandom soundrandom;
 
 	public SoundManager() {
 		this.soundevents = new ArrayList();
 		this.queuedsoundevents = new ArrayList();
 		this.sounddefinitions = null;
-		this.soundrandom = new Random();
+		this.soundrandom = new EaglercraftRandom();
 	}
 
 	/**
@@ -57,10 +56,12 @@ public class SoundManager {
 	 */
 	public void loadSoundSettings(GameSettings par1GameSettings) {
 		this.options = par1GameSettings;
+		EaglerAdapter.setMasterVolume(options.soundVolume);
 		if(this.sounddefinitions == null) {
 			this.sounddefinitions = new HashMap();
 			try {
 				NBTTagCompound file = CompressedStreamTools.readUncompressed(EaglerAdapter.loadResourceBytes("/sounds/sounds.dat"));
+				EaglerAdapter.setPlaybackOffsetDelay(file.hasKey("playbackOffset") ? file.getFloat("playbackOffset") : 0.03f);
 				NBTTagList l = file.getTagList("sounds");
 				int c = l.tagCount();
 				for(int i = 0; i < c; i++) {
@@ -77,7 +78,7 @@ public class SoundManager {
 	 * Called when one of the sound level options has changed.
 	 */
 	public void onSoundOptionsChanged() {
-		
+		EaglerAdapter.setMasterVolume(options.soundVolume);
 	}
 
 	/**
@@ -107,11 +108,10 @@ public class SoundManager {
 			double pitch = par1EntityLiving.prevRotationPitch + (par1EntityLiving.rotationPitch - par1EntityLiving.prevRotationPitch) * par2;
 			double yaw = par1EntityLiving.prevRotationYaw + (par1EntityLiving.rotationYaw - par1EntityLiving.prevRotationYaw) * par2;
 			
-			// I don't want to talk about this lol
-			
-			if((!Double.isNaN(x) && Double.isFinite(x)) && (!Double.isNaN(y) && Double.isFinite(y)) && (!Double.isNaN(z) && Double.isFinite(z))
-					&& (!Double.isNaN(pitch) && Double.isFinite(pitch)) && (!Double.isNaN(yaw) && Double.isFinite(yaw))) {
+			try {
 				EaglerAdapter.setListenerPos((float)x, (float)y, (float)z, (float)par1EntityLiving.motionX, (float)par1EntityLiving.motionY, (float)par1EntityLiving.motionZ, (float)pitch, (float)yaw);
+			}catch(Throwable t) {
+				System.err.println("AudioListener f***ed up again");
 			}
 		}
 	}
@@ -216,8 +216,7 @@ public class SoundManager {
 				return;
 			}
 		}
-		float v = par3 * this.options.soundVolume;
-		if(v > 0.0F) {
+		if(this.options.soundVolume > 0.0F && par3 > 0.0F) {
 			Integer ct = this.sounddefinitions.get(par1Str);
 			if(ct != null) {
 				int c = ct.intValue();
@@ -229,7 +228,7 @@ public class SoundManager {
 					path = "/sounds/"+par1Str.replace('.', '/')+r+".mp3";
 				}
 				int id = 0;
-				soundevents.add(new EntitySoundEvent(par2Entity, id = EaglerAdapter.beginPlayback(path, 0f, 0f, 0f, v, par4)));
+				soundevents.add(new EntitySoundEvent(par2Entity, id = EaglerAdapter.beginPlayback(path, 0f, 0f, 0f, par3, par4)));
 				EaglerAdapter.moveSound(id, (float)par2Entity.posX, (float)par2Entity.posY, (float)par2Entity.posZ, (float)par2Entity.motionX, (float)par2Entity.motionY, (float)par2Entity.motionZ);
 			}else {
 				System.err.println("unregistered sound effect: "+par1Str);
@@ -241,8 +240,7 @@ public class SoundManager {
 	 * Plays a sound. Args: soundName, x, y, z, volume, pitch
 	 */
 	public void playSound(String par1Str, float par2, float par3, float par4, float par5, float par6) {
-		float v = par5 * this.options.soundVolume;
-		if(v > 0.0F) {
+		if(this.options.soundVolume > 0.0F && par5 > 0.0F) {
 			Integer ct = this.sounddefinitions.get(par1Str);
 			if(ct != null) {
 				int c = ct.intValue();
@@ -253,7 +251,7 @@ public class SoundManager {
 					int r = soundrandom.nextInt(c) + 1;
 					path = "/sounds/"+par1Str.replace('.', '/')+r+".mp3";
 				}
-				EaglerAdapter.beginPlayback(path, par2, par3, par4, v, par6);
+				EaglerAdapter.beginPlayback(path, par2, par3, par4, par5, par6);
 			}else {
 				System.err.println("unregistered sound effect: "+par1Str);
 			}
@@ -266,8 +264,7 @@ public class SoundManager {
 	 * balanced)
 	 */
 	public void playSoundFX(String par1Str, float par2, float par3) {
-		float v = par3 * this.options.soundVolume;
-		if(v > 0.0F) {
+		if(this.options.soundVolume > 0.0F && par2 > 0.0F) {
 			Integer ct = this.sounddefinitions.get(par1Str);
 			if(ct != null) {
 				int c = ct.intValue();
@@ -278,7 +275,7 @@ public class SoundManager {
 					int r = soundrandom.nextInt(c) + 1;
 					path = "/sounds/"+par1Str.replace('.', '/')+r+".mp3";
 				}
-				EaglerAdapter.beginPlaybackStatic(path, v, par3);
+				EaglerAdapter.beginPlaybackStatic(path, par2, par3);
 			}else {
 				System.err.println("unregistered sound effect: "+par1Str);
 			}

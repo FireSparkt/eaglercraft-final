@@ -3,15 +3,13 @@ package net.minecraft.src;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
-import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.EffectPipelineFXAA;
+import net.minecraft.client.Minecraft;
 
 public class EntityRenderer {
 	public static boolean anaglyphEnable = false;
@@ -876,7 +874,7 @@ public class EntityRenderer {
 				}
 			}
 			
-			GuiScreenVoiceChannel.drawOverlay();
+			mc.voiceOverlay.drawOverlay();
 		}
 		
 	}
@@ -910,7 +908,9 @@ public class EntityRenderer {
 		EffectPipelineFXAA.displayWidth = this.mc.displayWidth;
 		EffectPipelineFXAA.displayHeight = this.mc.displayHeight;
 		EffectPipelineFXAA.beginPipelineRender();
-
+		
+		RenderManager.instance.voiceTagsDrawnThisFrame.clear();
+		
 		for (int var13 = 0; var13 < 2; ++var13) {
 			if (this.mc.gameSettings.anaglyph) {
 				anaglyphField = var13;
@@ -974,8 +974,13 @@ public class EntityRenderer {
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			RenderHelper.disableStandardItemLighting();
 			terrain.bindTexture();
-			EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
-			EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
+			if(EaglerAdapter.isKeyDown(34)) {
+				EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 1.0f);
+				EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST);
+			}else {
+				EaglerAdapter.glTexParameterf(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
+				EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_NEAREST_MIPMAP_LINEAR);
+			}
 			EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.6f);
 			this.mc.mcProfiler.endStartSection("terrain");
 			var5.sortAndRender(var4, 0, (double) par1);
@@ -1171,9 +1176,9 @@ public class EntityRenderer {
 				this.rainSoundCounter = 0;
 
 				if (var10 > var2.posY + 1.0D && var3.getPrecipitationHeight(MathHelper.floor_double(var2.posX), MathHelper.floor_double(var2.posZ)) > MathHelper.floor_double(var2.posY)) {
-					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.006F, 0.5F, false);
+					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.45F, 0.5F, false);
 				} else {
-					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.012F, 1.0F, false);
+					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.7F, 1.0F, false);
 				}
 			}
 		}

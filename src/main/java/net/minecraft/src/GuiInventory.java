@@ -1,9 +1,8 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiInventory extends InventoryEffectRenderer {
 	/**

@@ -5,6 +5,7 @@
 package net.md_5.bungee.api.event;
 
 import java.util.Arrays;
+
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.plugin.Cancellable;
 

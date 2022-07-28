@@ -33,22 +33,91 @@ menu.simulating=Simulating the world for a bit
 menu.respawning=Respawning
 menu.shareToLan=Open to LAN
 
+menu.skinCapeSettings=Skins/Capes Settings
+menu.skinCapeSettingsNote0=I put the button up here so
+menu.skinCapeSettingsNote1=lazy people can find it
+menu.skinCapeSettings.skinCustomization=Skin Customization
+menu.skinCapeSettings.skinCustomization.cape=Cape
+menu.skinCapeSettings.skinCustomization.jacket=Jacket
+menu.skinCapeSettings.skinCustomization.hat=Hat
+menu.skinCapeSettings.skinCustomization.leftArm=Left Sleeve
+menu.skinCapeSettings.skinCustomization.rightArm=Right Sleeve
+menu.skinCapeSettings.skinCustomization.leftPants=Left Pants Leg
+menu.skinCapeSettings.skinCustomization.rightPants=Right Pants Leg
+menu.skinCapeSettings.skinCustomization.otherPlayers=Other Player Skins
+menu.skinCapeSettings.skinCustomization.showErasersOn=Eraser Skins: Enable
+menu.skinCapeSettings.skinCustomization.showErasersOff=Eraser Skins: Disable
+menu.skinCapeSettings.skinCustomization.showOtherCapes=Show Capes
+menu.skinCapeSettings.skinCustomization.apply=Save Options and Return to Game
+
 profile.title=Edit Profile
+profile.capeTitle=Select Cape
 profile.screenname=Screenname
 profile.playerSkin=Player Skin
+profile.playerCape=Player Cape
 profile.addSkin=Add Skin
+profile.addCape=Add Cape
+profile.capes=Capes
 profile.clearSkin=Clear List
 
 fancyGraphicsNote=go to -> Options -> Video Settings on the pause menu to enable fancy graphics and smooth lighting
 
 voice.title=Voice Channel
-voice.addr=Channel Address
-voice.connect=Connect
-voice.disconnect=Disconnect
-voice.volume=Channel Volume
+voice.titleNoVoice=Voice is disabled on this server
+voice.titleVoiceUnavailable=Voice is unavailable
+voice.titleVoiceBrowserError=(fix your browser)
+voice.ptt=Press '$key$' to speak
+voice.pttChangeDesc=(Press Any Key)
+voice.changeKey=Change
+voice.off=OFF
+voice.radius=NEARBY
+voice.global=GLOBAL
+voice.volumeTitle=Change Volume
+voice.volumeListen=Speakers Volume:
+voice.volumeSpeak=Microphone Volume:
+voice.radiusTitle=Change Listener Radius
+voice.radiusLabel=Players Within:
+voice.radiusChange=change
+voice.notConnected=Not Connected
+voice.connecting=Connecting...
+voice.unavailable=Could not connect!
+voice.connectedGlobal=Connected - Global
+voice.connectedRadius=Connected - $f$Within $radius$m
+voice.playersListening=Players Listening:
+voice.muted=Players Muted:
+voice.unmute=unmute
+voice.mute=mute
+voice.apply=Apply
+voice.volumeSpeakerLabel=Speakers:
+voice.volumeMicrophoneLabel=Microphone:
 voice.warning1=§cWarning:§r your network does not support the STUN
 voice.warning2=connection procedure, a TURN relay will be used as
 voice.warning3=fallback, which will greatly impact the audio quality
+
+voice.unsupportedWarning1=Voice Warning
+voice.unsupportedWarning2=Your network's firewall may not support
+voice.unsupportedWarning3=eaglercraft's voice chat.
+voice.unsupportedWarning4=If your game doesn't work it's your issue
+voice.unsupportedWarning5=to solve, not ayunami2000's or lax1dude's.
+voice.unsupportedWarning6=Don't ask them to 'fix' it for you because
+voice.unsupportedWarning7=they won't help you fix a problem that only
+voice.unsupportedWarning8=you or your network's administrator has the
+voice.unsupportedWarning9=ability to correctly resolve.
+voice.unsupportedWarning10=Continue
+voice.unsupportedWarning11=Cancel
+
+voice.ipGrabWarning1=IP Logger Warning
+voice.ipGrabWarning2=Using Eaglercraft voice chat may allow your
+voice.ipGrabWarning3=IP address to be logged by other players
+voice.ipGrabWarning4=also using voice on the server.
+voice.ipGrabWarning5=This issue will not be fixed, it is an
+voice.ipGrabWarning6=internal browser issue, not a mistake in the
+voice.ipGrabWarning7=game. Fortunately, this can only be done if
+voice.ipGrabWarning8=the other player uses a hacked web browser
+voice.ipGrabWarning9=or has Wireshark to capture the voice
+voice.ipGrabWarning10=packets, as there exists no real javascript
+voice.ipGrabWarning11=method to log IPs using a normal skidded
+voice.ipGrabWarning12=eaglercraft hacked client.
 
 selectWorld.title=Select World
 selectWorld.empty=empty
@@ -236,9 +305,39 @@ disconnect.closed=Connection closed
 disconnect.loginFailed=Failed to login
 disconnect.loginFailedInfo=Failed to login: %s
 disconnect.quitting=Quitting
-disconnect.endOfStream=End of stream
+disconnect.endOfStream=End of stream (RIP)
 disconnect.overflow=Buffer overflow
 disconnect.spam=Kicked for spamming
+
+disconnect.ratelimit.ipNowLocked.title=Connection Closed
+disconnect.ratelimit.ipNowLocked.description0=Suspected Denial of Service
+disconnect.ratelimit.ipNowLocked.description1=Your IP is now blocked
+disconnect.ratelimit.ipNowLocked.tryAgain=please try again in an hour
+
+disconnect.ratelimit.ipLocked.title=Connection Refused
+disconnect.ratelimit.ipLocked.description0=Suspected Denial of Service
+disconnect.ratelimit.ipLocked.description1=Your IP is still blocked
+disconnect.ratelimit.ipLocked.tryAgain=please try again in an hour
+
+disconnect.ratelimit.ipFailedPossiblyLocked.title=Connection Failed
+disconnect.ratelimit.ipFailedPossiblyLocked.description0=You've been kicked by this server before for suspected
+disconnect.ratelimit.ipFailedPossiblyLocked.description1=$Denial of Service (DoS), your IP is probably blocked
+disconnect.ratelimit.ipFailedPossiblyLocked.tryAgain=please try again in an hour
+
+disconnect.ratelimit.ipBlocked.title=Connection Closed
+disconnect.ratelimit.ipBlocked.description0=Too many connections from your IP
+disconnect.ratelimit.ipBlocked.description1=Please try again in a few minutes
+disconnect.ratelimit.ipBlocked.tryAgain=(Suspected Denial of Service)
+
+disconnect.ratelimit.kickBlocked.title=Connection Closed
+disconnect.ratelimit.kickBlocked.description0=You're reconnecting too quickly!
+disconnect.ratelimit.kickBlocked.description1=Please try again in a minute
+disconnect.ratelimit.kickBlocked.tryAgain=(too many logins from your IP)
+
+disconnect.ratelimit.kickLocked.title=Connection Closed
+disconnect.ratelimit.kickLocked.description0=Suspected Denial of Service
+disconnect.ratelimit.kickLocked.description1=Logins from you IP are now blocked
+disconnect.ratelimit.kickLocked.tryAgain=please try again in an hour
 
 options.off=OFF
 options.on=ON
@@ -297,7 +396,7 @@ options.particles=Particles
 options.particles.all=All
 options.particles.decreased=Decreased
 options.particles.minimal=Minimal
-options.multiplayer.title=Multiplayer Settings...
+options.multiplayer.title=Chat Settings...
 options.chat.title=Chat Settings...
 options.chat.visibility=Chat
 options.chat.visibility.full=Shown
@@ -328,6 +427,7 @@ options.framebufferAntialias.fxaa=FXAA
 options.framebufferAntialias.msaa4=MSAA4
 options.framebufferAntialias.msaa8=MSAA8
 options.patchAnisotropic=Fix ANGLE bug #4994
+options.chunkUpdates=Chunk Update per FPS
 
 performance.max=Max FPS
 performance.balanced=Balanced

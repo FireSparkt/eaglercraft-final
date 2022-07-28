@@ -1,10 +1,9 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
 
 public class ItemRenderer {
 	/** A reference to the Minecraft object. */
@@ -108,9 +107,9 @@ public class ItemRenderer {
 			}
 
 			EaglerAdapter.glDisable(EaglerAdapter.GL_RESCALE_NORMAL);
+			
+			EaglerAdapter.flipLightMatrix();
 		}
-		
-		EaglerAdapter.flipLightMatrix();
 
 		EaglerAdapter.glPopMatrix();
 	}

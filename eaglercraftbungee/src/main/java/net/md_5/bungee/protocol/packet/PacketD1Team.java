@@ -5,6 +5,7 @@
 package net.md_5.bungee.protocol.packet;
 
 import java.util.Arrays;
+
 import io.netty.buffer.ByteBuf;
 
 public class PacketD1Team extends DefinedPacket {

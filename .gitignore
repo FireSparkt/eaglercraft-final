@@ -1,9 +1,13 @@
 .gradle
 .settings
+.idea
 build
 bin
+eaglercraftbungee/.idea
 eaglercraftbungee/bin
 eaglercraftbungee/rundir
+eaglercraftbungee/test
+eaglercraftbungee/minecrafthtml5bungee.iml
 epkcompiler/bin
 spigot-server/world*
 eaglercraftbungee/rundir
@@ -17,3 +21,6 @@ sp-server/.gradle
 sp-server/.settings
 sp-server/build
 sp-server/bin
+stable-download/_repl*
+lwjgl-rundir/_eagstorage*
+*.bak

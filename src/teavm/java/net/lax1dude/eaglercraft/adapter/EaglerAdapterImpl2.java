@@ -1,15 +1,30 @@
 package net.lax1dude.eaglercraft.adapter;
 
+import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
+
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import org.json.JSONObject;
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
@@ -17,9 +32,13 @@ import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.ajax.ReadyStateChangeHandler;
 import org.teavm.jso.ajax.XMLHttpRequest;
+import org.teavm.jso.browser.Storage;
 import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.events.ErrorEvent;
+import org.teavm.jso.canvas.CanvasRenderingContext2D;
+import org.teavm.jso.canvas.ImageData;
+import org.teavm.jso.dom.events.Event;
 import org.teavm.jso.dom.events.EventListener;
 import org.teavm.jso.dom.events.KeyboardEvent;
 import org.teavm.jso.dom.events.MessageEvent;
@@ -28,10 +47,16 @@ import org.teavm.jso.dom.events.WheelEvent;
 import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 import org.teavm.jso.dom.html.HTMLElement;
+import org.teavm.jso.dom.html.HTMLImageElement;
+import org.teavm.jso.dom.html.HTMLVideoElement;
+import org.teavm.jso.media.MediaError;
 import org.teavm.jso.typedarrays.ArrayBuffer;
+import org.teavm.jso.typedarrays.DataView;
 import org.teavm.jso.typedarrays.Float32Array;
 import org.teavm.jso.typedarrays.Int32Array;
 import org.teavm.jso.typedarrays.Uint8Array;
+import org.teavm.jso.typedarrays.Uint8ClampedArray;
+import org.teavm.jso.webaudio.AnalyserNode;
 import org.teavm.jso.webaudio.AudioBuffer;
 import org.teavm.jso.webaudio.AudioBufferSourceNode;
 import org.teavm.jso.webaudio.AudioContext;
@@ -39,7 +64,10 @@ import org.teavm.jso.webaudio.AudioListener;
 import org.teavm.jso.webaudio.DecodeErrorCallback;
 import org.teavm.jso.webaudio.DecodeSuccessCallback;
 import org.teavm.jso.webaudio.GainNode;
+import org.teavm.jso.webaudio.MediaElementAudioSourceNode;
 import org.teavm.jso.webaudio.MediaEvent;
+import org.teavm.jso.webaudio.MediaStream;
+import org.teavm.jso.webaudio.MediaStreamAudioSourceNode;
 import org.teavm.jso.webaudio.PannerNode;
 import org.teavm.jso.webgl.WebGLBuffer;
 import org.teavm.jso.webgl.WebGLFramebuffer;
@@ -54,15 +82,19 @@ import org.teavm.jso.workers.Worker;
 
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.Base64;
+import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
+import net.lax1dude.eaglercraft.ExpiringSet;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
+import net.lax1dude.eaglercraft.ServerQuery;
+import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
+import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
+import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
 import net.minecraft.src.MathHelper;
-
-import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
-import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
 
 public class EaglerAdapterImpl2 {
 
@@ -137,9 +169,6 @@ public class EaglerAdapterImpl2 {
 		});
 		request.send();
 	}
-	
-	@JSBody(params = { "obj" }, script = "window.currentContext = obj;")
-	private static native int setContextVar(JSObject obj);
 
 	@JSBody(params = { "v", "s" }, script = "window[v] = s;")
 	public static native void setDebugVar(String v, String s);
@@ -150,6 +179,8 @@ public class EaglerAdapterImpl2 {
 	public static HTMLDocument doc = null;
 	public static HTMLElement parent = null;
 	public static HTMLCanvasElement canvas = null;
+	public static CanvasRenderingContext2D frameBuffer = null;
+	public static HTMLCanvasElement renderingCanvas = null;
 	public static WebGL2RenderingContext webgl = null;
 	public static Window win = null;
 	private static byte[] loadedPackage = null;
@@ -167,14 +198,23 @@ public class EaglerAdapterImpl2 {
 		return identifier;
 	}
 
-	@JSBody(params = { "v" }, script = "try { return \"\"+window.eval(v); } catch(e) { return \"<error>\"; }")
-	private static native String getString(String var);
+	@JSBody(params = { "v" }, script = "try { return \"\"+window.navigator[v]; } catch(e) { return \"<error>\"; }")
+	private static native String getNavString(String var);
 	
 	public static void onWindowUnload() {
 		LocalStorageManager.saveStorageA();
 		LocalStorageManager.saveStorageG();
 		LocalStorageManager.saveStorageP();
 	}
+
+	@JSBody(params = { "m" }, script = "return m.offsetX;")
+	private static native int getOffsetX(MouseEvent m);
+	
+	@JSBody(params = { "m" }, script = "return m.offsetY;")
+	private static native int getOffsetY(MouseEvent m);
+	
+	@JSBody(params = { "e" }, script = "return e.which;")
+	private static native int getWhich(KeyboardEvent e);
 	
 	public static final void initializeContext(HTMLElement rootElement, String assetPackageURI) {
 		parent = rootElement;
@@ -183,13 +223,18 @@ public class EaglerAdapterImpl2 {
 		win = Window.current();
 		doc = win.getDocument();
 		canvas = (HTMLCanvasElement)doc.createElement("canvas");
-		canvas.setAttribute("id", "deevis589723589");
+		canvas.setWidth(parent.getClientWidth());
+		canvas.setHeight(parent.getClientHeight());
+		SelfDefence.init(canvas);
 		rootElement.appendChild(canvas);
-		webgl = (WebGL2RenderingContext) canvas.getContext("webgl2", youEagler());
+		renderingCanvas = (HTMLCanvasElement)doc.createElement("canvas");
+		renderingCanvas.setWidth(canvas.getWidth());
+		renderingCanvas.setHeight(canvas.getHeight());
+		frameBuffer = (CanvasRenderingContext2D) canvas.getContext("2d");
+		webgl = (WebGL2RenderingContext) renderingCanvas.getContext("webgl2", youEagler());
 		if(webgl == null) {
-			throw new RuntimeException("WebGL 2.0 is not supported in your browser ("+getString("window.navigator.userAgent")+")");
+			throw new RuntimeException("WebGL 2.0 is not supported in your browser ("+getNavString("userAgent")+")");
 		}
-		setContextVar(webgl);
 		
 		//String agent = getString("window.navigator.userAgent").toLowerCase();
 		//if(agent.contains("windows")) isAnisotropicPatched = false;
@@ -226,10 +271,13 @@ public class EaglerAdapterImpl2 {
 		canvas.addEventListener("mousemove", mousemove = new EventListener<MouseEvent>() {
 			@Override
 			public void handleEvent(MouseEvent evt) {
-				mouseX = evt.getClientX();
-				mouseY = canvas.getClientHeight() - evt.getClientY();
+				mouseX = getOffsetX(evt);
+				mouseY = canvas.getClientHeight() - getOffsetY(evt);
 				mouseDX += evt.getMovementX();
 				mouseDY += -evt.getMovementY();
+				if(hasBeenActive()) {
+					mouseEvents.add(evt);
+				}
 				evt.preventDefault();
 				evt.stopPropagation();
 			}
@@ -237,7 +285,8 @@ public class EaglerAdapterImpl2 {
 		win.addEventListener("keydown", keydown = new EventListener<KeyboardEvent>() {
 			@Override
 			public void handleEvent(KeyboardEvent evt) {
-				keyStates[remapKey(evt.getKeyCode())] = true;
+				//keyStates[remapKey(evt.getKeyCode())] = true;
+				keyStates[remapKey(getWhich(evt))] = true;
 				keyEvents.add(evt);
 				evt.preventDefault();
 				evt.stopPropagation();
@@ -246,7 +295,8 @@ public class EaglerAdapterImpl2 {
 		win.addEventListener("keyup", keyup = new EventListener<KeyboardEvent>() {
 			@Override
 			public void handleEvent(KeyboardEvent evt) {
-				keyStates[remapKey(evt.getKeyCode())] = false;
+				//keyStates[remapKey(evt.getKeyCode())] = false;
+				keyStates[remapKey(getWhich(evt))] = false;
 				keyEvents.add(evt);
 				evt.preventDefault();
 				evt.stopPropagation();
@@ -281,6 +331,11 @@ public class EaglerAdapterImpl2 {
 			}
 		});
 		onBeforeCloseRegister();
+		
+		/*
+		
+		this was on the singleplayer branch, it needs to be re-implemented without eval:
+		
 		execute("window.eagsFileChooser = {\r\n" + 
 				"inputElement: null,\r\n" + 
 				"openFileChooser: function(ext, mime){\r\n" + 
@@ -307,8 +362,13 @@ public class EaglerAdapterImpl2 {
 				"getFileChooserResult: null,\r\n" + 
 				"getFileChooserResultName: null\r\n" + 
 				"};");
+		*/
+		
+		initFileChooser();
 		
 		EarlyLoadScreen.paintScreen();
+		
+		voiceClient = startVoiceClient();
 		
 		downloadAssetPack(assetPackageURI);
 		
@@ -331,10 +391,58 @@ public class EaglerAdapterImpl2 {
 		}
 		
 		audioctx = AudioContext.create();
+		masterVolumeNode = audioctx.createGain();
+		masterVolumeNode.getGain().setValue(1.0f);
+		masterVolumeNode.connect(audioctx.getDestination());
 		
 		mouseEvents.clear();
 		keyEvents.clear();
+		
+		Window.setInterval(new TimerHandler() {
+			@Override
+			public void onTimer() {
+				Iterator<BufferedVideo> vids = videosBuffer.values().iterator();
+				while(vids.hasNext()) {
+					BufferedVideo v = vids.next();
+					if(System.currentTimeMillis() - v.requestedTime > v.ttl) {
+						v.videoElement.setSrc("");
+						vids.remove();
+					}
+				}
+			}
+		}, 5000);
 	}
+	
+	@JSBody(params = { }, script = "return window.startVoiceClient();")
+	private static native EaglercraftVoiceClient startVoiceClient();
+	
+	@JSBody(params = { }, script = 
+			"window.eagsFileChooser = {\r\n" + 
+			"inputElement: null,\r\n" + 
+			"openFileChooser: function(ext, mime){\r\n" + 
+			"var el = window.eagsFileChooser.inputElement = document.createElement(\"input\");\r\n" + 
+			"el.type = \"file\";\r\n" + 
+			"el.multiple = false;\r\n" + 
+			"el.addEventListener(\"change\", function(evt){\r\n" + 
+			"var f = window.eagsFileChooser.inputElement.files;\r\n" + 
+			"if(f.length == 0){\r\n" + 
+			"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
+			"}else{\r\n" + 
+			"(async function(){\r\n" + 
+			"window.eagsFileChooser.getFileChooserResult = await f[0].arrayBuffer();\r\n" + 
+			"window.eagsFileChooser.getFileChooserResultName = f[0].name;\r\n" + 
+			"})();\r\n" + 
+			"}\r\n" + 
+			"});\r\n" + 
+			"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
+			"window.eagsFileChooser.getFileChooserResultName = null;\r\n" + 
+			"el.accept = mime;\r\n" + 
+			"el.click();\r\n" + 
+			"},\r\n" + 
+			"getFileChooserResult: null,\r\n" + 
+			"getFileChooserResultName: null\r\n" + 
+			"};")
+	private static native void initFileChooser();
 	
 	public static final void destroyContext() {
 		
@@ -349,6 +457,13 @@ public class EaglerAdapterImpl2 {
 		win.removeEventListener("keyup", keyup);
 		win.removeEventListener("keypress", keypress);
 		win.removeEventListener("wheel", wheel);
+		String screenImg = canvas.toDataURL("image/png");
+		canvas.delete();
+		HTMLImageElement newImage = (HTMLImageElement) doc.createElement("img");
+		newImage.setSrc(screenImg);
+		newImage.setWidth(parent.getClientWidth());
+		newImage.setHeight(parent.getClientHeight());
+		parent.appendChild(newImage);
 	}
 
 	private static LinkedList<MouseEvent> mouseEvents = new LinkedList();
@@ -397,7 +512,7 @@ public class EaglerAdapterImpl2 {
 	public static final int _wGL_SRC_COLOR = SRC_COLOR;
 	public static final int _wGL_ONE = ONE;
 	public static final int _wGL_NEAREST = NEAREST;
-	public static final int _wGL_CLAMP = REPEAT;
+	public static final int _wGL_CLAMP = CLAMP_TO_EDGE;
 	public static final int _wGL_TEXTURE_WRAP_S = TEXTURE_WRAP_S;
 	public static final int _wGL_TEXTURE_WRAP_T = TEXTURE_WRAP_T;
 	public static final int _wGL_REPEAT = REPEAT;
@@ -453,6 +568,7 @@ public class EaglerAdapterImpl2 {
 	public static final int _wGL_READ_FRAMEBUFFER = READ_FRAMEBUFFER;
 	public static final int _wGL_DRAW_FRAMEBUFFER = DRAW_FRAMEBUFFER;
 	public static final int _wGL_FRAMEBUFFER = FRAMEBUFFER;
+	public static final int _wGL_POLYGON_OFFSET_FILL = POLYGON_OFFSET_FILL;
 	
 	public static final class TextureGL { 
 		protected final WebGLTexture obj;
@@ -588,18 +704,18 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglTexImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
 		int len = p9.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p9.get());
+			deevis.setInt32(i * 4, p9.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.texImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
 	}
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, IntBuffer p9) {
 		int len = p9.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p9.get());
+			deevis.setInt32(i * 4, p9.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.texSubImage2D(p1, p2, p3, p4, p5, p6, p7, p8, data);
@@ -619,6 +735,7 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglTexSubImage2D(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, ByteBuffer p9) {
 		int len = p9.remaining();
 		for(int i = 0; i < len; ++i) {
+			//uploadBuffer.set(swapEndian ? ((i >> 2) + (3 - (i & 3))) : i, (short) ((int)p9.get() & 0xff));
 			uploadBuffer.set(i, (short) ((int)p9.get() & 0xff));
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len);
@@ -677,18 +794,18 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglBufferData0(int p1, IntBuffer p2, int p3) {
 		int len = p2.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p2.get());
+			deevis.setInt32(i * 4, p2.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.bufferData(p1, data, p3);
 	}
 	public static final void _wglBufferSubData0(int p1, int p2, IntBuffer p3) {
 		int len = p3.remaining();
-		Int32Array deevis = Int32Array.create(uploadBuffer.getBuffer());
+		DataView deevis = DataView.create(uploadBuffer.getBuffer());
 		for(int i = 0; i < len; ++i) {
-			deevis.set(i, p3.get());
+			deevis.setInt32(i * 4, p3.get(), true);
 		}
 		Uint8Array data = Uint8Array.create(uploadBuffer.getBuffer(), 0, len*4);
 		webgl.bufferSubData(p1, p2, data);
@@ -835,6 +952,10 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglBlitFramebuffer(int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9, int p10) {
 		webgl.blitFramebuffer(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 	}
+	public static final int _wglGetAttribLocation(ProgramGL p1, String p2) {
+		return webgl.getAttribLocation(p1.obj, p2);
+	}
+	
 	@JSBody(params = { "ctx", "p" }, script = "return ctx.getTexParameter(0x0DE1, p) | 0;")
 	private static final native int __wglGetTexParameteri(WebGL2RenderingContext ctx, int p);
 	public static final int _wglGetTexParameteri(int p1) {
@@ -846,7 +967,541 @@ public class EaglerAdapterImpl2 {
 		return __wglGetTexParameterf(webgl, p1);
 	}
 	public static final boolean isWindows() {
-		return getString("window.navigator.platform").toLowerCase().contains("win");
+		return getNavString("platform").toLowerCase().contains("win");
+	}
+
+	private static HTMLCanvasElement imageLoadCanvas = null;
+	private static CanvasRenderingContext2D imageLoadContext = null;
+
+	@JSBody(params = { "buf", "mime" }, script = "return URL.createObjectURL(new Blob([buf], {type: mime}));")
+	private static native String getDataURL(ArrayBuffer buf, String mime);
+	
+	@JSBody(params = { "url" }, script = "URL.revokeObjectURL(url);")
+	private static native void freeDataURL(String url);
+	
+	public static final EaglerImage loadPNG(byte[] data) {
+		ArrayBuffer arr = ArrayBuffer.create(data.length);
+		Uint8Array.create(arr).set(data);
+		return loadPNG0(arr);
+	}
+	
+	@Async
+	private static native EaglerImage loadPNG0(ArrayBuffer data);
+	
+	private static void loadPNG0(ArrayBuffer data, final AsyncCallback<EaglerImage> ret) {
+		final HTMLImageElement toLoad = (HTMLImageElement) doc.createElement("img");
+		toLoad.addEventListener("load", new EventListener<Event>() {
+			@Override
+			public void handleEvent(Event evt) {
+				if(imageLoadCanvas == null) {
+					imageLoadCanvas = (HTMLCanvasElement) doc.createElement("canvas");
+				}
+				if(imageLoadCanvas.getWidth() < toLoad.getWidth()) {
+					imageLoadCanvas.setWidth(toLoad.getWidth());
+				}
+				if(imageLoadCanvas.getHeight() < toLoad.getHeight()) {
+					imageLoadCanvas.setHeight(toLoad.getHeight());
+				}
+				if(imageLoadContext == null) {
+					imageLoadContext = (CanvasRenderingContext2D) imageLoadCanvas.getContext("2d");
+				}
+				imageLoadContext.clearRect(0, 0, toLoad.getWidth(), toLoad.getHeight());
+				imageLoadContext.drawImage(toLoad, 0, 0, toLoad.getWidth(), toLoad.getHeight());
+				ImageData pxlsDat = imageLoadContext.getImageData(0, 0, toLoad.getWidth(), toLoad.getHeight());
+				Uint8ClampedArray pxls = pxlsDat.getData();
+				int totalPixels = pxlsDat.getWidth() * pxlsDat.getHeight();
+				freeDataURL(toLoad.getSrc());
+				if(pxls.getByteLength() < totalPixels * 4) {
+					ret.complete(null);
+					return;
+				}
+				int[] pixels = new int[totalPixels];
+				for(int i = 0; i < pixels.length; ++i) {
+					pixels[i] = (pxls.get(i * 4) << 16) | (pxls.get(i * 4 + 1) << 8) | pxls.get(i * 4 + 2) | (pxls.get(i * 4 + 3) << 24);
+				}
+				ret.complete(new EaglerImage(pixels, pxlsDat.getWidth(), pxlsDat.getHeight(), true));
+			}
+		});
+		toLoad.addEventListener("error", new EventListener<Event>() {
+			@Override
+			public void handleEvent(Event evt) {
+				freeDataURL(toLoad.getSrc());
+				ret.complete(null);
+			}
+		});
+		String src = getDataURL(data, "image/png");
+		if(src == null) {
+			ret.complete(null);
+		}else {
+			toLoad.setSrc(src);
+		}
+	}
+
+	private static HTMLVideoElement currentVideo = null;
+	private static TextureGL videoTexture = null;
+	private static boolean videoIsLoaded = false;
+	private static boolean videoTexIsInitialized = false;
+	private static int frameRate = 33;
+	private static long frameTimer = 0l;
+	
+	public static final boolean isVideoSupported() {
+		return true;
+	}
+	public static final void loadVideo(String src, boolean autoplay) {
+		loadVideo(src, autoplay, null, null);
+	}
+	public static final void loadVideo(String src, boolean autoplay, String setJavascriptPointer) {
+		loadVideo(src, autoplay, setJavascriptPointer, null);
+	}
+	
+	@JSBody(params = { "ptr", "el" }, script = "window[ptr] = el;")
+	private static native void setVideoPointer(String ptr, HTMLVideoElement el);
+	@JSBody(params = { "ptr", "el" }, script = "window[ptr](el);")
+	private static native void callVideoLoadEvent(String ptr, HTMLVideoElement el);
+	
+	private static MediaElementAudioSourceNode currentVideoAudioSource = null;
+	
+	private static GainNode currentVideoAudioGain = null;
+	private static float currentVideoAudioGainValue = 1.0f;
+	
+	private static PannerNode currentVideoAudioPanner = null;
+	private static float currentVideoAudioX = 0.0f;
+	private static float currentVideoAudioY = 0.0f;
+	private static float currentVideoAudioZ = 0.0f;
+	
+	public static final void loadVideo(String src, boolean autoplay, String setJavascriptPointer, final String javascriptOnloadFunction) {
+		videoIsLoaded = false;
+		videoTexIsInitialized = false;
+		if(videoTexture == null) {
+			videoTexture = _wglGenTextures();
+		}
+		if(currentVideo != null) {
+			currentVideo.pause();
+			currentVideo.setSrc("");
+		}
+		
+		BufferedVideo vid = videosBuffer.get(src);
+		
+		if(vid != null) {
+			currentVideo = vid.videoElement;
+			videosBuffer.remove(src);
+		}else {
+			currentVideo = (HTMLVideoElement) win.getDocument().createElement("video");
+			currentVideo.setAttribute("crossorigin", "anonymous");
+			currentVideo.setAutoplay(autoplay);
+		}
+		
+		if(setJavascriptPointer != null) {
+			setVideoPointer(setJavascriptPointer, currentVideo);
+		}
+		
+		currentVideo.addEventListener("playing", new EventListener<Event>() {
+			@Override
+			public void handleEvent(Event evt) {
+				videoIsLoaded = true;
+				if(javascriptOnloadFunction != null) {
+					callVideoLoadEvent(javascriptOnloadFunction, currentVideo);
+				}
+			}
+		});
+		
+		if(vid == null) {
+			currentVideo.setControls(false);
+			currentVideo.setSrc(src);
+		}else {
+			if(autoplay) {
+				currentVideo.play();
+			}
+		}
+		
+		if(currentVideoAudioSource != null) {
+			currentVideoAudioSource.disconnect();
+		}
+		
+		currentVideoAudioSource = audioctx.createMediaElementSource(currentVideo);
+		
+		if(currentVideoAudioGainValue < 0.0f) {
+			currentVideoAudioSource.connect(masterVolumeNode);
+		}else {
+			if(currentVideoAudioGain == null) {
+				currentVideoAudioGain = audioctx.createGain();
+				currentVideoAudioGain.getGain().setValue(currentVideoAudioGainValue > 1.0f ? 1.0f : currentVideoAudioGainValue);
+			}
+			
+			currentVideoAudioSource.connect(currentVideoAudioGain);
+			
+			if(currentVideoAudioPanner == null) {
+				currentVideoAudioPanner = audioctx.createPanner();
+				currentVideoAudioPanner.setRolloffFactor(1f);
+				currentVideoAudioPanner.setDistanceModel("linear");
+				currentVideoAudioPanner.setPanningModel("HRTF");
+				currentVideoAudioPanner.setConeInnerAngle(360f);
+				currentVideoAudioPanner.setConeOuterAngle(0f);
+				currentVideoAudioPanner.setConeOuterGain(0f);
+				currentVideoAudioPanner.setOrientation(0f, 1f, 0f);
+				currentVideoAudioPanner.setPosition(currentVideoAudioX, currentVideoAudioY, currentVideoAudioZ);
+				currentVideoAudioPanner.setMaxDistance(currentVideoAudioGainValue * 16f + 0.1f);
+				currentVideoAudioGain.connect(currentVideoAudioPanner);
+				currentVideoAudioPanner.connect(audioctx.getDestination());
+			}
+		}
+		
+	}
+	
+	private static class BufferedVideo {
+		
+		protected final HTMLVideoElement videoElement;
+		protected final String url;
+		protected final long requestedTime;
+		protected final int ttl;
+		
+		public BufferedVideo(HTMLVideoElement videoElement, String url, int ttl) {
+			this.videoElement = videoElement;
+			this.url = url;
+			this.requestedTime = System.currentTimeMillis();
+			this.ttl = ttl;
+		}
+		
+	}
+	
+	private static final HashMap<String, BufferedVideo> videosBuffer = new HashMap();
+	
+	public static final void bufferVideo(String src, int ttl) {
+		if(!videosBuffer.containsKey(src)) {
+			HTMLVideoElement video = (HTMLVideoElement) win.getDocument().createElement("video");
+			video.setAutoplay(false);
+			video.setAttribute("crossorigin", "anonymous");
+			video.setPreload("auto");
+			video.setControls(false);
+			video.setSrc(src);
+			videosBuffer.put(src, new BufferedVideo(video, src, ttl));
+		}
+	}
+	
+	public static final void unloadVideo() {
+		if(videoTexture != null) {
+			_wglDeleteTextures(videoTexture);
+			videoTexture = null;
+		}
+		if(currentVideo != null) {
+			currentVideo.pause();
+			currentVideo.setSrc("");
+			currentVideo = null;
+		}
+		if(currentVideoAudioSource != null) {
+			currentVideoAudioSource.disconnect();
+		}
+	}
+	public static final boolean isVideoLoaded() {
+		return videoTexture != null && currentVideo != null && videoIsLoaded;
+	}
+	public static final boolean isVideoPaused() {
+		return currentVideo == null || currentVideo.isPaused();
+	}
+	public static final void setVideoPaused(boolean pause) {
+		if(currentVideo != null) {
+			if(pause) {
+				currentVideo.pause();
+			}else {
+				currentVideo.play();
+			}
+		}
+	}
+	public static final void setVideoLoop(boolean loop) {
+		if(currentVideo != null) {
+			currentVideo.setLoop(loop);
+		}
+	}
+	public static final void setVideoVolume(float x, float y, float z, float v) {
+		currentVideoAudioX = x;
+		currentVideoAudioY = y;
+		currentVideoAudioZ = z;
+		if(v < 0.0f) {
+			if(currentVideoAudioGainValue >= 0.0f && currentVideoAudioSource != null) {
+				currentVideoAudioSource.disconnect();
+				currentVideoAudioSource.connect(masterVolumeNode);
+			}
+			currentVideoAudioGainValue = v;
+		}else {
+			if(currentVideoAudioGain != null) {
+				currentVideoAudioGain.getGain().setValue(v > 1.0f ? 1.0f : v);
+				if(currentVideoAudioGainValue < 0.0f && currentVideoAudioSource != null) {
+					currentVideoAudioSource.disconnect();
+					currentVideoAudioSource.connect(currentVideoAudioGain);
+				}
+			}
+			currentVideoAudioGainValue = v;
+			if(currentVideoAudioPanner != null) {
+				currentVideoAudioPanner.setMaxDistance(v * 16f + 0.1f);
+				currentVideoAudioPanner.setPosition(x, y, z);
+			}
+		}
+	}
+	
+	@JSBody(
+		params = {"ctx", "target", "internalformat", "format", "type", "video"},
+		script = "ctx.texImage2D(target, 0, internalformat, format, type, video);"
+	)
+	private static native void html5VideoTexImage2D(WebGL2RenderingContext ctx, int target, int internalformat, int format, int type, HTMLVideoElement video);
+
+	@JSBody(
+		params = {"ctx", "target", "format", "type", "video"},
+		script = "ctx.texSubImage2D(target, 0, 0, 0, format, type, video);"
+	)
+	private static native void html5VideoTexSubImage2D(WebGL2RenderingContext ctx, int target, int format, int type, HTMLVideoElement video);
+	
+	public static final void updateVideoTexture() {
+		long ms = System.currentTimeMillis();
+		if(ms - frameTimer < frameRate && videoTexIsInitialized) {
+			return;
+		}
+		frameTimer = ms;
+		if(currentVideo != null && videoTexture != null && videoIsLoaded) {
+			try {
+				_wglBindTexture(_wGL_TEXTURE_2D, videoTexture);
+				if(videoTexIsInitialized) {
+					html5VideoTexSubImage2D(webgl, _wGL_TEXTURE_2D, _wGL_RGBA, _wGL_UNSIGNED_BYTE, currentVideo);
+				}else {
+					html5VideoTexImage2D(webgl, _wGL_TEXTURE_2D, _wGL_RGBA, _wGL_RGBA, _wGL_UNSIGNED_BYTE, currentVideo);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_LINEAR);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MAG_FILTER, _wGL_LINEAR);
+					videoTexIsInitialized = true;
+				}
+			}catch(Throwable t) {
+				// rip
+			}
+		}
+	}
+	public static final void bindVideoTexture() {
+		if(videoTexture != null) {
+			_wglBindTexture(_wGL_TEXTURE_2D, videoTexture);
+		}
+	}
+	public static final int getVideoWidth() {
+		if(currentVideo != null && videoIsLoaded) {
+			return currentVideo.getWidth();
+		}else {
+			return -1;
+		}
+	}
+	public static final int getVideoHeight() {
+		if(currentVideo != null && videoIsLoaded) {
+			return currentVideo.getHeight();
+		}else {
+			return -1;
+		}
+	}
+	public static final float getVideoCurrentTime() {
+		if(currentVideo != null && videoIsLoaded) {
+			return (float) currentVideo.getCurrentTime();
+		}else {
+			return -1.0f;
+		}
+	}
+	public static final void setVideoCurrentTime(float seconds) {
+		if(currentVideo != null && videoIsLoaded) {
+			currentVideo.setCurrentTime(seconds);
+		}
+	}
+	public static final float getVideoDuration() {
+		if(currentVideo != null && videoIsLoaded) {
+			return (float) currentVideo.getDuration();
+		}else {
+			return -1.0f;
+		}
+	}
+
+	public static final int VIDEO_ERR_NONE = -1;
+	public static final int VIDEO_ERR_ABORTED = 1;
+	public static final int VIDEO_ERR_NETWORK = 2;
+	public static final int VIDEO_ERR_DECODE = 3;
+	public static final int VIDEO_ERR_SRC_NOT_SUPPORTED = 4;
+
+	public static final int getVideoError() {
+		if(currentVideo != null && videoIsLoaded) {
+			MediaError err = currentVideo.getError();
+			if(err != null) {
+				return err.getCode();
+			}else {
+				return -1;
+			}
+		}else {
+			return -1;
+		}
+	}
+	
+	public static final void setVideoFrameRate(float fps) {
+		frameRate = (int)(1000.0f / fps);
+		if(frameRate < 1) {
+			frameRate = 1;
+		}
+	}
+
+	private static HTMLImageElement currentImage = null;
+	private static TextureGL imageTexture = null;
+	private static boolean imageIsLoaded = false;
+	private static boolean imageTexIsInitialized = false;
+	private static int imageFrameRate = 33;
+	private static long imageFrameTimer = 0l;
+
+	public static final boolean isImageSupported() {
+		return true;
+	}
+	public static final void loadImage(String src) {
+		loadImage(src, null);
+	}
+	public static final void loadImage(String src, String setJavascriptPointer) {
+		loadImage(src, setJavascriptPointer, null);
+	}
+
+	@JSBody(params = { "ptr", "el" }, script = "window[ptr] = el;")
+	private static native void setImagePointer(String ptr, HTMLImageElement el);
+	@JSBody(params = { "ptr", "el" }, script = "window[ptr](el);")
+	private static native void callImageLoadEvent(String ptr, HTMLImageElement el);
+
+	public static final void loadImage(String src, String setJavascriptPointer, final String javascriptOnloadFunction) {
+		imageIsLoaded = false;
+		imageTexIsInitialized = false;
+		if(imageTexture == null) {
+			imageTexture = _wglGenTextures();
+		}
+		if(currentImage != null) {
+			currentImage.setSrc("");
+		}
+
+		BufferedImageElem img = imagesBuffer.get(src);
+
+		if(img != null) {
+			currentImage = img.imageElement;
+			imagesBuffer.remove(src);
+		}else {
+			currentImage = (HTMLImageElement) win.getDocument().createElement("img");
+			currentImage.setAttribute("crossorigin", "anonymous");
+		}
+
+		if(setJavascriptPointer != null) {
+			setImagePointer(setJavascriptPointer, currentImage);
+		}
+
+		currentImage.addEventListener("load", new EventListener<Event>() {
+			@Override
+			public void handleEvent(Event evt) {
+				imageIsLoaded = true;
+				if(javascriptOnloadFunction != null) {
+					callImageLoadEvent(javascriptOnloadFunction, currentImage);
+				}
+			}
+		});
+
+		if(img == null) {
+			currentImage.setSrc(src);
+		}
+	}
+
+	private static class BufferedImageElem {
+
+		protected final HTMLImageElement imageElement;
+		protected final String url;
+		protected final long requestedTime;
+		protected final int ttl;
+
+		public BufferedImageElem(HTMLImageElement imageElement, String url, int ttl) {
+			this.imageElement = imageElement;
+			this.url = url;
+			this.requestedTime = System.currentTimeMillis();
+			this.ttl = ttl;
+		}
+
+	}
+
+	private static final HashMap<String, BufferedImageElem> imagesBuffer = new HashMap();
+
+	public static final void bufferImage(String src, int ttl) {
+		if(!imagesBuffer.containsKey(src)) {
+			HTMLImageElement image = (HTMLImageElement) win.getDocument().createElement("img");
+			image.setAttribute("crossorigin", "anonymous");
+			image.setSrc(src);
+			imagesBuffer.put(src, new BufferedImageElem(image, src, ttl));
+		}
+	}
+
+	public static final void unloadImage() {
+		if(imageTexture != null) {
+			_wglDeleteTextures(imageTexture);
+			imageTexture = null;
+		}
+		if(currentImage != null) {
+			currentImage.setSrc("");
+			currentImage = null;
+		}
+	}
+	public static final boolean isImageLoaded() {
+		return imageTexture != null && currentImage != null && imageIsLoaded;
+	}
+
+	@JSBody(
+			params = {"ctx", "target", "internalformat", "format", "type", "image"},
+			script = "ctx.texImage2D(target, 0, internalformat, format, type, image);"
+	)
+	private static native void html5ImageTexImage2D(WebGL2RenderingContext ctx, int target, int internalformat, int format, int type, HTMLImageElement image);
+
+	@JSBody(
+			params = {"ctx", "target", "format", "type", "image"},
+			script = "ctx.texSubImage2D(target, 0, 0, 0, format, type, image);"
+	)
+	private static native void html5ImageTexSubImage2D(WebGL2RenderingContext ctx, int target, int format, int type, HTMLImageElement image);
+
+	public static final void updateImageTexture() {
+		long ms = System.currentTimeMillis();
+		if(ms - imageFrameTimer < imageFrameRate && imageTexIsInitialized) {
+			return;
+		}
+		imageFrameTimer = ms;
+		if(currentImage != null && imageTexture != null && imageIsLoaded) {
+			try {
+				_wglBindTexture(_wGL_TEXTURE_2D, imageTexture);
+				if(imageTexIsInitialized) {
+					html5ImageTexSubImage2D(webgl, _wGL_TEXTURE_2D, _wGL_RGBA, _wGL_UNSIGNED_BYTE, currentImage);
+				}else {
+					html5ImageTexImage2D(webgl, _wGL_TEXTURE_2D, _wGL_RGBA, _wGL_RGBA, _wGL_UNSIGNED_BYTE, currentImage);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_LINEAR);
+					_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MAG_FILTER, _wGL_LINEAR);
+					imageTexIsInitialized = true;
+				}
+			}catch(Throwable t) {
+				// rip
+			}
+		}
+	}
+	public static final void bindImageTexture() {
+		if(imageTexture != null) {
+			_wglBindTexture(_wGL_TEXTURE_2D, imageTexture);
+		}
+	}
+	public static final int getImageWidth() {
+		if(currentImage != null && imageIsLoaded) {
+			return currentImage.getWidth();
+		}else {
+			return -1;
+		}
+	}
+	public static final int getImageHeight() {
+		if(currentImage != null && imageIsLoaded) {
+			return currentImage.getHeight();
+		}else {
+			return -1;
+		}
+	}
+
+	public static final void setImageFrameRate(float fps) {
+		frameRate = (int)(1000.0f / fps);
+		if(frameRate < 1) {
+			frameRate = 1;
+		}
 	}
 	
 	private static MouseEvent currentEvent = null;
@@ -858,7 +1513,7 @@ public class EaglerAdapterImpl2 {
 		return !mouseEvents.isEmpty() && (currentEvent = mouseEvents.remove(0)) != null;
 	}
 	public static final int mouseGetEventButton() {
-		if(currentEvent == null) return -1;
+		if(currentEvent == null || currentEvent.getType().equals(MouseEvent.MOUSEMOVE)) return -1;
 		int b = currentEvent.getButton();
 		return b == 1 ? 2 : (b == 2 ? 1 : b);
 	}
@@ -918,11 +1573,22 @@ public class EaglerAdapterImpl2 {
 		return currentEvent == null ? -1 : canvas.getClientHeight() - currentEvent.getClientY();
 	}
 	public static final boolean keysNext() {
+		if(unpressCTRL) { //un-press ctrl after copy/paste permission
+			keyEvents.clear();
+			currentEventK = null;
+			keyStates[29] = false;
+			keyStates[157] = false;
+			keyStates[28] = false;
+			keyStates[219] = false;
+			keyStates[220] = false;
+			unpressCTRL = false;
+			return false;
+		}
 		currentEventK = null;
 		return !keyEvents.isEmpty() && (currentEventK = keyEvents.remove(0)) != null;
 	}
 	public static final int getEventKey() {
-		return currentEventK == null ? -1 : remapKey(currentEventK.getKeyCode());
+		return currentEventK == null ? -1 : remapKey(getWhich(currentEventK));
 	}
 	public static final char getEventChar() {
 		if(currentEventK == null) return '\0';
@@ -933,13 +1599,20 @@ public class EaglerAdapterImpl2 {
 		return currentEventK == null? false : !currentEventK.getType().equals("keyup");
 	}
 	public static final boolean isKeyDown(int p1) {
+		if(unpressCTRL) { //un-press ctrl after copy/paste permission
+			keyStates[28] = false;
+			keyStates[29] = false;
+			keyStates[157] = false;
+			keyStates[219] = false;
+			keyStates[220] = false;
+		}
 		return keyStates[p1];
 	}
 	public static final String getKeyName(int p1) {
 		return (p1 >= 0 && p1 < 256) ? LWJGLKeyNames[p1] : "null";
 	}
 	public static final void setFullscreen(boolean p1) {
-		win.alert("use F11 to enter fullscreen");
+		Window.alert("use F11 to enter fullscreen");
 	}
 	public static final boolean shouldShutdown() {
 		return false;
@@ -949,7 +1622,22 @@ public class EaglerAdapterImpl2 {
 	private static native int commitContext(JSObject obj);
 	
 	public static final void updateDisplay() {
-		commitContext(webgl);
+		//commitContext(webgl);
+		int w = parent.getClientWidth();
+		int h = parent.getClientHeight();
+		if(canvas.getWidth() != w) {
+			canvas.setWidth(w);
+		}
+		if(canvas.getHeight() != h) {
+			canvas.setHeight(h);
+		}
+		frameBuffer.drawImage(renderingCanvas, 0, 0, w, h);
+		if(renderingCanvas.getWidth() != w) {
+			renderingCanvas.setWidth(w);
+		}
+		if(renderingCanvas.getHeight() != h) {
+			renderingCanvas.setHeight(h);
+		}
 		try {
 			Thread.sleep(1l);
 		} catch (InterruptedException e) {
@@ -985,14 +1673,10 @@ public class EaglerAdapterImpl2 {
 		return win.getScreen().getAvailHeight();
 	}
 	public static final int getCanvasWidth() {
-		int w = parent.getClientWidth();
-		canvas.setWidth(w);
-		return w;
+		return renderingCanvas.getWidth();
 	}
 	public static final int getCanvasHeight() {
-		int h = parent.getClientHeight();
-		canvas.setHeight(h);
-		return h;
+		return renderingCanvas.getHeight();
 	}
 	public static final void setDisplaySize(int x, int y) {
 		
@@ -1000,20 +1684,66 @@ public class EaglerAdapterImpl2 {
 	public static final void syncDisplay(int performanceToFps) {
 		
 	}
+	
+	private static final DateFormat dateFormatSS = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+	public static final void saveScreenshot() {
+		saveScreenshot("screenshot_" + dateFormatSS.format(new Date()).toString() + ".png", canvas);
+	}
+	
+	@JSBody(params = { "name", "cvs" }, script = "var a=document.createElement(\"a\");a.href=cvs.toDataURL(\"image/png\");a.download=name;a.click();")
+	private static native void saveScreenshot(String name, HTMLCanvasElement cvs);
 
+	public static enum RateLimit {
+		NONE, FAILED, BLOCKED, FAILED_POSSIBLY_LOCKED, LOCKED, NOW_LOCKED;
+	}
+
+	private static final Set<String> rateLimitedAddresses = new HashSet();
+	private static final Set<String> blockedAddresses = new HashSet();
+	
 	private static WebSocket sock = null;
 	private static boolean sockIsConnecting = false;
+	private static boolean sockIsConnected = false;
+	private static boolean sockIsAlive = false;
 	private static LinkedList<byte[]> readPackets = new LinkedList();
+	private static RateLimit rateLimitStatus = null;
+	private static String currentSockURI = null;
+	
+	public static final RateLimit getRateLimitStatus() {
+		RateLimit l = rateLimitStatus;
+		rateLimitStatus = null;
+		return l;
+	}
+	public static final void logRateLimit(String addr, RateLimit l) {
+		if(l == RateLimit.BLOCKED) {
+			blockedAddresses.add(addr);
+		}else {
+			rateLimitedAddresses.add(addr);
+		}
+	}
+	public static final RateLimit checkRateLimitHistory(String addr) {
+		if(blockedAddresses.contains(addr)) {
+			return RateLimit.LOCKED;
+		}else if(rateLimitedAddresses.contains(addr)) {
+			return RateLimit.BLOCKED;
+		}else {
+			return RateLimit.NONE;
+		}
+	}
 	
 	@Async
 	public static native String connectWebSocket(String sockURI);
 	
 	private static void connectWebSocket(String sockURI, final AsyncCallback<String> cb) {
 		sockIsConnecting = true;
+		sockIsConnected = false;
+		sockIsAlive = false;
+		rateLimitStatus = null;
+		currentSockURI = sockURI;
 		try {
 			sock = WebSocket.create(sockURI);
 		} catch(Throwable t) {
 			sockIsConnecting = false;
+			sockIsAlive = false;
 			return;
 		}
 		sock.setBinaryType("arraybuffer");
@@ -1021,6 +1751,8 @@ public class EaglerAdapterImpl2 {
 			@Override
 			public void handleEvent(MessageEvent evt) {
 				sockIsConnecting = false;
+				sockIsAlive = false;
+				sockIsConnected = true;
 				readPackets.clear();
 				cb.complete("okay");
 			}
@@ -1029,15 +1761,55 @@ public class EaglerAdapterImpl2 {
 			@Override
 			public void handleEvent(CloseEvent evt) {
 				sock = null;
-				readPackets.clear();
+				if(sockIsConnecting) {
+					if(rateLimitStatus == null) {
+						if(blockedAddresses.contains(currentSockURI)) {
+							rateLimitStatus = RateLimit.LOCKED;
+						}else if(rateLimitedAddresses.contains(currentSockURI)) {
+							rateLimitStatus = RateLimit.FAILED_POSSIBLY_LOCKED;
+						}else {
+							rateLimitStatus = RateLimit.FAILED;
+						}
+					}
+				}else if(!sockIsAlive) {
+					if(rateLimitStatus == null) {
+						if(blockedAddresses.contains(currentSockURI)) {
+							rateLimitStatus = RateLimit.LOCKED;
+						}else if(rateLimitedAddresses.contains(currentSockURI)) {
+							rateLimitStatus = RateLimit.BLOCKED;
+						}
+					}
+				}
 				boolean b = sockIsConnecting;
 				sockIsConnecting = false;
+				sockIsConnected = false;
+				sockIsAlive = false;
 				if(b) cb.complete("fail");
 			}
 		});
 		sock.onMessage(new EventListener<MessageEvent>() {
 			@Override
 			public void handleEvent(MessageEvent evt) {
+				sockIsAlive = true;
+				if(isString(evt.getData())) {
+					String stat = evt.getDataAsString();
+					if(stat.equalsIgnoreCase("BLOCKED")) {
+						if(rateLimitStatus == null) {
+							rateLimitStatus = RateLimit.BLOCKED;
+						}
+						rateLimitedAddresses.add(currentSockURI);
+					}else if(stat.equalsIgnoreCase("LOCKED")) {
+						if(rateLimitStatus == null) {
+							rateLimitStatus = RateLimit.NOW_LOCKED;
+						}
+						rateLimitedAddresses.add(currentSockURI);
+						blockedAddresses.add(currentSockURI);
+					}
+					sockIsConnecting = false;
+					sockIsConnected = false;
+					sock.close();
+					return;
+				}
 				Uint8Array a = Uint8Array.create(evt.getDataAsArray());
 				byte[] b = new byte[a.getByteLength()];
 				for(int i = 0; i < b.length; ++i) {
@@ -1050,13 +1822,21 @@ public class EaglerAdapterImpl2 {
 	
 	public static final boolean startConnection(String uri) {
 		String res = connectWebSocket(uri);
-		return "fail".equals(res) ? false : true;
+		return !"fail".equals(res);
 	}
 	public static final void endConnection() {
+		if(sock == null || sock.getReadyState() == 3) {
+			sockIsConnecting = false;
+		}
 		if(sock != null && !sockIsConnecting) sock.close();
+
+		enableVoice(Voice.VoiceChannel.NONE);
 	}
 	public static final boolean connectionOpen() {
-		return sock != null && !sockIsConnecting;
+		if(sock == null || sock.getReadyState() == 3) {
+			sockIsConnecting = false;
+		}
+		return sock != null && !sockIsConnecting && sock.getReadyState() != 3;
 	}
 	@JSBody(params = { "sock", "buffer" }, script = "sock.send(buffer);")
 	private static native void nativeBinarySend(WebSocket sock, ArrayBuffer buffer);
@@ -1075,22 +1855,30 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 	public static final byte[] loadLocalStorage(String key) {
-		String s = win.getLocalStorage().getItem("_eaglercraft."+key);
-		if(s != null) {
-			return Base64.decodeBase64(s);
+		Storage strg = win.getLocalStorage();
+		if(strg != null) {
+			String s =strg.getItem("_eaglercraft."+key);
+			if(s != null) {
+				return Base64.decodeBase64(s);
+			}else {
+				return null;
+			}
 		}else {
 			return null;
 		}
 	}
 	public static final void saveLocalStorage(String key, byte[] data) {
-		win.getLocalStorage().setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+		Storage strg = win.getLocalStorage();
+		if(strg != null) {
+			strg.setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+		}
 	}
 	public static final void openLink(String url) {
-		win.open(url, "_blank");
+		SelfDefence.openWindowIgnore(url, "_blank");
 	}
-
-	@JSBody(params = { "str" }, script = "window.eval(str);")
-	private static native void execute(String str);
+	public static final void redirectTo(String url) {
+		Window.current().getLocation().setFullURL(url);
+	}
 	
 	@JSBody(params = { }, script = "window.onbeforeunload = function(){javaMethods.get('net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.onWindowUnload()V').invoke();return false;};")
 	private static native void onBeforeCloseRegister();
@@ -1119,25 +1907,28 @@ public class EaglerAdapterImpl2 {
 	public static native String getFileChooserResultName();
 	
 	public static final void setListenerPos(float x, float y, float z, float vx, float vy, float vz, float pitch, float yaw) {
-		float var11 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-		float var12 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
-		float var13 = -var12;
-		float var14 = -MathHelper.sin(-pitch * 0.017453292F - (float) Math.PI);
-		float var15 = -var11;
-		float var16 = 0.0F;
-		float var17 = 1.0F;
-		float var18 = 0.0F;
+		float var2 = MathHelper.cos(-yaw * 0.017453292F);
+		float var3 = MathHelper.sin(-yaw * 0.017453292F);
+		float var4 = -MathHelper.cos(pitch * 0.017453292F);
+		float var5 = MathHelper.sin(pitch * 0.017453292F);
 		AudioListener l = audioctx.getListener();
 		l.setPosition(x, y, z);
-		l.setOrientation(var13, var14, var15, var16, var17, var18);
-		//l.setVelocity(vx, vy, vz);
+		l.setOrientation(-var3 * var4, -var5, -var2 * var4, 0.0f, 1.0f, 0.0f);
 	}
-	
-	
 	
 	private static int playbackId = 0;
 	private static final HashMap<String,AudioBufferX> loadedSoundFiles = new HashMap();
-	private static AudioContext audioctx = null; 
+	private static AudioContext audioctx = null;
+	private static GainNode masterVolumeNode = null;
+	private static float playbackOffsetDelay = 0.03f;
+	
+	public static final void setPlaybackOffsetDelay(float f) {
+		playbackOffsetDelay = f;
+	}
+	
+	public static final void setMasterVolume(float f) {
+		masterVolumeNode.getGain().setValue(f);
+	}
 	
 	@Async
 	public static native AudioBuffer decodeAudioAsync(ArrayBuffer buffer);
@@ -1209,8 +2000,8 @@ public class EaglerAdapterImpl2 {
 		g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
 		s.connect(g);
 		g.connect(p);
-		p.connect(audioctx.getDestination());
-		s.start(0.0d, 0.03d);
+		p.connect(masterVolumeNode);
+		s.start(0.0d, playbackOffsetDelay);
 		final int theId = ++playbackId;
 		activeSoundEffects.put(theId, new AudioBufferSourceNodeX(s, p, g));
 		s.setOnEnded(new EventListener<MediaEvent>() {
@@ -1232,8 +2023,8 @@ public class EaglerAdapterImpl2 {
 		GainNode g = audioctx.createGain();
 		g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
 		s.connect(g);
-		g.connect(audioctx.getDestination());
-		s.start(0.0d, 0.03d);
+		g.connect(masterVolumeNode);
+		s.start(0.0d, playbackOffsetDelay);
 		final int theId = ++playbackId;
 		activeSoundEffects.put(theId, new AudioBufferSourceNodeX(s, null, g));
 		s.setOnEnded(new EventListener<MediaEvent>() {
@@ -1279,29 +2070,367 @@ public class EaglerAdapterImpl2 {
 	public static final void openConsole() {
 		
 	}
-	private static boolean connected = false;
-	public static final void voiceConnect(String channel) {
-		win.alert("voice channels are not implemented yet");
-		connected = true;
+
+	private static EaglercraftVoiceClient voiceClient = null;
+	
+	private static boolean voiceAvailableStat = false;
+	private static boolean voiceSignalHandlersInitialized = false;
+
+	private static Consumer<byte[]> returnSignalHandler = null;
+
+	private static final HashMap<String, AnalyserNode> voiceAnalysers = new HashMap<>();
+	private static final HashMap<String, GainNode> voiceGains = new HashMap<>();
+	private static final HashMap<String, PannerNode> voicePanners = new HashMap<>();
+	private static final HashSet<String> nearbyPlayers = new HashSet<>();
+
+	public static void clearVoiceAvailableStatus() {
+		voiceAvailableStat = false;
 	}
-	public static final void voiceVolume(float volume) {
-		
+
+	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) {
+		returnSignalHandler = signalHandler;
 	}
-	public static final boolean voiceActive() {
-		return connected;
+
+	public static final int VOICE_SIGNAL_ALLOWED = 0;
+	public static final int VOICE_SIGNAL_REQUEST = 0;
+	public static final int VOICE_SIGNAL_CONNECT = 1;
+	public static final int VOICE_SIGNAL_DISCONNECT = 2;
+	public static final int VOICE_SIGNAL_ICE = 3;
+	public static final int VOICE_SIGNAL_DESC = 4;
+	public static final int VOICE_SIGNAL_GLOBAL = 5;
+
+	public static void handleVoiceSignal(byte[] data) {
+		try {
+			DataInputStream streamIn = new DataInputStream(new ByteArrayInputStream(data));
+			int sig = streamIn.read();
+			switch(sig) {
+				case VOICE_SIGNAL_GLOBAL:
+					if (enabledChannel != Voice.VoiceChannel.GLOBAL) return;
+					String[] voicePlayers = new String[streamIn.readInt()];
+					for(int i = 0; i < voicePlayers.length; i++) voicePlayers[i] = streamIn.readUTF();
+					for (String username : voicePlayers) {
+						// notice that literally everyone except for those already connected using voice chat will receive the request; however, ones using proximity will simply ignore it.
+						sendVoiceRequestIfNeeded(username);
+					}
+					break;
+				case VOICE_SIGNAL_ALLOWED:
+					voiceAvailableStat = streamIn.read() == 1;
+					String[] servs = new String[streamIn.read()];
+					for(int i = 0; i < servs.length; i++) {
+						servs[i] = streamIn.readUTF();
+					}
+					voiceClient.setICEServers(servs);
+					break;
+				case VOICE_SIGNAL_CONNECT:
+					String peerId = streamIn.readUTF();
+					try {
+						boolean offer = streamIn.readBoolean();
+						voiceClient.signalConnect(peerId, offer);
+					} catch (EOFException e) { // this is actually a connect ANNOUNCE, not an absolute "yes please connect" situation
+						if (enabledChannel == Voice.VoiceChannel.PROXIMITY && !nearbyPlayers.contains(peerId)) return;
+						// send request to peerId
+						sendVoiceRequest(peerId);
+					}
+					break;
+				case VOICE_SIGNAL_DISCONNECT:
+					String peerId2 = streamIn.readUTF();
+					voiceClient.signalDisconnect(peerId2, true);
+					break;
+				case VOICE_SIGNAL_ICE:
+					String peerId3 = streamIn.readUTF();
+					String candidate = streamIn.readUTF();
+					voiceClient.signalICECandidate(peerId3, candidate);
+					break;
+				case VOICE_SIGNAL_DESC:
+					String peerId4 = streamIn.readUTF();
+					String descJSON = streamIn.readUTF();
+					voiceClient.signalDescription(peerId4, descJSON);
+					break;
+				default:
+					System.err.println("Unknown voice signal packet '" + sig + "'!");
+					break;
+			}
+		}catch(IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static final boolean voiceAvailable() {
+		return voiceClient.voiceClientSupported() && voiceClient.getReadyState() != EaglercraftVoiceClient.READYSTATE_ABORTED;
+	}
+	public static final boolean voiceAllowed() {
+		return voiceAvailableStat;
 	}
 	public static final boolean voiceRelayed() {
-		return connected;
+		return false;
 	}
-	public static final String[] voiceUsers() {
-		return new String[0];
+	private static Voice.VoiceChannel enabledChannel = Voice.VoiceChannel.NONE;
+
+	public static final void addNearbyPlayer(String username) {
+		recentlyNearbyPlayers.remove(username);
+		if (nearbyPlayers.add(username)) {
+			sendVoiceRequestIfNeeded(username);
+		}
 	}
-	public static final String[] voiceUsersTalking() {
-		return new String[0];
+
+	private static final void sendVoiceRequest(String username) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(baos);
+			dos.write(VOICE_SIGNAL_REQUEST);
+			dos.writeUTF(username);
+			returnSignalHandler.accept(baos.toByteArray());
+		} catch (IOException ignored) {  }
 	}
-	public static final void voiceEnd() {
-		connected = false;
+
+	private static final void sendVoiceRequestIfNeeded(String username) {
+		if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
+		if (!voiceGains.containsKey(username)) sendVoiceRequest(username);
 	}
+
+	private static final ExpiringSet<String> recentlyNearbyPlayers = new ExpiringSet<>(5000, new ExpiringSet.ExpiringEvent<String>() {
+		@Override
+		public void onExpiration(String username) {
+			if (!nearbyPlayers.contains(username)) voiceClient.signalDisconnect(username, false);
+		}
+	});
+
+	public static final void removeNearbyPlayer(String username) {
+		if (nearbyPlayers.remove(username)) {
+			if (getVoiceStatus() == Voice.VoiceStatus.DISCONNECTED || getVoiceStatus() == Voice.VoiceStatus.UNAVAILABLE) return;
+			if (enabledChannel == Voice.VoiceChannel.PROXIMITY) recentlyNearbyPlayers.add(username);
+		}
+	}
+
+	public static final void cleanupNearbyPlayers(HashSet<String> existingPlayers) {
+		nearbyPlayers.stream().filter(un -> !existingPlayers.contains(un)).collect(Collectors.toSet()).forEach(EaglerAdapterImpl2::removeNearbyPlayer);
+	}
+
+	public static final void updateVoicePosition(String username, double x, double y, double z) {
+		if (voicePanners.containsKey(username)) voicePanners.get(username).setPosition((float) x, (float) y, (float) z);
+	}
+
+	public static final void sendInitialVoice() {
+		returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_CONNECT });
+		for (String username : nearbyPlayers) sendVoiceRequest(username);
+	}
+
+	public static final void enableVoice(Voice.VoiceChannel enable) {
+		if (enabledChannel == enable) return;
+		voiceClient.resetPeerStates();
+		if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
+			for (String username : nearbyPlayers) voiceClient.signalDisconnect(username, false);
+			for (String username : recentlyNearbyPlayers) voiceClient.signalDisconnect(username, false);
+			nearbyPlayers.clear();
+			recentlyNearbyPlayers.clear();
+			returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_DISCONNECT });
+		} else if(enabledChannel == Voice.VoiceChannel.GLOBAL) {
+			Set<String> antiConcurrentModificationUsernames = new HashSet<>(voiceGains.keySet());
+			for (String username : antiConcurrentModificationUsernames) voiceClient.signalDisconnect(username, false);
+			returnSignalHandler.accept(new byte[] { VOICE_SIGNAL_DISCONNECT });
+		}
+		enabledChannel = enable;
+		if(enable == Voice.VoiceChannel.NONE) {
+			talkStatus = false;
+		}else {
+			if(!voiceSignalHandlersInitialized) {
+				voiceSignalHandlersInitialized = true;
+				voiceClient.setICECandidateHandler(new EaglercraftVoiceClient.ICECandidateHandler() {
+					@Override
+					public void call(String peerId, String candidate) {
+						try {
+							ByteArrayOutputStream bos = new ByteArrayOutputStream();
+							DataOutputStream dat = new DataOutputStream(bos);
+							dat.write(VOICE_SIGNAL_ICE);
+							dat.writeUTF(peerId);
+							dat.writeUTF(candidate);
+							returnSignalHandler.accept(bos.toByteArray());
+						}catch(IOException ex) {
+						}
+					}
+				});
+				voiceClient.setDescriptionHandler(new EaglercraftVoiceClient.DescriptionHandler() {
+					@Override
+					public void call(String peerId, String candidate) {
+						try {
+							ByteArrayOutputStream bos = new ByteArrayOutputStream();
+							DataOutputStream dat = new DataOutputStream(bos);
+							dat.write(VOICE_SIGNAL_DESC);
+							dat.writeUTF(peerId);
+							dat.writeUTF(candidate);
+							returnSignalHandler.accept(bos.toByteArray());
+						}catch(IOException ex) {
+						}
+					}
+				});
+				voiceClient.setPeerTrackHandler(new EaglercraftVoiceClient.PeerTrackHandler() {
+					@Override
+					public void call(String peerId, MediaStream audioStream) {
+						if (enabledChannel == Voice.VoiceChannel.NONE) return;
+						MediaStreamAudioSourceNode audioNode = audioctx.createMediaStreamSource(audioStream);
+						AnalyserNode analyser = audioctx.createAnalyser();
+						analyser.setSmoothingTimeConstant(0f);
+						analyser.setFftSize(32);
+						audioNode.connect(analyser);
+						voiceAnalysers.put(peerId, analyser);
+						if (enabledChannel == Voice.VoiceChannel.GLOBAL) {
+							GainNode gain = audioctx.createGain();
+							gain.getGain().setValue(getVoiceListenVolume());
+							analyser.connect(gain);
+							gain.connect(audioctx.getDestination());
+							voiceGains.put(peerId, gain);
+						} else if (enabledChannel == Voice.VoiceChannel.PROXIMITY) {
+							PannerNode panner = audioctx.createPanner();
+							panner.setRolloffFactor(1f);
+							panner.setDistanceModel("linear");
+							panner.setPanningModel("HRTF");
+							panner.setConeInnerAngle(360f);
+							panner.setConeOuterAngle(0f);
+							panner.setConeOuterGain(0f);
+							panner.setOrientation(0f, 1f, 0f);
+							panner.setPosition(0, 0, 0);
+							float vol = getVoiceListenVolume();
+							panner.setMaxDistance(vol * 2 * getVoiceProximity() + 0.1f);
+							GainNode gain = audioctx.createGain();
+							gain.getGain().setValue(vol);
+							analyser.connect(gain);
+							gain.connect(panner);
+							panner.connect(audioctx.getDestination());
+							voiceGains.put(peerId, gain);
+							voicePanners.put(peerId, panner);
+						}
+					}
+				});
+				voiceClient.setPeerDisconnectHandler(new EaglercraftVoiceClient.PeerDisconnectHandler() {
+					@Override
+					public void call(String peerId, boolean quiet) {
+						if (voiceAnalysers.containsKey(peerId)) {
+							voiceAnalysers.get(peerId).disconnect();
+							voiceAnalysers.remove(peerId);
+						}
+						if (voiceGains.containsKey(peerId)) {
+							voiceGains.get(peerId).disconnect();
+							voiceGains.remove(peerId);
+						}
+						if (voicePanners.containsKey(peerId)) {
+							voicePanners.get(peerId).disconnect();
+							voicePanners.remove(peerId);
+						}
+						if (!quiet) {
+							try {
+								ByteArrayOutputStream bos = new ByteArrayOutputStream();
+								DataOutputStream dat = new DataOutputStream(bos);
+								dat.write(VOICE_SIGNAL_DISCONNECT);
+								dat.writeUTF(peerId);
+								returnSignalHandler.accept(bos.toByteArray());
+							} catch (IOException ex) {
+							}
+						}
+					}
+				});
+				voiceClient.initializeDevices();
+			}
+			sendInitialVoice();
+		}
+	}
+	public static final Voice.VoiceChannel getVoiceChannel() {
+		return enabledChannel;
+	}
+	public static final boolean voicePeerErrored() {
+		return voiceClient.getPeerState() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateConnect() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateInitial() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateDesc() == EaglercraftVoiceClient.PEERSTATE_FAILED || voiceClient.getPeerStateIce() == EaglercraftVoiceClient.PEERSTATE_FAILED;
+	}
+	public static final Voice.VoiceStatus getVoiceStatus() {
+		return (!voiceAvailable() || !voiceAllowed()) ? Voice.VoiceStatus.UNAVAILABLE :
+			(voiceClient.getReadyState() != EaglercraftVoiceClient.READYSTATE_DEVICE_INITIALIZED ?
+					Voice.VoiceStatus.CONNECTING : (voicePeerErrored() ? Voice.VoiceStatus.UNAVAILABLE : Voice.VoiceStatus.CONNECTED));
+	}
+
+	private static boolean talkStatus = false;
+	public static final void activateVoice(boolean talk) {
+		if(talkStatus != talk) {
+			voiceClient.activateVoice(talk);
+		}
+		talkStatus = talk;
+	}
+
+	private static int proximity = 16;
+	public static final void setVoiceProximity(int prox) {
+		for (PannerNode panner : voicePanners.values()) panner.setMaxDistance(getVoiceListenVolume() * 2 * prox + 0.1f);
+		proximity = prox;
+	}
+	public static final int getVoiceProximity() {
+		return proximity;
+	}
+
+	private static float volumeListen = 0.5f;
+	public static final void setVoiceListenVolume(float f) {
+		for (String username : voiceGains.keySet()) {
+			GainNode gain = voiceGains.get(username);
+			float val = f;
+			if(val > 0.5f) val = 0.5f + (val - 0.5f) * 3.0f;
+			if(val > 2.0f) val = 2.0f;
+			if(val < 0.0f) val = 0.0f;
+			gain.getGain().setValue(val * 2.0f);
+			if (voicePanners.containsKey(username)) voicePanners.get(username).setMaxDistance(f * 2 * getVoiceProximity() + 0.1f);
+		}
+		volumeListen = f;
+	}
+	public static final float getVoiceListenVolume() {
+		return volumeListen;
+	}
+
+	private static float volumeSpeak = 0.5f;
+	public static final void setVoiceSpeakVolume(float f) {
+		if(volumeSpeak != f) {
+			voiceClient.setMicVolume(f);
+		}
+		volumeSpeak = f;
+	}
+	public static final float getVoiceSpeakVolume() {
+		return volumeSpeak;
+	}
+
+	private static final Set<String> mutedSet = new HashSet();
+	private static final Set<String> speakingSet = new HashSet();
+	public static final Set<String> getVoiceListening() {
+		return voiceGains.keySet();
+	}
+	public static final Set<String> getVoiceSpeaking() {
+		return speakingSet;
+	}
+	public static final void setVoiceMuted(String username, boolean mute) {
+		voiceClient.mutePeer(username, mute);
+		if(mute) {
+			mutedSet.add(username);
+		}else {
+			mutedSet.remove(username);
+		}
+	}
+	public static final Set<String> getVoiceMuted() {
+		return mutedSet;
+	}
+	public static final List<String> getVoiceRecent() {
+		return new ArrayList<>(voiceGains.keySet());
+	}
+
+	public static final void tickVoice() {
+		recentlyNearbyPlayers.checkForExpirations();
+		speakingSet.clear();
+		for (String username : voiceAnalysers.keySet()) {
+			AnalyserNode analyser = voiceAnalysers.get(username);
+			Uint8Array array = Uint8Array.create(analyser.getFrequencyBinCount());
+			analyser.getByteFrequencyData(array);
+			int len = array.getLength();
+			for (int i = 0; i < len; i++) {
+				if (array.get(i) >= 0.1f) {
+					speakingSet.add(username);
+					break;
+				}
+			}
+		}
+	}
+	
+	
 	public static final void doJavascriptCoroutines() {
 		
 	}
@@ -1317,6 +2446,9 @@ public class EaglerAdapterImpl2 {
 	public static final void exit() {
 		
 	}
+	
+	@JSBody(params = { }, script = "return window.navigator.userAgent;")
+	public static native String getUserAgent();
 	
 	private static String[] LWJGLKeyNames = new String[] {"NONE", "ESCAPE", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "MINUS", "EQUALS", "BACK", "TAB", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "LBRACKET", "RBRACKET", "RETURN", "LCONTROL", "A", "S", "D", "F", "G", "H", "J", "K", "L", "SEMICOLON", "APOSTROPHE", "GRAVE", "LSHIFT", "BACKSLASH", "Z", "X", "C", "V", "B", "N", "M", "COMMA", "PERIOD", "SLASH", "RSHIFT", "MULTIPLY", "LMENU", "SPACE", "CAPITAL", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "NUMLOCK", "SCROLL", "NUMPAD7", "NUMPAD8", "NUMPAD9", "SUBTRACT", "NUMPAD4", "NUMPAD5", "NUMPAD6", "ADD", "NUMPAD1", "NUMPAD2", "NUMPAD3", "NUMPAD0", "DECIMAL", "null", "null", "null", "F11", "F12", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "F13", "F14", "F15", "F16", "F17", "F18", "null", "null", "null", "null", "null", "null", "KANA", "F19", "null", "null", "null", "null", "null", "null", "null", "CONVERT", "null", "NOCONVERT", "null", "YEN", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "NUMPADEQUALS", "null", "null", "CIRCUMFLEX", "AT", "COLON", "UNDERLINE", "KANJI", "STOP", "AX", "UNLABELED", "null", "null", "null", "null", "NUMPADENTER", "RCONTROL", "null", "null", "null", "null", "null", "null", "null", "null", "null", "SECTION", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "NUMPADCOMMA", "null", "DIVIDE", "null", "SYSRQ", "RMENU", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "FUNCTION", "PAUSE", "null", "HOME", "UP", "PRIOR", "null", "LEFT", "null", "RIGHT", "null", "END", "DOWN", "NEXT", "INSERT", "DELETE", "null", "null", "null", "null", "null", "null", "CLEAR", "LMETA", "RMETA", "APPS", "POWER", "SLEEP", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null"};
 	
@@ -1708,6 +2840,256 @@ public class EaglerAdapterImpl2 {
 		ArrayBuffer d = ArrayBuffer.create(dat.length);
 		Uint8Array.create(d).set(dat);
 		downloadBytesImpl(str, d);
+	}
+	
+	@JSFunctor
+	private static interface StupidFunctionResolveString extends JSObject {
+		void resolveStr(String s);
+	}
+	
+	private static boolean unpressCTRL = false;
+	
+	@Async
+	public static native String getClipboard();
+	
+	private static void getClipboard(final AsyncCallback<String> cb) {
+		final long start = System.currentTimeMillis();
+		getClipboard0(new StupidFunctionResolveString() {
+			@Override
+			public void resolveStr(String s) {
+				if(System.currentTimeMillis() - start > 500l) {
+					unpressCTRL = true;
+				}
+				cb.complete(s);
+			}
+		});
+	}
+	
+	@JSBody(params = { "cb" }, script = "if(!window.navigator.clipboard) cb(null); else window.navigator.clipboard.readText().then(function(s) { cb(s); }, function(s) { cb(null); });")
+	private static native void getClipboard0(StupidFunctionResolveString cb);
+	
+	@JSBody(params = { "str" }, script = "if(window.navigator.clipboard) window.navigator.clipboard.writeText(str);")
+	public static native void setClipboard(String str);
+	
+	@JSBody(params = { "obj" }, script = "return typeof obj === \"string\";")
+	private static native boolean isString(JSObject obj);
+	
+	private static class ServerQueryImpl implements ServerQuery {
+		
+		private final LinkedList<QueryResponse> queryResponses = new LinkedList();
+		private final LinkedList<byte[]> queryResponsesBytes = new LinkedList();
+		private final String type;
+		private boolean open;
+		private boolean alive;
+		private String uriString;
+		
+		private final WebSocket sock;
+		
+		private ServerQueryImpl(String type_, String uri) {
+			type = type_;
+			uriString = uri;
+			alive = false;
+			WebSocket s = null;
+			try {
+				s = WebSocket.create(uri);
+				s.setBinaryType("arraybuffer");
+				open = true;
+			}catch(Throwable t) {
+				open = false;
+				if(EaglerAdapterImpl2.blockedAddresses.contains(uriString)) {
+					queryResponses.add(new QueryResponse(true));
+				}else if(EaglerAdapterImpl2.rateLimitedAddresses.contains(uriString)) {
+					queryResponses.add(new QueryResponse(false));
+				}
+				sock = null;
+				return;
+			}
+			sock = s;
+			if(open) {
+				sock.onOpen(new EventListener<MessageEvent>() {
+					@Override
+					public void handleEvent(MessageEvent evt) {
+						sock.send("Accept: " + type);
+					}
+				});
+				sock.onClose(new EventListener<CloseEvent>() {
+					@Override
+					public void handleEvent(CloseEvent evt) {
+						open = false;
+						if(!alive) {
+							if(EaglerAdapterImpl2.blockedAddresses.contains(uriString)) {
+								queryResponses.add(new QueryResponse(true));
+							}else if(EaglerAdapterImpl2.rateLimitedAddresses.contains(uriString)) {
+								queryResponses.add(new QueryResponse(false));
+							}
+						}
+					}
+				});
+				sock.onMessage(new EventListener<MessageEvent>() {
+					@Override
+					public void handleEvent(MessageEvent evt) {
+						alive = true;
+						if(isString(evt.getData())) {
+							try {
+								String str = evt.getDataAsString();
+								if(str.equalsIgnoreCase("BLOCKED")) {
+									EaglerAdapterImpl2.rateLimitedAddresses.add(uriString);
+									queryResponses.add(new QueryResponse(false));
+									sock.close();
+									return;
+								}else if(str.equalsIgnoreCase("LOCKED")) {
+									EaglerAdapterImpl2.blockedAddresses.add(uriString);
+									queryResponses.add(new QueryResponse(true));
+									sock.close();
+									return;
+								}else {
+									QueryResponse q = new QueryResponse(new JSONObject(str));
+									if(q.rateLimitStatus != null) {
+										if(q.rateLimitStatus == RateLimit.BLOCKED) {
+											EaglerAdapterImpl2.rateLimitedAddresses.add(uriString);
+										}else if(q.rateLimitStatus == RateLimit.LOCKED) {
+											EaglerAdapterImpl2.blockedAddresses.add(uriString);
+										}
+										sock.close();
+									}
+									queryResponses.add(q);
+								}
+							}catch(Throwable t) {
+								System.err.println("Query response could not be parsed: " + t.toString());
+							}
+						}else {
+							Uint8Array a = Uint8Array.create(evt.getDataAsArray());
+							byte[] b = new byte[a.getByteLength()];
+							for(int i = 0; i < b.length; ++i) {
+								b[i] = (byte) (a.get(i) & 0xFF);
+							}
+							queryResponsesBytes.add(b);
+						}
+					}
+				});
+				Window.setTimeout(new TimerHandler() {
+					@Override
+					public void onTimer() {
+						if(open && sock.getReadyState() != 1) {
+							if(sock.getReadyState() == 0) {
+								sock.close();
+							}
+							open = false;
+						}
+					}
+				}, 5000l);
+			}
+		}
+
+		@Override
+		public boolean isQueryOpen() {
+			return open;
+		}
+
+		@Override
+		public void close() {
+			open = false;
+			sock.close();
+		}
+
+		@Override
+		public void send(String str) {
+			sock.send(str);
+		}
+
+		@Override
+		public int responseAvailable() {
+			return queryResponses.size();
+		}
+
+		@Override
+		public int responseBinaryAvailable() {
+			return queryResponsesBytes.size();
+		}
+
+		@Override
+		public QueryResponse getResponse() {
+			return queryResponses.size() > 0 ? queryResponses.remove(0) : null;
+		}
+
+		@Override
+		public byte[] getBinaryResponse() {
+			return queryResponsesBytes.size() > 0 ? queryResponsesBytes.remove(0) : null;
+		}
+		
+	}
+
+	public static final ServerQuery openQuery(String type, String uri) {
+		return new ServerQueryImpl(type, uri);
+	}
+	
+	private static String serverToJoinOnLaunch = null;
+	
+	public static final void setServerToJoinOnLaunch(String s) {
+		serverToJoinOnLaunch = s;
+	}
+	
+	public static final String getServerToJoinOnLaunch() {
+		return serverToJoinOnLaunch;
+	}
+
+	private static boolean endianWasChecked = false;
+	private static boolean isBigEndian = false;
+	private static boolean isLittleEndian = false;
+	
+	public static final boolean isBigEndian() {
+		if(!endianWasChecked) {
+			int checkIntegerA = 0xFF000000;
+			int checkIntegerB = 0x000000FF;
+			
+			ArrayBuffer buf = ArrayBuffer.create(4);
+			Int32Array bufW = Int32Array.create(buf);
+			Uint8Array bufR = Uint8Array.create(buf);
+			
+			bufW.set(0, checkIntegerA);
+
+			boolean knownBig1 = false;
+			if(bufR.get(0) == (short)0xFF && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0) {
+				knownBig1 = true;
+			}
+			
+			boolean knownLittle1 = false;
+			if(bufR.get(0) == (short)0 && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0xFF) {
+				knownLittle1 = true;
+			}
+			
+			bufW.set(0, checkIntegerB);
+			
+			boolean knownBig2 = false;
+			if(bufR.get(0) == (short)0 && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0xFF) {
+				knownBig2 = true;
+			}
+
+			boolean knownLittle2 = false;
+			if(bufR.get(0) == (short)0xFF && bufR.get(1) == (short)0 && bufR.get(2) == (short)0 && bufR.get(3) == (short)0) {
+				knownLittle2 = true;
+			}
+			
+			if(knownBig1 == knownBig2 && knownLittle1 == knownLittle2 && knownBig1 != knownLittle1) {
+				isBigEndian = knownBig1;
+				isLittleEndian = knownLittle1;
+			}
+			
+			if(isBigEndian) {
+				System.out.println("This browser is BIG endian!");
+			}else if(isLittleEndian) {
+				System.out.println("This browser is LITTLE endian!");
+			}else {
+				System.out.println("The byte order of this browser is inconsistent!");
+				System.out.println(" - the sequence FF000000 was " + (knownBig1 ? "" : "not ") + "big endian.");
+				System.out.println(" - the sequence FF000000 was " + (knownLittle1 ? "" : "not ") + "little endian.");
+				System.out.println(" - the sequence 000000FF was " + (knownBig2 ? "" : "not ") + "big endian.");
+				System.out.println(" - the sequence 000000FF was " + (knownLittle2 ? "" : "not ") + "little endian.");
+			}
+			
+			endianWasChecked = true;
+		}
+		return !isLittleEndian;
 	}
 	
 }

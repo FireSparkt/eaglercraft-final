@@ -1,15 +1,15 @@
 package net.minecraft.src;
 
-import net.minecraft.client.Minecraft;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiButton extends Gui {
 	/** Button width in pixels */
-	protected int width;
+	public int width;
 
 	/** Button height in pixels */
-	protected int height;
+	public int height;
 
 	/** The x position of this control. */
 	public int xPosition;

@@ -1,9 +1,9 @@
 package net.lax1dude.eaglercraft;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.teavm.jso.JSBody;
-import org.teavm.jso.JSExceptions;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSError;
 import org.teavm.jso.dom.html.HTMLDocument;
@@ -19,13 +19,23 @@ public class Client {
 	public static HTMLElement rootElement = null;
 	public static Minecraft instance = null;
     public static void main(String[] args) {
-    	registerErrorHandler();
     	//try {
 	    	String[] e = getOpts();
-	    	EaglerAdapterImpl2.initializeContext(rootElement = Window.current().getDocument().getElementById(e[0]), e[1]);
+	    	try {
+	    		EaglerAdapterImpl2.initializeContext(rootElement = Window.current().getDocument().getElementById(e[0]), e[1]);
+	    	}catch(Throwable t) {
+	    		StringWriter s = new StringWriter();
+	    		t.printStackTrace(new PrintWriter(s));
+	    		showCrashScreen(s.toString());
+	    		return;
+	    	}
+	    	registerErrorHandler();
 	    	LocalStorageManager.loadStorage();
-	    	if(e.length > 2) {
+	    	if(e.length > 2 && e[2].length() > 0) {
 	    		ServerList.loadDefaultServers(e[2]);
+	    	}
+	    	if(e.length > 3) {
+	    		EaglerAdapterImpl2.setServerToJoinOnLaunch(e[3]);
 	    	}
 	    	run0();
 		//}catch(Throwable t) {
@@ -85,38 +95,37 @@ public class Client {
 			str.append("eaglercraft.minecraft = \"1.5.2\"\n");
 			str.append("eaglercraft.brand = \"eagtek\"\n");
 			str.append("eaglercraft.username = \"").append(EaglerProfile.username).append("\"\n");
-			str.append("eaglercraft.channel = \"").append(EaglerProfile.myChannel).append("\"\n");
 			str.append('\n');
-			addArray(str, "window.minecraftOpts");
+			shortenMinecraftOpts();
+			addArray(str, "minecraftOpts");
 			str.append('\n');
-			addDebug(str, "window.navigator.userAgent");
-			addDebug(str, "window.navigator.vendor");
-			addDebug(str, "window.navigator.language");
-			addDebug(str, "window.navigator.hardwareConcurrency");
-			addDebug(str, "window.navigator.deviceMemory");
-			addDebug(str, "window.navigator.platform");
-			addDebug(str, "window.navigator.product");
+			addDebugNav(str, "userAgent");
+			addDebugNav(str, "vendor");
+			addDebugNav(str, "language");
+			addDebugNav(str, "hardwareConcurrency");
+			addDebugNav(str, "deviceMemory");
+			addDebugNav(str, "platform");
+			addDebugNav(str, "product");
 			str.append('\n');
 			str.append("rootElement.clientWidth = ").append(rootElement.getClientWidth()).append('\n');
 			str.append("rootElement.clientHeight = ").append(rootElement.getClientHeight()).append('\n');
-			addDebug(str, "window.innerWidth");
-			addDebug(str, "window.innerHeight");
-			addDebug(str, "window.outerWidth");
-			addDebug(str, "window.outerHeight");
-			addDebug(str, "window.devicePixelRatio");
-			addDebug(str, "window.screen.availWidth");
-			addDebug(str, "window.screen.availHeight");
-			addDebug(str, "window.screen.colorDepth");
-			addDebug(str, "window.screen.pixelDepth");
+			addDebug(str, "innerWidth");
+			addDebug(str, "innerHeight");
+			addDebug(str, "outerWidth");
+			addDebug(str, "outerHeight");
+			addDebug(str, "devicePixelRatio");
+			addDebugScreen(str, "availWidth");
+			addDebugScreen(str, "availHeight");
+			addDebugScreen(str, "colorDepth");
+			addDebugScreen(str, "pixelDepth");
 			str.append('\n');
-			addDebug(str, "window.currentContext");
+			addDebug(str, "currentContext");
 			str.append('\n');
-			addDebug(str, "window.location.href");
-			addArray(str, "window.location.ancestorOrigins");
+			addDebugLocation(str, "href");
 			str.append("\n----- Begin Minecraft Config -----\n");
 			str.append(LocalStorageManager.dumpConfiguration());
 			str.append("\n----- End Minecraft Config -----\n\n");
-			addDebug(str, "window.minecraftServer");
+			addDebug(str, "minecraftServer");
 			
 			String s = rootElement.getAttribute("style");
 			rootElement.setAttribute("style", (s == null ? "" : s) + "position:relative;");
@@ -133,18 +142,42 @@ public class Client {
 		}
 	}
 	
-	@JSBody(params = { "v" }, script = "try { return \"\"+window.eval(v); } catch(e) { return \"<error>\"; }")
+	@JSBody(params = { "v" }, script = "try { return \"\"+window[v]; } catch(e) { return \"<error>\"; }")
 	private static native String getString(String var);
+	
+	@JSBody(params = { "v" }, script = "try { return \"\"+window.navigator[v]; } catch(e) { return \"<error>\"; }")
+	private static native String getStringNav(String var);
+
+	@JSBody(params = { "v" }, script = "try { return \"\"+window.screen[v]; } catch(e) { return \"<error>\"; }")
+	private static native String getStringScreen(String var);
+
+	@JSBody(params = { "v" }, script = "try { return \"\"+window.location[v]; } catch(e) { return \"<error>\"; }")
+	private static native String getStringLocation(String var);
+	
+	@JSBody(params = { }, script = "for(var i = 0; i < window.minecraftOpts.length; ++i) { if(window.minecraftOpts[i].length > 2048) window.minecraftOpts[i] = \"[\" + Math.floor(window.minecraftOpts[i].length * 0.001) + \"k characters]\"; }")
+	private static native void shortenMinecraftOpts();
 
 	private static void addDebug(StringBuilder str, String var) {
-		str.append(var).append(" = ").append(getString(var)).append('\n');
+		str.append("window.").append(var).append(" = ").append(getString(var)).append('\n');
+	}
+	
+	private static void addDebugNav(StringBuilder str, String var) {
+		str.append("window.navigator.").append(var).append(" = ").append(getStringNav(var)).append('\n');
+	}
+	
+	private static void addDebugScreen(StringBuilder str, String var) {
+		str.append("window.screen.").append(var).append(" = ").append(getStringScreen(var)).append('\n');
+	}
+	
+	private static void addDebugLocation(StringBuilder str, String var) {
+		str.append("window.location.").append(var).append(" = ").append(getStringLocation(var)).append('\n');
 	}
 	
 	private static void addArray(StringBuilder str, String var) {
-		str.append(var).append(" = ").append(getArray(var)).append('\n');
+		str.append("window.").append(var).append(" = ").append(getArray(var)).append('\n');
 	}
 	
-	@JSBody(params = { "v" }, script = "try { return JSON.stringify(window.eval(v)); } catch(e) { return \"[\\\"<error>\\\"]\"; }")
+	@JSBody(params = { "v" }, script = "try { return (typeof window[v] !== \"undefined\") ? JSON.stringify(window[v]) : \"[\\\"<error>\\\"]\"; } catch(e) { return \"[\\\"<error>\\\"]\"; }")
 	private static native String getArray(String var);
 	
 }

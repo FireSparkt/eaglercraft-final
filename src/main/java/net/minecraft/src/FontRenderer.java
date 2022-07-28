@@ -1,9 +1,5 @@
 package net.minecraft.src;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -134,7 +130,8 @@ public class FontRenderer {
 	}
 
 	private void readFontTexture(String par1Str) {
-		EaglerImage e = EaglerImage.loadImage(EaglerAdapter.loadResourceBytes(par1Str));
+		//EaglerImage e = EaglerImage.loadImage(EaglerAdapter.loadResourceBytes(par1Str));
+		EaglerImage e = EaglerAdapter.loadPNG(EaglerAdapter.loadResourceBytes(par1Str));
 		int[] var5 = e.data;
 		int var3 = e.w;
 		int var4 = e.h;
@@ -195,12 +192,12 @@ public class FontRenderer {
 		float var3 = (float) (par1 % 16 * 8);
 		float var4 = (float) (par1 / 16 * 8);
 		float var5 = par2 ? 1.0F : 0.0F;
-		float var6 = (float) this.charWidth[par1] - 0.01F;
+		float var6 = (float) this.charWidth[par1] - 0.2F;
 		Tessellator t = Tessellator.instance;
-		t.addVertexWithUV(this.posX + var5, this.posY, 0.0F, var3 / 128.0F, var4 / 128.0F);
-		t.addVertexWithUV(this.posX - var5, this.posY + 7.99F, 0.0F, var3 / 128.0F, (var4 + 7.99F) / 128.0F);
-		t.addVertexWithUV(this.posX + var6 - var5, this.posY + 7.99F, 0.0F, (var3 + var6) / 128.0F, (var4 + 7.99F) / 128.0F);
-		t.addVertexWithUV(this.posX + var6 + var5, this.posY, 0.0F, (var3 + var6) / 128.0F, var4 / 128.0F);
+		t.addVertexWithUV(this.posX + 0.05F + var5, this.posY + 0.05F, 0.0F, (var3 + 0.1F) / 128.0F, (var4 + 0.1F) / 128.0F);
+		t.addVertexWithUV(this.posX + 0.05F - var5, this.posY + 7.95F, 0.0F, (var3 + 0.1F) / 128.0F, (var4 + 7.8F) / 128.0F);
+		t.addVertexWithUV(this.posX + var6 - var5, this.posY + 7.95F, 0.0F, (var3 + var6) / 128.0F, (var4 + 7.8F) / 128.0F);
+		t.addVertexWithUV(this.posX + var6 + var5, this.posY + 0.05F, 0.0F, (var3 + var6) / 128.0F, (var4 + 0.1F) / 128.0F);
 		return (float) this.charWidth[par1];
 	}
 
@@ -231,13 +228,13 @@ public class FontRenderer {
 			float var7 = (float) (var5 + 1);
 			float var8 = (float) (par1 % 16 * 16) + var6;
 			float var9 = (float) ((par1 & 255) / 16 * 16);
-			float var10 = var7 - var6 - 0.02F;
+			float var10 = var7 - var6 - 0.04F;
 			float var11 = par2 ? 1.0F : 0.0F;
 			t.startDrawing(EaglerAdapter.GL_TRIANGLE_STRIP);
-			t.addVertexWithUV(this.posX + var11, this.posY, 0.0F, var8 / 256.0F, var9 / 256.0F);
-			t.addVertexWithUV(this.posX - var11, this.posY + 7.99F, 0.0F, var8 / 256.0F, (var9 + 15.98F) / 256.0F);
-			t.addVertexWithUV(this.posX + var10 / 2.0F + var11, this.posY, 0.0F, (var8 + var10) / 256.0F, var9 / 256.0F);
-			t.addVertexWithUV(this.posX + var10 / 2.0F - var11, this.posY + 7.99F, 0.0F, (var8 + var10) / 256.0F, (var9 + 15.98F) / 256.0F);
+			t.addVertexWithUV(this.posX + 0.02F + var11, this.posY + 0.02F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 0.02F) / 256.0F);
+			t.addVertexWithUV(this.posX + 0.02F - var11, this.posY + 7.98F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 15.98F) / 256.0F);
+			t.addVertexWithUV(this.posX + var10 / 2.0F + var11, this.posY + 0.02F, 0.0F, (var8 + var10) / 256.0F, (var9 + 0.02F) / 256.0F);
+			t.addVertexWithUV(this.posX + var10 / 2.0F - var11, this.posY + 7.98F, 0.0F, (var8 + var10) / 256.0F, (var9 + 15.98F) / 256.0F);
 			t.draw();
 			this.fontTexture.bindTexture();
 			t.startDrawingQuads();

@@ -4,10 +4,9 @@
 
 package net.md_5.bungee.log;
 
-import java.util.Iterator;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.LogRecord;
-import java.util.concurrent.BlockingQueue;
 
 public class LogDispatcher extends Thread {
 	private final BungeeLogger logger;

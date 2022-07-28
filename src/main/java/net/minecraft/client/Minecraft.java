@@ -4,19 +4,84 @@ import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
 
-import net.minecraft.src.*;
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerProfile;
-
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.GuiScreenLicense;
+import net.lax1dude.eaglercraft.GuiVoiceOverlay;
+import net.lax1dude.eaglercraft.LocalStorageManager;
+import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
+import net.minecraft.src.AchievementList;
+import net.minecraft.src.AxisAlignedBB;
+import net.minecraft.src.Block;
+import net.minecraft.src.ChatAllowedCharacters;
+import net.minecraft.src.ColorizerFoliage;
+import net.minecraft.src.ColorizerGrass;
+import net.minecraft.src.EffectRenderer;
+import net.minecraft.src.EntityBoat;
+import net.minecraft.src.EntityClientPlayerMP;
+import net.minecraft.src.EntityItemFrame;
+import net.minecraft.src.EntityList;
+import net.minecraft.src.EntityLiving;
+import net.minecraft.src.EntityMinecart;
+import net.minecraft.src.EntityPainting;
+import net.minecraft.src.EntityPlayer;
+import net.minecraft.src.EntityRenderer;
+import net.minecraft.src.EnumChatFormatting;
+import net.minecraft.src.EnumMovingObjectType;
+import net.minecraft.src.EnumOS;
+import net.minecraft.src.EnumOptions;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.GLAllocation;
+import net.minecraft.src.GameSettings;
+import net.minecraft.src.GuiAchievement;
+import net.minecraft.src.GuiChat;
+import net.minecraft.src.GuiConnecting;
+import net.minecraft.src.GuiGameOver;
+import net.minecraft.src.GuiIngame;
+import net.minecraft.src.GuiIngameMenu;
+import net.minecraft.src.GuiInventory;
+import net.minecraft.src.GuiMainMenu;
+import net.minecraft.src.GuiMultiplayer;
+import net.minecraft.src.GuiScreen;
+import net.minecraft.src.GuiSleepMP;
+import net.minecraft.src.INetworkManager;
+import net.minecraft.src.Item;
+import net.minecraft.src.ItemRenderer;
+import net.minecraft.src.ItemStack;
+import net.minecraft.src.KeyBinding;
+import net.minecraft.src.LoadingScreenRenderer;
+import net.minecraft.src.MathHelper;
+import net.minecraft.src.MouseHelper;
+import net.minecraft.src.MovementInputFromOptions;
+import net.minecraft.src.MovingObjectPosition;
+import net.minecraft.src.NetClientHandler;
+import net.minecraft.src.OpenGlHelper;
+import net.minecraft.src.Packet3Chat;
+import net.minecraft.src.PlayerControllerMP;
+import net.minecraft.src.Profiler;
+import net.minecraft.src.ProfilerResult;
+import net.minecraft.src.RenderBlocks;
+import net.minecraft.src.RenderEngine;
+import net.minecraft.src.RenderGlobal;
+import net.minecraft.src.RenderManager;
+import net.minecraft.src.ScaledResolution;
+import net.minecraft.src.ServerData;
+import net.minecraft.src.SoundManager;
+import net.minecraft.src.StatStringFormatKeyInv;
+import net.minecraft.src.StringTranslate;
+import net.minecraft.src.TextureManager;
+import net.minecraft.src.TexturePackList;
+import net.minecraft.src.Timer;
+import net.minecraft.src.WorldClient;
 
 public class Minecraft implements Runnable {
 	
@@ -29,6 +94,7 @@ public class Minecraft implements Runnable {
 	public PlayerControllerMP playerController;
 	private boolean fullscreen = false;
 	private boolean hasCrashed = false;
+	private boolean isGonnaTakeDatScreenShot = false;
 	
 	public int displayWidth;
 	public int displayHeight;
@@ -137,9 +203,11 @@ public class Minecraft implements Runnable {
 	/** The profiler instance */
 	public final Profiler mcProfiler = new Profiler();
 	private long field_83002_am = -1L;
-	
+
 	public int chunkUpdates = 0;
+	public int chunkGeometryUpdates = 0;
 	public static int debugChunkUpdates = 0;
+	public static int debugChunkGeometryUpdates = 0;
 
 	/**
 	 * Set to true to keep the game loop running. Set to false by shutdown() to
@@ -163,6 +231,8 @@ public class Minecraft implements Runnable {
 
 	/** Profiler currently displayed in the debug screen pie chart */
 	private String debugProfilerName = "root";
+	
+	public GuiVoiceOverlay voiceOverlay;
 
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
@@ -242,6 +312,12 @@ public class Minecraft implements Runnable {
 		this.checkGLError("Post startup");
 		this.guiAchievement = new GuiAchievement(this);
 		this.ingameGUI = new GuiIngame(this);
+		this.voiceOverlay = new GuiVoiceOverlay(this);
+
+		ScaledResolution var2 = new ScaledResolution(this.gameSettings, this.displayWidth, this.displayHeight);
+		int var3 = var2.getScaledWidth();
+		int var4 = var2.getScaledHeight();
+		this.voiceOverlay.setResolution(var3, var4);
 
 		//if (this.serverName != null) {
 		//	this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
@@ -252,7 +328,20 @@ public class Minecraft implements Runnable {
 		this.sndManager.playTheTitleMusic();
 		showIntroAnimation();
 		
-		this.displayGuiScreen(new GuiScreenEditProfile(new GuiMainMenu()));
+		String s = EaglerAdapter.getServerToJoinOnLaunch();
+		GuiScreen scr;
+		
+		if(s != null) {
+			scr = new GuiScreenEditProfile(new GuiConnecting(new GuiMainMenu(), this, new ServerData("Eaglercraft Server", s, false)));
+		}else {
+			scr = new GuiScreenEditProfile(new GuiMainMenu());
+		}
+		
+		if(!LocalStorageManager.profileSettingsStorage.getBoolean("acceptLicense")) {
+			scr = new GuiScreenLicense(scr);
+		}
+		
+		displayGuiScreen(scr);
 
 		this.loadingScreen = new LoadingScreenRenderer(this);
 
@@ -432,10 +521,12 @@ public class Minecraft implements Runnable {
 			e.printStackTrace();
 		}
 		
-		GuiScreenVoiceChannel.fadeInTimer = System.currentTimeMillis();
 		EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 		EaglerAdapter.glAlphaFunc(EaglerAdapter.GL_GREATER, 0.1F);
+
+		while(EaglerAdapter.keysNext());
+		while(EaglerAdapter.mouseNext());
 	}
 
 	/**
@@ -489,7 +580,7 @@ public class Minecraft implements Runnable {
 	}
 
 	public static EnumOS getOs() {
-		String var0 = System.getProperty("os.name").toLowerCase();
+		String var0 = EaglerAdapter.getUserAgent().toLowerCase();
 		return var0.contains("win") ? EnumOS.WINDOWS
 				: (var0.contains("mac") ? EnumOS.MACOS
 						: (var0.contains("solaris") ? EnumOS.SOLARIS : (var0.contains("sunos") ? EnumOS.SOLARIS : (var0.contains("linux") ? EnumOS.LINUX : (var0.contains("unix") ? EnumOS.LINUX : EnumOS.UNKNOWN)))));
@@ -535,6 +626,14 @@ public class Minecraft implements Runnable {
 		} else {
 			if(!this.inGameHasFocus) this.setIngameFocus();
 		}
+	}
+	
+	public boolean isChatOpen() {
+		return this.currentScreen != null && (this.currentScreen instanceof GuiChat);
+	}
+	
+	public String getServerURI() {
+		return this.getNetHandler() != null ? this.getNetHandler().getNetManager().getServerURI() : "[not connected]";
 	}
 
 	/**
@@ -588,36 +687,10 @@ public class Minecraft implements Runnable {
 
 	public void run() {
 		this.running = true;
-
-		//try {
-			this.startGame();
-		//} catch (Exception var11) {
-		//	var11.printStackTrace();
-		//	return;
-		//}
-
-		//try {
-			while (this.running) {
-
-				if (this.refreshTexturePacksScheduled) {
-					this.refreshTexturePacksScheduled = false;
-					this.renderEngine.refreshTextures();
-				}
-
-				try {
-					this.runGameLoop();
-				} catch (OutOfMemoryError var10) {
-					this.freeMemory();
-					this.stopServerAndDisplayGuiScreen(new GuiMemoryErrorScreen());
-					System.gc();
-				}
-			}
-		//} catch (MinecraftError var12) {
-		//	;
-		//} catch (Throwable var14) {
-		//	var14.printStackTrace();
-		//}
-		
+		this.startGame();
+		while (this.running) {
+			this.runGameLoop();
+		}
 		EaglerAdapter.destroyContext();
 		EaglerAdapter.exit();
 	}
@@ -626,6 +699,11 @@ public class Minecraft implements Runnable {
 	 * Called repeatedly from run()
 	 */
 	private void runGameLoop() {
+		if (this.refreshTexturePacksScheduled) {
+			this.refreshTexturePacksScheduled = false;
+			this.renderEngine.refreshTextures();
+		}
+
 		AxisAlignedBB.getAABBPool().cleanPool();
 
 		if (this.theWorld != null) {
@@ -711,8 +789,6 @@ public class Minecraft implements Runnable {
 		this.guiAchievement.updateAchievementWindow();
 		this.mcProfiler.startSection("root");
 
-		this.screenshotListener();
-
 		if (!this.fullscreen && (EaglerAdapter.getCanvasWidth() != this.displayWidth || EaglerAdapter.getCanvasHeight() != this.displayHeight)) {
 			this.displayWidth = EaglerAdapter.getCanvasWidth();
 			this.displayHeight = EaglerAdapter.getCanvasHeight();
@@ -738,12 +814,19 @@ public class Minecraft implements Runnable {
 			fpsCounter = 0;
 			debugChunkUpdates = chunkUpdates;
 			chunkUpdates = 0;
+			debugChunkGeometryUpdates = chunkGeometryUpdates;
+			chunkGeometryUpdates = 0;
 			secondTimer = System.currentTimeMillis();
 		}
 		this.mcProfiler.startSection("syncDisplay");
 
 		if (this.func_90020_K() > 0) {
 			EaglerAdapter.syncDisplay(EntityRenderer.performanceToFps(this.func_90020_K()));
+		}
+		
+		if(isGonnaTakeDatScreenShot) {
+			isGonnaTakeDatScreenShot = false;
+			EaglerAdapter.saveScreenshot();
 		}
 		
 		EaglerAdapter.doJavascriptCoroutines();
@@ -754,47 +837,6 @@ public class Minecraft implements Runnable {
 
 	private int func_90020_K() {
 		return this.currentScreen != null && this.currentScreen instanceof GuiMainMenu ? 2 : this.gameSettings.limitFramerate;
-	}
-
-	public void freeMemory() {
-		try {
-			this.renderGlobal.deleteAllDisplayLists();
-		} catch (Throwable var4) {
-			;
-		}
-
-		try {
-			System.gc();
-			AxisAlignedBB.getAABBPool().clearPool();
-			this.theWorld.getWorldVec3Pool().clearAndFreeCache();
-		} catch (Throwable var3) {
-			;
-		}
-
-		try {
-			System.gc();
-			this.loadWorld((WorldClient) null);
-		} catch (Throwable var2) {
-			;
-		}
-
-		System.gc();
-	}
-
-	/**
-	 * checks if keys are down
-	 */
-	private void screenshotListener() {
-		/*
-		if (EaglerAdapter.isKeyDown(60)) {
-			if (!this.isTakingScreenshot) {
-				this.isTakingScreenshot = true;
-				this.ingameGUI.getChatGUI().printChatMessage(ScreenShotHelper.saveScreenshot(minecraftDir, this.displayWidth, this.displayHeight));
-			}
-		} else {
-			this.isTakingScreenshot = false;
-		}
-		*/
 	}
 
 	/**
@@ -1003,7 +1045,7 @@ public class Minecraft implements Runnable {
 	
 	public void displayEaglercraftText(String s) {
 		if(this.thePlayer != null && shownPlayerMessages.add(s)) {
-			this.thePlayer.sendChatToPlayer("notice: "+s);
+			this.thePlayer.sendChatToPlayer(s);
 		}
 	}
 
@@ -1088,12 +1130,15 @@ public class Minecraft implements Runnable {
 		this.displayWidth = par1 <= 0 ? 1 : par1;
 		this.displayHeight = par2 <= 0 ? 1 : par2;
 
+		ScaledResolution var3 = new ScaledResolution(this.gameSettings, par1, par2);
+		int var4 = var3.getScaledWidth();
+		int var5 = var3.getScaledHeight();
+		
 		if (this.currentScreen != null) {
-			ScaledResolution var3 = new ScaledResolution(this.gameSettings, par1, par2);
-			int var4 = var3.getScaledWidth();
-			int var5 = var3.getScaledHeight();
 			this.currentScreen.setWorldAndResolution(this, var4, var5);
 		}
+		
+		this.voiceOverlay.setResolution(var4, var5);
 	}
 	
 	private boolean wasPaused = false;
@@ -1161,7 +1206,28 @@ public class Minecraft implements Runnable {
 			}
 		}
 		
-		GuiScreenVoiceChannel.tickVoiceConnection();
+		GuiMultiplayer.tickRefreshCooldown();
+		EaglerAdapter.tickVoice();
+		if (EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTING || EaglerAdapter.getVoiceStatus() == Voice.VoiceStatus.CONNECTED) {
+
+			EaglerAdapter.activateVoice((this.currentScreen == null || !this.currentScreen.blockHotKeys()) && EaglerAdapter.isKeyDown(gameSettings.voicePTTKey));
+
+			if (this.theWorld != null && this.thePlayer != null) {
+				HashSet<String> seenPlayers = new HashSet<>();
+				for (Object playerObject : this.theWorld.playerEntities) {
+					EntityPlayer player = (EntityPlayer) playerObject;
+					if (player == this.thePlayer) continue;
+					if (EaglerAdapter.getVoiceChannel() == Voice.VoiceChannel.PROXIMITY) EaglerAdapter.updateVoicePosition(player.username, player.posX, player.posY + player.getEyeHeight(), player.posZ);
+					int prox = 22;
+					// cube
+					if (Math.abs(thePlayer.posX - player.posX) <= prox && Math.abs(thePlayer.posY - player.posY) <= prox && Math.abs(thePlayer.posZ - player.posZ) <= prox) {
+						EaglerAdapter.addNearbyPlayer(player.username);
+						seenPlayers.add(player.username);
+					}
+				}
+				EaglerAdapter.cleanupNearbyPlayers(seenPlayers);
+			}
+		}
 
 		if (this.currentScreen == null || this.currentScreen.allowUserInput) {
 			this.mcProfiler.endStartSection("mouse");
@@ -1217,7 +1283,7 @@ public class Minecraft implements Runnable {
 				if (EaglerAdapter.getEventKeyState()) {
 					KeyBinding.onTick(EaglerAdapter.getEventKey());
 				}
-				
+
 				boolean F3down = (this.gameSettings.keyBindFunction.pressed && EaglerAdapter.isKeyDown(4));
 
 				if (this.field_83002_am > 0L) {
@@ -1233,6 +1299,7 @@ public class Minecraft implements Runnable {
 				}
 
 				if (EaglerAdapter.getEventKeyState()) {
+					isGonnaTakeDatScreenShot |= (this.gameSettings.keyBindFunction.pressed && EaglerAdapter.getEventKey() == 3);
 					if (EaglerAdapter.getEventKey() == 87) {
 						this.toggleFullscreen();
 					} else {
@@ -1292,6 +1359,11 @@ public class Minecraft implements Runnable {
 								if (this.gameSettings.thirdPersonView > 2) {
 									this.gameSettings.thirdPersonView = 0;
 								}
+							}
+							
+							if (EaglerAdapter.getEventKey() == 7 && this.gameSettings.keyBindFunction.pressed) {
+								this.gameSettings.showCoordinates = !this.gameSettings.showCoordinates;
+								this.gameSettings.saveOptions();
 							}
 
 							if (EaglerAdapter.getEventKey() == 9 && this.gameSettings.keyBindFunction.pressed) {
@@ -1390,7 +1462,7 @@ public class Minecraft implements Runnable {
 		if (this.theWorld != null) {
 			if (this.thePlayer != null) {
 				++this.joinPlayerCounter;
-
+				
 				if (this.joinPlayerCounter == 30) {
 					this.joinPlayerCounter = 0;
 					this.theWorld.joinEntityInSurroundings(this.thePlayer);
@@ -1481,6 +1553,9 @@ public class Minecraft implements Runnable {
 	 */
 	public void loadWorld(WorldClient par1WorldClient, String par2Str) {
 		if (par1WorldClient == null) {
+			
+			EaglerAdapter.enableVoice(Voice.VoiceChannel.NONE);
+			
 			NetClientHandler var3 = this.getNetHandler();
 
 			if (var3 != null) {
@@ -1513,6 +1588,9 @@ public class Minecraft implements Runnable {
 
 		this.sndManager.playStreaming((String) null, 0.0F, 0.0F, 0.0F);
 		this.sndManager.stopAllSounds();
+		if(EaglerAdapter.isVideoSupported()) {
+			EaglerAdapter.unloadVideo();
+		}
 		this.theWorld = par1WorldClient;
 
 		if (par1WorldClient != null) {
@@ -1536,7 +1614,13 @@ public class Minecraft implements Runnable {
 			StringTranslate var4 = StringTranslate.getInstance();
 			
 			if(!this.gameSettings.fancyGraphics || this.gameSettings.ambientOcclusion == 0) {
-				displayEaglercraftText(var4.translateKey("fancyGraphicsNote"));
+				displayEaglercraftText("Note: " + var4.translateKey("fancyGraphicsNote"));
+			}
+			
+			if(this.gameSettings.showCoordinates) {
+				displayEaglercraftText(EnumChatFormatting.LIGHT_PURPLE + "Note: use F+6 to hide the coordinates off of the screen (if you're in public)");
+			}else {
+				displayEaglercraftText(EnumChatFormatting.LIGHT_PURPLE + "Note: use F+6 to show your coordinates on the screen");
 			}
 
 			this.thePlayer.preparePlayerToSpawn();

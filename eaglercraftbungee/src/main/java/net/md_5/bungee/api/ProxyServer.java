@@ -4,18 +4,20 @@
 
 package net.md_5.bungee.api;
 
-import net.md_5.bungee.api.tab.CustomTabList;
-import net.md_5.bungee.api.scheduler.TaskScheduler;
 import java.io.File;
 import java.net.InetSocketAddress;
-import net.md_5.bungee.api.config.ConfigurationAdapter;
-import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.api.config.ServerInfo;
-import java.util.Map;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.Collection;
+import java.util.Map;
 import java.util.logging.Logger;
+
 import com.google.common.base.Preconditions;
+
+import net.md_5.bungee.api.config.ConfigurationAdapter;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.api.scheduler.TaskScheduler;
+import net.md_5.bungee.api.tab.CustomTabList;
 
 public abstract class ProxyServer {
 	private static ProxyServer instance;

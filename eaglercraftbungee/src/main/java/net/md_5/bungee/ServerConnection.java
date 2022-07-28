@@ -7,12 +7,13 @@ package net.md_5.bungee;
 import java.beans.ConstructorProperties;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
+
+import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.protocol.packet.PacketFFKick;
 
 public class ServerConnection implements Server {
 	private final ChannelWrapper ch;
@@ -27,7 +28,7 @@ public class ServerConnection implements Server {
 
 	@Override
 	public synchronized void disconnect(final String reason) {
-		if (!this.ch.isClosed()) {
+		if (this.ch != null && !this.ch.isClosed()) {
 			this.unsafe().sendPacket(new PacketFFKick(reason));
 			this.ch.getHandle().eventLoop().schedule((Runnable) new Runnable() {
 				@Override
@@ -40,7 +41,7 @@ public class ServerConnection implements Server {
 
 	@Override
 	public InetSocketAddress getAddress() {
-		return this.getInfo().getAddress();
+		return this.getInfo() == null ? null : this.getInfo().getAddress();
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class ServerConnection implements Server {
 		this.unsafe = new Connection.Unsafe() {
 			@Override
 			public void sendPacket(final DefinedPacket packet) {
-				ServerConnection.this.ch.write(packet);
+				if (ServerConnection.this.ch != null) ServerConnection.this.ch.write(packet);
 			}
 		};
 		this.ch = ch;

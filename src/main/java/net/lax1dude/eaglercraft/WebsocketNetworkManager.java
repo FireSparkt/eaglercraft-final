@@ -1,11 +1,11 @@
 package net.lax1dude.eaglercraft;
 
-import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
@@ -16,8 +16,10 @@ import net.minecraft.src.Packet;
 public class WebsocketNetworkManager implements INetworkManager {
 	
 	private NetHandler netHandler;
+	private String serverURI;
 	
 	public WebsocketNetworkManager(String uri, String eagler, NetHandler netHandler) throws IOException {
+		this.serverURI = uri;
 		this.netHandler = netHandler;
 		if(!EaglerAdapter.startConnection(uri)) {
 			throw new IOException("websocket to "+uri+" failed");
@@ -28,7 +30,7 @@ public class WebsocketNetworkManager implements INetworkManager {
 	public void setNetHandler(NetHandler netHandler) {
 		this.netHandler = netHandler;
 	}
-	
+
 	private ByteArrayOutputStream sendBuffer = new ByteArrayOutputStream();
 	
 	public void addToSendQueue(Packet var1) {
@@ -77,7 +79,6 @@ public class WebsocketNetworkManager implements INetworkManager {
 			readChunks.add(ByteBuffer.wrap(packet));
 		}
 		if(!readChunks.isEmpty()) {
-			
 			int cap = 0;
 			for(ByteBuffer b : readChunks) {
 				cap += b.limit();
@@ -134,6 +135,10 @@ public class WebsocketNetworkManager implements INetworkManager {
 			EaglerAdapter.endConnection();
 			EaglerAdapter.setDebugVar("minecraftServer", "null");
 		}
+	}
+	
+	public String getServerURI() {
+		return this.serverURI;
 	}
 
 }

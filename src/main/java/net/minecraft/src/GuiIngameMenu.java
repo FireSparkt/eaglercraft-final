@@ -1,19 +1,24 @@
 package net.minecraft.src;
 
-import net.lax1dude.eaglercraft.GuiScreenVoiceChannel;
+import net.lax1dude.eaglercraft.AbortedException;
+import net.lax1dude.eaglercraft.ConfigConstants;
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.GuiScreenSkinCapeSettings;
+import net.lax1dude.eaglercraft.GuiVoiceMenu;
+import net.minecraft.client.Minecraft;
 
 public class GuiIngameMenu extends GuiScreen {
-	/** Also counts the number of updates, not certain as to why yet. */
-	private int updateCounter2 = 0;
 
-	/** Counts the number of screen updates. */
-	private int updateCounter = 0;
+	private GuiVoiceMenu voiceMenu;
 
+	public GuiIngameMenu() {
+		voiceMenu = new GuiVoiceMenu(this);
+	}
+	
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
 	 */
 	public void initGui() {
-		this.updateCounter2 = 0;
 		this.buttonList.clear();
 		byte var1 = -16;
 		this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + var1, StatCollector.translateToLocal("menu.returnToMenu")));
@@ -23,11 +28,11 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 
 		this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + var1, StatCollector.translateToLocal("menu.returnToGame")));
-		//this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + var1, StatCollector.translateToLocal("menu.voicechannel")));
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.options")));
 		GuiButton var3;
 		this.buttonList.add(var3 = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.shareToLan")));
 		var3.enabled = false;
+		this.buttonList.add(new GuiButton(8, 3, 3, 120, 20, StatCollector.translateToLocal("menu.skinCapeSettings")));
 	}
 
 	/**
@@ -57,8 +62,8 @@ public class GuiIngameMenu extends GuiScreen {
 			this.mc.sndManager.resumeAllSounds();
 			break;
 			
-		case 5:
-			this.mc.displayGuiScreen(new GuiScreenVoiceChannel(this));
+		case 8:
+			this.mc.displayGuiScreen(new GuiScreenSkinCapeSettings(this));
 			break;
 		}
 	}
@@ -68,7 +73,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	public void updateScreen() {
 		super.updateScreen();
-		++this.updateCounter;
+		voiceMenu.updateScreen();
 	}
 
 	/**
@@ -78,5 +83,65 @@ public class GuiIngameMenu extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, "Game menu", this.width / 2, 40, 16777215);
 		super.drawScreen(par1, par2, par3);
+		if(par1 >= 3 && par1 < 123 && par2 >= 3 && par2 < 23) {
+			int c = 0xCCCC66;
+			StringTranslate var1 = StringTranslate.getInstance();
+			EaglerAdapter.glPushMatrix();
+			EaglerAdapter.glTranslatef(126.0f, 6.0f, 0.0f);
+			EaglerAdapter.glScalef(0.8f, 0.8f, 0.8f);
+			this.drawString(fontRenderer, var1.translateKey("menu.skinCapeSettingsNote0"), 0, 0, c);
+			this.drawString(fontRenderer, var1.translateKey("menu.skinCapeSettingsNote1"), 0, 9, c);
+			EaglerAdapter.glPopMatrix();
+		}
+		
+		drawString(fontRenderer, "Eaglercraft: " + ConfigConstants.version, 6, 27, 0x999999);
+		
+		try {
+			if(voiceMenu.isBlockingInput()) {
+				super.drawScreen(0, 0, par3);
+			}else {
+				super.drawScreen(par1, par2, par3);
+			}
+			voiceMenu.drawScreen(par1, par2, par3);
+		}catch(AbortedException ex) {
+		}
+		
 	}
+	
+	/**
+	 * Fired when a key is typed. This is the equivalent of
+	 * KeyListener.keyTyped(KeyEvent e).
+	 */
+	protected void keyTyped(char par1, int par2) {
+		try {
+			voiceMenu.keyTyped(par1, par2);
+			super.keyTyped(par1, par2);
+		}catch(AbortedException ex) {
+		}
+	}
+	
+	/**
+	 * Called when the mouse is clicked.
+	 */
+	protected void mouseClicked(int par1, int par2, int par3) {
+		try {
+			voiceMenu.mouseClicked(par1, par2, par3);
+			super.mouseClicked(par1, par2, par3);
+		}catch(AbortedException ex) {
+		}
+	}
+	
+	public void setWorldAndResolution(Minecraft par1Minecraft, int par2, int par3) {
+		super.setWorldAndResolution(par1Minecraft, par2, par3);
+		voiceMenu.setWorldAndResolution(par1Minecraft, par2, par3);
+	}
+	
+	protected void mouseMovedOrUp(int par1, int par2, int par3) {
+		try {
+			voiceMenu.mouseMovedOrUp(par1, par2, par3);
+			super.mouseMovedOrUp(par1, par2, par3);
+		}catch(AbortedException ex) {
+		}
+	}
+	
 }

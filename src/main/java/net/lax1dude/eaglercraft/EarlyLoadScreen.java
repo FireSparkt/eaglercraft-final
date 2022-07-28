@@ -1,10 +1,68 @@
 package net.lax1dude.eaglercraft;
 
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.*;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_CLAMP;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_COLOR_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_DEPTH_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FLOAT;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_NEAREST;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_RGBA;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE0;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE_2D;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE_MAG_FILTER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE_MIN_FILTER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE_WRAP_S;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TEXTURE_WRAP_T;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_TRIANGLES;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_VERTEX_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wgetShaderHeader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglActiveTexture;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglAttachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindAttributeLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindTexture;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBufferData0;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglClear;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglClearColor;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCompileShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteTextures;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDetachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDisableVertexAttribArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDrawArrays;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglFlush;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGenTextures;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglLinkProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglShaderSource;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglTexImage2D;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglTexParameteri;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1i;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform2f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUseProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglViewport;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.getCanvasHeight;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.getCanvasWidth;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.updateDisplay;
 
 import java.nio.IntBuffer;
 
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferArrayGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ShaderGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.TextureGL;
 import net.minecraft.src.GLAllocation;
 
 public class EarlyLoadScreen {
@@ -24,7 +82,8 @@ public class EarlyLoadScreen {
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_NEAREST);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
-		EaglerImage img = EaglerImage.loadImage(Base64.decodeBase64(loadScreen));
+		//EaglerImage img = EaglerImage.loadImage(Base64.decodeBase64(loadScreen));
+		EaglerImage img = EaglerAdapter.loadPNG(Base64.decodeBase64(loadScreen));
 		IntBuffer upload = GLAllocation.createDirectIntBuffer(192*192);
 		upload.put(img.data);
 		upload.flip();
@@ -55,6 +114,7 @@ public class EarlyLoadScreen {
 		
 		_wglAttachShader(program, vert);
 		_wglAttachShader(program, frag);
+		_wglBindAttributeLocation(program, 0, "a_pos");
 		_wglLinkProgram(program);
 		_wglDetachShader(program, vert);
 		_wglDetachShader(program, frag);
@@ -68,7 +128,6 @@ public class EarlyLoadScreen {
 		}
 		
 		_wglUseProgram(program);
-		_wglBindAttributeLocation(program, 0, "a_pos");
 		_wglUniform1i(_wglGetUniformLocation(program, "tex"), 0);
 
 		int width = getCanvasWidth();
@@ -116,7 +175,8 @@ public class EarlyLoadScreen {
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_NEAREST);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
-		EaglerImage img = EaglerImage.loadImage(Base64.decodeBase64(enableScreen));
+		//EaglerImage img = EaglerImage.loadImage(Base64.decodeBase64(enableScreen));
+		EaglerImage img = EaglerAdapter.loadPNG(Base64.decodeBase64(enableScreen));
 		IntBuffer upload = GLAllocation.createDirectIntBuffer(128*128);
 		upload.put(img.data);
 		upload.flip();

@@ -5,54 +5,50 @@
 package net.md_5.bungee.connection;
 
 import java.beans.ConstructorProperties;
-import java.util.ArrayList;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import net.md_5.bungee.protocol.packet.PacketFFKick;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.netty.HandlerBoss;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.UserConnection;
-import net.md_5.bungee.protocol.packet.PacketCDClientStatus;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.security.GeneralSecurityException;
-import net.md_5.bungee.netty.CipherEncoder;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.Callback;
-import javax.crypto.Cipher;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.net.URLEncoder;
-import io.netty.channel.ChannelHandler;
-import net.md_5.bungee.netty.CipherDecoder;
-import net.md_5.bungee.netty.PipelineUtils;
-import java.security.Key;
-import net.md_5.bungee.protocol.packet.PacketFCEncryptionResponse;
-import net.md_5.bungee.EncryptionUtil;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.PacketConstants;
-import net.md_5.bungee.BungeeCord;
-import java.util.logging.Level;
-import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.protocol.Forge;
-import net.md_5.bungee.netty.PacketDecoder;
-import com.google.common.base.Preconditions;
-import net.md_5.bungee.api.event.ProxyPingEvent;
-import net.md_5.bungee.api.ServerPing;
-import net.md_5.bungee.protocol.packet.PacketFEPing;
-import net.md_5.bungee.Util;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.connection.Connection;
-import javax.crypto.SecretKey;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import java.util.ArrayList;
 import java.util.List;
-import net.md_5.bungee.protocol.packet.PacketFDEncryptionRequest;
-import net.md_5.bungee.protocol.packet.Packet2Handshake;
-import net.md_5.bungee.protocol.packet.Packet1Login;
-import net.md_5.bungee.api.config.ListenerInfo;
-import net.md_5.bungee.netty.ChannelWrapper;
+import java.util.logging.Level;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+
+import com.google.common.base.Preconditions;
+
+import io.netty.channel.ChannelHandler;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.EncryptionUtil;
+import net.md_5.bungee.PacketConstants;
+import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.Util;
+import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.config.ListenerInfo;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.PendingConnection;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.ProxyPingEvent;
+import net.md_5.bungee.eaglercraft.AuthHandler;
+import net.md_5.bungee.eaglercraft.BanList;
+import net.md_5.bungee.eaglercraft.BanList.BanCheck;
+import net.md_5.bungee.eaglercraft.BanList.BanState;
+import net.md_5.bungee.eaglercraft.WebSocketProxy;
+import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.netty.CipherDecoder;
+import net.md_5.bungee.netty.CipherEncoder;
+import net.md_5.bungee.netty.HandlerBoss;
+import net.md_5.bungee.netty.PacketDecoder;
 import net.md_5.bungee.netty.PacketHandler;
+import net.md_5.bungee.netty.PipelineUtils;
+import net.md_5.bungee.protocol.Forge;
+import net.md_5.bungee.protocol.packet.*;
 
 public class InitialHandler extends PacketHandler implements PendingConnection {
 	private final ProxyServer bungee;
@@ -112,15 +108,73 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 		if (handshake.getProcolVersion() == 69) {
 			skipEncryption = true;
 			this.handshake.swapProtocol((byte) 61);
+		}else if(handshake.getProcolVersion() == 71) {
+			this.disconnect("this server does not support microsoft accounts");
+			return;
 		}else if(handshake.getProcolVersion() != 61) {
 			this.disconnect("minecraft 1.5.2 required for eaglercraft backdoor access");
+			return;
 		}
-		if (handshake.getUsername().length() < 3) {
+		String un = handshake.getUsername();
+		if (un.length() < 3) {
 			this.disconnect("Username must be at least 3 characters");
 			return;
 		}
-		if (handshake.getUsername().length() > 16) {
+		if (un.length() > 16) {
 			this.disconnect("Cannot have username longer than 16 characters");
+			return;
+		}
+		if(!un.equals(un.replaceAll("[^A-Za-z0-9\\-_]", "_").trim())) {
+			this.disconnect("Go fuck yourself");
+			return;
+		}
+		InetAddress sc;
+		synchronized(WebSocketProxy.localToRemote) {
+			sc = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
+		}
+		if(sc == null) {
+			this.bungee.getLogger().log(Level.WARNING, "player '" + un + "' doesn't have a websocket IP, remote address: " + this.ch.getHandle().remoteAddress().toString());
+		}else {
+			BanCheck bc = BanList.checkIpBanned(sc);
+			if(bc.isBanned()) {
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' [" + sc.toString() + "] is banned by IP: " + bc.match + " (" + bc.string + ")");
+				this.disconnect("" + ChatColor.RED + "You are banned.\n" + ChatColor.DARK_GRAY + "Reason: " + bc.string);
+				return;
+			}else {
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] has remote websocket IP: " + sc.getHostAddress());
+			}
+		}
+		String dnm;
+		synchronized(WebSocketProxy.localToRemote) {
+			dnm = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		}
+		if(dnm != null) {
+			if(dnm.equalsIgnoreCase("null")) {
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] is using an offline download");
+			}else {
+				this.bungee.getLogger().log(Level.INFO, "Player '" + un + "' [" + sc.toString() + "] is using a client at: " + dnm);
+			}
+		}
+		BanCheck bc = BanList.checkBanned(un);
+		if(bc.isBanned()) {
+			switch(bc.reason) {
+			case USER_BANNED:
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by username, because '" + bc.string + "'");
+				break;
+			case WILDCARD_BANNED:
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by wildcard: " + bc.match);
+				break;
+			case REGEX_BANNED:
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned by regex: " + bc.match);
+				break;
+			default:
+				this.bungee.getLogger().log(Level.SEVERE, "Player '" + un + "' is banned: " + bc.string);
+			}
+			if(bc.reason == BanState.USER_BANNED || ((BungeeCord)bungee).config.shouldShowBanType()) {
+				this.disconnect("" + ChatColor.RED + "You are banned.\n" + ChatColor.DARK_GRAY + "Reason: " + bc.string);
+			}else {
+				this.disconnect("" + ChatColor.RED + "You are banned.");
+			}
 			return;
 		}
 		final int limit = BungeeCord.getInstance().config.getPlayerLimit();
@@ -128,7 +182,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			this.disconnect(this.bungee.getTranslation("proxy_full"));
 			return;
 		}
-		if (!BungeeCord.getInstance().config.isOnlineMode() && this.bungee.getPlayer(handshake.getUsername()) != null) {
+		if (!BungeeCord.getInstance().config.isOnlineMode() && this.bungee.getPlayer(un) != null) {
 			this.disconnect(this.bungee.getTranslation("already_connected"));
 			return;
 		}
@@ -189,11 +243,24 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 	public void handle(final PacketCDClientStatus clientStatus) throws Exception {
 		Preconditions.checkState(this.thisState == State.LOGIN, (Object) "Not expecting LOGIN");
 		final UserConnection userCon = new UserConnection(this.bungee, this.ch, this.getName(), this);
+		InetAddress ins = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());
+		if(ins != null) {
+			userCon.getAttachment().put("remoteAddr", ins);
+		}
+		String origin = WebSocketProxy.origins.get(this.ch.getHandle().remoteAddress());
+		if(origin != null) {
+			userCon.getAttachment().put("origin", origin);
+		}
 		userCon.init();
-		this.bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));
-		((HandlerBoss) this.ch.getHandle().pipeline().get((Class) HandlerBoss.class)).setHandler(new UpstreamBridge(this.bungee, userCon));
-		final ServerInfo server = this.bungee.getReconnectHandler().getServer(userCon);
-		userCon.connect(server, true);
+		HandlerBoss handlerBoss = ((HandlerBoss) this.ch.getHandle().pipeline().get((Class) HandlerBoss.class));
+		if (BungeeCord.getInstance().config.getAuthInfo().isEnabled()) {
+			handlerBoss.setHandler(new AuthHandler(this.bungee, userCon, handlerBoss));
+		} else {
+			this.bungee.getPluginManager().callEvent(new PostLoginEvent(userCon));
+			handlerBoss.setHandler(new UpstreamBridge(this.bungee, userCon));
+			final ServerInfo server = this.bungee.getReconnectHandler().getServer(userCon);
+			userCon.connect(server, true);
+		}
 		this.thisState = State.FINISHED;
 		throw new CancelSendSignal();
 	}
@@ -218,7 +285,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 
 	@Override
 	public InetSocketAddress getVirtualHost() {
-		return (this.handshake == null) ? null : new InetSocketAddress(this.handshake.getHost(), this.handshake.getPort());
+		return (this.handshake == null) ? null : new InetSocketAddress(this.handshake.getHost(), this.handshake.getPort() & 0xFFFF);
 	}
 
 	@Override

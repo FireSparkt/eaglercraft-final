@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 
 public class GLAllocation {
@@ -68,8 +67,8 @@ public class GLAllocation {
 	 * Creates and returns a direct byte buffer with the specified capacity. Applies
 	 * native ordering to speed up access.
 	 */
-	public static synchronized ByteBuffer createDirectByteBuffer(int par0) {
-		return EaglerAdapter.isWebGL ? ByteBuffer.wrap(new byte[par0]).order(ByteOrder.nativeOrder()) : ByteBuffer.allocateDirect(par0).order(ByteOrder.nativeOrder());
+	public static ByteBuffer createDirectByteBuffer(int par0) {
+		return EaglerAdapter.isWebGL ? ByteBuffer.wrap(new byte[par0]) : ByteBuffer.allocateDirect(par0).order(ByteOrder.nativeOrder());
 	}
 
 	/**

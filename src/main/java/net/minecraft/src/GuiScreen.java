@@ -2,10 +2,11 @@ package net.minecraft.src;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.minecraft.client.Minecraft;
 
 public class GuiScreen extends Gui {
 	public static final boolean isMacOs = Minecraft.getOs() == EnumOS.MACOS;
@@ -58,14 +59,22 @@ public class GuiScreen extends Gui {
 	 * Returns a string stored in the system clipboard.
 	 */
 	public static String getClipboardString() {
-		return "";
+		try {
+			String s = EaglerAdapter.getClipboard();
+			return s == null ? "" : s;
+		}catch(Throwable t) {
+			return "";
+		}
 	}
 
 	/**
 	 * store a string in the system clipboard
 	 */
 	public static void setClipboardString(String par0Str) {
-		
+		try {
+			EaglerAdapter.setClipboard(par0Str);
+		}catch(Throwable t) {
+		}
 	}
 
 	/**
@@ -181,9 +190,9 @@ public class GuiScreen extends Gui {
 				return;
 			}
 
-			if (isMacOs && var1 == 28 && var2 == 0) {
-				var1 = 29;
-			}
+			//if (isMacOs && var1 == 28 && var2 == 0) {
+			//	var1 = 29;
+			//}
 
 			this.keyTyped(var2, var1);
 		}
@@ -250,11 +259,14 @@ public class GuiScreen extends Gui {
 	}
 
 	public static boolean isCtrlKeyDown() {
-		boolean var0 = EaglerAdapter.isKeyDown(28) && EaglerAdapter.getEventChar() == 0;
-		return EaglerAdapter.isKeyDown(29) || EaglerAdapter.isKeyDown(157) || isMacOs && (var0 || EaglerAdapter.isKeyDown(219) || EaglerAdapter.isKeyDown(220));
+		return EaglerAdapter.isKeyDown(29) || EaglerAdapter.isKeyDown(157) || (isMacOs && (EaglerAdapter.isKeyDown(28) || EaglerAdapter.isKeyDown(219) || EaglerAdapter.isKeyDown(220)));
 	}
 
 	public static boolean isShiftKeyDown() {
 		return EaglerAdapter.isKeyDown(42) || EaglerAdapter.isKeyDown(54);
+	}
+	
+	public boolean blockHotKeys() {
+		return false;
 	}
 }

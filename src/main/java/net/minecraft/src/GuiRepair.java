@@ -1,9 +1,10 @@
 package net.minecraft.src;
 
 import java.util.List;
-import net.minecraft.client.Minecraft;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.TextureLocation;
+import net.minecraft.client.Minecraft;
 
 public class GuiRepair extends GuiContainer implements ICrafting {
 	private ContainerRepair repairContainer;
@@ -161,5 +162,9 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * value. Both are truncated to shorts in non-local SMP.
 	 */
 	public void sendProgressBarUpdate(Container par1Container, int par2, int par3) {
+	}
+	
+	public boolean blockHotKeys() {
+		return itemNameField.isFocused();
 	}
 }

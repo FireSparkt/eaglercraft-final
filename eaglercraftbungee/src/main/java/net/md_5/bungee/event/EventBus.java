@@ -4,19 +4,18 @@
 
 package net.md_5.bungee.event;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Iterator;
-import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
-import java.util.logging.Level;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.HashMap;
 import java.lang.annotation.Annotation;
-import java.util.logging.Logger;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EventBus {
 	private final Map<Class<?>, Map<Object, Method[]>> eventToHandler;

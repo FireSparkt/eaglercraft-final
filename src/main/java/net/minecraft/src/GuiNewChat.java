@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
-
 import net.minecraft.client.Minecraft;
 
 public class GuiNewChat extends Gui {

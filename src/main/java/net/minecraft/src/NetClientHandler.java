@@ -8,12 +8,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.function.Consumer;
 
 import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WebsocketNetworkManager;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
 
 public class NetClientHandler extends NetHandler {
@@ -47,7 +50,7 @@ public class NetClientHandler extends NetHandler {
 	private GuiScreen field_98183_l = null;
 
 	/** RNG. */
-	Random rand = new Random();
+	EaglercraftRandom rand = new EaglercraftRandom();
 
 	public NetClientHandler(Minecraft par1Minecraft, String channel) throws IOException {
 		this.mc = par1Minecraft;
@@ -57,6 +60,14 @@ public class NetClientHandler extends NetHandler {
 	public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = new WebsocketNetworkManager(par2Str, null, this);
+		EaglerAdapter.clearVoiceAvailableStatus();
+		EaglerAdapter.setVoiceSignalHandler(new Consumer<byte[]>() {
+			@Override
+			public void accept(byte[] bytes) {
+				NetClientHandler.this.addToSendQueue(new Packet250CustomPayload("EAG|Voice", bytes));
+			}
+		});
+		if (EaglerAdapter.getVoiceChannel() != Voice.VoiceChannel.NONE) EaglerAdapter.sendInitialVoice();
 	}
 
 	//public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3, GuiScreen par4GuiScreen) throws IOException {
@@ -77,6 +88,8 @@ public class NetClientHandler extends NetHandler {
 		this.netManager = null;
 		this.worldClient = null;
 	}
+	
+	
 
 	/**
 	 * Processes the packets that have been read since the last call to this
@@ -86,14 +99,36 @@ public class NetClientHandler extends NetHandler {
 		if (!this.disconnected && this.netManager != null) {
 			this.netManager.processReadPackets();
 		}
-
-		if (this.netManager != null) {
-			this.netManager.wakeThreads();
+		
+		if(!EaglerAdapter.connectionOpen()) {
+			if(!this.disconnected) {
+				RateLimit r = EaglerAdapter.getRateLimitStatus();
+				if(r != null) {
+					if(r == RateLimit.NOW_LOCKED) {
+						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipNowLocked", "disconnect.endOfStream", null));
+					}else if(r == RateLimit.LOCKED) {
+						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipLocked", "disconnect.endOfStream", null));
+					}else if(r == RateLimit.BLOCKED) {
+						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipBlocked", "disconnect.endOfStream", null));
+					}else if(r == RateLimit.FAILED_POSSIBLY_LOCKED) {
+						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipFailedPossiblyLocked", "disconnect.endOfStream", null));
+					}else {
+						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "RateLimit." + r.name(), null));
+					}
+				}else {
+					this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.endOfStream", null));
+				}
+				this.disconnected = true;
+				this.mc.loadWorld((WorldClient) null);
+			}
+		}else {
+			if(this.disconnected) {
+				EaglerAdapter.endConnection();
+			}
 		}
 	}
 
 	public void handleServerAuthData(Packet253ServerAuthData par1Packet253ServerAuthData) {
-
 		this.addToSendQueue(new Packet252SharedKey());
 	}
 
@@ -459,32 +494,37 @@ public class NetClientHandler extends NetHandler {
 		this.netManager.networkShutdown("disconnect.kicked", new Object[0]);
 		this.disconnected = true;
 		this.mc.loadWorld((WorldClient) null);
-
-		this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
-
+		if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("BLOCKED")) {
+			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.BLOCKED);
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.kickBlocked", "disconnect.endOfStream", (Object[])null));
+		}else if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("LOCKED")) {
+			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.LOCKED);
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.kickLocked", "disconnect.endOfStream", (Object[])null));
+		}else {
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
+		}
 	}
 
 	public void handleErrorMessage(String par1Str, Object[] par2ArrayOfObj) {
 		if (!this.disconnected) {
 			this.disconnected = true;
 			this.mc.loadWorld((WorldClient) null);
-
 			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", par1Str, par2ArrayOfObj));
 		}
 	}
 
 	public void quitWithPacket(Packet par1Packet) {
-		if (!this.disconnected) {
+		if (!this.disconnected && EaglerAdapter.connectionOpen()) {
 			this.netManager.addToSendQueue(par1Packet);
-			this.netManager.serverShutdown();
 		}
+		this.netManager.serverShutdown();
 	}
 
 	/**
 	 * Adds the packet to the send queue
 	 */
 	public void addToSendQueue(Packet par1Packet) {
-		if (!this.disconnected) {
+		if (!this.disconnected && EaglerAdapter.connectionOpen()) {
 			this.netManager.addToSendQueue(par1Packet);
 		}
 	}
@@ -989,8 +1029,14 @@ public class NetClientHandler extends NetHandler {
 	public void handleMapData(Packet131MapData par1Packet131MapData) {
 		if (par1Packet131MapData.itemID == Item.map.itemID) {
 			ItemMap.getMPMapData(par1Packet131MapData.uniqueID, this.mc.theWorld).updateMPMapData(par1Packet131MapData.itemData);
+		} else if (par1Packet131MapData.itemID == 103) {
+			ItemMap.readAyunamiMapPacket(this.mc.theWorld, par1Packet131MapData.uniqueID, par1Packet131MapData.itemData);
+		} else if (par1Packet131MapData.itemID == 104) {
+			ItemMap.processVideoMap(this.mc.theWorld, par1Packet131MapData.itemData);
+		} else if (par1Packet131MapData.itemID == 105) {
+			ItemMap.processImageMap(this.mc.theWorld, par1Packet131MapData.itemData);
 		} else {
-			System.err.println("Unknown itemid: " + par1Packet131MapData.uniqueID);
+			System.err.println("Unknown itemid: " + par1Packet131MapData.itemID);
 		}
 	}
 
@@ -1121,6 +1167,23 @@ public class NetClientHandler extends NetHandler {
 			}
 		}else if("EAG|UserSkin".equals(par1Packet250CustomPayload.channel)) {
 			DefaultSkinRenderer.skinResponse(par1Packet250CustomPayload.data);
+		}else if("EAG|SkinLayers".equals(par1Packet250CustomPayload.channel)) {
+			DataInputStream var8 = new DataInputStream(new ByteArrayInputStream(par1Packet250CustomPayload.data));
+			try {
+				int var9 = var8.read();
+				String user = var8.readUTF();
+				EntityPlayer pp = mc.theWorld.getPlayerEntityByName(user);
+				if(pp != null && (pp instanceof EntityOtherPlayerMP)) {
+					byte[] pkt = ((EntityOtherPlayerMP)pp).skinPacket;
+					if(pkt != null) {
+						DefaultSkinRenderer.updateSkinLayerByte(var9, pkt);
+					}
+				}
+			} catch (IOException var7) {
+				var7.printStackTrace();
+			}
+		}else if("EAG|Voice".equals(par1Packet250CustomPayload.channel)) {
+			EaglerAdapter.handleVoiceSignal(par1Packet250CustomPayload.data);
 		}
 	}
 

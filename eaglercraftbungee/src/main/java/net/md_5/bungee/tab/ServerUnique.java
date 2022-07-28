@@ -4,12 +4,11 @@
 
 package net.md_5.bungee.tab;
 
-import java.util.Iterator;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
+
 import net.md_5.bungee.api.tab.TabListAdapter;
+import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 
 public class ServerUnique extends TabListAdapter {
 	private final Collection<String> usernames;

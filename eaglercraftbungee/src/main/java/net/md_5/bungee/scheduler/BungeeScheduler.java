@@ -4,20 +4,22 @@
 
 package net.md_5.bungee.scheduler;
 
-import com.google.common.base.Preconditions;
-import net.md_5.bungee.BungeeCord;
-import java.util.concurrent.TimeUnit;
-import java.util.Set;
 import java.util.HashSet;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.HashMultimap;
-import gnu.trove.TCollections;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import net.md_5.bungee.api.plugin.Plugin;
-import com.google.common.collect.Multimap;
-import gnu.trove.map.TIntObjectMap;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+
+import gnu.trove.TCollections;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.api.scheduler.TaskScheduler;
 
 public class BungeeScheduler implements TaskScheduler {

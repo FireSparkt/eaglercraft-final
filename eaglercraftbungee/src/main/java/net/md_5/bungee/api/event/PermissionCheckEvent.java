@@ -5,6 +5,7 @@
 package net.md_5.bungee.api.event;
 
 import java.beans.ConstructorProperties;
+
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Event;
 

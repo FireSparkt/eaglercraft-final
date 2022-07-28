@@ -2,7 +2,6 @@ package net.minecraft.src;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 import net.lax1dude.eaglercraft.EaglercraftRandom;
@@ -30,7 +29,7 @@ public class WorldClient extends World {
 	 * with each subsequent tick until the spawn queue is empty.
 	 */
 	private Set entitySpawnQueue = new HashSet();
-	private final Minecraft mc = Minecraft.getMinecraft();
+	public final Minecraft mc = Minecraft.getMinecraft();
 	private final Set previousActiveChunkSet = new HashSet();
 
 	public WorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {

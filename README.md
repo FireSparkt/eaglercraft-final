@@ -1,34 +1,234 @@
 # Eaglercraft
 
-![eaglercraft](https://cdn.discordapp.com/attachments/378764518081429506/932053915061587978/thumbnail2.png)
+### Note: someone got eags.us suspended for copyright infringement, use [https://eaglercraft.us/](https://eaglercraft.us/) for now (until it gets deleted too)
 
-### Official Demo URL: [https://g.eags.us/eaglercraft/](https://g.eags.us/eaglercraft/)
+### Client: [https://eaglercraft.us/](https://eaglercraft.us/)
+
+### Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
+
+### Minecraft Beta: [https://github.com/LAX1DUDE/eaglercraft-beta/](https://github.com/LAX1DUDE/eaglercraft-beta/)
+
+### Note: we will be transitioning away from Eaglercraft being standalone 'free browser minecraft' to Eaglercraft being a bukkit/bungee plugin for servers to allow 'online access' to players who register with a command as their real online-mode Minecraft account on the server. Server owners can still elect to set `online-mode=false` in their server.properties to allow free login but now that's their legal screw up instead of mine
+
+![eaglercraft](https://cdn.discordapp.com/attachments/378764518081429506/964047481849643018/new_github_screenshot.png)
+
+### Official Demo URL: [https://eaglercraft.us/](https://eaglercraft.us/)
 
 ### Download Locally: [stable-download/Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
 (right click the link and press 'Save link as...' to download the file)
 
-**Here is a 50 minute source walkthrough: [https://youtu.be/QvHvSX4Th84](https://youtu.be/QvHvSX4Th84)**
+### Play Minecraft Beta Singleplayer: use [https://eaglercraft.us/beta/](https://eaglercraft.us/beta/) for now until I fix eags.us
 
-Note that the server may be down - if you want a gameplay demo download the files from here [https://github.com/LAX1DUDE/eaglercraft/tree/main/stable-download](https://github.com/LAX1DUDE/eaglercraft/tree/main/stable-download) and host the page locally yourself
-
-### Visit this site for a list of servers: [https://g.eags.us/eaglercraft/servers/](https://g.eags.us/eaglercraft/servers/)
-
-**For any questions you can join the discord server and hit me up there [https://discord.gg/KMQW9Uvjyq](https://discord.gg/KMQW9Uvjyq)**
+**For any questions you can join the discord server and hit me up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
 
 ## What is Eaglercraft?
 
 Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. You can join real Minecraft 1.5.2 servers with it through a custom proxy based on Bungeecord.
 
+### Ayonull runs a FAQ site: [https://eagler.nully.tech/](https://eagler.nully.tech/)
+
+## How to make a server
+
+### If replit is acceptable, you can use this:
+
+### [https://replit.com/@ayunami2000/eaglercraft-server](https://replit.com/@ayunami2000/eaglercraft-server)
+
+### Manual setup instructions:
+1. **Check if Java is installed.** You can download it from [https://www.java.com/en/download/](https://www.java.com/en/download/)
+2. Download the [stable-download/stable-download.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download.zip) file from this repository
+4. Extract the ZIP file you downloaded to a new folder
+5. Open the new folder, go into the `java/bungee_command` folder
+6. In Windows, double-click `run.bat`. It should open a new terminal window  
+![run.bat](https://i.gyazo.com/2b0f6b3e5b2e5a5a102c62ea5b6fba3f.png)  
+**Some computers may just say 'run' instead of 'run.bat', both are correct**
+7. On macOS or Linux, google how to open the terminal and use the `cd` command to navigate to `java/bungee_command`  
+Then, in that folder, run `chmod +x run_unix.sh` and then run `./run_unix.sh`. It should start the same server
+8. Go to the other `java/bukkit_command` folder that was also extracted from the ZIP
+9. Again, on Windows, double-click `run.bat` in the folder. It should open a second terminal window.  
+Keep both the first and second terminal window you opened, just minimize them don't close
+10. Again, on macOS or Linux, repeat step 7 except in the `java/bukkit_command` folder
+11. **Your server is now ready.** Download and open [stable-download/Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
+12. Go to 'Multiplayer' from the main menu. Select 'Direct Connect', type `127.0.0.1:25565` and press 'Join Server'
+13. **It should allow you to connect, if not, check the two terminal windows for errors**
+14. If you are okay with regularly checking for updates to [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html), you are now finished
+15. If you are playing with friends and want a shared website that can be updated, see the `stable-download/web` folder
+16. To install, create a website and upload the contents of `stable-download/web` to the URL you want to have Eaglercraft on
+17. **The 'web' folder will not work if you open it in your browser locally! If you see 'file:///' in the URL you are doing it wrong. You need to upload the folder to an HTTP or HTTPS server and access it over the internet via http:// or https://. The game will not load otherwise, this is not a bug**
+18. To modify the default list of servers, download [servers_template.dat](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/servers_template.dat) and open it in [NBTExplorer](https://github.com/jaquadro/NBTExplorer/releases). Make your changes and then save
+19. **If you can't install NBTExplorer, try [WebNBT](https://irath96.github.io/webNBT/)**
+20. Upload your modified `servers_template.dat` to [base64encode.org](https://www.base64encode.org/) and press 'Encode'.
+21. Download and open the encoded file, copy and paste the text in the file back between the quotes in `index.html` at line 21 (or 22) in place of the old text that also begins with `CgAACQAHc2Vydm` between the quotes
+22. **To create a link to your site that automatically joins the server,** add a `?server=` variable to the URL, like (for example): [https://g.eags.us/eaglercraft/?server=127.0.0.1:25565](https://g.eags.us/eaglercraft/?server=127.0.0.1:25565) will automatically join `ws://127.0.0.1:25565/` as soon as the player finishes setting their username and skin
+23. To change your server's MOTD and icon, edit the `motd1:` tag of the listener config in `java/bungee_command/config.yml`, and replace `server-icon.png` in the folder where the config file is. Use `&` to add color/formatting codes. The server list will downscale your icon to 64x64 pixels
+24. You can give your MOTD multiple lines, add a `motd2:` to define a second line
+25. **For an animated MOTD and icon, install EaglerMOTD: [https://github.com/LAX1DUDE/eaglercraft-motd/](https://github.com/LAX1DUDE/eaglercraft-motd/)**
+26. To add some bukkit plugins, download the plugin's JAR file for CraftBukkit 1.5.2 and place it in `java/bukkit_command/plugins`
+27. To add some bungee plugins, download the plugin's JAR file and place it in `java/bungee_command/plugins`
+28. See [https://github.com/LAX1DUDE/eaglercraft-plugins/](https://github.com/LAX1DUDE/eaglercraft-plugins/) to download some supported plugins
+29. **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
+30. To add `/login` and `/register`, install [AuthMe](https://github.com/LAX1DUDE/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
+31. **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
+32. **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
+33. To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
+34. To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
+35. **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
+36. To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
+37. **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
+38. To connect to your server through a `ws://` or `wss://` URL instead of `ip:port`, set up [nginx](https://nginx.org/) as a reverse proxy to the `ip:port` of you EaglercraftBungee server you want the URL to connect to. Use a location URL template with the `proxy_pass` directive.
+39. Eaglercraft uses port 80 for IP connections by default, typing `127.0.0.1` is the same as typing `ws://127.0.0.1:80/`
+40. To forward a client's remote IP address from a request on nginx to EaglercraftBungee for enforcing IP bans, set the `X-Real-IP` header on the request to websocket when it is proxied
+41. To make a custom resource pack for your site, clone this repository and edit the files in [lwjgl-rundir/resources](https://github.com/LAX1DUDE/eaglercraft/tree/main/lwjgl-rundir/resources).
+42. When you are done, navigate to [epkcompiler/](https://github.com/LAX1DUDE/eaglercraft/tree/main/epkcompiler) and double-click `run.bat`. Wait for the window to say `Press any key to continue...` and close it. Then, go to `../javascript` in the repository and copy `javascript/assets.epk` to the `assets.epk` on your website
+43. If you're on mac or linux, navigate to the epkcompiler folder via `cd` and run `chmod +x run_unix.sh` and then `./run_unix.sh` to do this, then copy the same `javascript/assets.epk` to the `assets.epk` on your website
+
+## Singleplayer?
+
+I successfully created Singleplayer for this version of eaglercraft and it works 100%, **but after many rounds of very thorough testing**, I found that TeaVM is unable to optimize certain aspects of terrain generation and world ticking as well as it can optimize the rendering for a multiplayer-only build. On an [i9-11900K]( https://www.cpubenchmark.net/cpu.php?cpu=Intel+Core+i9-11900K+%40+3.50GHz&id=3904) a render distance of 'Tiny' struggles to pass 12 TPS while standing still, and drops below 1 TPS as soon as a couple new chunks have to be generated and trigger lighting updates. The playerbase of this game **will bother me every f\*\*king day if what I release as singleplayer is not perfect** and therefore singleplayer will remain private indefinetly and I will not answer any further questions about it or share the source code unless you are just looking to repurpose some of the base OS emulation code.
+
+**You can play Minecraft Beta singleplayer here: [https://g.eags.us/eaglercraft/singleplayer_test/](https://g.eags.us/eaglercraft/singleplayer_test/)**
+
 ## How does it work?
 
 Eaglercraft uses the decompiled source code of the official build of Minecraft 1.5.2 direct from Mojang. It is decompiled by [MCP](http://www.modcoderpack.com/) and then recompiled to Javascript using [TeaVM](https://teavm.org/). Therefore it can join real Minecraft 1.5.2 servers, as it is really running Minecraft 1.5.2 in the browser. However, due to security limitations in modern browsers, it must use javascript Websocket objects for multiplayer instead of direct TCP connections to it's servers. A modified version of Bungeecord is included with Eaglercraft which accepts browser HTTP Websocket connections from Eaglercraft clients and unwraps the streams internally to regular TCP so they can be forwarded to regular Bukkit servers with no plugins. For graphics, a custom GPU compatibility layer allows Mojang's fixed function OpenGL 1.3 based rendering engine to render directly to an HTML5 WebGL 2.0 canvas on the page with minimal changes to the source, preserving the game's graphics to look exactly the same as desktop vanilla Minecraft 1.5.2.
 
-## Installing
+## Issues?
+
+I got tired of closing duplicate 'how to maek sever' and 'add single player' issues almost every day so I disabled it because honestly I don't really care anymore, [join discord](https://discord.gg/Ekzcgs3DKZ) if you've got an issue to report that you are confident can be backed up with source code
+
+## EaglercraftBungee
+
+EaglercraftBungee translates WebSockets to a raw Minecraft 1.5.2 TCP connection. It is just regular BungeeCord with more `config.yml` options, and a built in plugin for syncing people's custom skins between clients so people can see each other's skins
+
+### If voice chat causes moderation problems, set `voice_enabled: false` in config.yml
+
+**To enable the /login and /register commands in EaglercraftBungee, you can edit this portion of config.yml**
+
+```yaml
+authservice:
+  enabled: false
+  register_enabled: true
+  authfile: auths.db
+  ip_limit: 0
+  join_messages:
+  - '&3Welcome to my &aEaglercraftBungee &3server!'
+  login_timeout: 30
+```
+
+- `enable` Turns login commands on and off
+
+- `register_enabled` Turns register command on and off
+
+- `authfile` Sets the authentication database file, which is **compatible with AuthMe**
+
+- `ip_limit` Sets the max number of registrations per IP, 0 = unlimited
+
+- `join_messages` List of messages to show the player when they join
+
+- `login_timeout` Sets how many seconds players have to log in before they are kicked
+
+**EaglercraftBungee has a built in domain blacklist that updates automatically, you can disable it by setting this in config.yml:**
+
+```yaml
+enable_web_origin_blacklist: false
+```
+
+**To block all clients on replit from joining, set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_replit_clients: true
+```
+
+**To block all offline-download clients, set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_offline_download: true
+```
+
+**To block the debug runtime (or other desktop clients), set this to true in config.yml:**
+
+```yaml
+origin_blacklist_block_missing_origin_header: true
+```
+
+**To add your own blacklisted domains**, create a file called `origin_blacklist.txt` in your bungeecord directory and put the regular expressions inside, one on each line. There 's also a `domain` command in the console to view a player's domain, and a `block-domain` and `block-domain-name` and `unblock-domain` command to manage the local `origin_blacklist.txt` from the bungee console (if you don't know how to edit a file on your own). The list reloads automatically when changes to the file are detected.
+
+### To configure bungee to block connections from all clients except your own, set this option:
+
+```yaml
+origin_blacklist_use_simple_whitelist: true
+```
+
+### Then, add your domain to `origin_blacklist_simple_whitelist` like this:
+
+```yaml
+origin_blacklist_simple_whitelist:
+- type the name of your client's domain here
+```
+
+### Then, unless still you want it as an option for your players, disable the offline download so hackers don't use it to bypass the whitelist, as it is not blocked in whitelist mode by default:
+
+```yaml
+origin_blacklist_block_offline_download: true
+```
+
+### To stop people from using bookmarklets to load a client from a different URL onto your official URL via XXS, add these headers to NGINX:
+
+```
+add_header X-Frame-Options "SAMEORIGIN";
+add_header Referrer-Policy "strict-origin";
+add_header X-XSS-Protection "1; mode=block";
+add_header Content-Security-Policy "default-src 'self' 'unsafe-inline'; img-src 'self' 'unsafe-inline' data: blob:; connect-src 'self' ws: wss:; upgrade-insecure-requests";
+```
+
+(not fully tested, excuse the scroll bar)
+
+### To use IP bans and rate limiting, enable `forward_ip` and pass a X-Real-IP header from your proxy to the bungeecord's websocket port
+
+Nginx example: add `proxy_set_header X-Real-IP $remote_addr` to your proxy configuration
+
+**The server has built in DoS protection, reset it via typing 'eag-ratelimit reset' in the bungee console**
+
+```yaml
+ratelimit:
+  ip:
+    enable: true
+    period: 90
+    limit: 60
+    limit_lockout: 80
+    lockout_duration: 1200
+    exceptions: []
+```
+
+- `enable` enable rate limiting
+
+- `period` and `limit` set the number of requests (`limit`) can be made in (`period`) number of seconds
+
+- `limit_lockout` and `lockout_duration` set the number of requests (`limit_lockout`) that can be made in (`period`) seconds before the IP is blocked for `lockout_duration` number of seconds
+
+- `exceptions` a list of IP addresses that should never get rate limited. **Local IPs like 127.0.0.1 and 192.168.\*.\* and such are set as exceptions by default**
+
+**you need `forward_ip` configured to use rate limiting, otherwise it will be disabled by defualt**
+
+**To develop a plugin, download [stable-download/java/bungee_command/bungee_dist.jar](https://github.com/LAX1DUDE/eaglercraft/blob/main/stable-download/java/bungee_command/bungee-dist.jar) and add it to the Build Path of your Java IDE. Develop the plugin just like a regular BungeeCord plugin, see [EaglerMOTD](https://github.com/LAX1DUDE/eaglercraft-motd/) for an example.**
+
+**Test your plugin by exporting it as a jar and putting it in the '/plugins' directory of EaglercraftBungee and then clicking 'run.bat'**
+
+### New Events:
+
+- **[net.md_5.bungee.api.event.WebsocketMOTDEvent](https://github.com/LAX1DUDE/eaglercraft/blob/main/eaglercraftbungee/src/main/java/net/md_5/bungee/api/event/WebsocketMOTDEvent.java)**: Triggered when a client or website requests the MOTD
+
+- **[net.md_5.bungee.api.event.WebsocketQueryEvent](https://github.com/LAX1DUDE/eaglercraft/blob/main/eaglercraftbungee/src/main/java/net/md_5/bungee/api/event/WebsocketQueryEvent.java)**: Triggered when a client or website requests a query. This happens when a site opens a text WebSocket to a listener and sends a single string `Accept: <query>` packet. Can be used to provide additional custom statistics to server list sites supporting integrated WebSocket queries
+
+**Register event handlers using the standard BungeeCord** `@EventHandler` **annotation in your** `Listener` **class**
+
+## Installing (outdated guide, detailed)
 
 If you want to use this project but don't want to compile it from scratch, download [stable-download/stable-download.zip](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/stable-download.zip) and extract
 
-Within stable-download.zip there is a 'java' and a 'web' folder. Upload the contents of the web folder to your web server. **The web folder will not work if it is opened locally via file:///, it needs to be opened on an http:// or https:// page. Try [this extention](https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb/) if you are on chrome or if that's not possible then download the alternative single-file html [offline version](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html) that does work on file URLs.** If you use this alternative version, please make sure you and your peers keep your copies up to date by regularly downloading any newer versions of the html file at [this link](https://github.com/LAX1DUDE/eaglercraft/blob/main/stable-download/Offline_Download_Version.html) to avoid getting stuck with a version that has a game-breaking glitch or mistake. The eaglercraft bungeecord executable is in the java/bungee_command folder along with the sample configuration file and a run.bat script to launch it. CraftBukkit for minecraft 1.5.2 configured to work with the eaglercraft bungee executable is in java/bukkit_command. The available version of Spigot 1.5.2 has a bug when used with bungee so you are limited to CraftBukkit and CraftBukkit plugins only on your servers
+Within stable-download.zip there is a 'java' and a 'web' folder. Upload the contents of the web folder to your web server. **The web folder will not work if it is opened locally via file:///, it needs to be opened on an http:// or https:// page. Try [this extensions](https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb/) if you are on chrome or if that's not possible then download the alternative single-file html [offline version](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html) that does work on file URLs.** If you use this alternative version, please make sure you and your peers keep your copies up to date by regularly downloading any newer versions of the html file at [this link](https://github.com/LAX1DUDE/eaglercraft/blob/main/stable-download/Offline_Download_Version.html) to avoid getting stuck with a version that has a game-breaking glitch or mistake. The eaglercraft bungeecord executable is in the java/bungee_command folder along with the sample configuration file and a run.bat script to launch it. CraftBukkit for minecraft 1.5.2 configured to work with the eaglercraft bungee executable is in java/bukkit_command. The available version of Spigot 1.5.2 has a bug when used with bungee so you are limited to CraftBukkit and CraftBukkit plugins only on your servers
+
+**Here are some Bukkit plugins compatible with Eaglercraft: [https://github.com/LAX1DUDE/eaglercraft-plugins](https://github.com/LAX1DUDE/eaglercraft-plugins)**
 
 To play the game, launch the run.bat script in both the bungee_command and bukkit_command folders. Then navigate to the URL where the contents of the web folder ended up. The game should load without any issues. Go to the Multiplayer screen and select 'Direct Connect'. **Type 127.0.0.1:25565.** Press connect or whatever and enjoy, the default port configured in the bungeecord config.yml is 25565 instead of 80 to avoid any potential conflict with the local web server or the OS (and linux desktop users can't use port numbers under 1024 without sudo).
 
@@ -36,11 +236,11 @@ To play the game, launch the run.bat script in both the bungee_command and bukki
 
 If you want SSL, set up [nginx](https://www.nginx.com/) as a reverse proxy from port 443 to the port on the bungeecord server. You can very easily configure SSL on an nginx virtual host when it is in proxy mode, much more easily than you could if I created my own websocket SSL config option in bungee. To connect to a server running an SSL websocket on the multiplayer screen, use this format: `wss://[url]/`. You can also add the :port option again after the domain or ip address at the beggining of the URL to change the port and connect with SSL. **If you set up the Eaglercraft index.html on an https:// URL, Chrome will only allow you to make wss:// connections from the multiplayer screen. It is a security feature in Chrome, if you want to support both ws:// and wss:// you have to host the Eaglercraft index.html on an http:// URL**. The best advice I have for security is to use Cloudflare to proxy both the site and the websocket, because you can use http and ws on your servers locally and then you can configure cloudflare to do the SSL for you when the connections are proxied. And it conceils your IP address to the max and you can also set up a content delivery network for the big assets.epk and classes.js files all for free on their little starter package
 
-**To change the default servers on the server list, see the base64 in the javascript at line 8 of [stable-download/web/index.html](https://github.com/LAX1DUDE/eaglercraft/tree/main/stable-download/web/index.html). Copy and decode the base64 in the quotes using [base64decode.org](base64decode.org) and open the resulting file with NBTExplorer (the minecraft one). You will see the list of default servers in a 'servers' tag stored as NBT components, and you can edit them and add more as long as you follow the same format the existing servers have. When you're done, encode the file back to base64 using [base64encode.org](base64encode.org) and replace the base64 between the quotes on line 8 in index.html with the new base64 from base64encode.org.**
+**To change the default servers on the server list, download [stable-download/servers_template.dat](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/servers_template.dat) and open the file with NBTExplorer (the minecraft one). You will see the list of default servers in a 'servers' tag stored as NBT components, and you can edit them and add more as long as you follow the same format the existing servers have. When you're done, save the file and encode the file back to base64 using the upload option on [base64encode.org](base64encode.org), then download the encoded file and open it and replace the base64 between the quotes on line 8 of your index.html with the new base64 in the encoded file you downloaded.**
 
-There is a plugin hard coded into the bungeecord server to synchronize the eaglercraft profile skins, and also a plugin like authme for creating a secure isolated authentication lobby on the proxy. The authentication lobby plugin has not been implemented though, it is non-functional. For now you'll just have to use a different 3rd party bungeecord lobby authentication plugin like AuthMeBungee if you want authentication, which unfortunately is a must for any public server to prevent people from stealing each other's usernames. Just ignore the existing EaglerAuth plugin and it's configuration section in the main config.yml and just install and use some 3rd party plugin like AuthMeBungee instead.
+There is a plugin hard coded into the bungeecord server to auto synchronize the eaglercraft profile skins between players and worlds
 
-Someday I'll finish implementing EaglerAuth but right now I have bigger fish to fry
+You should probably use a plugin like [AuthMe](https://dev.bukkit.org/projects/authme-reloaded/files/682502) to keep griefers from logging in to other people's profiles
 
 ## Compiling
 
@@ -52,7 +252,7 @@ To complile to regular desktop Java for quick debugging, using native OpenGL for
 - Create a run configuration and add a jvm argument pointing to the lwjgl natives folder (lwjgl-rundir/natives) like this: `-Djava.library.path=natives`, and make sure the working directory for the run configuration is the lwjgl-rundir folder.
 
 
-To modify the game's assets repository (javascript/assets.epk), make your changes in lwjgl-runtime/resources/ and use the Eclipse project located in epkcompiler/ to regenerate the assets.epk file and copy it to the Javascript directory. 
+To modify the game's resource pack (javascript/assets.epk), view the readme in the [/epkcompiler](https://github.com/LAX1DUDE/eaglercraft/tree/main/epkcompiler) directory
 
 this project is just a proof of concept to show what can be accomplished when using TeaVM to cross compile an existing java program to javascript. It is not very fast or stable, and the only real useful portion is the emulator code which creates a makeshift fixed function OpenGL 1.3 context using webgl (based on OpenGL 3.3) operational in the browser. Maybe it can be used to port other games in the future.
 

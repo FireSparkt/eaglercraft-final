@@ -1,15 +1,52 @@
 package net.lax1dude.eaglercraft.glemu;
 
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_VERTEX_SHADER;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wgetShaderHeader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglAttachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindAttributeLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCompileShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateBuffer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateVertexArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDetachShader;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramLinked;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderCompiled;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglLinkProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglShaderSource;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1i;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform2f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform3f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform4f;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniformMat4fv;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUseProgram;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.fileContents;
+
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferArrayGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ShaderGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.UniformGL;
 import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector2f;
 import net.lax1dude.eaglercraft.glemu.vector.Vector4f;
 
-import static net.lax1dude.eaglercraft.glemu.EaglerAdapterGL30.*;
-
 public class FixedFunctionShader {
 	
-	private static final FixedFunctionShader[] instances = new FixedFunctionShader[2048]; //lol
+	private static final FixedFunctionShader[] instances = new FixedFunctionShader[4096]; //lol
 	
 	public static void refreshCoreGL() {
 		for(int i = 0; i < instances.length; ++i) {
@@ -32,6 +69,7 @@ public class FixedFunctionShader {
 	public static final int UNIT0 = 256;
 	public static final int UNIT1 = 512;
 	public static final int FIX_ANISOTROPIC = 1024;
+	public static final int SWAP_RB = 2048;
 	
 	public static FixedFunctionShader instance(int i) {
 		FixedFunctionShader s = instances[i];
@@ -47,6 +85,7 @@ public class FixedFunctionShader {
 			boolean CC_unit0 = false;
 			boolean CC_unit1 = false;
 			boolean CC_anisotropic = false;
+			boolean CC_swap_rb = false;
 			if((i & COLOR) == COLOR) {
 				CC_a_color = true;
 			}
@@ -80,7 +119,11 @@ public class FixedFunctionShader {
 			if((i & FIX_ANISOTROPIC) == FIX_ANISOTROPIC) {
 				CC_anisotropic = true;
 			}
-			s = new FixedFunctionShader(i, CC_a_color, CC_a_normal, CC_a_texture0, CC_a_texture1, CC_TEX_GEN_STRQ, CC_lighting, CC_fog, CC_alphatest, CC_unit0, CC_unit1, CC_anisotropic);
+			if((i & SWAP_RB) == SWAP_RB) {
+				CC_swap_rb = true;
+			}
+			s = new FixedFunctionShader(i, CC_a_color, CC_a_normal, CC_a_texture0, CC_a_texture1, CC_TEX_GEN_STRQ, CC_lighting,
+					CC_fog, CC_alphatest, CC_unit0, CC_unit1, CC_anisotropic, CC_swap_rb);
 			instances[i] = s;
 		}
 		return s;
@@ -99,6 +142,7 @@ public class FixedFunctionShader {
 	private final boolean enable_unit0;
 	private final boolean enable_unit1;
 	private final boolean enable_anisotropic_fix;
+	private final boolean enable_swap_rb;
 	private final ProgramGL globject;
 
 	private UniformGL u_matrix_m = null;
@@ -148,7 +192,8 @@ public class FixedFunctionShader {
 	public final BufferGL genericBuffer;
 	public boolean bufferIsInitialized = false;
 	
-	private FixedFunctionShader(int j, boolean CC_a_color, boolean CC_a_normal, boolean CC_a_texture0, boolean CC_a_texture1, boolean CC_TEX_GEN_STRQ, boolean CC_lighting, boolean CC_fog, boolean CC_alphatest, boolean CC_unit0, boolean CC_unit1, boolean CC_anisotropic_fix) {
+	private FixedFunctionShader(int j, boolean CC_a_color, boolean CC_a_normal, boolean CC_a_texture0, boolean CC_a_texture1, boolean CC_TEX_GEN_STRQ, boolean CC_lighting, 
+			boolean CC_fog, boolean CC_alphatest, boolean CC_unit0, boolean CC_unit1, boolean CC_anisotropic_fix, boolean CC_swap_rb) {
 		enable_color = CC_a_color;
 		enable_normal = CC_a_normal;
 		enable_texture0 = CC_a_texture0;
@@ -160,6 +205,7 @@ public class FixedFunctionShader {
 		enable_unit0 = CC_unit0;
 		enable_unit1 = CC_unit1;
 		enable_anisotropic_fix = CC_anisotropic_fix;
+		enable_swap_rb = CC_swap_rb;
 		
 		if(shaderSource == null) {
 			shaderSource = fileContents("/glsl/core.glsl");
@@ -177,6 +223,7 @@ public class FixedFunctionShader {
 		if(enable_unit0) source += "#define CC_unit0\n";
 		if(enable_unit1) source += "#define CC_unit1\n";
 		if(enable_anisotropic_fix) source += "#define CC_patch_anisotropic\n";
+		if(enable_swap_rb) source += "#define CC_swap_rb\n";
 		source += shaderSource;
 		
 		ShaderGL v = _wglCreateShader(_wGL_VERTEX_SHADER);
@@ -200,6 +247,38 @@ public class FixedFunctionShader {
 		globject = _wglCreateProgram();
 		_wglAttachShader(globject, v);
 		_wglAttachShader(globject, f);
+		
+		int i = 0;
+		a_position = i++;
+		_wglBindAttributeLocation(globject, a_position, "a_position");
+		
+		if(enable_texture0) {
+			a_texture0 = i++;
+			_wglBindAttributeLocation(globject, a_texture0, "a_texture0");
+		}else {
+			a_texture0 = -1;
+		}
+		if(enable_color) {
+			a_color = i++;
+			_wglBindAttributeLocation(globject, a_color, "a_color");
+		}else {
+			a_color = -1;
+		}
+		if(enable_normal) {
+			a_normal = i++;
+			_wglBindAttributeLocation(globject, a_normal, "a_normal");
+		}else {
+			a_normal = -1;
+		}
+		if(enable_texture1) {
+			a_texture1 = i++;
+			_wglBindAttributeLocation(globject, a_texture1, "a_texture1");
+		}else {
+			a_texture1 = -1;
+		}
+		
+		attributeIndexesToEnable = i;
+		
 		_wglLinkProgram(globject);
 		
 		_wglDetachShader(globject, v);
@@ -262,37 +341,6 @@ public class FixedFunctionShader {
 		
 		u_texCoordV0 = _wglGetUniformLocation(globject, "texCoordV0");
 		u_texCoordV1 = _wglGetUniformLocation(globject, "texCoordV1");
-		
-		int i = 0;
-		a_position = i++;
-		_wglBindAttributeLocation(globject, a_position, "a_position");
-		
-		if(enable_texture0) {
-			a_texture0 = i++;
-			_wglBindAttributeLocation(globject, a_texture0, "a_texture0");
-		}else {
-			a_texture0 = -1;
-		}
-		if(enable_color) {
-			a_color = i++;
-			_wglBindAttributeLocation(globject, a_color, "a_color");
-		}else {
-			a_color = -1;
-		}
-		if(enable_normal) {
-			a_normal = i++;
-			_wglBindAttributeLocation(globject, a_normal, "a_normal");
-		}else {
-			a_normal = -1;
-		}
-		if(enable_texture1) {
-			a_texture1 = i++;
-			_wglBindAttributeLocation(globject, a_texture1, "a_texture1");
-		}else {
-			a_texture1 = -1;
-		}
-		
-		attributeIndexesToEnable = i;
 		
 		genericArray = _wglCreateVertexArray();
 		genericBuffer = _wglCreateBuffer();

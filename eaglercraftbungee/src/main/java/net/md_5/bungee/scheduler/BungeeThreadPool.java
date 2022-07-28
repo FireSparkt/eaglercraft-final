@@ -4,11 +4,12 @@
 
 package net.md_5.bungee.scheduler;
 
-import java.util.logging.Level;
-import net.md_5.bungee.api.ProxyServer;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeThreadPool extends ScheduledThreadPoolExecutor {
 	public BungeeThreadPool(final ThreadFactory threadFactory) {

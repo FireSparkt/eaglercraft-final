@@ -5,8 +5,9 @@
 package net.md_5.bungee.api.plugin;
 
 import java.util.logging.LogRecord;
-import net.md_5.bungee.api.ProxyServer;
 import java.util.logging.Logger;
+
+import net.md_5.bungee.api.ProxyServer;
 
 public class PluginLogger extends Logger {
 	private String pluginName;

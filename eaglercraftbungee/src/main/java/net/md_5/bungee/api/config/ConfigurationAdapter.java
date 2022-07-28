@@ -23,6 +23,18 @@ public interface ConfigurationAdapter {
 	Collection<String> getGroups(final String p0);
 
 	Collection<String> getPermissions(final String p0);
+
+	Collection<String> getBlacklistURLs();
+	
+	Collection<String> getBlacklistSimpleWhitelist();
+
+	Collection<String> getDisabledCommands();
+	
+	Collection<String> getICEServers();
 	
 	AuthServiceInfo getAuthSettings();
+
+	Map<String, Object> getMap();
+	
+	void forceSave();
 }

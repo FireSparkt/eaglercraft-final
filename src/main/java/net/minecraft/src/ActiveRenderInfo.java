@@ -1,7 +1,6 @@
 package net.minecraft.src;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 

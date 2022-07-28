@@ -5,36 +5,36 @@
 package net.md_5.bungee;
 
 import java.beans.ConstructorProperties;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import io.netty.util.concurrent.GenericFutureListener;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelHandler;
-import net.md_5.bungee.netty.PipelineUtils;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Queue;
+
+import com.google.common.base.Preconditions;
+
 import io.netty.bootstrap.Bootstrap;
-import io.netty.util.concurrent.Future;
-import net.md_5.bungee.netty.PacketHandler;
-import net.md_5.bungee.connection.PingHandler;
-import net.md_5.bungee.netty.HandlerBoss;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import net.md_5.bungee.api.ServerPing;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.GenericFutureListener;
 import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
-import java.util.Objects;
-import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.CommandSender;
-import java.util.Collections;
-import net.md_5.bungee.protocol.packet.DefinedPacket;
-import java.util.Queue;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import java.util.Collection;
-import java.net.InetSocketAddress;
+import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.connection.PingHandler;
+import net.md_5.bungee.netty.HandlerBoss;
+import net.md_5.bungee.netty.PipelineUtils;
+import net.md_5.bungee.protocol.packet.DefinedPacket;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
 
 public class BungeeServerInfo implements ServerInfo {
 	private final String name;
