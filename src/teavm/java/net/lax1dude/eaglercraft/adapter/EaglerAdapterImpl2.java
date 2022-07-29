@@ -83,8 +83,10 @@ import org.teavm.jso.workers.Worker;
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.EaglerImage;
+import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.ExpiringSet;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.ServerQuery;
@@ -94,6 +96,7 @@ import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.MathHelper;
 
 public class EaglerAdapterImpl2 {
@@ -1833,6 +1836,9 @@ public class EaglerAdapterImpl2 {
 		enableVoice(Voice.VoiceChannel.NONE);
 	}
 	public static final boolean connectionOpen() {
+		if(IntegratedServer.doesChannelExist(EaglerProfile.username)) {
+			return true;
+		}
 		if(sock == null || sock.getReadyState() == 3) {
 			sockIsConnecting = false;
 		}
@@ -1857,7 +1863,7 @@ public class EaglerAdapterImpl2 {
 	public static final byte[] loadLocalStorage(String key) {
 		Storage strg = win.getLocalStorage();
 		if(strg != null) {
-			String s =strg.getItem("_eaglercraft."+key);
+			String s = strg.getItem("_eaglercraft."+key);
 			if(s != null) {
 				return Base64.decodeBase64(s);
 			}else {

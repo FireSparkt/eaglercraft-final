@@ -304,43 +304,48 @@ public class IntegratedServer {
 						break;
 					case IPCPacket07ImportWorld.ID: {
 							IPCPacket07ImportWorld pkt = (IPCPacket07ImportWorld)packet;
-							if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_EAG) {
-								try {
-									String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
-									VFile dir = new VFile("worlds", folder);
-									EPKDecompiler dc = new EPKDecompiler(pkt.worldData);
-									EPKDecompiler.FileEntry f = null;
-									int lastProgUpdate = 0;
-									int prog = 0;
-									while((f = dc.readFile()) != null) {
-										byte[] b = f.data;
-										if(f.name.equals("level.dat")) {
-											NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
-											worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
-											worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
-											b = CompressedStreamTools.compress(worldDatNBT);
+							if(isServerStopped()) {
+								if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_EAG) {
+									try {
+										String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
+										VFile dir = new VFile("worlds", folder);
+										EPKDecompiler dc = new EPKDecompiler(pkt.worldData);
+										EPKDecompiler.FileEntry f = null;
+										int lastProgUpdate = 0;
+										int prog = 0;
+										while((f = dc.readFile()) != null) {
+											byte[] b = f.data;
+											if(f.name.equals("level.dat")) {
+												NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
+												worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
+												worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
+												b = CompressedStreamTools.compress(worldDatNBT);
+											}
+											VFile ff = new VFile(dir, f.name);
+											ff.setAllBytes(b);
+											prog += b.length;
+											if(prog - lastProgUpdate > 10000) {
+												lastProgUpdate = prog;
+												updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+											}
 										}
-										VFile ff = new VFile(dir, f.name);
-										ff.setAllBytes(b);
-										prog += b.length;
-										if(prog - lastProgUpdate > 10000) {
-											lastProgUpdate = prog;
-											updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+										String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+										if(worldsTxt == null || worldsTxt.length <= 0) {
+											worldsTxt = new String[] { folder };
+										}else {
+											String[] tmp = worldsTxt;
+											worldsTxt = new String[worldsTxt.length + 1];
+											System.arraycopy(tmp, 0, worldsTxt, 0, tmp.length);
+											worldsTxt[worldsTxt.length - 1] = folder;
 										}
+										SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
+										sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
+									}catch(Throwable t) {
+										throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as EPK", t);
+										sendTaskFailed();
 									}
-									String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
-									if(worldsTxt == null || worldsTxt.length <= 0) {
-										worldsTxt = new String[] { folder };
-									}else {
-										String[] tmp = worldsTxt;
-										worldsTxt = new String[worldsTxt.length + 1];
-										System.arraycopy(tmp, 0, worldsTxt, 0, tmp.length);
-										worldsTxt[worldsTxt.length - 1] = folder;
-									}
-									SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
-									sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
-								}catch(Throwable t) {
-									throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as EPK", t);
+								}else {
+									System.err.println("Client tried to import a world in an unknown format: 0x" + Integer.toHexString(pkt.worldFormat));
 									sendTaskFailed();
 								}
 							}else {
@@ -496,7 +501,7 @@ public class IntegratedServer {
 					continue;
 				}
 				if(!msg.channel.startsWith("NET|") || currentProcess == null) {
-					System.err.println("Unknown ICP channel: '" + msg.channel + "' passed " + msg.data.length + " bytes");
+					//System.err.println("Unknown ICP channel: '" + msg.channel + "' passed " + msg.data.length + " bytes");
 					continue;
 				}
 				String u = msg.channel.substring(4);
@@ -553,17 +558,7 @@ public class IntegratedServer {
 	@JSBody(params = { "wb" }, script = "onmessage = function(o) { wb(o.data.ch, o.data.dat); };")
 	private static native void registerPacketHandler(WorkerBinaryPacketHandler wb);
 	
-	@JSBody(script = "return (((typeof window) !== \"undefined\") && ((typeof window.testScript) !== \"undefined\")) ? window.testScript : null;")
-	private static native String shouldLaunchTest();
-	
 	public static void main(String[] args) {
-		
-		String test = shouldLaunchTest();
-		
-		if(test != null) {
-			WorkerTest.init(test);
-			return;
-		}
 		
 		registerPacketHandler(new WorkerBinaryPacketHandlerImpl());
 		

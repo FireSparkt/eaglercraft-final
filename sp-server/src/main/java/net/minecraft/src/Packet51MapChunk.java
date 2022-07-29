@@ -54,19 +54,19 @@ public class Packet51MapChunk extends Packet {
 		this.zCh = par1Chunk.zPosition;
 		this.includeInitialize = par2;
 		Packet51MapChunkData var4 = getMapChunkData(par1Chunk, par2, par3);
-		Deflater var5 = new Deflater(-1);
+		//Deflater var5 = new Deflater(-1);
 		this.yChMax = var4.chunkHasAddSectionFlag;
 		this.yChMin = var4.chunkExistFlag;
 
-		try {
-			this.compressedChunkData = var4.compressedData;
-			var5.setInput(var4.compressedData, 0, var4.compressedData.length);
-			var5.finish();
-			this.chunkData = new byte[var4.compressedData.length];
-			this.tempLength = var5.deflate(this.chunkData);
-		} finally {
-			var5.end();
-		}
+		//try {
+			//this.compressedChunkData = var4.compressedData;
+			//var5.setInput(var4.compressedData, 0, var4.compressedData.length);
+			//var5.finish();
+			this.chunkData = var4.compressedData;
+			this.tempLength = var4.compressedData.length;
+		//} finally {
+		//	var5.end();
+		//}
 	}
 
 	/**
@@ -79,7 +79,9 @@ public class Packet51MapChunk extends Packet {
 		this.yChMin = par1DataInputStream.readShort();
 		this.yChMax = par1DataInputStream.readShort();
 		this.tempLength = par1DataInputStream.readInt();
-
+		this.compressedChunkData = new byte[this.tempLength];
+		par1DataInputStream.readFully(this.compressedChunkData, 0, this.tempLength);
+/*
 		if (temp.length < this.tempLength) {
 			temp = new byte[this.tempLength];
 		}
@@ -109,6 +111,7 @@ public class Packet51MapChunk extends Packet {
 		} finally {
 			var4.end();
 		}
+*/
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class Packet51MapChunk extends Packet {
 		par1DataOutputStream.writeBoolean(this.includeInitialize);
 		par1DataOutputStream.writeShort((short) (this.yChMin & 65535));
 		par1DataOutputStream.writeShort((short) (this.yChMax & 65535));
-		par1DataOutputStream.writeInt(this.tempLength);
+		par1DataOutputStream.writeInt(this.tempLength | 0x10000000);
 		par1DataOutputStream.write(this.chunkData, 0, this.tempLength);
 	}
 

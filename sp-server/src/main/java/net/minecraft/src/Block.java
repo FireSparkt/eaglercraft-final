@@ -1341,6 +1341,5 @@ public class Block {
 		}
 
 		canBlockGrass[0] = true;
-		StatList.initBreakableStats();
 	}
 }

@@ -105,15 +105,9 @@ public class StatList {
 
 	/** Tracks the number of times a given block or item has been broken. */
 	public static StatBase[] objectBreakStats;
-	private static boolean blockStatsInitialized;
-	private static boolean itemStatsInitialized;
+	private static boolean blockStatsInitialized = false;
+	private static boolean itemStatsInitialized = false;
 
-	/**
-	 * This method simply NOPs. It is presumably used to call the static
-	 * constructors on server start.
-	 */
-	public static void nopInit() {
-	}
 
 	/**
 	 * Initializes statistic fields related to breakable items and blocks.
@@ -132,6 +126,11 @@ public class StatList {
 		initCraftableStats();
 	}
 
+	public static void initAll() {
+		initStats();
+		initBreakableStats();
+	}
+	
 	/**
 	 * Initializes statistics related to craftable items. Is only called after both
 	 * block and item stats have been initialized.
@@ -270,10 +269,5 @@ public class StatList {
 			par0ArrayOfStatBase[par1] = par0ArrayOfStatBase[par2];
 		}
 	}
-
-	static {
-		AchievementList.init();
-		blockStatsInitialized = false;
-		itemStatsInitialized = false;
-	}
+	
 }

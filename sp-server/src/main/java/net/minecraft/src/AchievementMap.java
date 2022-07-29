@@ -10,6 +10,7 @@ public class AchievementMap {
 	
 	public static void init(List<String> guid) {
 		instance = new AchievementMap(guid);
+		StatList.initAll();
 	}
 
 	/** Maps a achievement id with it's unique GUID. */

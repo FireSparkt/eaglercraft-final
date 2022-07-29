@@ -616,8 +616,5 @@ public class Item {
 	public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack) {
 		return false;
 	}
-
-	static {
-		StatList.initStats();
-	}
+	
 }

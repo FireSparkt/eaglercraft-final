@@ -4,9 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 public class Packet56MapChunks extends Packet {
 	private int[] chunkPostX;
@@ -60,75 +57,17 @@ public class Packet56MapChunks extends Packet {
 			this.field_73584_f[var4] = var6.compressedData;
 		}
 
-		Deflater var11 = new Deflater(-1);
+		this.chunkDataBuffer = new byte[var3];
+		System.arraycopy(chunkDataNotCompressed, 0, this.chunkDataBuffer, 0, var3);
+		this.dataLength = this.chunkDataBuffer.length;
 
-		try {
-			var11.setInput(chunkDataNotCompressed, 0, var3);
-			var11.finish();
-			this.chunkDataBuffer = new byte[var3];
-			this.dataLength = var11.deflate(this.chunkDataBuffer);
-		} finally {
-			var11.end();
-		}
 	}
 
 	/**
 	 * Abstract. Reads the raw packet data from the data stream.
 	 */
 	public void readPacketData(DataInputStream par1DataInputStream) throws IOException {
-		short var2 = par1DataInputStream.readShort();
-		this.dataLength = par1DataInputStream.readInt();
-		this.skyLightSent = par1DataInputStream.readBoolean();
-		this.chunkPostX = new int[var2];
-		this.chunkPosZ = new int[var2];
-		this.field_73590_a = new int[var2];
-		this.field_73588_b = new int[var2];
-		this.field_73584_f = new byte[var2][];
-
-		if (chunkDataNotCompressed.length < this.dataLength) {
-			chunkDataNotCompressed = new byte[this.dataLength];
-		}
-
-		par1DataInputStream.readFully(chunkDataNotCompressed, 0, this.dataLength);
-		byte[] var3 = new byte[196864 * var2];
-		Inflater var4 = new Inflater();
-		var4.setInput(chunkDataNotCompressed, 0, this.dataLength);
-
-		try {
-			var4.inflate(var3);
-		} catch (DataFormatException var12) {
-			throw new IOException("Bad compressed data format");
-		} finally {
-			var4.end();
-		}
-
-		int var5 = 0;
-
-		for (int var6 = 0; var6 < var2; ++var6) {
-			this.chunkPostX[var6] = par1DataInputStream.readInt();
-			this.chunkPosZ[var6] = par1DataInputStream.readInt();
-			this.field_73590_a[var6] = par1DataInputStream.readShort();
-			this.field_73588_b[var6] = par1DataInputStream.readShort();
-			int var7 = 0;
-			int var8 = 0;
-			int var9;
-
-			for (var9 = 0; var9 < 16; ++var9) {
-				var7 += this.field_73590_a[var6] >> var9 & 1;
-				var8 += this.field_73588_b[var6] >> var9 & 1;
-			}
-
-			var9 = 2048 * 4 * var7 + 256;
-			var9 += 2048 * var8;
-
-			if (this.skyLightSent) {
-				var9 += 2048 * var7;
-			}
-
-			this.field_73584_f[var6] = new byte[var9];
-			System.arraycopy(var3, var5, this.field_73584_f[var6], 0, var9);
-			var5 += var9;
-		}
+		// not used in server
 	}
 
 	/**

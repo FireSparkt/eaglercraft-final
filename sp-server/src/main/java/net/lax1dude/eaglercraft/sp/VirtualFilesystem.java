@@ -24,7 +24,6 @@ import org.teavm.jso.indexeddb.IDBCursorRequest;
 import org.teavm.jso.indexeddb.IDBDatabase;
 import org.teavm.jso.indexeddb.IDBFactory;
 import org.teavm.jso.indexeddb.IDBGetRequest;
-import org.teavm.jso.indexeddb.IDBObjectStore;
 import org.teavm.jso.indexeddb.IDBObjectStoreParameters;
 import org.teavm.jso.indexeddb.IDBOpenDBRequest;
 import org.teavm.jso.indexeddb.IDBRequest;
@@ -489,7 +488,7 @@ public class VirtualFilesystem {
 			f.setOnUpgradeNeeded(new EventListener<IDBVersionChangeEvent>() {
 				@Override
 				public void handleEvent(IDBVersionChangeEvent evt) {
-					f.getResult().createObjectStore("filesystem", IDBObjectStoreParameters.create().keyPath("path"));
+					IDBObjectStorePatched.createObjectStorePatch(f.getResult(), "filesystem", IDBObjectStoreParameters.create().keyPath("path"));
 				}
 			});
 		}
@@ -499,7 +498,7 @@ public class VirtualFilesystem {
 		
 		private static void deleteFile(IDBDatabase db, String name, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBRequest r = tx.objectStore("filesystem").delete(makeTheFuckingKeyWork(name));
+			final IDBRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").delete(makeTheFuckingKeyWork(name));
 			
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -526,7 +525,7 @@ public class VirtualFilesystem {
 		
 		private static void readWholeFile(IDBDatabase db, String name, final AsyncCallback<ArrayBuffer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
-			final IDBGetRequest r = tx.objectStore("filesystem").get(makeTheFuckingKeyWork(name));
+			final IDBGetRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").get(makeTheFuckingKeyWork(name));
 			r.setOnSuccess(new EventHandler() {
 				@Override
 				public void handleEvent() {
@@ -553,7 +552,7 @@ public class VirtualFilesystem {
 		
 		private static void iterateFiles(IDBDatabase db, final VirtualFilesystem vfs, final String prefix, boolean rw, final VFSIterator itr, final AsyncCallback<Integer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", rw ? "readwrite" : "readonly");
-			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
+			final IDBCursorRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").openCursor();
 			final int[] res = new int[1];
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -591,7 +590,7 @@ public class VirtualFilesystem {
 		
 		private static void deleteFiles(IDBDatabase db, final String prefix, final AsyncCallback<Integer> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBCursorRequest r = tx.objectStore("filesystem").openCursor();
+			final IDBCursorRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").openCursor();
 			final int[] res = new int[1];
 			r.setOnSuccess(new EventHandler() {
 				@Override
@@ -624,7 +623,7 @@ public class VirtualFilesystem {
 		
 		private static void fileExists(IDBDatabase db, String name, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readonly");
-			final IDBCountRequest r = tx.objectStore("filesystem").count(makeTheFuckingKeyWork(name));
+			final IDBCountRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").count(makeTheFuckingKeyWork(name));
 			r.setOnSuccess(new EventHandler() {
 				@Override
 				public void handleEvent() {
@@ -647,7 +646,7 @@ public class VirtualFilesystem {
 		
 		private static void writeWholeFile(IDBDatabase db, String name, ArrayBuffer data, final AsyncCallback<BooleanResult> cb) {
 			IDBTransaction tx = db.transaction("filesystem", "readwrite");
-			final IDBRequest r = tx.objectStore("filesystem").put(writeRow(name, data));
+			final IDBRequest r = IDBObjectStorePatched.objectStorePatch(tx, "filesystem").put(writeRow(name, data));
 			
 			r.setOnSuccess(new EventHandler() {
 				@Override

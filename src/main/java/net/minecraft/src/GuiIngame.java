@@ -481,7 +481,7 @@ public class GuiIngame extends Gui {
 					var8.drawStringWithShadow(info.get(i), (int)(var6 / 0.75f) - var8.getStringWidth(info.get(i)) - 2, 12 + i * 10, 14737632);
 				}
 			}
-			
+			/*
 			if(mc.currentScreen == null || !(mc.currentScreen instanceof GuiIngameMenu)) {
 				int offset = this.mc.isChatOpen() ? 135 : 0;
 				int offset2 = this.mc.isChatOpen() ? 4 : 0;
@@ -490,6 +490,7 @@ public class GuiIngame extends Gui {
 				str = "eaglercraft: " + ConfigConstants.version;
 				var8.drawStringWithShadow(str, (var6 * 4 / 3) - 2 - var8.getStringWidth(str) - offset, 12 + offset2, 14737632);
 			}
+			*/
 			EaglerAdapter.glPopMatrix();
 		}
 
