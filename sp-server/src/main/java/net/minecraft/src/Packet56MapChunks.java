@@ -75,7 +75,7 @@ public class Packet56MapChunks extends Packet {
 	 */
 	public void writePacketData(DataOutputStream par1DataOutputStream) throws IOException {
 		par1DataOutputStream.writeShort(this.chunkPostX.length);
-		par1DataOutputStream.writeInt(this.dataLength);
+		par1DataOutputStream.writeInt(this.dataLength | 0x10000000);
 		par1DataOutputStream.writeBoolean(this.skyLightSent);
 		par1DataOutputStream.write(this.chunkDataBuffer, 0, this.dataLength);
 

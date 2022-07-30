@@ -101,9 +101,10 @@ public class IntegratedServer {
 	}
 	
 	public static void unloadWorld() {
-		ensureWorldReady();
-		statusState = IntegratedState.WORLD_UNLOADING;
-		sendIPCPacket(new IPCPacket01StopServer());
+		if(isWorldRunning()) {
+			statusState = IntegratedState.WORLD_UNLOADING;
+			sendIPCPacket(new IPCPacket01StopServer());
+		}
 	}
 	
 	public static void autoSave() {

@@ -73,7 +73,9 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	public void updateScreen() {
 		super.updateScreen();
-		voiceMenu.updateScreen();
+		if(!mc.isSingleplayer()) {
+			voiceMenu.updateScreen();
+		}
 	}
 
 	/**
@@ -97,12 +99,16 @@ public class GuiIngameMenu extends GuiScreen {
 		drawString(fontRenderer, "Eaglercraft: " + ConfigConstants.version, 6, 27, 0x999999);
 		
 		try {
-			if(voiceMenu.isBlockingInput()) {
-				super.drawScreen(0, 0, par3);
+			if(!mc.isSingleplayer()) {
+				if(voiceMenu.isBlockingInput()) {
+					super.drawScreen(0, 0, par3);
+				}else {
+					super.drawScreen(par1, par2, par3);
+				}
+				voiceMenu.drawScreen(par1, par2, par3);
 			}else {
 				super.drawScreen(par1, par2, par3);
 			}
-			voiceMenu.drawScreen(par1, par2, par3);
 		}catch(AbortedException ex) {
 		}
 		
@@ -114,7 +120,9 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	protected void keyTyped(char par1, int par2) {
 		try {
-			voiceMenu.keyTyped(par1, par2);
+			if(!mc.isSingleplayer()) {
+				voiceMenu.keyTyped(par1, par2);
+			}
 			super.keyTyped(par1, par2);
 		}catch(AbortedException ex) {
 		}
@@ -125,7 +133,9 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	protected void mouseClicked(int par1, int par2, int par3) {
 		try {
-			voiceMenu.mouseClicked(par1, par2, par3);
+			if(!mc.isSingleplayer()) {
+				voiceMenu.mouseClicked(par1, par2, par3);
+			}
 			super.mouseClicked(par1, par2, par3);
 		}catch(AbortedException ex) {
 		}
@@ -138,7 +148,9 @@ public class GuiIngameMenu extends GuiScreen {
 	
 	protected void mouseMovedOrUp(int par1, int par2, int par3) {
 		try {
-			voiceMenu.mouseMovedOrUp(par1, par2, par3);
+			if(!mc.isSingleplayer()) {
+				voiceMenu.mouseMovedOrUp(par1, par2, par3);
+			}
 			super.mouseMovedOrUp(par1, par2, par3);
 		}catch(AbortedException ex) {
 		}

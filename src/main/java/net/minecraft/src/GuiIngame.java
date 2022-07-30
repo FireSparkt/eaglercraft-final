@@ -433,10 +433,10 @@ public class GuiIngame extends Gui {
 			this.drawString(var8, "Press F+6 to " + (mc.gameSettings.showCoordinates ? "disable" : "enable") + " showing coords in ingame GUI", 2, 135, 0xFFFFFFFF);
 
 			if(IntegratedServer.isWorldRunning()) {
-				this.drawString(var8, "IntegratedServer is running", 2, 106, 14737632);
+				this.drawString(var8, "IntegratedServer is running", 2, 154, 14737632);
 				List<String> info = IntegratedServer.getTPS();
 				for(int i = 0, size = info.size(); i < size; ++i) {
-					this.drawString(var8, info.get(i), 2, 122 + i * 8, 14737632);
+					this.drawString(var8, info.get(i), 2, 173 + i * 9, 14737632);
 				}
 			}
 			

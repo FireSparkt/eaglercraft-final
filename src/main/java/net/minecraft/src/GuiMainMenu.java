@@ -9,7 +9,6 @@ import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.GuiScreenEditProfile;
-import net.lax1dude.eaglercraft.GuiScreenSingleplayerNotice;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
@@ -273,15 +272,11 @@ public class GuiMainMenu extends GuiScreen {
 		
 		if (par1GuiButton.id == 1) {
 			if(EaglerAdapter.isIntegratedServerAvailable()) {
-				if(!hasClickedSingleplayer) {
-					this.mc.displayGuiScreen(new GuiScreenSingleplayerNotice(this));
+				if(!IntegratedServer.isAlive()) {
+					IntegratedServer.begin();
+					this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(new GuiSelectWorld(this), "starting up integrated server", () -> IntegratedServer.isReady()));
 				}else {
-					if(!IntegratedServer.isAlive()) {
-						IntegratedServer.begin();
-						this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(new GuiSelectWorld(this), "starting up integrated server", () -> IntegratedServer.isReady()));
-					}else {
-						this.mc.displayGuiScreen(new GuiSelectWorld(this));
-					}
+					this.mc.displayGuiScreen(new GuiSelectWorld(this));
 				}
 				hasClickedSingleplayer = true;
 			}

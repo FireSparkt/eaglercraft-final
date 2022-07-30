@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import net.lax1dude.eaglercraft.EaglerInflater;
+
 public class Packet56MapChunks extends Packet {
 	private int[] chunkPostX;
 	private int[] chunkPosZ;
@@ -44,8 +46,18 @@ public class Packet56MapChunks extends Packet {
 		this.field_73588_b = new int[var2];
 		this.field_73584_f = new byte[var2][];
 
-		byte[] var3 = new byte[this.dataLength];
-		par1DataInputStream.readFully(var3, 0, this.dataLength);
+		byte[] var3;
+		if((this.dataLength & 0x10000000) == 0x10000000) {
+			this.dataLength &= 0xFFFFFFF;
+			var3 = new byte[this.dataLength];
+			par1DataInputStream.readFully(var3, 0, this.dataLength);
+		}else {
+			if (chunkDataNotCompressed.length < this.dataLength) {
+				chunkDataNotCompressed = new byte[this.dataLength];
+			}
+			par1DataInputStream.readFully(chunkDataNotCompressed, 0, this.dataLength);
+			var3 = EaglerInflater.uncompress(chunkDataNotCompressed);
+		}
 
 		int var5 = 0;
 
