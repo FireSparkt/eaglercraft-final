@@ -47,7 +47,7 @@ public class IPCPacket07ImportWorld implements IPCPacketBase {
 
 	@Override
 	public int size() {
-		return IPCPacketBase.strLen(worldName) + worldData.length + 4;
+		return IPCPacketBase.strLen(worldName) + worldData.length + 5;
 	}
 
 }
