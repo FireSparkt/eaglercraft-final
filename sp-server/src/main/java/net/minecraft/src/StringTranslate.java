@@ -21,7 +21,7 @@ public class StringTranslate {
 	}
 	
 	public static void init(List<String> en_us) {
-		instance = new StringTranslate(en_us);
+		instance.loadLanguageList(en_us);
 	}
 
 	/**

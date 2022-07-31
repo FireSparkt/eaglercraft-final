@@ -381,7 +381,6 @@ public class IntegratedServer {
 								sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket0BPause.ID));
 							}else {
 								System.err.println("Client tried to " + (pkt.pause ? "pause" : "unpause") + " while server was stopped");
-								sendTaskFailed();
 							}
 						}
 						break;
