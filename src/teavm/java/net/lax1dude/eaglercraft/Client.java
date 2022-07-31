@@ -54,6 +54,10 @@ public class Client {
 		EaglerAdapterImpl2.setServerToJoinOnLaunch(conf.optString("joinServer", null));
 
 		String assetsURI = conf.getString("assetsURI");
+		if(assetsURI.length() > 256) {
+			conf.put("assetsURI", assetsURI.substring(0, 256) + " ... ");
+			crashScreenOptsDump = "window.eaglercraftOpts = " + conf.toString();
+		}
 		String serverWorkerURI = conf.getString("serverWorkerURI");
 		EaglerAdapterImpl2.setWorldDatabaseName(conf.optString("worldsFolder", "MAIN"));
 
