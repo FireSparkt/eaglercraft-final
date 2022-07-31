@@ -128,6 +128,15 @@ public class InitialHandler extends PacketHandler implements PendingConnection {
 			this.disconnect("Go fuck yourself");
 			return;
 		}
+		if (BungeeCord.getInstance().tokenVerify.isEmpty()) {
+			String hostname = handshake.getHost();
+			if (hostname.contains(":")) {
+				handshake.setHost(hostname.substring(0, hostname.indexOf(':')));
+			}
+		} else {
+			handshake.setHost(BungeeCord.getInstance().tokenVerify);
+			handshake.setPort(0);
+		}
 		InetAddress sc;
 		synchronized(WebSocketProxy.localToRemote) {
 			sc = WebSocketProxy.localToRemote.get(this.ch.getHandle().remoteAddress());

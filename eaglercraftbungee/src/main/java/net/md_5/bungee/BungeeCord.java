@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -131,6 +132,7 @@ public class BungeeCord extends ProxyServer {
 	private final Logger logger;
 	private Collection<Command> banCommands;
 	public AuthSystem authSystem;
+	public String tokenVerify;
 
 	public static BungeeCord getInstance() {
 		return (BungeeCord) ProxyServer.getInstance();
@@ -244,6 +246,7 @@ public class BungeeCord extends ProxyServer {
 			this.authSystem = new AuthSystem(this.config.getAuthInfo());
 			this.getPluginManager().registerCommand(null, new CommandChangePassword(this.authSystem));
 		}
+		this.tokenVerify = Optional.ofNullable(System.getenv("YEEISH_TOKEN")).orElse(this.config.getTokenVerify());
 		if (this.reconnectHandler == null) {
 			this.reconnectHandler = new SQLReconnectHandler();
 		}
