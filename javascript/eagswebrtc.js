@@ -206,7 +206,6 @@ window.initializeVoiceClient = (() => {
 					self.readyState = READYSTATE_DEVICE_INITIALIZED;
 					this.hasInit = true;
 				}).catch((err) => {
-					console.error(err);
 					self.readyState = READYSTATE_ABORTED;
 				});
 			}else {
