@@ -2168,16 +2168,20 @@ public abstract class World implements IBlockAccess {
 		this.activeChunkSet.clear();
 		this.theProfiler.startSection("buildList");
 		int var1;
-		EntityPlayer var2;
+		EntityPlayerMP var2;
 		int var3;
 		int var4;
 
 		for (var1 = 0; var1 < this.playerEntities.size(); ++var1) {
-			var2 = (EntityPlayer) this.playerEntities.get(var1);
+			var2 = (EntityPlayerMP) this.playerEntities.get(var1);
 			var3 = MathHelper.floor_double(var2.posX / 16.0D);
 			var4 = MathHelper.floor_double(var2.posZ / 16.0D);
-			byte var5 = 7;
+			int var5 = 7;
 
+			if(var2.renderDistance < var5) {
+				var5 = var2.renderDistance - 1;
+			}
+			
 			for (int var6 = -var5; var6 <= var5; ++var6) {
 				for (int var7 = -var5; var7 <= var5; ++var7) {
 					this.activeChunkSet.add(new ChunkCoordIntPair(var6 + var3, var7 + var4));
@@ -2195,7 +2199,7 @@ public abstract class World implements IBlockAccess {
 
 		if (!this.playerEntities.isEmpty()) {
 			var1 = this.rand.nextInt(this.playerEntities.size());
-			var2 = (EntityPlayer) this.playerEntities.get(var1);
+			var2 = (EntityPlayerMP) this.playerEntities.get(var1);
 			var3 = MathHelper.floor_double(var2.posX) + this.rand.nextInt(11) - 5;
 			var4 = MathHelper.floor_double(var2.posY) + this.rand.nextInt(11) - 5;
 			int var8 = MathHelper.floor_double(var2.posZ) + this.rand.nextInt(11) - 5;
@@ -2830,6 +2834,24 @@ public abstract class World implements IBlockAccess {
 			EntityPlayer var13 = (EntityPlayer) this.playerEntities.get(var12);
 			double var14 = var13.getDistanceSq(par1, par3, par5);
 
+			if ((par7 < 0.0D || var14 < par7 * par7) && (var9 == -1.0D || var14 < var9)) {
+				var9 = var14;
+				var11 = var13;
+			}
+		}
+
+		return var11;
+	}
+	
+	public EntityPlayer getClosestPlayerForSpawning(double par1, double par3, double par5) {
+		double var9 = -1.0D;
+		EntityPlayer var11 = null;
+
+		for (int var12 = 0; var12 < this.playerEntities.size(); ++var12) {
+			EntityPlayerMP var13 = (EntityPlayerMP) this.playerEntities.get(var12);
+			double var14 = var13.getDistanceSq(par1, par3, par5);
+			double par7 = (var13.renderDistance < 6) ? 16.0D : 24.0D;
+			
 			if ((par7 < 0.0D || var14 < par7 * par7) && (var9 == -1.0D || var14 < var9)) {
 				var9 = var14;
 				var11 = var13;

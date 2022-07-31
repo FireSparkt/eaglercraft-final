@@ -32,6 +32,8 @@ public class NetLoginHandler extends NetHandler {
 
 	private int hash = 0;
 	private static int hashBase = 69696969;
+	
+	private int viewDistance = 2;
 
 	public NetLoginHandler(MinecraftServer par1MinecraftServer, WorkerNetworkManager par2Socket) {
 		this.mcServer = par1MinecraftServer;
@@ -85,6 +87,7 @@ public class NetLoginHandler extends NetHandler {
 
 	public void handleClientProtocol(Packet2ClientProtocol par1Packet2ClientProtocol) {
 		this.clientUsername = par1Packet2ClientProtocol.getUsername();
+		this.viewDistance = par1Packet2ClientProtocol.getViewDistance();
 		System.out.println("[Server][HANDSHAKE][" + this.clientUsername + "]");
 
 		if (!this.clientUsername.equals(StringUtils.stripControlCodes(this.clientUsername))) {
@@ -129,7 +132,7 @@ public class NetLoginHandler extends NetHandler {
 			this.kickUser(var1);
 		} else {
 			EntityPlayerMP var2 = this.mcServer.getConfigurationManager().createPlayerForUser(this.clientUsername);
-
+			var2.renderDistance = var2.lastRenderDistance = this.viewDistance;
 			if (var2 != null) {
 				this.mcServer.getConfigurationManager().initializeConnectionToPlayer(this.myTCPConnection, var2);
 			}else {

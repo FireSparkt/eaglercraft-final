@@ -35,6 +35,7 @@ public class EAGMinecraftServer extends MinecraftServer {
 	
 	public void mainLoop() {
 		if(paused && this.playersOnline.size() <= 1) {
+			lastTick = System.currentTimeMillis();
 			return;
 		}
 		

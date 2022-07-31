@@ -3,9 +3,11 @@ package net.minecraft.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.sp.IntegratedServer;
+import net.lax1dude.eaglercraft.sp.SYS;
 import net.lax1dude.eaglercraft.sp.WorkerListenThread;
 import net.lax1dude.eaglercraft.sp.VFSSaveHandler;
 import net.lax1dude.eaglercraft.sp.VFile;
@@ -217,6 +219,10 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		//this.setUserMessage("menu.generatingTerrain");
 		byte var6 = 0;
 		this.setUserMessage("Preparing start region for level " + var6);
+		
+		// Removed 'spawn chunks' for performance, they are unnecessary
+		
+		/*
 		WorldServer var7 = this.worldServers[var6];
 		ChunkCoordinates var8 = var7.getSpawnPoint();
 		long var9 = System.currentTimeMillis();
@@ -236,7 +242,8 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 				var7.theChunkProviderServer.loadChunk(var8.posX + var11 >> 4, var8.posZ + var12 >> 4);
 			}
 		}
-
+		 */
+		
 		this.clearCurrentTask();
 	}
 
@@ -450,9 +457,10 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		
 		++tpsCounter;
 		long millis = System.currentTimeMillis();
-		if(millis - tpsTimer >= 1000l) {
+		long elapsed = millis - tpsTimer;
+		if(elapsed >= 1000l) {
 			tpsTimer = millis;
-			tpsMeasure = tpsCounter;
+			tpsMeasure = (int)(tpsCounter * 1000l / elapsed);
 			IntegratedServer.sendIPCPacket(new IPCPacket14StringList(IPCPacket14StringList.SERVER_TPS, getTPSAndChunkBuffer()));
 			tpsCounter = 0;
 		}
@@ -833,17 +841,12 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 		throw new IllegalArgumentException("variable removed");
 	}
 
-	public ISaveFormat getActiveAnvilConverter() {
-		return null;
-	}
-
 	/**
 	 * WARNING : directly calls
 	 * getActiveAnvilConverter().deleteWorldDirectory(theWorldServer[0].getSaveHandler().getWorldDirectoryName());
 	 */
 	public void deleteWorldAndStopServer() {
 		this.worldIsBeingDeleted = true;
-		this.getActiveAnvilConverter().flushCache();
 
 		for (int var1 = 0; var1 < this.worldServers.length; ++var1) {
 			WorldServer var2 = this.worldServers[var1];
@@ -852,9 +855,20 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 				var2.flush();
 			}
 		}
-
-		this.getActiveAnvilConverter()
-				.deleteWorldDirectory(this.worldServers[0].getSaveHandler().getWorldDirectoryName());
+		
+		String dir = this.worldServers[0].getSaveHandler().getWorldDirectoryName();
+		SYS.VFS.deleteFiles(dir);
+		String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+		if(worldsTxt != null) {
+			LinkedList<String> newWorlds = new LinkedList();
+			for(String str : worldsTxt) {
+				if(!str.equalsIgnoreCase(dir)) {
+					newWorlds.add(str);
+				}
+			}
+			SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", newWorlds));
+		}
+		
 		this.initiateShutdown();
 	}
 

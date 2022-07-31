@@ -54,6 +54,9 @@ public class ServerConfigurationManager {
 	}
 
 	public void initializeConnectionToPlayer(INetworkManager par1INetworkManager, EntityPlayerMP par2EntityPlayerMP) {
+		if(par2EntityPlayerMP.username.equals(mcServer.getServerOwner())) {
+			viewDistance = par2EntityPlayerMP.renderDistance;
+		}
 		NBTTagCompound var3 = this.readPlayerDataFromFile(par2EntityPlayerMP);
 		par2EntityPlayerMP.setWorld(this.mcServer.worldServerForDimension(par2EntityPlayerMP.dimension));
 		par2EntityPlayerMP.theItemInWorldManager.setWorld((WorldServer) par2EntityPlayerMP.worldObj);

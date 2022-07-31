@@ -145,7 +145,7 @@ public class GameSettings {
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
 				this.keyBindChat, this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindSprint, this.keyBindZoom, this.keyBindFunction };
-		this.difficulty = 2;
+		this.difficulty = 1;
 		this.hideGUI = false;
 		this.thirdPersonView = 0;
 		this.showDebugInfo = false;
@@ -538,6 +538,7 @@ public class GameSettings {
 			if(yee.hasKey("voiceSpeakVolume")) voiceSpeakVolume = yee.getFloat("voiceSpeakVolume");
 			if(yee.hasKey("voicePTTKey")) voicePTTKey = yee.getInteger("voicePTTKey");
 			if(yee.hasKey("voiceListenRadius")) voiceListenRadius = yee.getInteger("voiceListenRadius");
+			if(yee.hasKey("difficulty")) difficulty = yee.getByte("difficulty");
 			
 			if(voiceListenRadius < 5) voiceListenRadius = 5;
 			else if(voiceListenRadius > 22) voiceListenRadius = 22;
@@ -612,6 +613,7 @@ public class GameSettings {
 		yee.setFloat("voiceSpeakVolume", voiceSpeakVolume);
 		yee.setInteger("voicePTTKey", voicePTTKey);
 		yee.setInteger("voiceListenRadius", voiceListenRadius);
+		yee.setByte("difficulty", (byte)difficulty);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

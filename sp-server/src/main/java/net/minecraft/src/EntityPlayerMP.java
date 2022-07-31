@@ -54,8 +54,8 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	private int ticksOfInvuln = 60;
 
 	/** must be between 3>x>15 (strictly between) */
-	public int renderDistance = 0;
-	public int lastRenderDistance = 0;
+	public int renderDistance = 4;
+	public int lastRenderDistance = 4;
 	public int chatVisibility = 0;
 	private boolean chatColours = true;
 
@@ -82,7 +82,6 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		super(par2World);
 		par4ItemInWorldManager.thisPlayerMP = this;
 		this.theItemInWorldManager = par4ItemInWorldManager;
-		this.renderDistance = this.lastRenderDistance = par1MinecraftServer.getConfigurationManager().getViewDistance();
 		ChunkCoordinates var5 = par2World.getSpawnPoint();
 		int var6 = var5.posX;
 		int var7 = var5.posZ;
@@ -817,6 +816,12 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		if (var2 > 3 && var2 < 15) {
 			this.renderDistance = var2;
 			if(this.lastRenderDistance != this.renderDistance) {
+				if(this.mcServer.isSinglePlayer() && this.mcServer.getServerOwner().equals(this.username)) {
+					for(int i = 0; i < this.mcServer.worldServers.length; ++i) {
+						this.mcServer.worldServers[i].getEntityTracker().setMainRenderDistance(
+								PlayerManager.getFurthestViewableBlock(this.renderDistance));
+					}
+				}
 				((WorldServer)this.worldObj).getPlayerManager().cycleRenderDistance(this);
 			}
 		}

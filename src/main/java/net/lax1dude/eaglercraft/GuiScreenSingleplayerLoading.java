@@ -110,7 +110,13 @@ public class GuiScreenSingleplayerLoading extends GuiScreen {
 			killTask.enabled = true;
 		}
 		if(IntegratedServer.didLastCallFail()) {
-			onException.accept(this, IntegratedServer.worldStatusErrors());
+			IPCPacket15ThrowException[] pk = IntegratedServer.worldStatusErrors();
+			if(pk != null) {
+				onException.accept(this, pk);
+			}else {
+				onException.accept(this, new IPCPacket15ThrowException[] { new IPCPacket15ThrowException("Server Crash: State '" +
+						IntegratedState.getStateName(IntegratedServer.statusState()) + "'", new String[0]) });
+			}
 			return;
 		}
 		if(checkTaskComplete.getAsBoolean()) {

@@ -80,11 +80,11 @@ public class IntegratedServer {
 		if(currentProcess != null) {
 			try {
 				currentProcess.stopServer();
-				currentProcess = null;
 			}catch(Throwable t) {
 				System.err.println("Failed to stop server!");
 				throwExceptionToClient("Failed to stop server!", t);
 			}
+			currentProcess = null;
 		}
 	}
 	
@@ -552,6 +552,9 @@ public class IntegratedServer {
 		
 		if(currentProcess != null) {
 			currentProcess.mainLoop();
+			if(currentProcess.isServerStopped()) {
+				currentProcess = null;
+			}
 		}
 	}
 	

@@ -8,7 +8,7 @@ public class Packet2ClientProtocol extends Packet {
 	private int protocolVersion;
 	private String username;
 	private String serverHost;
-	private int serverPort;
+	private int viewDistance;
 
 	/**
 	 * Abstract. Reads the raw packet data from the data stream.
@@ -17,7 +17,7 @@ public class Packet2ClientProtocol extends Packet {
 		this.protocolVersion = par1DataInputStream.readByte();
 		this.username = readString(par1DataInputStream, 16);
 		this.serverHost = readString(par1DataInputStream, 255);
-		this.serverPort = par1DataInputStream.readInt();
+		this.viewDistance = par1DataInputStream.readInt();
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class Packet2ClientProtocol extends Packet {
 		par1DataOutputStream.writeByte(this.protocolVersion);
 		writeString(this.username, par1DataOutputStream);
 		writeString(this.serverHost, par1DataOutputStream);
-		par1DataOutputStream.writeInt(this.serverPort);
+		par1DataOutputStream.writeInt(this.viewDistance);
 	}
 
 	/**
@@ -57,4 +57,9 @@ public class Packet2ClientProtocol extends Packet {
 	public String getUsername() {
 		return this.username;
 	}
+	
+	public int getViewDistance() {
+		return this.viewDistance;
+	}
+	
 }

@@ -57,7 +57,7 @@ public class GuiScreenSingleplayerConnecting extends GuiScreen {
 			try {
 				netHandler = new NetClientHandler(mc, EaglerProfile.username);
 				this.mc.setNetManager(netHandler.getNetManager());
-				netHandler.addToSendQueue(new Packet2ClientProtocol(61, EaglerProfile.username, "127.0.0.1", 0));
+				netHandler.addToSendQueue(new Packet2ClientProtocol(61, EaglerProfile.username, "127.0.0.1", mc.gameSettings.renderDistance));
 			} catch (IOException e) {
 				this.mc.displayGuiScreen(new GuiDisconnected(this.menu, "connect.failed", "disconnect.genericReason", "could not create nethandler", ""));
 				e.printStackTrace();

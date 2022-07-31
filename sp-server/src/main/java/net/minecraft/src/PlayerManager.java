@@ -88,9 +88,23 @@ public class PlayerManager {
 	}
 	
 	public void cycleRenderDistance(EntityPlayerMP player) {
-		//System.out.println("" + player.lastRenderDistance + " => " + player.renderDistance);
-		removePlayer(player);
-		addPlayer(player);
+		if(player.mcServer.getServerOwner().equals(player.username)) {
+			cycleAllRenderDistance(player);
+		}else {
+			removePlayer(player);
+			addPlayer(player);
+		}
+	}
+	
+	public void cycleAllRenderDistance(EntityPlayerMP player) {
+		player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
+		List curList = new ArrayList();
+		curList.addAll(players);
+		for(int i = 0, l = curList.size(); i < l; ++i) {
+			EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
+			removePlayer(playerReload);
+			addPlayer(playerReload);
+		}
 	}
 
 	/**
@@ -103,9 +117,14 @@ public class PlayerManager {
 		par1EntityPlayerMP.managedPosZ = par1EntityPlayerMP.posZ;
 		
 		int rd = par1EntityPlayerMP.lastRenderDistance = par1EntityPlayerMP.renderDistance;
+		
 		for (int var4 = var2 - rd; var4 <= var2 + rd; ++var4) {
 			for (int var5 = var3 - rd; var5 <= var3 + rd; ++var5) {
-				this.getPlayerInstance(var4, var5, true).addPlayer(par1EntityPlayerMP);
+				PlayerInstance pi = this.getPlayerInstance(var4, var5, true);
+				pi.addPlayer(par1EntityPlayerMP);
+				if(!playerInstancesToUpdate.contains(pi)) {
+					playerInstancesToUpdate.add(pi);
+				}
 			}
 		}
 

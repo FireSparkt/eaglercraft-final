@@ -16,6 +16,7 @@ import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WebsocketNetworkManager;
+import net.lax1dude.eaglercraft.WorkerNetworkManager;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
 
@@ -89,14 +90,20 @@ public class NetClientHandler extends NetHandler {
 		this.worldClient = null;
 	}
 	
-	
+	private GuiScreen backToMenu() {
+		if(netManager instanceof WorkerNetworkManager) {
+			return new GuiMainMenu();
+		}else {
+			return new GuiMultiplayer(new GuiMainMenu());
+		}
+	}
 
 	/**
 	 * Processes the packets that have been read since the last call to this
 	 * function.
 	 */
 	public void processReadPackets() {
-		if (!this.disconnected && this.netManager != null) {
+		if (this.netManager != null) {
 			this.netManager.processReadPackets();
 		}
 		
@@ -105,18 +112,20 @@ public class NetClientHandler extends NetHandler {
 				RateLimit r = EaglerAdapter.getRateLimitStatus();
 				if(r != null) {
 					if(r == RateLimit.NOW_LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipNowLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipNowLocked", "disconnect.endOfStream", null));
 					}else if(r == RateLimit.LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipLocked", "disconnect.endOfStream", null));
 					}else if(r == RateLimit.BLOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipBlocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipBlocked", "disconnect.endOfStream", null));
 					}else if(r == RateLimit.FAILED_POSSIBLY_LOCKED) {
-						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.ipFailedPossiblyLocked", "disconnect.endOfStream", null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.ipFailedPossiblyLocked", "disconnect.endOfStream", null));
 					}else {
-						this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "RateLimit." + r.name(), null));
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "RateLimit." + r.name(), null));
 					}
 				}else {
-					this.mc.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.endOfStream", null));
+					if(!(this.mc.currentScreen instanceof GuiDisconnected)) {
+						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.endOfStream", null));
+					}
 				}
 				this.disconnected = true;
 				this.mc.loadWorld((WorldClient) null);
@@ -496,12 +505,12 @@ public class NetClientHandler extends NetHandler {
 		this.mc.loadWorld((WorldClient) null);
 		if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("BLOCKED")) {
 			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.BLOCKED);
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.kickBlocked", "disconnect.endOfStream", (Object[])null));
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickBlocked", "disconnect.endOfStream", (Object[])null));
 		}else if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("LOCKED")) {
 			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.LOCKED);
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.ratelimit.kickLocked", "disconnect.endOfStream", (Object[])null));
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickLocked", "disconnect.endOfStream", (Object[])null));
 		}else {
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
 		}
 	}
 
@@ -509,7 +518,7 @@ public class NetClientHandler extends NetHandler {
 		if (!this.disconnected) {
 			this.disconnected = true;
 			this.mc.loadWorld((WorldClient) null);
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", par1Str, par2ArrayOfObj));
+			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.lost", par1Str, par2ArrayOfObj));
 		}
 	}
 

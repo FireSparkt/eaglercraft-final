@@ -41,14 +41,21 @@ public final class SpawnerAnimals {
 			int var7;
 
 			for (var4 = 0; var4 < par0WorldServer.playerEntities.size(); ++var4) {
-				EntityPlayer var5 = (EntityPlayer) par0WorldServer.playerEntities.get(var4);
+				EntityPlayerMP var5 = (EntityPlayerMP) par0WorldServer.playerEntities.get(var4);
 				int var6 = MathHelper.floor_double(var5.posX / 16.0D);
 				var7 = MathHelper.floor_double(var5.posZ / 16.0D);
-				byte var8 = 8;
+				int var8 = 8;
 
+				if(var5.renderDistance < var8) {
+					var8 = var5.renderDistance;
+					if(var8 < 4) {
+						var8 = 4;
+					} // TODO
+				}
+				
 				for (int var9 = -var8; var9 <= var8; ++var9) {
 					for (int var10 = -var8; var10 <= var8; ++var10) {
-						boolean var11 = var9 == -var8 || var9 == var8 || var10 == -var8 || var10 == var8;
+						boolean var11 = var8 >= 8 && (var9 == -var8 || var9 == var8 || var10 == -var8 || var10 == var8);
 						ChunkCoordIntPair var12 = new ChunkCoordIntPair(var9 + var6, var10 + var7);
 
 						if (!var11) {
@@ -114,8 +121,8 @@ public final class SpawnerAnimals {
 													float var25 = (float) var19;
 													float var26 = (float) var20 + 0.5F;
 
-													if (par0WorldServer.getClosestPlayer((double) var24, (double) var25,
-															(double) var26, 24.0D) == null) {
+													if (par0WorldServer.getClosestPlayerForSpawning((double) var24,
+															(double) var25, (double) var26) == null) {
 														float var27 = var24 - (float) var32.posX;
 														float var28 = var25 - (float) var32.posY;
 														float var29 = var26 - (float) var32.posZ;
