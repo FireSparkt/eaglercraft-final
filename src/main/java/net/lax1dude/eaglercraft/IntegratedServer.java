@@ -122,7 +122,7 @@ public class IntegratedServer {
 			if(pause) {
 				statusState = IntegratedState.WORLD_PAUSED;
 			}else {
-				statusState = IntegratedState.WORLD_NONE;
+				statusState = IntegratedState.WORLD_LOADED;
 			}
 			sendIPCPacket(new IPCPacket0BPause(pause));
 			isPaused = pause;

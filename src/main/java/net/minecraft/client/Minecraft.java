@@ -15,6 +15,7 @@ import net.lax1dude.eaglercraft.GuiScreenLicense;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.WorkerNetworkManager;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
@@ -1880,7 +1881,7 @@ public class Minecraft implements Runnable {
 	 * the integrated one.
 	 */
 	public boolean isSingleplayer() {
-		return isIntegratedServerRunning() && (this.theWorld == null || this.theWorld.playerEntities.size() <= 1);
+		return (myNetworkManager instanceof WorkerNetworkManager) && (this.theWorld == null || this.theWorld.playerEntities.size() <= 1);
 	}
 	
 	/**
