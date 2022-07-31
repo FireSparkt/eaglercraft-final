@@ -2,10 +2,14 @@ package net.minecraft.src;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import net.lax1dude.eaglercraft.*;
 import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
@@ -63,6 +67,52 @@ public class ServerList {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void loadDefaultServers(JSONObject json) {
+		
+		ConfigConstants.profanity = json.optBoolean("profanity", ConfigConstants.profanity);
+		
+		hideDownDefaultServers = json.optBoolean("hideDownServers", hideDownDefaultServers);
+		
+		ConfigConstants.ayonullTitle = json.optString("serverListTitle", ConfigConstants.ayonullTitle);
+		ConfigConstants.ayonullLink = json.optString("serverListLink", ConfigConstants.ayonullLink);
+		
+		JSONObject mainMenu = json.optJSONObject("mainMenu", null);
+		if(mainMenu != null) {
+			
+			ConfigConstants.mainMenuItemLink = mainMenu.optString("itemLink", ConfigConstants.mainMenuItemLink);
+			if(ConfigConstants.mainMenuItemLink != null) {
+				ConfigConstants.mainMenuItemLine0 = mainMenu.optString("itemLine0", ConfigConstants.mainMenuItemLine0);
+				ConfigConstants.mainMenuItemLine1 = mainMenu.optString("itemLine1", ConfigConstants.mainMenuItemLine1);
+				ConfigConstants.mainMenuItemLine2 = mainMenu.optString("itemLine2", ConfigConstants.mainMenuItemLine2);
+			}
+			
+			ConfigConstants.eaglercraftTitleLogo = mainMenu.optBoolean("eaglerLogo", ConfigConstants.eaglercraftTitleLogo);
+			
+			JSONArray splashes = mainMenu.optJSONArray("splashes");
+			if(splashes != null) {
+				ConfigConstants.splashTexts = new ArrayList();
+				for(int i = 0, l = splashes.length(); i < l; ++i) {
+					ConfigConstants.splashTexts.add(splashes.getString(i));
+				}
+			}
+			
+		}
+		
+		JSONArray servers = json.optJSONArray("servers");
+		if(servers != null) {
+			forcedServers.clear();
+			for(int i = 0, l = servers.length(); i < l; ++i) {
+				JSONObject serverJSON = servers.getJSONObject(i);
+				ServerData newServer = new ServerData(serverJSON.getString("serverName"),
+						serverJSON.getString("serverAddress"), true);
+				newServer.setHideAddress(serverJSON.optBoolean("hideAddress", false));
+				forcedServers.add(newServer);
+			}
+		}
+		
+		
 	}
 
 	/**

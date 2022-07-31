@@ -22,5 +22,7 @@ public class ConfigConstants {
 	public static String mainMenuItemLink = null;
 
 	public static List<String> splashTexts = null;
+
+	public static boolean eaglercraftTitleLogo = false;
 	
 }

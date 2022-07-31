@@ -196,6 +196,7 @@ public class EaglerAdapterImpl2 {
 	private static EventListener keypress = null;
 	private static EventListener wheel = null;
 	private static String[] identifier = new String[0];
+	private static String integratedServerScript = "worker_bootstrap.js";
 	
 	public static final String[] getIdentifier() {
 		return identifier;
@@ -219,12 +220,13 @@ public class EaglerAdapterImpl2 {
 	@JSBody(params = { "e" }, script = "return e.which;")
 	private static native int getWhich(KeyboardEvent e);
 	
-	public static final void initializeContext(HTMLElement rootElement, String assetPackageURI) {
+	public static final void initializeContext(HTMLElement rootElement, String assetPackageURI, String serverWorkerURI) {
 		parent = rootElement;
 		String s = parent.getAttribute("style");
 		parent.setAttribute("style", (s == null ? "" : s)+"overflow-x:hidden;overflow-y:hidden;");
 		win = Window.current();
 		doc = win.getDocument();
+		integratedServerScript = serverWorkerURI;
 		canvas = (HTMLCanvasElement)doc.createElement("canvas");
 		canvas.setWidth(parent.getClientWidth());
 		canvas.setHeight(parent.getClientHeight());
@@ -2764,23 +2766,33 @@ public class EaglerAdapterImpl2 {
 	
 	@JSBody(params = { "w", "wb" }, script = "w.onmessage = function(o) { wb(o.data.ch, o.data.dat); };")
 	private static native void registerPacketHandler(Worker w, WorkerBinaryPacketHandler wb);
-	
+
 	@JSBody(params = { "w", "ch", "dat" }, script = "w.postMessage({ ch: ch, dat : dat });")
 	private static native void sendWorkerPacket(Worker w, String channel, ArrayBuffer arr);
+	
+	@JSBody(params = { "w", "dbName" }, script = "w.postMessage({ worldDatabaseName : dbName });")
+	private static native void sendWorkerStartPacket(Worker w, String dbName);
+	
+	private static String worldDatabaseName = "MAIN";
 	
 	public static final void beginLoadingIntegratedServer() {
 		if(server != null) {
 			server.terminate();
 		}
 		workerMessageQueue.put("IPC", new LinkedList<PKT>());
-		server = Worker.create("bootstrap.js");
+		server = Worker.create(integratedServerScript);
 		server.onError(new EventListener<ErrorEvent>() {
 			@Override
 			public void handleEvent(ErrorEvent evt) {
 				System.err.println("Worker Error: " + evt.getError());
 			}
 		});
+		sendWorkerStartPacket(server, worldDatabaseName);
 		registerPacketHandler(server, new WorkerBinaryPacketHandlerImpl());
+	}
+	
+	public static final void setWorldDatabaseName(String name) {
+		worldDatabaseName = name;
 	}
 	
 	public static final boolean isIntegratedServerAlive() {
