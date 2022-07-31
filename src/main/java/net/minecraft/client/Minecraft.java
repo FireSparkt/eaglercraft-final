@@ -235,6 +235,8 @@ public class Minecraft implements Runnable {
 	
 	public GuiVoiceOverlay voiceOverlay;
 
+	private int messageOnLoginCounter = 0;
+	
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
 		this.fullscreen = false;
@@ -1468,6 +1470,16 @@ public class Minecraft implements Runnable {
 					this.joinPlayerCounter = 0;
 					this.theWorld.joinEntityInSurroundings(this.thePlayer);
 				}
+				
+				++messageOnLoginCounter;
+				
+				if(messageOnLoginCounter == 100 && isSingleplayerOrLAN()) {
+					displayEaglercraftText(EnumChatFormatting.GREEN + "Notice: chunk loading may take a while in singleplayer.");
+				}
+				
+				if(messageOnLoginCounter == 150 && isSingleplayerOrLAN()) {
+					displayEaglercraftText(EnumChatFormatting.AQUA + "Especially in new worlds, if no chunks show give the game up to 120 seconds before \"giving up\" on a new world");
+				}
 			}
 
 			this.mcProfiler.endStartSection("gameRenderer");
@@ -1623,6 +1635,8 @@ public class Minecraft implements Runnable {
 			}else {
 				displayEaglercraftText(EnumChatFormatting.LIGHT_PURPLE + "Note: use F+6 to show your coordinates on the screen");
 			}
+			
+			messageOnLoginCounter = 0;
 
 			this.thePlayer.preparePlayerToSpawn();
 			par1WorldClient.spawnEntityInWorld(this.thePlayer);
@@ -1881,7 +1895,7 @@ public class Minecraft implements Runnable {
 	 * the integrated one.
 	 */
 	public boolean isSingleplayer() {
-		return (myNetworkManager instanceof WorkerNetworkManager) && (this.theWorld == null || this.theWorld.playerEntities.size() <= 1);
+		return myNetworkManager instanceof WorkerNetworkManager;
 	}
 	
 	/**

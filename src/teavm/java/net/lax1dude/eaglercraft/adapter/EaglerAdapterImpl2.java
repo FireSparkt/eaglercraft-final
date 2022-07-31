@@ -1838,7 +1838,7 @@ public class EaglerAdapterImpl2 {
 		enableVoice(Voice.VoiceChannel.NONE);
 	}
 	public static final boolean connectionOpen() {
-		if(IntegratedServer.doesChannelExist(EaglerProfile.username)) {
+		if(IntegratedServer.doesChannelExist(EaglerProfile.username) && IntegratedServer.isWorldRunning()) {
 			return true;
 		}
 		if(sock == null || sock.getReadyState() == 3) {
@@ -2307,6 +2307,7 @@ public class EaglerAdapterImpl2 {
 							voiceGains.put(peerId, gain);
 							voicePanners.put(peerId, panner);
 						}
+						if(mutedSet.contains(peerId)) voiceClient.mutePeer(peerId, true);
 					}
 				});
 				voiceClient.setPeerDisconnectHandler(new EaglercraftVoiceClient.PeerDisconnectHandler() {
