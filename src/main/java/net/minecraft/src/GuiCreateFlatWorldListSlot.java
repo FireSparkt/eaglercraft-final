@@ -21,8 +21,10 @@ class GuiCreateFlatWorldListSlot extends GuiSlot {
 
 		if (par3ItemStack != null) {
 			RenderHelper.enableGUIStandardItemLighting();
+			EaglerAdapter.flipLightMatrix();
 			GuiCreateFlatWorld.getRenderItem().renderItemIntoGUI(this.createFlatWorldGui.fontRenderer,
 					this.createFlatWorldGui.mc.renderEngine, par3ItemStack, par1 + 2, par2 + 2);
+			EaglerAdapter.flipLightMatrix();
 			RenderHelper.disableStandardItemLighting();
 		}
 

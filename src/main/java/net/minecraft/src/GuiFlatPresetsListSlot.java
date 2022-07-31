@@ -18,8 +18,10 @@ class GuiFlatPresetsListSlot extends GuiSlot {
 		this.func_82456_d(par1 + 1, par2 + 1);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_RESCALE_NORMAL);
 		RenderHelper.enableGUIStandardItemLighting();
+		EaglerAdapter.flipLightMatrix();
 		GuiFlatPresets.getPresetIconRenderer().renderItemIntoGUI(this.flatPresetsGui.fontRenderer,
 				this.flatPresetsGui.mc.renderEngine, new ItemStack(par3, 1, 0), par1 + 2, par2 + 2);
+		EaglerAdapter.flipLightMatrix();
 		RenderHelper.disableStandardItemLighting();
 		EaglerAdapter.glDisable(EaglerAdapter.GL_RESCALE_NORMAL);
 	}
