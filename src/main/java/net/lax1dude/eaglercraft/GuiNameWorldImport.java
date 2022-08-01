@@ -20,7 +20,7 @@ public class GuiNameWorldImport extends GuiScreen {
 		this.parentGuiScreen = menu;
 		this.importFormat = format;
 		this.oldName = name;
-		if(name.length() > 4 && name.endsWith(".epk")) {
+		if(name.length() > 4 && (name.endsWith(".epk") || name.endsWith(".zip"))) {
 			name = name.substring(0, name.length() - 4);
 		}
 		this.name = name;

@@ -1,11 +1,19 @@
 package net.lax1dude.eaglercraft.sp;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import net.minecraft.src.NBTBase;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
@@ -342,6 +350,74 @@ public class IntegratedServer {
 										sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
 									}catch(Throwable t) {
 										throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as EPK", t);
+										sendTaskFailed();
+									}
+								}else if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_MCA) {
+									try {
+										String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
+										VFile dir = new VFile("worlds", folder);
+										ZipInputStream folderNames = new ZipInputStream(new ByteArrayInputStream(pkt.worldData));
+										ZipEntry folderNameFile = null;
+										List<char[]> fileNames = new ArrayList<>();
+										while((folderNameFile = folderNames.getNextEntry()) != null) {
+											if (folderNameFile.getName().contains("__MACOSX/")) continue;
+											if (folderNameFile.getName().toLowerCase().endsWith(".txt")) continue;
+											if (folderNameFile.getName().toLowerCase().endsWith(".lnk")) continue;
+											if (folderNameFile.isDirectory()) continue;
+											fileNames.add(folderNameFile.getName().toCharArray());
+										}
+										final int[] i = new int[] { 0 };
+										while(fileNames.get(0).length > i[0] && fileNames.stream().allMatch(w -> w[i[0]] == fileNames.get(0)[i[0]])) i[0]++;
+										int folderPrefixOffset = i[0];
+										ZipInputStream dc = new ZipInputStream(new ByteArrayInputStream(pkt.worldData));
+										ZipEntry f = null;
+										int lastProgUpdate = 0;
+										int prog = 0;
+										byte[] bb = new byte[16000];
+										while ((f = dc.getNextEntry()) != null) {
+											if (f.getName().contains("__MACOSX/")) continue;
+											if (f.getName().toLowerCase().endsWith(".txt")) continue;
+											if (f.getName().toLowerCase().endsWith(".lnk")) continue;
+											if (f.isDirectory()) continue;
+											ByteArrayOutputStream baos = new ByteArrayOutputStream();
+											int len;
+											while ((len = dc.read(bb)) != -1) {
+												baos.write(bb, 0, len);
+											}
+											baos.close();
+											byte[] b = baos.toByteArray();
+											String fileName = f.getName().substring(folderPrefixOffset);
+											if (fileName.equals("level.dat")) {
+												NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
+												worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
+												worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
+												b = CompressedStreamTools.compress(worldDatNBT);
+											}
+											if (fileName.endsWith(".mcr") || fileName.endsWith(".mca")) {
+												MCAConverter.convertMCA(dir, b, fileName);
+											} else {
+												VFile ff = new VFile(dir, fileName);
+												ff.setAllBytes(b);
+											}
+											prog += b.length;
+											if (prog - lastProgUpdate > 10000) {
+												lastProgUpdate = prog;
+												updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+											}
+										}
+										String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
+										if(worldsTxt == null || worldsTxt.length <= 0) {
+											worldsTxt = new String[] { folder };
+										}else {
+											String[] tmp = worldsTxt;
+											worldsTxt = new String[worldsTxt.length + 1];
+											System.arraycopy(tmp, 0, worldsTxt, 0, tmp.length);
+											worldsTxt[worldsTxt.length - 1] = folder;
+										}
+										SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
+										sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
+									}catch(Throwable t) {
+										throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as MCA", t);
 										sendTaskFailed();
 									}
 								}else {

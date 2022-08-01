@@ -60,7 +60,8 @@ public class GuiScreenCreateWorldSelection extends GuiScreen {
 			isImportingEPK = true;
 			EaglerAdapter.openFileChooser("epk", null);
 		}else if(par1GuiButton.id == 3) {
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "import vanilla world"));
+			isImportingMCA = true;
+			EaglerAdapter.openFileChooser("zip", null);
 		}
 	}
 	

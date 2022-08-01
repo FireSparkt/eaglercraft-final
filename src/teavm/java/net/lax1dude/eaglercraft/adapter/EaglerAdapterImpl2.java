@@ -441,7 +441,7 @@ public class EaglerAdapterImpl2 {
 			"});\r\n" + 
 			"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
 			"window.eagsFileChooser.getFileChooserResultName = null;\r\n" + 
-			"el.accept = mime;\r\n" + 
+			"el.accept = \".\" + ext;\r\n" +
 			"el.click();\r\n" + 
 			"},\r\n" + 
 			"getFileChooserResult: null,\r\n" + 

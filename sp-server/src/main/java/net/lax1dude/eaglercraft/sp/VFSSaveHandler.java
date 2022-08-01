@@ -2,7 +2,6 @@ package net.lax1dude.eaglercraft.sp;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import net.minecraft.src.CompressedStreamTools;
 import net.minecraft.src.EntityPlayer;
