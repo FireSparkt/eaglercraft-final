@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
 
@@ -63,6 +64,19 @@ public class CompressedStreamTools {
 	public static byte[] compress(NBTTagCompound par0NBTTagCompound) throws IOException {
 		ByteArrayOutputStream var1 = new ByteArrayOutputStream();
 		DataOutputStream var2 = new DataOutputStream(new GZIPOutputStream(var1));
+
+		try {
+			write(par0NBTTagCompound, var2);
+		} finally {
+			var2.close();
+		}
+
+		return var1.toByteArray();
+	}
+
+	public static byte[] compressChunk(NBTTagCompound par0NBTTagCompound) throws IOException {
+		ByteArrayOutputStream var1 = new ByteArrayOutputStream();
+		DataOutputStream var2 = new DataOutputStream(new GZIPOutputStream(var1, new Deflater(2, 15+16), 2048, true));
 
 		try {
 			write(par0NBTTagCompound, var2);

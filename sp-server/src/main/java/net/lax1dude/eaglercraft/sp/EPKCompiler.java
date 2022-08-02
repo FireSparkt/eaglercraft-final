@@ -16,7 +16,6 @@ public class EPKCompiler {
 	
 	public EPKCompiler(String name) {
 		try {
-			d = new Deflater(9);
 			os = new DataOutputStream(osb);
 			os.write("EAGPKG!!".getBytes(Charset.forName("UTF-8")));
 			os.writeUTF("\n\n #  eaglercraft package file - " + name + "\n #  eagler eagler eagler eagler eagler eagler eagler\n\n");

@@ -89,7 +89,7 @@ public class VFSChunkLoader implements IChunkLoader {
 		try {
 			NBTTagCompound chunkFileSave = new NBTTagCompound();
 			chunkFileSave.setCompoundTag("Level", chunkFile);
-			save = CompressedStreamTools.compress(chunkFileSave);
+			save = CompressedStreamTools.compressChunk(chunkFileSave);
 		}catch(IOException e) {
 			System.err.println("Corrupted chunk could not be serialized: [" + var2.xPosition + ", " + var2.zPosition + "]");
 			return;
