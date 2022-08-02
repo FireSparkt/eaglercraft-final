@@ -79,7 +79,15 @@ public class GuiScreenBackupWorld extends GuiScreen {
 				return false;
 			}));
 		}else if(par1GuiButton.id == 4) {
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerNotImplemented(this, "export vanilla 1.5.2 world"));
+			IntegratedServer.exportWorld(worldName, IPCPacket05RequestData.REQUEST_LEVEL_MCA);
+			this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(selectWorld, "selectWorld.progress.exporting.1", () -> {
+				byte[] b = IntegratedServer.getExportResponse();
+				if(b != null) {
+					EaglerAdapter.downloadBytes(worldName + ".zip", b);
+					return true;
+				}
+				return false;
+			}));
 		}
 	}
 }

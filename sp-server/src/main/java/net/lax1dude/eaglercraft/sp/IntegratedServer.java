@@ -1,19 +1,19 @@
 package net.lax1dude.eaglercraft.sp;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
-import net.minecraft.src.NBTBase;
+import net.minecraft.src.ChunkCoordIntPair;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
@@ -277,14 +277,97 @@ public class IntegratedServer {
 										byte[] b = i.getAllBytes();
 										c.append(i.path.substring(pfx.length()), b);
 										bytesWritten[0] += b.length;
-										if(bytesWritten[0] - lastUpdate[0] > 10000) {
+										if (bytesWritten[0] - lastUpdate[0] > 10000) {
 											lastUpdate[0] = bytesWritten[0];
 											updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
 										}
 									});
 									sendIPCPacket(new IPCPacket09RequestResponse(c.complete()));
-								}catch(Throwable t) {
+								} catch (Throwable t) {
 									throwExceptionToClient("Failed to export world '" + pkt.worldName + "' as EPK", t);
+									sendTaskFailed();
+								}
+							}else if(pkt.request == IPCPacket05RequestData.REQUEST_LEVEL_MCA) {
+								try {
+									final int[] bytesWritten = new int[1];
+									final int[] lastUpdate = new int[1];
+									String pfx = "worlds/" + pkt.worldName + "/";
+									ByteArrayOutputStream baos = new ByteArrayOutputStream();
+									ZipOutputStream c = new ZipOutputStream(baos);
+									c.setComment("contains backup of world '" + pkt.worldName + "'");
+									Map<ChunkCoordIntPair, byte[]> regions = new HashMap<>();
+									Map<ChunkCoordIntPair, byte[]> regions1 = new HashMap<>();
+									Map<ChunkCoordIntPair, byte[]> regionsn1 = new HashMap<>();
+									SYS.VFS.iterateFiles(pfx, false, (i) -> {
+										String currPath = i.path.substring(pfx.length());
+										System.out.println(currPath); // 12yee
+										try {
+											byte[] b = i.getAllBytes();
+											if (currPath.startsWith("region/")) {
+												regions.put(VFSChunkLoader.getChunkCoords(currPath.substring(7, -4)), b);
+											} else if (currPath.startsWith("DIM1/region/")) {
+												regions1.put(VFSChunkLoader.getChunkCoords(currPath.substring(12, -4)), b);
+											} else if (currPath.startsWith("DIM-1/region/")) {
+												regionsn1.put(VFSChunkLoader.getChunkCoords(currPath.substring(13, -4)), b);
+											} else {
+												ZipEntry zipEntry = new ZipEntry(currPath);
+												c.putNextEntry(zipEntry);
+												c.write(b); // 12yee
+												c.closeEntry();
+												bytesWritten[0] += b.length;
+												if (bytesWritten[0] - lastUpdate[0] > 10000) {
+													lastUpdate[0] = bytesWritten[0];
+													updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
+												}
+											}
+										} catch (Throwable t) {
+											throwExceptionToClient("Failed to export file '" + currPath + "'", t);
+											sendTaskFailed();
+										}
+									});
+									Map<String, byte[]> regionsOut = MCAConverter.convertToMCA(regions);
+									for (String path : regionsOut.keySet()) {
+										byte[] b = regionsOut.get(path);
+										ZipEntry zipEntry = new ZipEntry("region/" + path + ".dat");
+										c.putNextEntry(zipEntry);
+										c.write(b); // 12yee
+										c.closeEntry();
+										bytesWritten[0] += b.length;
+										if (bytesWritten[0] - lastUpdate[0] > 10000) {
+											lastUpdate[0] = bytesWritten[0];
+											updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
+										}
+									}
+									Map<String, byte[]> regions1Out = MCAConverter.convertToMCA(regions1);
+									for (String path : regions1Out.keySet()) {
+										byte[] b = regions1Out.get(path);
+										ZipEntry zipEntry = new ZipEntry("DIM1/region/" + path + ".dat");
+										c.putNextEntry(zipEntry);
+										c.write(b); // 12yee
+										c.closeEntry();
+										bytesWritten[0] += b.length;
+										if (bytesWritten[0] - lastUpdate[0] > 10000) {
+											lastUpdate[0] = bytesWritten[0];
+											updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
+										}
+									}
+									Map<String, byte[]> regionsn1Out = MCAConverter.convertToMCA(regionsn1);
+									for (String path : regionsn1Out.keySet()) {
+										byte[] b = regionsn1Out.get(path);
+										ZipEntry zipEntry = new ZipEntry("DIM-1/region/" + path + ".dat");
+										c.putNextEntry(zipEntry);
+										c.write(b); // 12yee
+										c.closeEntry();
+										bytesWritten[0] += b.length;
+										if (bytesWritten[0] - lastUpdate[0] > 10000) {
+											lastUpdate[0] = bytesWritten[0];
+											updateStatusString("selectWorld.progress.exporting." + pkt.request, bytesWritten[0]);
+										}
+									}
+									c.close();
+									sendIPCPacket(new IPCPacket09RequestResponse(baos.toByteArray()));
+								} catch (Throwable t) {
+									throwExceptionToClient("Failed to export world '" + pkt.worldName + "' as MCA", t);
 									sendTaskFailed();
 								}
 							}else {
@@ -361,9 +444,9 @@ public class IntegratedServer {
 										List<char[]> fileNames = new ArrayList<>();
 										while((folderNameFile = folderNames.getNextEntry()) != null) {
 											if (folderNameFile.getName().contains("__MACOSX/")) continue;
-											if (folderNameFile.getName().toLowerCase().endsWith(".txt")) continue;
-											if (folderNameFile.getName().toLowerCase().endsWith(".lnk")) continue;
 											if (folderNameFile.isDirectory()) continue;
+											String lowerName = folderNameFile.getName().toLowerCase();
+											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".dat_old") || lowerName.endsWith(".dat_mcr") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
 											fileNames.add(folderNameFile.getName().toCharArray());
 										}
 										final int[] i = new int[] { 0 };
@@ -376,9 +459,9 @@ public class IntegratedServer {
 										byte[] bb = new byte[16000];
 										while ((f = dc.getNextEntry()) != null) {
 											if (f.getName().contains("__MACOSX/")) continue;
-											if (f.getName().toLowerCase().endsWith(".txt")) continue;
-											if (f.getName().toLowerCase().endsWith(".lnk")) continue;
 											if (f.isDirectory()) continue;
+											String lowerName = f.getName().toLowerCase();
+											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".dat_old") || lowerName.endsWith(".dat_mcr") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
 											ByteArrayOutputStream baos = new ByteArrayOutputStream();
 											int len;
 											while ((len = dc.read(bb)) != -1) {
@@ -394,7 +477,7 @@ public class IntegratedServer {
 												b = CompressedStreamTools.compress(worldDatNBT);
 											}
 											if (fileName.endsWith(".mcr") || fileName.endsWith(".mca")) {
-												MCAConverter.convertMCA(dir, b, fileName);
+												MCAConverter.convertFromMCA(dir, b, fileName);
 											} else {
 												VFile ff = new VFile(dir, fileName);
 												ff.setAllBytes(b);

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.src.Chunk;
+import net.minecraft.src.ChunkCoordIntPair;
 import net.minecraft.src.CompressedStreamTools;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityList;
@@ -35,6 +36,21 @@ public class VFSChunkLoader implements IChunkLoader {
 		}
 		
 		return new String(path);
+	}
+
+	public static ChunkCoordIntPair getChunkCoords(String filename) {
+		String strX = filename.substring(0, 6);
+		String strZ = filename.substring(6);
+
+		int retX = 0;
+		int retZ = 0;
+
+		for(int i = 0; i < 6; ++i) {
+			retX |= hex.indexOf(strX.charAt(i)) << (i << 2);
+			retZ |= hex.indexOf(strZ.charAt(i)) << (i << 2);
+		}
+
+		return new ChunkCoordIntPair(retX - 1900000, retZ - 1900000);
 	}
 	
 	public VFSChunkLoader(VFile chunkDirectory) {

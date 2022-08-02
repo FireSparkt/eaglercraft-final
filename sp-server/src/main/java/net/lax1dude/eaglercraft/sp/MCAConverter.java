@@ -1,12 +1,20 @@
 package net.lax1dude.eaglercraft.sp;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
+import net.minecraft.src.ChunkCoordIntPair;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class MCAConverter {
-    public static void convertMCA(VFile dir, byte[] file, String fileName) {
+    public static void convertFromMCA(VFile dir, byte[] file, String fileName) {
         VFile levelDir = new VFile(dir, "level" + (fileName.startsWith("region/") ? "0" : fileName.substring(3, fileName.indexOf('/'))));
 
         String[] xz = fileName.substring(fileName.lastIndexOf('r') + 2, fileName.length() - 4).split("\\.");
@@ -57,5 +65,82 @@ public class MCAConverter {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    public static Map<String, byte[]> convertToMCA(Map<ChunkCoordIntPair, byte[]> regions) {
+        Map<String, byte[]> regionsOut = new HashMap<>();
+
+        try {
+            int timestamp = (int) System.currentTimeMillis();
+
+            int maxX = Integer.MIN_VALUE;
+            int maxZ = Integer.MIN_VALUE;
+            int minX = Integer.MAX_VALUE;
+            int minZ = Integer.MAX_VALUE;
+
+            for (ChunkCoordIntPair coords : regions.keySet()) {
+                if (maxX < coords.chunkXPos) maxX = coords.chunkXPos;
+                if (maxZ < coords.chunkZPos) maxZ = coords.chunkZPos;
+                if (minX > coords.chunkXPos) minX = coords.chunkXPos;
+                if (minZ > coords.chunkZPos) minZ = coords.chunkZPos;
+            }
+
+            for (int x = minX - (minX % 32); x <= maxX + (maxX % 32); x += 32) {
+                for (int z = minZ - (minZ % 32); z <= maxZ + (maxZ % 32); z += 32) {
+                    ByteArrayOutputStream offsets = new ByteArrayOutputStream();
+                    DataOutputStream offsetsDos = new DataOutputStream(offsets);
+                    ByteArrayOutputStream timestamps = new ByteArrayOutputStream();
+                    DataOutputStream timestampsDos = new DataOutputStream(timestamps);
+                    ByteArrayOutputStream chunks = new ByteArrayOutputStream();
+                    DataOutputStream chunksDos = new DataOutputStream(chunks);
+                    for (int cx = 0; cx < 32; ++cx) {
+                        for (int cz = 0; cz < 32; ++cz) {
+                            int tx = x + cx;
+                            int tz = z + cz;
+
+                            byte[] region = regions.get(new ChunkCoordIntPair(tx, tz));
+                            if (region == null) {
+                                offsetsDos.writeInt(0);
+                                timestampsDos.writeInt(0);
+                            } else {
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                DeflaterOutputStream dos = new DeflaterOutputStream(baos);
+                                dos.write(region);
+                                dos.close();
+                                byte[] zlibbed = baos.toByteArray();
+
+                                int offset = chunksDos.size();
+                                offsetsDos.write((offset >> 16) & 0xff);
+                                offsetsDos.write((offset >> 8) & 0xff);
+                                offsetsDos.write(offset & 0xff);
+                                offsetsDos.write(5 + zlibbed.length);
+
+                                timestampsDos.writeInt(timestamp);
+
+                                chunksDos.writeInt(region.length);
+                                chunksDos.write(2);
+                                chunksDos.write(zlibbed);
+                            }
+                        }
+                    }
+                    offsetsDos.close();
+                    timestampsDos.close();
+                    chunksDos.close();
+
+                    byte[] offsetsOut = offsets.toByteArray();
+                    byte[] timestampsOut = timestamps.toByteArray();
+                    byte[] chunksOut = chunks.toByteArray();
+
+                    byte[] regionFile = new byte[offsetsOut.length + timestampsOut.length + chunksOut.length];
+                    System.arraycopy(offsetsOut, 0, regionFile, 0, offsetsOut.length);
+                    System.arraycopy(timestampsOut, 0, regionFile, offsetsOut.length, timestampsOut.length);
+                    System.arraycopy(chunksOut, 0, regionFile, offsetsOut.length + timestampsOut.length, chunksOut.length);
+                    regionsOut.put("r." + (x / 32) + "." + (z / 32), regionFile);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return regionsOut;
     }
 }
