@@ -302,6 +302,11 @@ public class IntegratedServer {
 										String currPath = i.path.substring(pfx.length());
 										try {
 											byte[] b = i.getAllBytes();
+											if(currPath.equals("level.dat")) {
+												NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
+												worldDatNBT.getCompoundTag("Data").setInteger("version", 19133);
+												b = CompressedStreamTools.compress(worldDatNBT);
+											}
 											if (currPath.startsWith("level0/")) {
 												regions.put(VFSChunkLoader.getChunkCoords(currPath.substring(7, currPath.length() - 4)), b);
 											} else if (currPath.startsWith("level1/")) {
@@ -355,7 +360,7 @@ public class IntegratedServer {
 										byte[] b = regionsn1Out.get(path);
 										ZipEntry zipEntry = new ZipEntry(shortpfx + "DIM-1/region/" + path + ".mca");
 										c.putNextEntry(zipEntry);
-										c.write(b); // 12yee
+										c.write(b);
 										c.closeEntry();
 										bytesWritten[0] += b.length;
 										if (bytesWritten[0] - lastUpdate[0] > 10000) {
@@ -445,7 +450,7 @@ public class IntegratedServer {
 											if (folderNameFile.getName().contains("__MACOSX/")) continue;
 											if (folderNameFile.isDirectory()) continue;
 											String lowerName = folderNameFile.getName().toLowerCase();
-											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".dat_old") || lowerName.endsWith(".dat_mcr") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
+											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
 											fileNames.add(folderNameFile.getName().toCharArray());
 										}
 										final int[] i = new int[] { 0 };
@@ -460,7 +465,7 @@ public class IntegratedServer {
 											if (f.getName().contains("__MACOSX/")) continue;
 											if (f.isDirectory()) continue;
 											String lowerName = f.getName().toLowerCase();
-											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".dat_old") || lowerName.endsWith(".dat_mcr") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
+											if (!(lowerName.endsWith(".dat") || lowerName.endsWith(".mca") || lowerName.endsWith(".mcr"))) continue;
 											ByteArrayOutputStream baos = new ByteArrayOutputStream();
 											int len;
 											while ((len = dc.read(bb)) != -1) {

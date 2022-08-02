@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.jcraft.jzlib.DeflaterOutputStream;
+import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
 import net.minecraft.src.ChunkCoordIntPair;
 
@@ -73,6 +74,8 @@ public class MCAConverter {
 
         if (regions.size() == 0) return regionsOut;
 
+        byte[] readBuffer = new byte[16000];
+
         try {
             int timestamp = (int) System.currentTimeMillis();
 
@@ -88,16 +91,17 @@ public class MCAConverter {
                 if (minZ > coords.chunkZPos) minZ = coords.chunkZPos;
             }
 
-            for (int x = minX + (minX % 32); x <= maxX + (maxX % 32); x += 32) {
-                for (int z = minZ + (minZ % 32); z <= maxZ + (maxZ % 32); z += 32) {
+            for (int z = minZ - (32 + (minZ % 32)); z <= maxZ + (32 + (maxZ % 32)); z += 32) {
+                for (int x = minX - (32 + (minX % 32)); x <= maxX + (32 + (maxX % 32)); x += 32) {
                     ByteArrayOutputStream offsets = new ByteArrayOutputStream();
                     DataOutputStream offsetsDos = new DataOutputStream(offsets);
                     ByteArrayOutputStream timestamps = new ByteArrayOutputStream();
                     DataOutputStream timestampsDos = new DataOutputStream(timestamps);
                     ByteArrayOutputStream chunks = new ByteArrayOutputStream();
                     DataOutputStream chunksDos = new DataOutputStream(chunks);
-                    for (int cx = 0; cx < 32; ++cx) {
-                        for (int cz = 0; cz < 32; ++cz) {
+                    boolean anyChunks = false;
+                    for (int cz = 0; cz < 32; cz++) {
+                        for (int cx = 0; cx < 32; cx++) {
                             int tx = x + cx;
                             int tz = z + cz;
 
@@ -106,29 +110,45 @@ public class MCAConverter {
                                 offsetsDos.writeInt(0);
                                 timestampsDos.writeInt(0);
                             } else {
+                                anyChunks = true;
+
+                                ByteArrayInputStream bais = new ByteArrayInputStream(region);
+                                GZIPInputStream gis = new GZIPInputStream(bais);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 DeflaterOutputStream dos = new DeflaterOutputStream(baos);
-                                dos.write(region);
+                                int len;
+                                while ((len = gis.read(readBuffer)) > 0) {
+                                    dos.write(readBuffer, 0, len);
+                                }
                                 dos.close();
+                                baos.close();
+                                bais.close();
+                                gis.close();
                                 byte[] zlibbed = baos.toByteArray();
 
-                                int offset = chunksDos.size();
+                                int offset = 2 + (chunksDos.size() / 4096);
                                 offsetsDos.write((offset >> 16) & 0xff);
                                 offsetsDos.write((offset >> 8) & 0xff);
                                 offsetsDos.write(offset & 0xff);
-                                offsetsDos.write(5 + zlibbed.length);
+                                offsetsDos.write((int) Math.ceil((5 + zlibbed.length) / 4096.0));
 
                                 timestampsDos.writeInt(timestamp);
 
                                 chunksDos.writeInt(region.length);
                                 chunksDos.write(2);
                                 chunksDos.write(zlibbed);
+
+                                int chunksSizeOff = chunksDos.size() % 4096;
+                                if (chunksSizeOff != 0) chunksDos.write(new byte[4096 - chunksSizeOff]);
                             }
                         }
                     }
+
                     offsetsDos.close();
                     timestampsDos.close();
                     chunksDos.close();
+
+                    if (!anyChunks) continue;
 
                     byte[] offsetsOut = offsets.toByteArray();
                     byte[] timestampsOut = timestamps.toByteArray();
