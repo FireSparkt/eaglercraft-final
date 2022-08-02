@@ -80,7 +80,7 @@ public class GuiScreenBackupWorld extends GuiScreen {
 			}));
 		}else if(par1GuiButton.id == 4) {
 			IntegratedServer.exportWorld(worldName, IPCPacket05RequestData.REQUEST_LEVEL_MCA);
-			this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(selectWorld, "selectWorld.progress.exporting.1", () -> {
+			this.mc.displayGuiScreen(new GuiScreenSingleplayerLoading(selectWorld, "selectWorld.progress.exporting.2", () -> {
 				byte[] b = IntegratedServer.getExportResponse();
 				if(b != null) {
 					EaglerAdapter.downloadBytes(worldName + ".zip", b);

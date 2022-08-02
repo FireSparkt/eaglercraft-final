@@ -508,6 +508,7 @@ public class ItemRenderer {
 	 * partialTickTime, blockTextureIndex
 	 */
 	private void renderInsideOfBlock(float par1, Icon par2Icon) {
+		if (par2Icon == null) return;
 		Tessellator var3 = Tessellator.instance;
 		float var4 = 0.1F;
 		EaglerAdapter.glColor4f(var4, var4, var4, 0.5F);
