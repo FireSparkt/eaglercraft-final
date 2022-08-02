@@ -5,12 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import com.jcraft.jzlib.DeflaterOutputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
 import net.minecraft.src.ChunkCoordIntPair;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class MCAConverter {
@@ -70,6 +71,8 @@ public class MCAConverter {
     public static Map<String, byte[]> convertToMCA(Map<ChunkCoordIntPair, byte[]> regions) {
         Map<String, byte[]> regionsOut = new HashMap<>();
 
+        if (regions.size() == 0) return regionsOut;
+
         try {
             int timestamp = (int) System.currentTimeMillis();
 
@@ -85,8 +88,8 @@ public class MCAConverter {
                 if (minZ > coords.chunkZPos) minZ = coords.chunkZPos;
             }
 
-            for (int x = minX - (minX % 32); x <= maxX + (maxX % 32); x += 32) {
-                for (int z = minZ - (minZ % 32); z <= maxZ + (maxZ % 32); z += 32) {
+            for (int x = minX + (minX % 32); x <= maxX + (maxX % 32); x += 32) {
+                for (int z = minZ + (minZ % 32); z <= maxZ + (maxZ % 32); z += 32) {
                     ByteArrayOutputStream offsets = new ByteArrayOutputStream();
                     DataOutputStream offsetsDos = new DataOutputStream(offsets);
                     ByteArrayOutputStream timestamps = new ByteArrayOutputStream();

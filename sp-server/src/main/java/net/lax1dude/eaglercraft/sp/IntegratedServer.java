@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import net.minecraft.src.ChunkCoordIntPair;
 import org.teavm.jso.JSBody;
@@ -291,7 +290,8 @@ public class IntegratedServer {
 								try {
 									final int[] bytesWritten = new int[1];
 									final int[] lastUpdate = new int[1];
-									String pfx = "worlds/" + pkt.worldName + "/";
+									String shortpfx = pkt.worldName + "/";
+									String pfx = "worlds/" + shortpfx;
 									ByteArrayOutputStream baos = new ByteArrayOutputStream();
 									ZipOutputStream c = new ZipOutputStream(baos);
 									c.setComment("contains backup of world '" + pkt.worldName + "'");
@@ -300,19 +300,18 @@ public class IntegratedServer {
 									Map<ChunkCoordIntPair, byte[]> regionsn1 = new HashMap<>();
 									SYS.VFS.iterateFiles(pfx, false, (i) -> {
 										String currPath = i.path.substring(pfx.length());
-										System.out.println(currPath); // 12yee
 										try {
 											byte[] b = i.getAllBytes();
-											if (currPath.startsWith("region/")) {
-												regions.put(VFSChunkLoader.getChunkCoords(currPath.substring(7, -4)), b);
-											} else if (currPath.startsWith("DIM1/region/")) {
-												regions1.put(VFSChunkLoader.getChunkCoords(currPath.substring(12, -4)), b);
-											} else if (currPath.startsWith("DIM-1/region/")) {
-												regionsn1.put(VFSChunkLoader.getChunkCoords(currPath.substring(13, -4)), b);
+											if (currPath.startsWith("level0/")) {
+												regions.put(VFSChunkLoader.getChunkCoords(currPath.substring(7, currPath.length() - 4)), b);
+											} else if (currPath.startsWith("level1/")) {
+												regions1.put(VFSChunkLoader.getChunkCoords(currPath.substring(7, currPath.length() - 4)), b);
+											} else if (currPath.startsWith("level-1/")) {
+												regionsn1.put(VFSChunkLoader.getChunkCoords(currPath.substring(8, currPath.length() - 4)), b);
 											} else {
-												ZipEntry zipEntry = new ZipEntry(currPath);
+												ZipEntry zipEntry = new ZipEntry(shortpfx + currPath);
 												c.putNextEntry(zipEntry);
-												c.write(b); // 12yee
+												c.write(b);
 												c.closeEntry();
 												bytesWritten[0] += b.length;
 												if (bytesWritten[0] - lastUpdate[0] > 10000) {
@@ -328,9 +327,9 @@ public class IntegratedServer {
 									Map<String, byte[]> regionsOut = MCAConverter.convertToMCA(regions);
 									for (String path : regionsOut.keySet()) {
 										byte[] b = regionsOut.get(path);
-										ZipEntry zipEntry = new ZipEntry("region/" + path + ".dat");
+										ZipEntry zipEntry = new ZipEntry(shortpfx + "region/" + path + ".mca");
 										c.putNextEntry(zipEntry);
-										c.write(b); // 12yee
+										c.write(b);
 										c.closeEntry();
 										bytesWritten[0] += b.length;
 										if (bytesWritten[0] - lastUpdate[0] > 10000) {
@@ -341,9 +340,9 @@ public class IntegratedServer {
 									Map<String, byte[]> regions1Out = MCAConverter.convertToMCA(regions1);
 									for (String path : regions1Out.keySet()) {
 										byte[] b = regions1Out.get(path);
-										ZipEntry zipEntry = new ZipEntry("DIM1/region/" + path + ".dat");
+										ZipEntry zipEntry = new ZipEntry(shortpfx + "DIM1/region/" + path + ".mca");
 										c.putNextEntry(zipEntry);
-										c.write(b); // 12yee
+										c.write(b);
 										c.closeEntry();
 										bytesWritten[0] += b.length;
 										if (bytesWritten[0] - lastUpdate[0] > 10000) {
@@ -354,7 +353,7 @@ public class IntegratedServer {
 									Map<String, byte[]> regionsn1Out = MCAConverter.convertToMCA(regionsn1);
 									for (String path : regionsn1Out.keySet()) {
 										byte[] b = regionsn1Out.get(path);
-										ZipEntry zipEntry = new ZipEntry("DIM-1/region/" + path + ".dat");
+										ZipEntry zipEntry = new ZipEntry(shortpfx + "DIM-1/region/" + path + ".mca");
 										c.putNextEntry(zipEntry);
 										c.write(b); // 12yee
 										c.closeEntry();
