@@ -32,6 +32,11 @@ public class WorkerListenThread {
 
 	public void stopListening() {
 		this.isListening = false;
+		List<String> names = new ArrayList();
+		names.addAll(channels.keySet());
+		for(int i = 0, l = names.size(); i < l; ++i) {
+			closeChannel(names.get(i));
+		}
 	}
 	
 	public boolean openChannel(String player) {

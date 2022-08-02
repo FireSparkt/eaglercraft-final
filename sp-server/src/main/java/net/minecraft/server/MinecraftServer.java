@@ -396,6 +396,7 @@ public abstract class MinecraftServer implements ICommandSender, Runnable {
 			this.getLogAgent().logSevereException(
 					"Encountered an unexpected exception " + var48.getClass().getSimpleName(), var48);
 			var48.printStackTrace();
+			IntegratedServer.throwExceptionToClient("Encountered an unexpected exception", var48);
 		} finally {
 			try {
 				this.stopServer();

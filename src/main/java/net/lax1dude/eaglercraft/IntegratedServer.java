@@ -61,7 +61,12 @@ public class IntegratedServer {
 	}
 	
 	public static boolean isWorldRunning() {
-		return statusState == IntegratedState.WORLD_LOADED || statusState == IntegratedState.WORLD_PAUSED;
+		return statusState == IntegratedState.WORLD_LOADED || statusState == IntegratedState.WORLD_PAUSED ||
+				statusState == IntegratedState.WORLD_LOADING || statusState == IntegratedState.WORLD_SAVING;
+	}
+	
+	public static boolean isWorldReady() {
+		return statusState == IntegratedState.WORLD_LOADED || statusState == IntegratedState.WORLD_LOADING;
 	}
 	
 	private static void ensureReady() {
@@ -72,7 +77,7 @@ public class IntegratedServer {
 	}
 	
 	private static void ensureWorldReady() {
-		if(!isWorldRunning()) {
+		if(!isWorldReady()) {
 			String msg = "Server is in state " + statusState + " '" + IntegratedState.getStateName(statusState) + "' which is not the 'WORLD_LOADED' state for the requested IPC operation";
 			throw new IllegalStateException(msg);
 		}
@@ -131,6 +136,7 @@ public class IntegratedServer {
 	}
 	
 	public static void requestWorldList() {
+		ensureReady();
 		statusState = IntegratedState.WORLD_LISTING;
 		worlds.clear();
 		sendIPCPacket(new IPCPacket0EListWorlds());
@@ -282,6 +288,8 @@ public class IntegratedServer {
 								callFailed = true;
 								break;
 							case IPCPacket01StopServer.ID:
+								statusState = IntegratedState.WORLD_NONE;
+								break;
 							case IPCPacket03DeleteWorld.ID:
 							case IPCPacket04RenameWorld.ID:
 							case IPCPacket07ImportWorld.ID:

@@ -57,7 +57,8 @@ public class GuiSelectWorld extends GuiScreen {
 	/** The rename button in the world selection GUI */
 	private GuiButton buttonRename;
 	private GuiButton buttonBackup;
-	
+
+	private boolean hasRequestedWorlds = false;
 	private boolean waitingForWorlds = false;
 
 	public GuiSelectWorld(GuiScreen par1GuiScreen) {
@@ -72,8 +73,14 @@ public class GuiSelectWorld extends GuiScreen {
 		this.screenTitle = var1.translateKey("selectWorld.title");
 		this.saveList = new LinkedList();
 		
-		waitingForWorlds = true;
-		IntegratedServer.requestWorldList();
+		if(IntegratedServer.isReady()) {
+			hasRequestedWorlds = true;
+			waitingForWorlds = true;
+			IntegratedServer.requestWorldList();
+		}else {
+			IntegratedServer.unloadWorld();
+			hasRequestedWorlds = false;
+		}
 		
 		this.localizedWorldText = var1.translateKey("selectWorld.world");
 		this.localizedMustConvertText = var1.translateKey("selectWorld.conversion");
@@ -86,7 +93,11 @@ public class GuiSelectWorld extends GuiScreen {
 	}
 	
 	public void updateScreen() {
-		if(waitingForWorlds && IntegratedServer.getWorldList() != null) {
+		if(!hasRequestedWorlds && IntegratedServer.isReady()) {
+			hasRequestedWorlds = true;
+			waitingForWorlds = true;
+			IntegratedServer.requestWorldList();
+		}else if(waitingForWorlds && IntegratedServer.getWorldList() != null) {
 			waitingForWorlds = false;
 			this.loadSaves();
 		}

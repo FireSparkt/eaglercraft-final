@@ -711,6 +711,7 @@ public class IntegratedServer {
 		if(currentProcess != null) {
 			currentProcess.mainLoop();
 			if(currentProcess.isServerStopped()) {
+				sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket01StopServer.ID));
 				currentProcess = null;
 			}
 		}

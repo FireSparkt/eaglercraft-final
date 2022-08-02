@@ -14,6 +14,8 @@ import net.lax1dude.eaglercraft.DefaultSkinRenderer;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerException;
+import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WebsocketNetworkManager;
 import net.lax1dude.eaglercraft.WorkerNetworkManager;
@@ -123,8 +125,9 @@ public class NetClientHandler extends NetHandler {
 						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "RateLimit." + r.name(), null));
 					}
 				}else {
-					if(!(this.mc.currentScreen instanceof GuiDisconnected)) {
-						this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.endOfStream", null));
+					if(!(this.mc.currentScreen instanceof GuiDisconnected) && !(this.mc.currentScreen instanceof GuiScreenSingleplayerException) &&
+							!(this.mc.currentScreen instanceof GuiScreenSingleplayerLoading)) {
+						this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.endOfStream", null));
 					}
 				}
 				this.disconnected = true;
@@ -505,10 +508,10 @@ public class NetClientHandler extends NetHandler {
 		this.mc.loadWorld((WorldClient) null);
 		if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("BLOCKED")) {
 			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.BLOCKED);
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickBlocked", "disconnect.endOfStream", (Object[])null));
+			this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickBlocked", "disconnect.endOfStream", (Object[])null));
 		}else if(par1Packet255KickDisconnect.reason.equalsIgnoreCase("LOCKED")) {
 			EaglerAdapter.logRateLimit(netManager.getServerURI(), RateLimit.LOCKED);
-			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickLocked", "disconnect.endOfStream", (Object[])null));
+			this.mc.displayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.ratelimit.kickLocked", "disconnect.endOfStream", (Object[])null));
 		}else {
 			this.mc.stopServerAndDisplayGuiScreen(new GuiDisconnected(backToMenu(), "disconnect.disconnected", "disconnect.genericReason", new Object[] { par1Packet255KickDisconnect.reason }));
 		}
