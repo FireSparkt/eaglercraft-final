@@ -2,7 +2,6 @@ package net.minecraft.src;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +10,10 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.lax1dude.eaglercraft.*;
+import net.lax1dude.eaglercraft.Base64;
+import net.lax1dude.eaglercraft.ConfigConstants;
+import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;

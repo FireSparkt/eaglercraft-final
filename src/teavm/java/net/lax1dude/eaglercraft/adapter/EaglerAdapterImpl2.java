@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft.adapter;
 
 import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
+import static org.teavm.jso.webgl.WebGLRenderingContext.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.json.JSONObject;
 import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
@@ -35,9 +37,9 @@ import org.teavm.jso.ajax.XMLHttpRequest;
 import org.teavm.jso.browser.Storage;
 import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
-import org.teavm.jso.dom.events.ErrorEvent;
 import org.teavm.jso.canvas.CanvasRenderingContext2D;
 import org.teavm.jso.canvas.ImageData;
+import org.teavm.jso.dom.events.ErrorEvent;
 import org.teavm.jso.dom.events.Event;
 import org.teavm.jso.dom.events.EventListener;
 import org.teavm.jso.dom.events.KeyboardEvent;
@@ -96,7 +98,6 @@ import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLQuery;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.MathHelper;
 
 public class EaglerAdapterImpl2 {

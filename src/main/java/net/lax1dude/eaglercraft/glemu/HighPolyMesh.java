@@ -1,19 +1,6 @@
 package net.lax1dude.eaglercraft.glemu;
 
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ARRAY_BUFFER;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ELEMENT_ARRAY_BUFFER;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FLOAT;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_STATIC_DRAW;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_UNSIGNED_BYTE;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindBuffer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindVertexArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBufferData0;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateBuffer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateVertexArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteBuffer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteVertexArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglEnableVertexAttribArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

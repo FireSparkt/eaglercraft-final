@@ -9,7 +9,6 @@ import java.util.List;
 import net.lax1dude.eaglercraft.GuiScreenBackupWorld;
 import net.lax1dude.eaglercraft.GuiScreenCreateWorldSelection;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
-import net.lax1dude.eaglercraft.GuiScreenSingleplayerNotImplemented;
 import net.lax1dude.eaglercraft.IntegratedServer;
 
 public class GuiSelectWorld extends GuiScreen {

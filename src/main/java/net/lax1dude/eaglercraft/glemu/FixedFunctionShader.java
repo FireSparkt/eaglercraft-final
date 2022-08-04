@@ -1,40 +1,7 @@
 package net.lax1dude.eaglercraft.glemu;
 
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_ARRAY_BUFFER;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_FRAGMENT_SHADER;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wGL_VERTEX_SHADER;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wgetShaderHeader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglAttachShader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindAttributeLocation;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindBuffer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglBindVertexArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCompileShader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateBuffer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateProgram;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateShader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglCreateVertexArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteProgram;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDeleteShader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDetachShader;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglEnableVertexAttribArray;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramInfoLog;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetProgramLinked;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderCompiled;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetShaderInfoLog;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglGetUniformLocation;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglLinkProgram;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglShaderSource;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1f;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform1i;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform2f;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform3f;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniform4f;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUniformMat4fv;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglUseProgram;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglVertexAttribPointer;
-import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.fileContents;
+import static net.lax1dude.eaglercraft.EaglerAdapter.*;
 
-import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferArrayGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.BufferGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
@@ -352,22 +319,22 @@ public class FixedFunctionShader {
 	
 	public void setupArrayForProgram() {
 		_wglEnableVertexAttribArray(a_position);
-		_wglVertexAttribPointer(a_position, 3, EaglerAdapter._wGL_FLOAT, false, 32, 0);
+		_wglVertexAttribPointer(a_position, 3, _wGL_FLOAT, false, 32, 0);
 		if(enable_texture0) {
 			_wglEnableVertexAttribArray(a_texture0);
-			_wglVertexAttribPointer(a_texture0, 2, EaglerAdapter._wGL_FLOAT, false, 32, 12);
+			_wglVertexAttribPointer(a_texture0, 2, _wGL_FLOAT, false, 32, 12);
 		}
 		if(enable_color) {
 			_wglEnableVertexAttribArray(a_color);
-			_wglVertexAttribPointer(a_color, 4, EaglerAdapter._wGL_UNSIGNED_BYTE, true, 32, 20);
+			_wglVertexAttribPointer(a_color, 4, _wGL_UNSIGNED_BYTE, true, 32, 20);
 		}
 		if(enable_normal) {
 			_wglEnableVertexAttribArray(a_normal);
-			_wglVertexAttribPointer(a_normal, 4, EaglerAdapter._wGL_UNSIGNED_BYTE, true, 32, 24);
+			_wglVertexAttribPointer(a_normal, 4, _wGL_UNSIGNED_BYTE, true, 32, 24);
 		}
 		if(enable_texture1) {
 			_wglEnableVertexAttribArray(a_texture1);
-			_wglVertexAttribPointer(a_texture1, 2, EaglerAdapter._wGL_SHORT, false, 32, 28);
+			_wglVertexAttribPointer(a_texture1, 2, _wGL_SHORT, false, 32, 28);
 		}
 	}
 	

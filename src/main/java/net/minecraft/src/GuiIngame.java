@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
-import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.EnumBrowser;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.lax1dude.eaglercraft.glemu.EffectPipeline;
