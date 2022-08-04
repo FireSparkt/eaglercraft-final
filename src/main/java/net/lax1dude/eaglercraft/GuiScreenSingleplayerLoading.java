@@ -137,7 +137,7 @@ public class GuiScreenSingleplayerLoading extends GuiScreen {
 		if(par1GuiButton.id == 0) {
 			if(areYouSure <= 0) {
 				areYouSure = 80;
-			}else if(areYouSure <= 40) {
+			}else if(areYouSure <= 65) {
 				taskKill.run();
 			}
 		}
