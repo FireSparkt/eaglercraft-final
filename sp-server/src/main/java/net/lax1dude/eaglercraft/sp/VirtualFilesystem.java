@@ -15,7 +15,6 @@ import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.dom.events.Event;
 import org.teavm.jso.dom.events.EventListener;
 import org.teavm.jso.indexeddb.EventHandler;
 import org.teavm.jso.indexeddb.IDBCountRequest;

@@ -8,9 +8,9 @@ import java.util.List;
 
 import net.lax1dude.eaglercraft.sp.IntegratedServer;
 import net.lax1dude.eaglercraft.sp.SYS;
-import net.lax1dude.eaglercraft.sp.WorkerListenThread;
 import net.lax1dude.eaglercraft.sp.VFSSaveHandler;
 import net.lax1dude.eaglercraft.sp.VFile;
+import net.lax1dude.eaglercraft.sp.WorkerListenThread;
 import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0DProgressUpdate;
 import net.lax1dude.eaglercraft.sp.ipc.IPCPacket14StringList;
 import net.minecraft.src.AxisAlignedBB;
@@ -24,7 +24,6 @@ import net.minecraft.src.ICommandManager;
 import net.minecraft.src.ICommandSender;
 import net.minecraft.src.ILogAgent;
 import net.minecraft.src.IProgressUpdate;
-import net.minecraft.src.ISaveFormat;
 import net.minecraft.src.ISaveHandler;
 import net.minecraft.src.IUpdatePlayerListBox;
 import net.minecraft.src.MinecraftException;

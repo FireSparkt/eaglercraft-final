@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import java.util.List;
+
 import net.minecraft.server.MinecraftServer;
 
 public class CommandServerEmote extends CommandBase {

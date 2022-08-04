@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import java.util.Iterator;
+
 import net.minecraft.server.MinecraftServer;
 
 public class WorldManager implements IWorldAccess {

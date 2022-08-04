@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import java.util.List;
+
 import net.minecraft.server.MinecraftServer;
 
 public abstract class EntityMinecart extends Entity {

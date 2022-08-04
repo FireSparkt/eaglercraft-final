@@ -1,10 +1,7 @@
 package net.minecraft.src;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+
 import net.minecraft.server.MinecraftServer;
 
 public class CommandDebug extends CommandBase {

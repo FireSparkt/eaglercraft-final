@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import java.util.Arrays;
 import java.util.List;
+
 import net.minecraft.server.MinecraftServer;
 
 public class CommandServerMessage extends CommandBase {

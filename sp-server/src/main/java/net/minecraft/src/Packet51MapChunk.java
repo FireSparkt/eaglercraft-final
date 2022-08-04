@@ -3,9 +3,6 @@ package net.minecraft.src;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 public class Packet51MapChunk extends Packet {
 	/** The x-position of the transmitted chunk, in chunk coordinates. */

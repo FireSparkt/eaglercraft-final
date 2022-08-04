@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.server.MinecraftServer;
 
 public class TileEntity {
