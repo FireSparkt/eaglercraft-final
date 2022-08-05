@@ -58,7 +58,7 @@ public class Client {
 			conf.put("assetsURI", assetsURI.substring(0, 256) + " ... ");
 			crashScreenOptsDump = "window.eaglercraftOpts = " + conf.toString();
 		}
-		String serverWorkerURI = conf.getString("serverWorkerURI");
+		String serverWorkerURI = conf.optString("serverWorkerURI", null);
 		EaglerAdapterImpl2.setWorldDatabaseName(conf.optString("worldsFolder", "MAIN"));
 
 		try {

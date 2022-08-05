@@ -24,7 +24,6 @@ public class GuiMainMenu extends GuiScreen {
 	/** The splash message. */
 	public String splashText = null;
 	private GuiButton buttonResetDemo;
-	private boolean hasClickedSingleplayer = false;
 	
 	private static boolean showingEndian = true;
 	private static final int showRandomItem;
@@ -87,7 +86,8 @@ public class GuiMainMenu extends GuiScreen {
 			}
 		}
 		this.field_92025_p = EaglerAdapter._wisWebGL() ? ("eaglercraft javascript runtime") : ("eaglercraft desktop runtime");
-		this.start = System.currentTimeMillis() + System.currentTimeMillis() % 10000l;
+		this.start = System.currentTimeMillis();
+		this.start += this.start % 10000l;
 		this.ackLines = new ArrayList();
 		
 		if(!LocalStorageManager.gameSettingsStorage.getBoolean("seenAcknowledgements")) {
@@ -145,11 +145,14 @@ public class GuiMainMenu extends GuiScreen {
 		StringTranslate var2 = StringTranslate.getInstance();
 		int var4 = this.height / 4 + 48;
 
-		GuiButton single;
-		this.buttonList.add(single = new GuiButton(1, this.width / 2 - 100, var4, var2.translateKey("menu.singleplayer")));
-		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, var4 + 24 * 1, var2.translateKey("menu.multiplayer")));
-		this.buttonList.add(new GuiButton(3, this.width / 2 - 100, var4 + 24 * 2, var2.translateKey("menu.forkme")));
-		single.enabled = true;
+		if(EaglerAdapter.isIntegratedServerAvailable()) {
+			this.buttonList.add(new GuiButton(1, this.width / 2 - 100, var4, var2.translateKey("menu.singleplayer")));
+			this.buttonList.add(new GuiButton(2, this.width / 2 - 100, var4 + 24 * 1, var2.translateKey("menu.multiplayer")));
+			this.buttonList.add(new GuiButton(3, this.width / 2 - 100, var4 + 24 * 2, var2.translateKey("menu.forkme")));
+		}else {
+			this.buttonList.add(new GuiButton(2, this.width / 2 - 100, var4, var2.translateKey("menu.multiplayer")));
+			this.buttonList.add(new GuiButton(3, this.width / 2 - 100, var4 + 24, var2.translateKey("menu.forkme")));
+		}
 
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, var4 + 72 + 12, 98, 20, var2.translateKey("menu.options")));
 		this.buttonList.add(new GuiButton(4, this.width / 2 + 2, var4 + 72 + 12, 98, 20, var2.translateKey("menu.editprofile")));
@@ -210,12 +213,10 @@ public class GuiMainMenu extends GuiScreen {
 					showAck = true;
 					return;
 				}
-				/*
 				w = this.fontRenderer.getStringWidth("debug console") * 3 / 4;
 				if(par1 >= 0 && par1 <= (w + 4) && par2 >= 0 && par2 <= 9) {
 					EaglerAdapter.openConsole();
 				}
-				*/
 				if(ConfigConstants.mainMenuItemLink != null) {
 					//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);
 
@@ -278,7 +279,6 @@ public class GuiMainMenu extends GuiScreen {
 				}else {
 					this.mc.displayGuiScreen(new GuiSelectWorld(this));
 				}
-				hasClickedSingleplayer = true;
 			}
 		}
 
@@ -533,7 +533,7 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
 		this.drawString(this.fontRenderer, var10, 0, 0, 16777215);
 		EaglerAdapter.glPopMatrix();
-		/*
+		
 		var10 = "debug console";
 		w = this.fontRenderer.getStringWidth(var10) * 3 / 4;
 		if(!showAck && par1 >= 0 && par1 <= (w + 4) && par2 >= 0 && par2 <= 9) {
@@ -546,7 +546,6 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
 		this.drawString(this.fontRenderer, var10, 0, 0, 16777215);
 		EaglerAdapter.glPopMatrix();
-		*/
 		
 		if(ConfigConstants.mainMenuItemLink != null) {
 			//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);

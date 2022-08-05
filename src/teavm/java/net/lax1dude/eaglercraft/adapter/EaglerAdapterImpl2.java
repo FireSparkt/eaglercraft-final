@@ -2081,7 +2081,7 @@ public class EaglerAdapterImpl2 {
 		return activeSoundEffects.containsKey(id);
 	}
 	public static final void openConsole() {
-		
+		Window.alert("Still under development");
 	}
 
 	private static EaglercraftVoiceClient voiceClient = null;
@@ -2723,7 +2723,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final boolean isIntegratedServerAvailable() {
-		return true;
+		return integratedServerScript != null;
 	}
 	
 	@JSFunctor
