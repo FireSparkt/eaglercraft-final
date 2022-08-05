@@ -55,9 +55,14 @@ public class IntegratedServer {
 			EaglerAdapter.beginLoadingIntegratedServer();
 		}
 	}
-	
+
 	public static boolean isReady() {
 		return statusState == IntegratedState.WORLD_NONE;
+	}
+
+	public static boolean isWorldNotLoaded() {
+		return statusState == IntegratedState.WORLD_NONE || statusState == IntegratedState.WORLD_WORKER_NOT_RUNNING ||
+				statusState == IntegratedState.WORLD_WORKER_BOOTING;
 	}
 	
 	public static boolean isWorldRunning() {

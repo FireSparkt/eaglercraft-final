@@ -590,7 +590,7 @@ public class Minecraft implements Runnable {
 	}
 	
 	public void stopServerAndDisplayGuiScreen(GuiScreen par1GuiScreen) {
-		if(!IntegratedServer.isReady()) {
+		if(!IntegratedServer.isWorldNotLoaded()) {
 			IntegratedServer.unloadWorld();
 			displayGuiScreen(new GuiScreenSingleplayerLoading(par1GuiScreen, "saving world", () -> IntegratedServer.isReady()));
 		}else {
