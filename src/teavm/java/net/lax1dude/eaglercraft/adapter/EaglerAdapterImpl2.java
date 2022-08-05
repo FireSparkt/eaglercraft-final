@@ -1908,6 +1908,10 @@ public class EaglerAdapterImpl2 {
 		}
 		return ret;
 	}
+	
+	public static final void clearFileChooserResult() {
+		getFileChooserResult0();
+	}
 
 	@JSBody(params = {  }, script = "var ret = window.eagsFileChooser.getFileChooserResult; window.eagsFileChooser.getFileChooserResult = null; return ret;")
 	private static native ArrayBuffer getFileChooserResult0();

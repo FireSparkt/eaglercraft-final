@@ -70,6 +70,7 @@ public class GuiNameWorldImport extends GuiScreen {
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.enabled) {
 			if (par1GuiButton.id == 1) {
+				EaglerAdapter.clearFileChooserResult();
 				this.mc.displayGuiScreen(this.parentGuiScreen);
 			} else if (par1GuiButton.id == 0) {
 				this.buttonList.clear();
