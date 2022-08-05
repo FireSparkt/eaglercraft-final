@@ -1478,7 +1478,7 @@ public class Minecraft implements Runnable {
 				}
 				
 				if(messageOnLoginCounter == 150 && isSingleplayerOrLAN()) {
-					displayEaglercraftText(EnumChatFormatting.AQUA + "Especially in new worlds, if no chunks show give the game up to 120 seconds before \"giving up\" on a new world");
+					displayEaglercraftText(EnumChatFormatting.AQUA + "Especially in new worlds, if no chunks show give the game up to 5 straight minutes before \"giving up\" on a new world");
 				}
 			}
 

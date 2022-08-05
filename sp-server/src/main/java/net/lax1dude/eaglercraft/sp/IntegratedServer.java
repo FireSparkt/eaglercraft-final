@@ -266,12 +266,20 @@ public class IntegratedServer {
 						break;
 					case IPCPacket05RequestData.ID: {
 							IPCPacket05RequestData pkt = (IPCPacket05RequestData)packet;
-							if(pkt.request == IPCPacket05RequestData.REQUEST_LEVEL_EAG) {
+							if(pkt.request == IPCPacket05RequestData.REQUEST_LEVEL_EAG) {String realWorldName = pkt.worldName;
+								String worldOwner = "UNKNOWN";
+								String splitter = new String(new char[] { (char)253, (char)233, (char)233 });
+								if(realWorldName.contains(splitter)) {
+									int i = realWorldName.lastIndexOf(splitter);
+									worldOwner = realWorldName.substring(i + 3);
+									realWorldName = realWorldName.substring(0, i);
+								}
 								try {
+									
 									final int[] bytesWritten = new int[1];
 									final int[] lastUpdate = new int[1];
-									String pfx = "worlds/" + pkt.worldName + "/";
-									EPKCompiler c = new EPKCompiler("contains backup of world '" + pkt.worldName + "'");
+									String pfx = "worlds/" + realWorldName + "/";
+									EPK2Compiler c = new EPK2Compiler(realWorldName, worldOwner, "epk/world152");
 									SYS.VFS.iterateFiles(pfx, false, (i) -> {
 										byte[] b = i.getAllBytes();
 										c.append(i.path.substring(pfx.length()), b);
@@ -283,7 +291,7 @@ public class IntegratedServer {
 									});
 									sendIPCPacket(new IPCPacket09RequestResponse(c.complete()));
 								} catch (Throwable t) {
-									throwExceptionToClient("Failed to export world '" + pkt.worldName + "' as EPK", t);
+									throwExceptionToClient("Failed to export world '" + realWorldName + "' as EPK", t);
 									sendTaskFailed();
 								}
 							}else if(pkt.request == IPCPacket05RequestData.REQUEST_LEVEL_MCA) {
@@ -401,27 +409,38 @@ public class IntegratedServer {
 							IPCPacket07ImportWorld pkt = (IPCPacket07ImportWorld)packet;
 							if(isServerStopped()) {
 								if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_EAG) {
+									String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
 									try {
-										String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
 										VFile dir = new VFile("worlds", folder);
 										EPKDecompiler dc = new EPKDecompiler(pkt.worldData);
 										EPKDecompiler.FileEntry f = null;
 										int lastProgUpdate = 0;
 										int prog = 0;
+										boolean hasReadType = dc.isOld();
 										while((f = dc.readFile()) != null) {
 											byte[] b = f.data;
-											if(f.name.equals("level.dat")) {
-												NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
-												worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
-												worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
-												b = CompressedStreamTools.compress(worldDatNBT);
+											if(!hasReadType) {
+												if(f.type.equals("HEAD") && f.name.equals("file-type") && EPKDecompiler.readASCII(f.data).equals("epk/world152")) {
+													hasReadType = true;
+													continue;
+												}else {
+													throw new IOException("file does not contain a singleplayer 1.5.2 world!");
+												}
 											}
-											VFile ff = new VFile(dir, f.name);
-											ff.setAllBytes(b);
-											prog += b.length;
-											if(prog - lastProgUpdate > 10000) {
-												lastProgUpdate = prog;
-												updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+											if(f.type.equals("FILE")) {
+												if(f.name.equals("level.dat")) {
+													NBTTagCompound worldDatNBT = CompressedStreamTools.decompress(b);
+													worldDatNBT.getCompoundTag("Data").setString("LevelName", pkt.worldName);
+													worldDatNBT.getCompoundTag("Data").setLong("LastPlayed", System.currentTimeMillis());
+													b = CompressedStreamTools.compress(worldDatNBT);
+												}
+												VFile ff = new VFile(dir, f.name);
+												ff.setAllBytes(b);
+												prog += b.length;
+												if(prog - lastProgUpdate > 10000) {
+													lastProgUpdate = prog;
+													updateStatusString("selectWorld.progress.importing." + pkt.worldFormat, prog);
+												}
 											}
 										}
 										String[] worldsTxt = SYS.VFS.getFile("worlds.txt").getAllLines();
@@ -436,12 +455,13 @@ public class IntegratedServer {
 										SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
 										sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
 									}catch(Throwable t) {
+										SYS.VFS.deleteFiles("worlds/" + folder + "/");
 										throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as EPK", t);
 										sendTaskFailed();
 									}
 								}else if(pkt.worldFormat == IPCPacket07ImportWorld.WORLD_FORMAT_MCA) {
+									String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
 									try {
-										String folder = VFSSaveHandler.worldNameToFolderName(pkt.worldName);
 										VFile dir = new VFile("worlds", folder);
 										ZipInputStream folderNames = new ZipInputStream(new ByteArrayInputStream(pkt.worldData));
 										ZipEntry folderNameFile = null;
@@ -504,6 +524,7 @@ public class IntegratedServer {
 										SYS.VFS.getFile("worlds.txt").setAllChars(String.join("\n", worldsTxt));
 										sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket07ImportWorld.ID));
 									}catch(Throwable t) {
+										SYS.VFS.deleteFiles("worlds/" + folder + "/");
 										throwExceptionToClient("Failed to import world '" + pkt.worldName + "' as MCA", t);
 										sendTaskFailed();
 									}

@@ -231,6 +231,9 @@ public class IntegratedServer {
 	public static void exportWorld(String name, int format) {
 		ensureReady();
 		statusState = IntegratedState.WORLD_EXPORTING;
+		if(format == IPCPacket05RequestData.REQUEST_LEVEL_EAG) {
+			name = name + (new String(new char[] { (char)253, (char)233, (char)233 })) + EaglerProfile.username;
+		}
 		sendIPCPacket(new IPCPacket05RequestData(name, (byte)format));
 	}
 	

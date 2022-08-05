@@ -108,7 +108,7 @@ public class AssetRepository {
 			blockType = loadInt(zis);
 			
 			if(blockType == blockEnd) {
-				throw new IOException("Unexpected EOF when there are still " + (numFiles - i) + " files remaining");
+				throw new IOException("Unexpected END when there are still " + (numFiles - i) + " files remaining");
 			}
 			
 			String name = readASCII(zis);
