@@ -93,6 +93,8 @@ import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
+import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANServer;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
 import net.lax1dude.eaglercraft.adapter.teavm.SelfDefence;
 import net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext;
@@ -338,43 +340,16 @@ public class EaglerAdapterImpl2 {
 		});
 		onBeforeCloseRegister();
 		
-		/*
-		
-		this was on the singleplayer branch, it needs to be re-implemented without eval:
-		
-		execute("window.eagsFileChooser = {\r\n" + 
-				"inputElement: null,\r\n" + 
-				"openFileChooser: function(ext, mime){\r\n" + 
-				"el = window.eagsFileChooser.inputElement = document.createElement(\"input\");\r\n" + 
-				"el.type = \"file\";\r\n" + 
-				"el.multiple = false;\r\n" + 
-				"el.addEventListener(\"change\", function(evt){\r\n" + 
-				"var f = window.eagsFileChooser.inputElement.files;\r\n" + 
-				"if(f.length == 0){\r\n" + 
-				"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
-				"window.eagsFileChooser.getFileChooserResultName = \"<none>\";\r\n" + 
-				"}else{\r\n" + 
-				"(async function(){\r\n" + 
-				"window.eagsFileChooser.getFileChooserResult = await f[0].arrayBuffer();\r\n" + 
-				"window.eagsFileChooser.getFileChooserResultName = f[0].name;\r\n" + 
-				"})();\r\n" + 
-				"}\r\n" + 
-				"});\r\n" + 
-				"window.eagsFileChooser.getFileChooserResult = null;\r\n" + 
-				"window.eagsFileChooser.getFileChooserResultName = null;\r\n" + 
-				"el.accept = (mime === null ? \".\"+ext : mime);\r\n" + 
-				"el.click();\r\n" + 
-				"},\r\n" + 
-				"getFileChooserResult: null,\r\n" + 
-				"getFileChooserResultName: null\r\n" + 
-				"};");
-		*/
-		
 		initFileChooser();
 		
 		EarlyLoadScreen.paintScreen();
 		
 		voiceClient = startVoiceClient();
+		rtcLANClient = startRTCLANClient();
+		
+		if(integratedServerScript != null) {
+			rtcLANServer = startRTCLANServer();
+		}
 		
 		downloadAssetPack(assetPackageURI);
 		
@@ -2100,7 +2075,7 @@ public class EaglerAdapterImpl2 {
 		voiceAvailableStat = false;
 	}
 
-	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) {
+	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) { //TODO
 		returnSignalHandler = signalHandler;
 	}
 
@@ -2467,230 +2442,51 @@ public class EaglerAdapterImpl2 {
 	private static String[] LWJGLKeyNames = new String[] {"NONE", "ESCAPE", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "MINUS", "EQUALS", "BACK", "TAB", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "LBRACKET", "RBRACKET", "RETURN", "LCONTROL", "A", "S", "D", "F", "G", "H", "J", "K", "L", "SEMICOLON", "APOSTROPHE", "GRAVE", "LSHIFT", "BACKSLASH", "Z", "X", "C", "V", "B", "N", "M", "COMMA", "PERIOD", "SLASH", "RSHIFT", "MULTIPLY", "LMENU", "SPACE", "CAPITAL", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "NUMLOCK", "SCROLL", "NUMPAD7", "NUMPAD8", "NUMPAD9", "SUBTRACT", "NUMPAD4", "NUMPAD5", "NUMPAD6", "ADD", "NUMPAD1", "NUMPAD2", "NUMPAD3", "NUMPAD0", "DECIMAL", "null", "null", "null", "F11", "F12", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "F13", "F14", "F15", "F16", "F17", "F18", "null", "null", "null", "null", "null", "null", "KANA", "F19", "null", "null", "null", "null", "null", "null", "null", "CONVERT", "null", "NOCONVERT", "null", "YEN", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "NUMPADEQUALS", "null", "null", "CIRCUMFLEX", "AT", "COLON", "UNDERLINE", "KANJI", "STOP", "AX", "UNLABELED", "null", "null", "null", "null", "NUMPADENTER", "RCONTROL", "null", "null", "null", "null", "null", "null", "null", "null", "null", "SECTION", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "NUMPADCOMMA", "null", "DIVIDE", "null", "SYSRQ", "RMENU", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "FUNCTION", "PAUSE", "null", "HOME", "UP", "PRIOR", "null", "LEFT", "null", "RIGHT", "null", "END", "DOWN", "NEXT", "INSERT", "DELETE", "null", "null", "null", "null", "null", "null", "CLEAR", "LMETA", "RMETA", "APPS", "POWER", "SLEEP", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null"};
 	
 	private static int[] LWJGLKeyCodes = new int[] {
-			/* 0 */ -1,
-			/* 1 */ -1,
-			/* 2 */ -1,
-			/* 3 */ -1,
-			/* 4 */ -1,
-			/* 5 */ -1,
-			/* 6 */ -1,
-			/* 7 */ -1,
-			/* 8 */ 14,
-			/* 9 */ 15,
-			/* 10 */ -1,
-			/* 11 */ -1,
-			/* 12 */ -1,
-			/* 13 */ 28,
-			/* 14 */ -1,
-			/* 15 */ -1,
-			/* 16 */ 42,
-			/* 17 */ 29,
-			/* 18 */ 56,
-			/* 19 */ -1,
-			/* 20 */ -1,
-			/* 21 */ -1,
-			/* 22 */ -1,
-			/* 23 */ -1,
-			/* 24 */ -1,
-			/* 25 */ -1,
-			/* 26 */ -1,
-			/* 27 */ 1,
-			/* 28 */ -1,
-			/* 29 */ -1,
-			/* 30 */ -1,
-			/* 31 */ -1,
-			/* 32 */ 57,
-			/* 33 */ 210,
-			/* 34 */ 201,
-			/* 35 */ 207,
-			/* 36 */ 199,
-			/* 37 */ 203,
-			/* 38 */ 200,
-			/* 39 */ 205,
-			/* 40 */ 208,
-			/* 41 */ 205,
-			/* 42 */ 208,
-			/* 43 */ -1,
-			/* 44 */ -1,
-			/* 45 */ 210,
-			/* 46 */ 211,
-			/* 47 */ 211,
-			/* 48 */ 11,
-			/* 49 */ 2,
-			/* 50 */ 3,
-			/* 51 */ 4,
-			/* 52 */ 5,
-			/* 53 */ 6,
-			/* 54 */ 7,
-			/* 55 */ 8,
-			/* 56 */ 9,
-			/* 57 */ 10,
-			/* 58 */ -1,
-			/* 59 */ -1,
-			/* 60 */ -1,
-			/* 61 */ -1,
-			/* 62 */ -1,
-			/* 63 */ -1,
-			/* 64 */ -1,
-			/* 65 */ 30,
-			/* 66 */ 48,
-			/* 67 */ 46,
-			/* 68 */ 32,
-			/* 69 */ 18,
-			/* 70 */ 33,
-			/* 71 */ 34,
-			/* 72 */ 35,
-			/* 73 */ 23,
-			/* 74 */ 36,
-			/* 75 */ 37,
-			/* 76 */ 38,
-			/* 77 */ 50,
-			/* 78 */ 49,
-			/* 79 */ 24,
-			/* 80 */ 25,
-			/* 81 */ 16,
-			/* 82 */ 19,
-			/* 83 */ 31,
-			/* 84 */ 20,
-			/* 85 */ 22,
-			/* 86 */ 47,
-			/* 87 */ 17,
-			/* 88 */ 45,
-			/* 89 */ 21,
-			/* 90 */ 44,
-			/* 91 */ -1,
-			/* 92 */ -1,
-			/* 93 */ -1,
-			/* 94 */ -1,
-			/* 95 */ -1,
-			/* 96 */ -1,
-			/* 97 */ -1,
-			/* 98 */ -1,
-			/* 99 */ -1,
-			/* 100 */ -1,
-			/* 101 */ -1,
-			/* 102 */ -1,
-			/* 103 */ -1,
-			/* 104 */ -1,
-			/* 105 */ -1,
-			/* 106 */ -1,
-			/* 107 */ -1,
-			/* 108 */ -1,
-			/* 109 */ 12,
-			/* 110 */ 52,
-			/* 111 */ 53,
-			/* 112 */ -1,
-			/* 113 */ -1,
-			/* 114 */ -1,
-			/* 115 */ -1,
-			/* 116 */ -1,
-			/* 117 */ -1,
-			/* 118 */ -1,
-			/* 119 */ -1,
-			/* 120 */ -1,
-			/* 121 */ -1,
-			/* 122 */ -1,
-			/* 123 */ -1,
-			/* 124 */ -1,
-			/* 125 */ -1,
-			/* 126 */ -1,
-			/* 127 */ -1,
-			/* 128 */ -1,
-			/* 129 */ -1,
-			/* 130 */ -1,
-			/* 131 */ -1,
-			/* 132 */ -1,
-			/* 133 */ -1,
-			/* 134 */ -1,
-			/* 135 */ -1,
-			/* 136 */ -1,
-			/* 137 */ -1,
-			/* 138 */ -1,
-			/* 139 */ -1,
-			/* 140 */ -1,
-			/* 141 */ -1,
-			/* 142 */ -1,
-			/* 143 */ -1,
-			/* 144 */ -1,
-			/* 145 */ -1,
-			/* 146 */ -1,
-			/* 147 */ -1,
-			/* 148 */ -1,
-			/* 149 */ -1,
-			/* 150 */ -1,
-			/* 151 */ -1,
-			/* 152 */ -1,
-			/* 153 */ -1,
-			/* 154 */ -1,
-			/* 155 */ -1,
-			/* 156 */ -1,
-			/* 157 */ -1,
-			/* 158 */ -1,
-			/* 159 */ -1,
-			/* 160 */ -1,
-			/* 161 */ -1,
-			/* 162 */ -1,
-			/* 163 */ -1,
-			/* 164 */ -1,
-			/* 165 */ -1,
-			/* 166 */ -1,
-			/* 167 */ -1,
-			/* 168 */ -1,
-			/* 169 */ -1,
-			/* 170 */ -1,
-			/* 171 */ -1,
-			/* 172 */ -1,
-			/* 173 */ -1,
-			/* 174 */ -1,
-			/* 175 */ -1,
-			/* 176 */ -1,
-			/* 177 */ -1,
-			/* 178 */ -1,
-			/* 179 */ -1,
-			/* 180 */ -1,
-			/* 181 */ -1,
-			/* 182 */ -1,
-			/* 183 */ -1,
-			/* 184 */ -1,
-			/* 185 */ -1,
-			/* 186 */ 39,
-			/* 187 */ 13,
-			/* 188 */ 51,
-			/* 189 */ 12,
-			/* 190 */ 52,
-			/* 191 */ 53,
-			/* 192 */ -1,
-			/* 193 */ -1,
-			/* 194 */ -1,
-			/* 195 */ -1,
-			/* 196 */ -1,
-			/* 197 */ -1,
-			/* 198 */ -1,
-			/* 199 */ -1,
-			/* 200 */ -1,
-			/* 200 */ -1,
-			/* 201 */ -1,
-			/* 202 */ -1,
-			/* 203 */ -1,
-			/* 204 */ -1,
-			/* 205 */ -1,
-			/* 206 */ -1,
-			/* 207 */ -1,
-			/* 208 */ -1,
-			/* 209 */ -1,
-			/* 210 */ -1,
-			/* 211 */ -1,
-			/* 212 */ -1,
-			/* 213 */ -1,
-			/* 214 */ -1,
-			/* 215 */ -1,
-			/* 216 */ -1,
-			/* 217 */ -1,
-			/* 218 */ -1,
-			/* 219 */ 26,
-			/* 220 */ 43,
-			/* 221 */ 27,
-			/* 222 */ 40
+			/* 0 */ -1, /* 1 */ -1, /* 2 */ -1, /* 3 */ -1, /* 4 */ -1,
+			/* 5 */ -1, /* 6 */ -1, /* 7 */ -1, /* 8 */ 14, /* 9 */ 15,
+			/* 10 */ -1, /* 11 */ -1, /* 12 */ -1, /* 13 */ 28, /* 14 */ -1,
+			/* 15 */ -1, /* 16 */ 42, /* 17 */ 29, /* 18 */ 56, /* 19 */ -1,
+			/* 20 */ -1, /* 21 */ -1, /* 22 */ -1, /* 23 */ -1, /* 24 */ -1,
+			/* 25 */ -1, /* 26 */ -1, /* 27 */ 1, /* 28 */ -1, /* 29 */ -1,
+			/* 30 */ -1, /* 31 */ -1, /* 32 */ 57, /* 33 */ 210, /* 34 */ 201,
+			/* 35 */ 207, /* 36 */ 199, /* 37 */ 203, /* 38 */ 200, /* 39 */ 205,
+			/* 40 */ 208, /* 41 */ 205, /* 42 */ 208, /* 43 */ -1, /* 44 */ -1,
+			/* 45 */ 210, /* 46 */ 211, /* 47 */ 211, /* 48 */ 11, /* 49 */ 2,
+			/* 50 */ 3, /* 51 */ 4, /* 52 */ 5, /* 53 */ 6, /* 54 */ 7,
+			/* 55 */ 8, /* 56 */ 9, /* 57 */ 10, /* 58 */ -1, /* 59 */ -1,
+			/* 60 */ -1, /* 61 */ -1, /* 62 */ -1, /* 63 */ -1, /* 64 */ -1,
+			/* 65 */ 30, /* 66 */ 48, /* 67 */ 46, /* 68 */ 32, /* 69 */ 18,
+			/* 70 */ 33, /* 71 */ 34, /* 72 */ 35, /* 73 */ 23, /* 74 */ 36,
+			/* 75 */ 37, /* 76 */ 38, /* 77 */ 50, /* 78 */ 49, /* 79 */ 24,
+			/* 80 */ 25, /* 81 */ 16, /* 82 */ 19, /* 83 */ 31, /* 84 */ 20,
+			/* 85 */ 22, /* 86 */ 47, /* 87 */ 17, /* 88 */ 45, /* 89 */ 21,
+			/* 90 */ 44, /* 91 */ -1, /* 92 */ -1, /* 93 */ -1, /* 94 */ -1,
+			/* 95 */ -1, /* 96 */ -1, /* 97 */ -1, /* 98 */ -1, /* 99 */ -1,
+			/* 100 */ -1, /* 101 */ -1, /* 102 */ -1, /* 103 */ -1, /* 104 */ -1,
+			/* 105 */ -1, /* 106 */ -1, /* 107 */ -1, /* 108 */ -1, /* 109 */ 12,
+			/* 110 */ 52, /* 111 */ 53, /* 112 */ -1, /* 113 */ -1, /* 114 */ -1,
+			/* 115 */ -1, /* 116 */ -1, /* 117 */ -1, /* 118 */ -1, /* 119 */ -1,
+			/* 120 */ -1, /* 121 */ -1, /* 122 */ -1, /* 123 */ -1, /* 124 */ -1,
+			/* 125 */ -1, /* 126 */ -1, /* 127 */ -1, /* 128 */ -1, /* 129 */ -1,
+			/* 130 */ -1, /* 131 */ -1, /* 132 */ -1, /* 133 */ -1, /* 134 */ -1,
+			/* 135 */ -1, /* 136 */ -1, /* 137 */ -1, /* 138 */ -1, /* 139 */ -1,
+			/* 140 */ -1, /* 141 */ -1, /* 142 */ -1, /* 143 */ -1, /* 144 */ -1,
+			/* 145 */ -1, /* 146 */ -1, /* 147 */ -1, /* 148 */ -1, /* 149 */ -1,
+			/* 150 */ -1, /* 151 */ -1, /* 152 */ -1, /* 153 */ -1, /* 154 */ -1,
+			/* 155 */ -1, /* 156 */ -1, /* 157 */ -1, /* 158 */ -1, /* 159 */ -1,
+			/* 160 */ -1, /* 161 */ -1, /* 162 */ -1, /* 163 */ -1, /* 164 */ -1,
+			/* 165 */ -1, /* 166 */ -1, /* 167 */ -1, /* 168 */ -1, /* 169 */ -1,
+			/* 170 */ -1, /* 171 */ -1, /* 172 */ -1, /* 173 */ -1, /* 174 */ -1,
+			/* 175 */ -1, /* 176 */ -1, /* 177 */ -1, /* 178 */ -1, /* 179 */ -1,
+			/* 180 */ -1, /* 181 */ -1, /* 182 */ -1, /* 183 */ -1, /* 184 */ -1,
+			/* 185 */ -1, /* 186 */ 39, /* 187 */ 13, /* 188 */ 51, /* 189 */ 12,
+			/* 190 */ 52, /* 191 */ 53, /* 192 */ -1, /* 193 */ -1, /* 194 */ -1,
+			/* 195 */ -1, /* 196 */ -1, /* 197 */ -1, /* 198 */ -1, /* 199 */ -1,
+			/* 200 */ -1, /* 201 */ -1, /* 202 */ -1, /* 203 */ -1, /* 204 */ -1,
+			/* 205 */ -1, /* 206 */ -1, /* 207 */ -1, /* 208 */ -1, /* 209 */ -1,
+			/* 210 */ -1, /* 211 */ -1, /* 212 */ -1, /* 213 */ -1, /* 214 */ -1,
+			/* 215 */ -1, /* 216 */ -1, /* 217 */ -1, /* 218 */ -1, /* 219 */ 26,
+			/* 220 */ 43, /* 221 */ 27, /* 222 */ 40
 	};
 
 	public static final int _wArrayByteLength(Object obj) {
@@ -3114,6 +2910,105 @@ public class EaglerAdapterImpl2 {
 			endianWasChecked = true;
 		}
 		return !isLittleEndian;
+	}
+
+	private static EaglercraftLANClient rtcLANClient = null; //TODO
+	
+	@JSBody(params = { }, script = "return window.startLANClient();")
+	private static native EaglercraftLANClient startRTCLANClient();
+	
+	public static final int LAN_CLIENT_INIT_FAILED = -2;
+	public static final int LAN_CLIENT_FAILED = -1;
+	public static final int LAN_CLIENT_DISCONNECTED = 0;
+	public static final int LAN_CLIENT_CONNECTING = 1;
+	public static final int LAN_CLIENT_CONNECTED = 2;
+	
+	public static final boolean clientLANSupported() {
+		return true;
+	}
+	
+	public static final void clientLANSetServer(String relay, String peerId) {
+		
+	}
+	
+	public static final int clientLANReadyState() {
+		return 0;
+	}
+	
+	public static final void clientLANCloseConnection() {
+		
+	}
+	
+	public static final void clientLANSendPacket(byte[] pkt) {
+		
+	}
+	
+	public static final byte[] clientLANReadPacket() {
+		return null;
+	}
+	
+	private static EaglercraftLANServer rtcLANServer = null;
+
+	@JSBody(params = { }, script = "return window.startLANServer();")
+	private static native EaglercraftLANServer startRTCLANServer();
+	
+	public static final boolean serverLANSupported() {
+		return true;
+	}
+	
+	public static final String serverLANInitializeServer(String relay) {
+		return null;
+	}
+	
+	public static final boolean serverLANServerOpen() {
+		return true;
+	}
+
+	public static final void serverLANCloseServer() {
+		
+	}
+	
+	public static interface LANConnectionEvent {
+		
+		public String getPeerName();
+		
+		public void accept();
+		
+		public void reject();
+		
+	}
+	
+	public static final LANConnectionEvent serverLANGetConnectionEvent() {
+		return null;
+	}
+	
+	public static final String serverLANGetDisconnectEvent() {
+		return null;
+	}
+	
+	public static class LANPeerPacket {
+		
+		public final String peer;
+		
+		public final byte[] packet;
+
+		protected LANPeerPacket(String peer, byte[] packet) {
+			this.peer = peer;
+			this.packet = packet;
+		}
+		
+	}
+	
+	public static final LANPeerPacket serverLANReadPacket() {
+		return null;
+	}
+
+	public static final void serverLANWritePacket(String peer, byte[] data) {
+		
+	}
+	
+	public static final void serverLANDisconnectPeer(String peer) {
+		
 	}
 	
 }

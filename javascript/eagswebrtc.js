@@ -2,13 +2,16 @@
 
 /*
 
-This is the backend for voice channels in eaglercraft, it links with TeaVM EaglerAdapter at runtime
+This is the backend for voice channels and LAN servers in eaglercraft
 
-Copyright 2022 Calder Young & ayunami2000. All rights reserved.
+it links with TeaVM EaglerAdapter at runtime
 
-Based on code written by ayunami2000
+Copyright 2022 ayunami2000 & lax1dude. All rights reserved.
 
 */
+
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%% VOICE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 window.initializeVoiceClient = (() => {
 
@@ -304,4 +307,166 @@ window.startVoiceClient = () => {
 		window.initializeVoiceClient();
 	}
 	return window.constructVoiceClient();
+};
+
+
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%% LAN CLIENT CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+window.initializeLANClient = (() => {
+	
+	const READYSTATE_INIT_FAILED = -2;
+	const READYSTATE_FAILED = -1;
+	const READYSTATE_DISCONNECTED = 0;
+	const READYSTATE_CONNECTING = 1;
+	const READYSTATE_CONNECTED = 2;
+	
+	class EaglercraftLANClient {
+		
+		constructor() {
+			
+		}
+		
+		LANClientSupported() {
+			
+		}
+		
+		initializeClient() {
+			
+		}
+		
+		setICEServers(urls) {
+			
+		}
+		
+		setICECandidateHandler(cb) {
+			
+		}
+		
+		setDescriptionHandler(cb) {
+			
+		}
+		
+		setRemoteDataChannelHandler(cb) {
+			
+		}
+		
+		setRemoteDisconnectHandler(cb) {
+			
+		}
+		
+		setRemotePacketHandler(cb) {
+			
+		}
+		
+		getReadyState() {
+			
+		}
+		
+		sendPacketToServer(buffer) {
+			
+		}
+		
+		signalRemoteConnect() {
+			
+		}
+		
+		signalRemoteDescription(descJSON) {
+			
+		}
+		
+		signalRemoteICECandidate(candidate) {
+			
+		}
+		
+	};
+	
+	window.constructLANClient = () => new EaglercraftLANClient();
+});
+
+window.startLANClient = () => {
+	if(typeof window.constructLANClient !== "function") {
+		window.initializeLANClient();
+	}
+	return window.constructLANClient();
+};
+
+
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%% LAN SERVER CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+window.initializeLANServer = (() => {
+	
+	class EaglercraftLANServer {
+		
+		constructor() {
+			
+		}
+		
+		LANServerSupported() {
+			
+		}
+		
+		initializeServer() {
+			
+		}
+		
+		setRecieveCodeHandler(cb) {
+			
+		}
+		
+		setICEServers(urls) {
+			
+		}
+		
+		setICECandidateHandler(cb) {
+			
+		}
+		
+		setDescriptionHandler(cb) {
+			
+		}
+		
+		setRemoteClientDataChannelHandler(cb) {
+			
+		}
+		
+		setRemoteClientDisconnectHandler(cb) {
+			
+		}
+		
+		setRemoteClientPacketHandler(cb) {
+			
+		}
+		
+		sendPacketToRemoteClient(peerId, buffer) {
+			
+		}
+		
+		signalRemoteConnect(peerId) {
+			
+		}
+		
+		signalRemoteDescription(peerId, descJSON) {
+			
+		}
+		
+		signalRemoteICECandidate(peerId, candidate) {
+			
+		}
+		
+		disconnectRemotePeer(peerId) {
+			
+		}
+		
+	};
+	
+	window.constructLANServer = () => new EaglercraftLANServer();
+});
+
+window.startLANServer = () => {
+	if(typeof window.constructLANServer !== "function") {
+		window.initializeLANServer();
+	}
+	return window.constructLANerver();
 };

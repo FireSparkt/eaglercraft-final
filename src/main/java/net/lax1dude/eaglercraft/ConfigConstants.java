@@ -6,7 +6,7 @@ public class ConfigConstants {
 	
 	public static boolean profanity = false;
 
-	public static final String version = "SP-SNAPSHOT-02";
+	public static final String version = "SP-SNAPSHOT-03";
 	public static final String mainMenuString = "eaglercraft " + version;
 	
 	public static final String forkMe = "https://github.com/LAX1DUDE/eaglercraft";

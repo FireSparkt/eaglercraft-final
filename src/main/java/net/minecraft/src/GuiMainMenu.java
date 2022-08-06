@@ -451,6 +451,7 @@ public class GuiMainMenu extends GuiScreen {
 	}
 
 	private static final TextureLocation mclogo = new TextureLocation("/title/mclogo.png");
+	private static final TextureLocation eag = new TextureLocation("/title/eag.png");
 	private static final TextureLocation ackbk = new TextureLocation("/gui/demo_bg.png");
 	private static final TextureLocation beaconx = new TextureLocation("/gui/beacon.png");
 	private static final TextureLocation items = new TextureLocation("/gui/items.png");
@@ -468,13 +469,15 @@ public class GuiMainMenu extends GuiScreen {
 		byte var7 = 30;
 		this.drawGradientRect(0, 0, this.width, this.height, -2130706433, 16777215);
 		this.drawGradientRect(0, 0, this.width, this.height, 0, Integer.MIN_VALUE);
-		mclogo.bindTexture();
 		
-		this.drawTexturedModalRect(var6 + 0, var7 + 0, 0, 0, 99, 44);
-		this.drawTexturedModalRect(var6 + 99, var7 + 0, 129, 0, 27, 44);
-		this.drawTexturedModalRect(var6 + 99 + 26, var7 + 0, 126, 0, 3, 44);
-		this.drawTexturedModalRect(var6 + 99 + 26 + 3, var7 + 0, 99, 0, 26, 44);
-		this.drawTexturedModalRect(var6 + 154, var7 + 0, 0, 45, 155, 44);
+		if(ConfigConstants.eaglercraftTitleLogo) {
+			eag.bindTexture();
+		}else {
+			mclogo.bindTexture();
+		}
+
+		this.drawTexturedModalRect(var6 + 0, var7 + 0, 0, 0, 155, 44);
+		this.drawTexturedModalRect(var6 + 155, var7 + 0, 0, 45, 155, 44);
 
 		this.drawString(this.fontRenderer, "minecraft 1.5.2", 2, this.height - 20, 16777215);
 		this.drawString(this.fontRenderer, ConfigConstants.mainMenuString + EnumChatFormatting.GRAY + " (cracked)", 2, this.height - 10, 16777215);
