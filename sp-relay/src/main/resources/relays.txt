@@ -1,0 +1,13 @@
+
+[STUN]
+url=stun:openrelay.metered.ca:80
+
+[TURN]
+url=turn:openrelay.metered.ca:443
+username=openrelayproject
+password=openrelayproject
+
+[TURN]
+url=turn:openrelay.metered.ca:443?transport=tcp
+username=openrelayproject
+password=openrelayproject
