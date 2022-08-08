@@ -468,5 +468,5 @@ window.startLANServer = () => {
 	if(typeof window.constructLANServer !== "function") {
 		window.initializeLANServer();
 	}
-	return window.constructLANerver();
+	return window.constructLANServer();
 };

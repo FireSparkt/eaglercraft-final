@@ -123,13 +123,14 @@ public class GuiMultiplayer extends GuiScreen {
 	 */
 	public void initGuiControls() {
 		StringTranslate var1 = StringTranslate.getInstance();
-		this.buttonList.add(this.field_96289_p = new GuiButton(7, this.width / 2 - 154, this.height - 28, 70, 20, var1.translateKey("selectServer.edit")));
-		this.buttonList.add(this.buttonDelete = new GuiButton(2, this.width / 2 - 74, this.height - 28, 70, 20, var1.translateKey("selectServer.delete")));
+		this.buttonList.add(this.field_96289_p = new GuiButton(7, this.width / 2 - 154 + 36, this.height - 28, 60, 20, var1.translateKey("selectServer.edit")));
+		this.buttonList.add(this.buttonDelete = new GuiButton(2, this.width / 2 - 74 + 22, this.height - 28, 60, 20, var1.translateKey("selectServer.delete")));
 		this.buttonList.add(this.buttonSelect = new GuiButton(1, this.width / 2 - 154, this.height - 52, 100, 20, var1.translateKey("selectServer.select")));
 		this.buttonList.add(new GuiButton(4, this.width / 2 - 50, this.height - 52, 100, 20, var1.translateKey("selectServer.direct")));
 		this.buttonList.add(new GuiButton(3, this.width / 2 + 4 + 50, this.height - 52, 100, 20, var1.translateKey("selectServer.add")));
-		this.buttonList.add(new GuiButton(8, this.width / 2 + 4, this.height - 28, 70, 20, var1.translateKey("selectServer.refresh")));
+		this.buttonList.add(new GuiButton(8, this.width / 2 + 4 + 10, this.height - 28, 60, 20, var1.translateKey("selectServer.refresh")));
 		this.buttonList.add(new GuiButton(0, this.width / 2 + 4 + 76, this.height - 28, 75, 20, var1.translateKey("gui.cancel")));
+		this.buttonList.add(new GuiButton(10, this.width / 2 - 154, this.height - 28, 30, 20, var1.translateKey("selectServer.lan")));
 		boolean var2 = this.selectedServer >= 0 && this.selectedServer < this.serverSlotContainer.getSize();
 		this.buttonSelect.enabled = var2;
 		this.field_96289_p.enabled = var2;
@@ -193,6 +194,8 @@ public class GuiMultiplayer extends GuiScreen {
 					--cooldownTimer;
 					this.mc.displayGuiScreen(new GuiMultiplayer(this.parentScreen));
 				}
+			} else if (par1GuiButton.id == 10) {
+				this.mc.displayGuiScreen(this.parentScreen);
 			} else {
 				this.serverSlotContainer.actionPerformed(par1GuiButton);
 			}

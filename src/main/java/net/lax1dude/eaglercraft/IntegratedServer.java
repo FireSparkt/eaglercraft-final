@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.sp.ipc.*;
+import net.minecraft.src.EnumGameType;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.WorldSettings;
@@ -426,5 +427,19 @@ public class IntegratedServer {
 		EaglerAdapter.disableChannel("NET|" + channel);
 		sendIPCPacket(new IPCPacket0CPlayerChannel(channel, false));
 	}
-	
+
+	private static boolean hostingLAN = false;
+
+	public static final String shareToLAN(EnumGameType gameType, boolean allowCommands) {
+		hostingLAN = true;
+		return "yee";
+	}
+
+	public static final void closeLAN() {
+		hostingLAN = false;
+	}
+
+	public static final boolean isHostingLAN() {
+		return hostingLAN;
+	}
 }
