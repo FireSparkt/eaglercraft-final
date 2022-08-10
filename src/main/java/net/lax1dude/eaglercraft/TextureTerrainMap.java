@@ -5,6 +5,8 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.FramebufferGL;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.TextureGL;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.GLAllocation;
@@ -21,7 +23,7 @@ public class TextureTerrainMap implements IconRegister {
 		public final String name;
 		public final int id;
 		public final int size;
-		private EaglerImage[][] frames = null;
+		private TextureGL frames = null;
 		private int[] framesIdx = null;
 
 		protected int originX;
@@ -70,6 +72,13 @@ public class TextureTerrainMap implements IconRegister {
 			this.minV_center = (float)(originY_center + 0.025f) / (float)map.height;
 			this.maxU_center = (float)(originX_center + 16 - 0.025f) / (float)map.width;
 			this.maxV_center = (float)(originY_center + 16 - 0.025f) / (float)map.height;
+		}
+		
+		private void free() {
+			if(frames != null) {
+				EaglerAdapter._wglDeleteTextures(frames);
+				frames = null;
+			}
 		}
 
 		@Override
@@ -131,12 +140,11 @@ public class TextureTerrainMap implements IconRegister {
 		
 		private void updateAnimation() {
 			if(frames != null) {
-				int var4 = this.frameCounter;
 				this.frameCounter = (this.frameCounter + 1) % this.framesIdx.length;
 				int i = framesIdx[this.frameCounter];
 				if (this.frameCurrent != i) {
 					this.frameCurrent = i;
-					map.replaceTexture(this, frames[i]);
+					map.copyFrame(this, i);
 				}
 			}
 		}
@@ -153,19 +161,58 @@ public class TextureTerrainMap implements IconRegister {
 					int ss = size * 16;
 					int divs = img.h / ss;
 					if(divs == 1) {
+						map.replaceTexture(this, generateMip(img));
 						this.frames = null;
 						this.framesIdx = null;
-						map.replaceTexture(this, generateMip(img));
 					}else {
-						frames = new EaglerImage[divs][];
-						for(int i = 0; i < divs; ++i) {
-							frames[i] = generateMip(img.getSubImage(0, i * ss, ss, ss));
-						}
+						map.replaceTexture(this, generateMip(img.getSubImage(0, 0, ss, ss)));
+						
+						EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, -1);
+						frames = EaglerAdapter._wglGenTextures();
+						EaglerAdapter._wglBindTexture(EaglerAdapter.GL_TEXTURE_2D, frames);
+
+						EaglerImage mipLvl = populateAlpha(img);
+						uploadBuffer.clear();
+						uploadBuffer.put(mipLvl.data);
+						uploadBuffer.flip();
+						EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, 0, EaglerAdapter.GL_RGBA, mipLvl.w, mipLvl.h, 0,
+								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+
+						mipLvl = generateLevel(mipLvl);
+						uploadBuffer.clear();
+						uploadBuffer.put(mipLvl.data);
+						uploadBuffer.flip();
+						EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, 1, EaglerAdapter.GL_RGBA, mipLvl.w, mipLvl.h, 0,
+								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+
+						mipLvl = generateLevel(mipLvl);
+						uploadBuffer.clear();
+						uploadBuffer.put(mipLvl.data);
+						uploadBuffer.flip();
+						EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, 2, EaglerAdapter.GL_RGBA, mipLvl.w, mipLvl.h, 0,
+								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+
+						mipLvl = generateLevel(mipLvl);
+						uploadBuffer.clear();
+						uploadBuffer.put(mipLvl.data);
+						uploadBuffer.flip();
+						EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, 3, EaglerAdapter.GL_RGBA, mipLvl.w, mipLvl.h, 0,
+								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+
+						mipLvl = generateLevel(mipLvl);
+						uploadBuffer.clear();
+						uploadBuffer.put(mipLvl.data);
+						uploadBuffer.flip();
+						EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, 4, EaglerAdapter.GL_RGBA, mipLvl.w, mipLvl.h, 0,
+								EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
+						
+						EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAX_LEVEL, 4);
+						
 						String dat = EaglerAdapter.fileContents("/" + map.basePath + name + ".txt");
 						if(dat != null) System.out.println("Found animation info for: " + map.basePath + name + ".png");
 						if(dat == null || (dat = dat.trim()).isEmpty()) {
-							framesIdx = new int[frames.length];
-							for(int i = 0; i < frames.length; ++i) {
+							framesIdx = new int[divs];
+							for(int i = 0; i < divs; ++i) {
 								framesIdx[i] = i;
 							}
 						}else {
@@ -190,7 +237,6 @@ public class TextureTerrainMap implements IconRegister {
 								}
 							}
 						}
-						map.replaceTexture(this, this.frames[framesIdx[0]]);
 					}
 				}
 			}
@@ -205,10 +251,12 @@ public class TextureTerrainMap implements IconRegister {
 	private ArrayList<TerrainIconV2> iconList;
 	public final int texture;
 	private final EaglerImage[] missingData;
+	public final FramebufferGL copyFramebuffer;
 	
 	private int[] nextSlot = new int[3];
 	
-	private static final IntBuffer uploadBuffer = EaglerAdapter.isWebGL ? IntBuffer.wrap(new int[4096]) : ByteBuffer.allocateDirect(4096 << 2).order(ByteOrder.nativeOrder()).asIntBuffer();
+	private static final IntBuffer uploadBuffer = EaglerAdapter.isWebGL ? IntBuffer.wrap(new int[0xFFFF]) :
+			ByteBuffer.allocateDirect(0xFFFF << 2).order(ByteOrder.nativeOrder()).asIntBuffer();
 	
 	public TextureTerrainMap(int size, String par2, String par3Str, EaglerImage par4BufferedImage) {
 		this.width = size;
@@ -217,15 +265,16 @@ public class TextureTerrainMap implements IconRegister {
 		this.missingImage = new TerrainIconV2(nextSlot[1]++, 1, this, null);
 		this.iconList = new ArrayList();
 		this.texture = EaglerAdapter.glGenTextures();
+		this.copyFramebuffer = EaglerAdapter._wglCreateFramebuffer();
 		EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);
 		int levelW = width;
 		int levelH = height;
 		IntBuffer blank = GLAllocation.createDirectIntBuffer(levelW * levelH);
-		for(int i = 0; i < blank.limit(); ++i) {
-			blank.put(i, ((i / width + (i % width)) % 2 == 0) ? 0xffff00ff : 0xff000000);
-		}
 		for(int i = 0; i < 5; ++i) {
 			blank.clear().limit(levelW * levelH);
+			for(int j = 0; j < blank.limit(); ++j) {
+				blank.put(j, ((j / levelW + (j % levelW)) % 2 == 0) ? 0xffff00ff : 0xff000000);
+			}
 			EaglerAdapter.glTexImage2D(EaglerAdapter.GL_TEXTURE_2D, i, EaglerAdapter.GL_RGBA, levelW, levelH, 0, EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, blank);
 			levelW /= 2;
 			levelH /= 2;
@@ -406,6 +455,9 @@ public class TextureTerrainMap implements IconRegister {
 	}
 
 	public void refreshTextures() {
+		for(TerrainIconV2 t : iconList) {
+			t.free();
+		}
 		iconList.clear();
 		nextSlot = new int[3];
 		nextSlot[1] = 1;
@@ -429,8 +481,6 @@ public class TextureTerrainMap implements IconRegister {
 	}
 	
 	private void replaceTexture(TerrainIconV2 icon, EaglerImage[] textures) {
-		int levelW = width;
-		int levelH = height;
 		int divisor = 1;
 		EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);
 		for(int i = 0; i < 5; i++) {
@@ -439,10 +489,44 @@ public class TextureTerrainMap implements IconRegister {
 			uploadBuffer.flip();
 			EaglerAdapter.glTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX / divisor, icon.originY / divisor, 
 					(16 * icon.size + 32) / divisor, (16 * icon.size + 32) / divisor, EaglerAdapter.GL_RGBA, EaglerAdapter.GL_UNSIGNED_BYTE, uploadBuffer);
-			levelW /= 2;
-			levelH /= 2;
 			divisor *= 2;
 		}
+	}
+	
+	private void copyFrame(TerrainIconV2 icon, int frame) {
+		int off = icon.size * 16;
+		int divisor = 1;
+		EaglerAdapter._wglBindFramebuffer(EaglerAdapter._wGL_FRAMEBUFFER, copyFramebuffer);
+		EaglerAdapter._wglReadBuffer(EaglerAdapter._wGL_COLOR_ATTACHMENT0);
+		for(int i = 0; i < 5; i++) {
+			EaglerAdapter._wglBindTexture(EaglerAdapter.GL_TEXTURE_2D, icon.frames);
+			EaglerAdapter._wglFramebufferTexture2D(EaglerAdapter._wGL_COLOR_ATTACHMENT0, icon.frames, i);
+			EaglerAdapter.glBindTexture(EaglerAdapter.GL_TEXTURE_2D, texture);
+			
+			// 0, -1
+			EaglerAdapter.glCopyTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX_center / divisor, (icon.originY_center - 16) / divisor,
+					0, (frame * off + off - 16 / divisor), off, 16 / divisor);
+
+			// -1, 0
+			EaglerAdapter.glCopyTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, (icon.originX_center - 16) / divisor, icon.originY_center / divisor,
+					off - 16 / divisor, frame * off, 16 / divisor, off);
+			
+			// 0, 0
+			EaglerAdapter.glCopyTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX_center / divisor, icon.originY_center / divisor,
+					0, frame * off, off, off);
+			
+			// 0, 1
+			EaglerAdapter.glCopyTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, icon.originX_center / divisor, (icon.originY_center + 16 * icon.size) / divisor,
+					0, frame * off, off, 16 / divisor);
+			
+			// 1, 0
+			EaglerAdapter.glCopyTexSubImage2D(EaglerAdapter.GL_TEXTURE_2D, i, (icon.originX_center + 16 * icon.size) / divisor, icon.originY_center / divisor,
+					0, frame * off, 16 / divisor, off);
+			
+			off /= 2;
+			divisor *= 2;
+		}
+		EaglerAdapter._wglBindFramebuffer(EaglerAdapter._wGL_FRAMEBUFFER, null);
 	}
 
 	public void updateAnimations() {

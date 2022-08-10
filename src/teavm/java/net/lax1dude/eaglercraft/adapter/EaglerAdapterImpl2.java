@@ -876,6 +876,9 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglBindFramebuffer(int p1, FramebufferGL p2) {
 		webgl.bindFramebuffer(p1, p2 == null ? null : p2.obj);
 	}
+	public static final void _wglReadBuffer(int p1) {
+		webgl.readBuffer(p1);
+	}
 	public static final FramebufferGL _wglCreateFramebuffer() {
 		return new FramebufferGL(webgl.createFramebuffer());
 	}
@@ -884,6 +887,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglFramebufferTexture2D(int p1, TextureGL p2) {
 		webgl.framebufferTexture2D(FRAMEBUFFER, p1, TEXTURE_2D, p2 == null ? null : p2.obj, 0);
+	}
+	public static final void _wglFramebufferTexture2D(int p1, TextureGL p2, int p3) {
+		webgl.framebufferTexture2D(FRAMEBUFFER, p1, TEXTURE_2D, p2 == null ? null : p2.obj, p3);
 	}
 	public static final QueryGL _wglCreateQuery() { 
 		return new QueryGL(webgl.createQuery()); 

@@ -554,6 +554,9 @@ public class EaglerAdapterImpl2 {
 	public static final void _wglBindFramebuffer(int p1, FramebufferGL p2) {
 		GL30.glBindFramebuffer(p1, p2 == null ? 0 : p2.obj);
 	}
+	public static final void _wglReadBuffer(int p1) {
+		GL11.glReadBuffer(p1);
+	}
 	public static final void _wglDrawBuffer(int p1) {
 		GL11.glDrawBuffer(p1);
 	}
@@ -568,6 +571,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglFramebufferTexture2D(int p1, TextureGL p2) {
 		GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, p1, GL11.GL_TEXTURE_2D, p2.obj, 0);
+	}
+	public static final void _wglFramebufferTexture2D(int p1, TextureGL p2, int lvl) {
+		GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, p1, GL11.GL_TEXTURE_2D, p2.obj, lvl);
 	}
 	public static final RenderbufferGL _wglCreateRenderBuffer() {
 		return new RenderbufferGL(GL30.glGenRenderbuffers());
@@ -898,6 +904,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void mouseSetGrabbed(boolean grabbed) {
 		Mouse.setGrabbed(grabbed);
+	}
+	public static final boolean isPointerLocked() {
+		return Mouse.isGrabbed();
 	}
 	public static final int mouseGetDX() {
 		return Mouse.getDX();
@@ -1245,6 +1254,10 @@ public class EaglerAdapterImpl2 {
 		fileChooserName = null;
 		return s;
 	}
+	public static final void clearFileChooserResult() {
+		fileChooserName = null;
+		fileChooserFile = null;
+	}
 	public static final void setListenerPos(float x, float y, float z, float vx, float vy, float vz, float pitch, float yaw) {
 		float var2 = MathHelper.cos(-yaw * 0.017453292F);
 		float var3 = MathHelper.sin(-yaw * 0.017453292F);
@@ -1354,10 +1367,10 @@ public class EaglerAdapterImpl2 {
 		
 	}
 	public static final boolean voiceAvailable() {
-		return true;
+		return false;
 	}
 	public static final boolean voiceAllowed() {
-		return true;
+		return false;
 	}
 	public static final boolean voiceRelayed() {
 		return false;
@@ -1643,7 +1656,7 @@ public class EaglerAdapterImpl2 {
 	}
 
 	public static final boolean isIntegratedServerAvailable() {
-		return true; //TODO: change to false
+		return false; //TODO: change to false
 	}
 	
 	public static final void beginLoadingIntegratedServer() {
@@ -1651,7 +1664,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final boolean isIntegratedServerAlive() {
-		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
+		return false;
 	}
 	
 	public static final void terminateIntegratedServer() {
@@ -1670,7 +1683,7 @@ public class EaglerAdapterImpl2 {
 		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
 	}
 	
-	public static final PKT recieveFromIntegratedServer(String channel, byte[] pkt) {
+	public static final PKT recieveFromIntegratedServer(String channel) {
 		throw new UnsupportedOperationException("Integrated server is not available in LWJGL eagleradapter");
 	}
 	
