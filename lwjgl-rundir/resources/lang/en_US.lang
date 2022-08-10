@@ -32,6 +32,7 @@ menu.convertingLevel=Converting world
 menu.simulating=Simulating the world for a bit
 menu.respawning=Respawning
 menu.shareToLan=Open to LAN
+menu.closeLan=Close LAN
 
 menu.skinCapeSettings=Skins/Capes Settings
 menu.skinCapeSettingsNote0=I put the button up here so
@@ -232,6 +233,7 @@ selectServer.direct=Direct Connect
 selectServer.edit=Edit
 selectServer.delete=Delete
 selectServer.add=Add server
+selectServer.lan=§3LAN
 selectServer.defaultName=Minecraft Server
 selectServer.deleteQuestion=Are you sure you want to remove this server?
 selectServer.deleteWarning=will be lost forever! (A long time!)

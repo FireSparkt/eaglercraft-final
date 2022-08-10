@@ -4,7 +4,7 @@ import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 
-public interface EaglercraftLANServer {
+public interface EaglercraftLANServer extends JSObject {
 	
 	boolean LANServerSupported();
 	

@@ -4,7 +4,7 @@ import org.teavm.jso.JSFunctor;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 
-public interface EaglercraftLANClient {
+public interface EaglercraftLANClient extends JSObject {
 	
 	final int READYSTATE_INIT_FAILED = -2;
 	final int READYSTATE_FAILED = -1;
