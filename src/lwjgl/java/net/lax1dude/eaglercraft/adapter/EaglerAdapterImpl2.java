@@ -978,6 +978,9 @@ public class EaglerAdapterImpl2 {
 	public static final int getCanvasHeight() {
 		return daCanvas.getHeight();
 	}
+	public static final float getContentScaling() {
+		return 1.0f;
+	}
 	public static final void setDisplaySize(int x, int y) {
 		try {
 			Display.setDisplayMode(new DisplayMode(x, y));

@@ -39,6 +39,7 @@ import org.teavm.jso.browser.TimerHandler;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.canvas.CanvasRenderingContext2D;
 import org.teavm.jso.canvas.ImageData;
+import org.teavm.jso.dom.css.CSSStyleDeclaration;
 import org.teavm.jso.dom.events.ErrorEvent;
 import org.teavm.jso.dom.events.Event;
 import org.teavm.jso.dom.events.EventListener;
@@ -230,14 +231,23 @@ public class EaglerAdapterImpl2 {
 		win = Window.current();
 		doc = win.getDocument();
 		integratedServerScript = serverWorkerURI;
+		double r = win.getDevicePixelRatio();
+		int iw = parent.getClientWidth();
+		int ih = parent.getClientHeight();
+		int sw = (int)(r * iw);
+		int sh = (int)(r * ih);
 		canvas = (HTMLCanvasElement)doc.createElement("canvas");
-		canvas.setWidth(parent.getClientWidth());
-		canvas.setHeight(parent.getClientHeight());
+		CSSStyleDeclaration canvasStyle = canvas.getStyle();
+		canvasStyle.setProperty("width", "100%");
+		canvasStyle.setProperty("height", "100%");
+		canvasStyle.setProperty("image-rendering", "pixelated");
+		canvas.setWidth(sw);
+		canvas.setHeight(sh);
 		SelfDefence.init(canvas);
 		rootElement.appendChild(canvas);
 		renderingCanvas = (HTMLCanvasElement)doc.createElement("canvas");
-		renderingCanvas.setWidth(canvas.getWidth());
-		renderingCanvas.setHeight(canvas.getHeight());
+		renderingCanvas.setWidth(sw);
+		renderingCanvas.setHeight(sh);
 		frameBuffer = (CanvasRenderingContext2D) canvas.getContext("2d");
 		webgl = (WebGL2RenderingContext) renderingCanvas.getContext("webgl2", youEagler());
 		if(webgl == null) {
@@ -279,8 +289,8 @@ public class EaglerAdapterImpl2 {
 		canvas.addEventListener("mousemove", mousemove = new EventListener<MouseEvent>() {
 			@Override
 			public void handleEvent(MouseEvent evt) {
-				mouseX = getOffsetX(evt);
-				mouseY = canvas.getClientHeight() - getOffsetY(evt);
+				mouseX = (int)(getOffsetX(evt) * win.getDevicePixelRatio());
+				mouseY = (int)((canvas.getClientHeight() - getOffsetY(evt)) * win.getDevicePixelRatio());
 				mouseDX += evt.getMovementX();
 				mouseDY += -evt.getMovementY();
 				if(hasBeenActive()) {
@@ -1554,10 +1564,10 @@ public class EaglerAdapterImpl2 {
 		return mouseY;
 	}
 	public static final int mouseGetEventX() {
-		return currentEvent == null ? -1 : currentEvent.getClientX();
+		return currentEvent == null ? -1 : (int)(currentEvent.getClientX() * win.getDevicePixelRatio());
 	}
 	public static final int mouseGetEventY() {
-		return currentEvent == null ? -1 : canvas.getClientHeight() - currentEvent.getClientY();
+		return currentEvent == null ? -1 : (int)((canvas.getClientHeight() - currentEvent.getClientY()) * win.getDevicePixelRatio());
 	}
 	public static final boolean keysNext() {
 		if(unpressCTRL) { //un-press ctrl after copy/paste permission
@@ -1610,26 +1620,32 @@ public class EaglerAdapterImpl2 {
 	
 	public static final void updateDisplay() {
 		//commitContext(webgl);
+		double r = win.getDevicePixelRatio();
 		int w = parent.getClientWidth();
 		int h = parent.getClientHeight();
-		if(canvas.getWidth() != w) {
-			canvas.setWidth(w);
+		int w2 = (int)(w * r);
+		int h2 = (int)(h * r);
+		if(canvas.getWidth() != w2) {
+			canvas.setWidth(w2);
 		}
-		if(canvas.getHeight() != h) {
-			canvas.setHeight(h);
+		if(canvas.getHeight() != h2) {
+			canvas.setHeight(h2);
 		}
-		frameBuffer.drawImage(renderingCanvas, 0, 0, w, h);
-		if(renderingCanvas.getWidth() != w) {
-			renderingCanvas.setWidth(w);
+		frameBuffer.drawImage(renderingCanvas, 0, 0, w2, h2);
+		if(renderingCanvas.getWidth() != w2) {
+			renderingCanvas.setWidth(w2);
 		}
-		if(renderingCanvas.getHeight() != h) {
-			renderingCanvas.setHeight(h);
+		if(renderingCanvas.getHeight() != h2) {
+			renderingCanvas.setHeight(h2);
 		}
 		try {
 			Thread.sleep(1l);
 		} catch (InterruptedException e) {
 			;
 		}
+	}
+	public static final float getContentScaling() {
+		 return (float)win.getDevicePixelRatio();
 	}
 	public static final void setVSyncEnabled(boolean p1) {
 		
@@ -1867,7 +1883,7 @@ public class EaglerAdapterImpl2 {
 		SelfDefence.openWindowIgnore(url, "_blank");
 	}
 	public static final void redirectTo(String url) {
-		Window.current().getLocation().setFullURL(url);
+		win.getLocation().setFullURL(url);
 	}
 	
 	@JSBody(params = { }, script = "window.onbeforeunload = function(){javaMethods.get('net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.onWindowUnload()V').invoke();return false;};")
@@ -2081,7 +2097,7 @@ public class EaglerAdapterImpl2 {
 		voiceAvailableStat = false;
 	}
 
-	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) { //TODO
+	public static void setVoiceSignalHandler(Consumer<byte[]> signalHandler) {
 		returnSignalHandler = signalHandler;
 	}
 

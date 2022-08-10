@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EaglerAdapter;
+
 public class ScaledResolution {
 	private int scaledWidth;
 	private int scaledHeight;
@@ -8,8 +10,9 @@ public class ScaledResolution {
 	private int scaleFactor;
 
 	public ScaledResolution(GameSettings par1GameSettings, int par2, int par3) {
-		this.scaledWidth = par2;
-		this.scaledHeight = par3;
+		float f = EaglerAdapter.getContentScaling();
+		this.scaledWidth = (int)(par2 / f);
+		this.scaledHeight = (int)(par3 / f);
 		this.scaleFactor = 1;
 		int var4 = par1GameSettings.guiScale;
 
