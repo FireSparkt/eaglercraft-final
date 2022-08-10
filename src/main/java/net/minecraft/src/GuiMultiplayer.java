@@ -176,7 +176,7 @@ public class GuiMultiplayer extends GuiScreen {
 				this.joinServer(this.selectedServer);
 			} else if (par1GuiButton.id == 4) {
 				this.directClicked = true;
-				this.mc.displayGuiScreen(new GuiScreenServerList(this, this.theServerData = new ServerData(StatCollector.translateToLocal("selectServer.defaultName"), "", false)));
+				this.mc.displayGuiScreen(new GuiScreenDirectConnect(this, this.theServerData = new ServerData(StatCollector.translateToLocal("selectServer.defaultName"), "", false)));
 			} else if (par1GuiButton.id == 3) {
 				this.addClicked = true;
 				this.mc.displayGuiScreen(new GuiScreenAddServer(this, this.theServerData = new ServerData(StatCollector.translateToLocal("selectServer.defaultName"), "", false)));
