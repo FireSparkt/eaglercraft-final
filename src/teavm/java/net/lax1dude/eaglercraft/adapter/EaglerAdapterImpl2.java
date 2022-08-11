@@ -1,7 +1,6 @@
 package net.lax1dude.eaglercraft.adapter;
 
 import static net.lax1dude.eaglercraft.adapter.teavm.WebGL2RenderingContext.*;
-import static org.teavm.jso.webgl.WebGLRenderingContext.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -107,10 +106,6 @@ public class EaglerAdapterImpl2 {
 
 	public static final boolean _wisWebGL() {
 		return true;
-	}
-	private static boolean isAnisotropicPatched = false;
-	public static final boolean _wisAnisotropicPatched() {
-		return isAnisotropicPatched;
 	}
 	public static final String _wgetShaderHeader() {
 		return "#version 300 es";
@@ -965,6 +960,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final boolean isWindows() {
 		return getNavString("platform").toLowerCase().contains("win");
+	}
+	public static final boolean glNeedsAnisotropicFix() {
+		return DetectAnisotropicGlitch.detectGlitch();
 	}
 
 	private static HTMLCanvasElement imageLoadCanvas = null;

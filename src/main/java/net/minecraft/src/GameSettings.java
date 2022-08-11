@@ -62,7 +62,6 @@ public class GameSettings {
 	public boolean showCape = true;
 	public boolean touchscreen = false;
 	public int antialiasMode = 1;
-	public boolean patchAnisotropic = false;
 	public int overrideWidth = 0;
 	public int overrideHeight = 0;
 	public boolean heldItemTooltips = true;
@@ -163,7 +162,6 @@ public class GameSettings {
 		this.particleSetting = 0;
 		this.language = "en_US";
 		this.mc = par1Minecraft;
-		this.patchAnisotropic = EaglerAdapter.isWindows();
 		this.loadOptions();
 	}
 
@@ -358,11 +356,6 @@ public class GameSettings {
 			}
 		}
 
-		if (par1EnumOptions == EnumOptions.PATCH_ANGLE) {
-			this.patchAnisotropic = !this.patchAnisotropic;
-			this.mc.renderGlobal.loadRenderers();
-		}
-
 		this.saveOptions();
 	}
 
@@ -412,9 +405,6 @@ public class GameSettings {
 
 		case 11:
 			return this.fullScreen;
-
-		case 12:
-			return this.patchAnisotropic;
 
 		case 13:
 			return this.showCape;
@@ -523,7 +513,6 @@ public class GameSettings {
 			if(yee.hasKey("chatHeightUnfocused")) this.chatHeightUnfocused = yee.getFloat("chatHeightUnfocused");
 			if(yee.hasKey("chatScale")) this.chatScale = yee.getFloat("chatScale");
 			if(yee.hasKey("chatWidth")) this.chatWidth = yee.getFloat("chatWidth");
-			if(yee.hasKey("patchAnisotropic")) this.patchAnisotropic = yee.getBoolean("patchAnisotropic");
 			if(yee.hasKey("showCoordinates")) this.showCoordinates = yee.getBoolean("showCoordinates");
 			if(yee.hasKey("showSkinJacket")) showSkinJacket = yee.getBoolean("showSkinJacket");
 			if(yee.hasKey("showSkinHat")) showSkinHat = yee.getBoolean("showSkinHat");
@@ -598,7 +587,6 @@ public class GameSettings {
 		yee.setFloat("chatHeightUnfocused", this.chatHeightUnfocused);
 		yee.setFloat("chatScale", this.chatScale);
 		yee.setFloat("chatWidth", this.chatWidth);
-		yee.setBoolean("patchAnisotropic", this.patchAnisotropic);
 		yee.setBoolean("showCoordinates", this.showCoordinates);
 		yee.setBoolean("showSkinJacket", showSkinJacket);
 		yee.setBoolean("showSkinHat", showSkinHat);

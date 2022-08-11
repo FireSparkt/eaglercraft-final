@@ -65,12 +65,6 @@ class EnumOptionsHelper {
 		}
 
 		try {
-			enumOptionsMappingHelperArray[EnumOptions.PATCH_ANGLE.ordinal()] = 12;
-		} catch (NoSuchFieldError var3) {
-			;
-		}
-
-		try {
 			enumOptionsMappingHelperArray[EnumOptions.SHOW_CAPE.ordinal()] = 13;
 		} catch (NoSuchFieldError var2) {
 			;

@@ -322,9 +322,7 @@ public class Minecraft implements Runnable {
 		int var4 = var2.getScaledHeight();
 		this.voiceOverlay.setResolution(var3, var4);
 
-		//if (this.serverName != null) {
-		//	this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
-		//} else {
+		EaglerAdapter.anisotropicPatch(EaglerAdapter.glNeedsAnisotropicFix());
 		
 		EaglerProfile.loadFromStorage();
 		
@@ -1153,8 +1151,6 @@ public class Minecraft implements Runnable {
 		if (this.rightClickDelayTimer > 0) {
 			--this.rightClickDelayTimer;
 		}
-		
-		EaglerAdapter.anisotropicPatch(this.gameSettings.patchAnisotropic);
 
 		this.mcProfiler.startSection("stats");
 		this.mcProfiler.endStartSection("gui");
