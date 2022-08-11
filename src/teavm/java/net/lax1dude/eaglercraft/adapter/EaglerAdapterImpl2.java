@@ -2932,10 +2932,13 @@ public class EaglerAdapterImpl2 {
 		return !isLittleEndian;
 	}
 
-	private static EaglercraftLANClient rtcLANClient = null; //TODO
+	private static EaglercraftLANClient rtcLANClient = null;
 	
 	@JSBody(params = { }, script = "return window.startLANClient();")
 	private static native EaglercraftLANClient startRTCLANClient();
+
+	private static boolean clientLANinit = false;
+	private static final List<byte[]> clientLANPacketBuffer = new ArrayList<>();
 	
 	public static final int LAN_CLIENT_INIT_FAILED = -2;
 	public static final int LAN_CLIENT_FAILED = -1;
@@ -2944,39 +2947,128 @@ public class EaglerAdapterImpl2 {
 	public static final int LAN_CLIENT_CONNECTED = 2;
 	
 	public static final boolean clientLANSupported() {
-		return true;
+		return rtcLANClient.LANClientSupported();
 	}
 	
 	public static final void clientLANSetServer(String relay, String peerId) {
-		
+		if(!clientLANinit) {
+			clientLANinit = true;
+			rtcLANClient.setDescriptionHandler(new EaglercraftLANClient.DescriptionHandler() {
+				@Override
+				public void call(String description) {
+
+				}
+			});
+			rtcLANClient.setICECandidateHandler(new EaglercraftLANClient.ICECandidateHandler() {
+				@Override
+				public void call(String candidate) {
+
+				}
+			});
+			rtcLANClient.setRemoteDataChannelHandler(new EaglercraftLANClient.ClientSignalHandler() {
+				@Override
+				public void call() {
+					// basically useless, ignore for now.
+				}
+			});
+			rtcLANClient.setRemotePacketHandler(new EaglercraftLANClient.RemotePacketHandler() {
+				@Override
+				public void call(ArrayBuffer buffer) {
+					Uint8Array array = Uint8Array.create(buffer);
+					byte[] ret = new byte[array.getByteLength()];
+					for(int i = 0; i < ret.length; ++i) {
+						ret[i] = (byte) array.get(i);
+					}
+					clientLANPacketBuffer.add(ret);
+				}
+			});
+			rtcLANClient.setRemoteDisconnectHandler(new EaglercraftLANClient.ClientSignalHandler() {
+				@Override
+				public void call() {
+					// disconnected
+				}
+			});
+		}
+		// todo: java-side: register with relay and set server
 	}
 	
 	public static final int clientLANReadyState() {
-		return 0;
+		return rtcLANClient.getReadyState();
 	}
 	
 	public static final void clientLANCloseConnection() {
-		
+		rtcLANClient.signalRemoteDisconnect();
 	}
 	
 	public static final void clientLANSendPacket(byte[] pkt) {
-		
+		ArrayBuffer arr = ArrayBuffer.create(pkt.length);
+		Uint8Array.create(arr).set(pkt);
+		rtcLANClient.sendPacketToServer(arr);
 	}
 	
 	public static final byte[] clientLANReadPacket() {
-		return null;
+		return clientLANPacketBuffer.size() > 0 ? clientLANPacketBuffer.remove(0) : null;
 	}
 	
 	private static EaglercraftLANServer rtcLANServer = null;
 
 	@JSBody(params = { }, script = "return window.startLANServer();")
 	private static native EaglercraftLANServer startRTCLANServer();
+
+	private static boolean serverLANinit = false;
+	private static final List<LANPeerPacket> serverLANPacketBuffer = new ArrayList<>();
 	
 	public static final boolean serverLANSupported() {
-		return true;
+		return rtcLANServer.LANServerSupported();
 	}
 	
 	public static final String serverLANInitializeServer(String relay) {
+		rtcLANServer.initializeServer();
+		if(!serverLANinit) {
+			serverLANinit = true;
+			rtcLANServer.setDescriptionHandler(new EaglercraftLANServer.DescriptionHandler() {
+				@Override
+				public void call(String peerId, String candidate) {
+
+				}
+			});
+			rtcLANServer.setICECandidateHandler(new EaglercraftLANServer.ICECandidateHandler() {
+				@Override
+				public void call(String peerId, String candidate) {
+
+				}
+			});
+			rtcLANServer.setRecieveCodeHandler(new EaglercraftLANServer.CodeHandler() {
+				@Override
+				public void call(String code) {
+
+				}
+			});
+			rtcLANServer.setRemoteClientDataChannelHandler(new EaglercraftLANServer.ClientSignalHandler() {
+				@Override
+				public void call() {
+					// unused
+				}
+			});
+			rtcLANServer.setRemoteClientPacketHandler(new EaglercraftLANServer.PeerPacketHandler() {
+				@Override
+				public void call(String peerId, ArrayBuffer buffer) {
+					Uint8Array array = Uint8Array.create(buffer);
+					byte[] ret = new byte[array.getByteLength()];
+					for(int i = 0; i < ret.length; ++i) {
+						ret[i] = (byte) array.get(i);
+					}
+					serverLANPacketBuffer.add(new LANPeerPacket(peerId, ret));
+				}
+			});
+			rtcLANServer.setRemoteClientDisconnectHandler(new EaglercraftLANServer.ClientSignalHandler() {
+				@Override
+				public void call() {
+					// disconnected
+				}
+			});
+		}
+		// todo: java-side: register in relay & return code!!
 		return null;
 	}
 	
@@ -2985,7 +3077,8 @@ public class EaglerAdapterImpl2 {
 	}
 
 	public static final void serverLANCloseServer() {
-		
+		rtcLANServer.signalRemoteDisconnect("");
+		// todo: java-side: disconnect from relay server
 	}
 	
 	public static interface LANConnectionEvent {
@@ -3020,15 +3113,17 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final LANPeerPacket serverLANReadPacket() {
-		return null;
+		return serverLANPacketBuffer.size() > 0 ? serverLANPacketBuffer.remove(0) : null;
 	}
 
 	public static final void serverLANWritePacket(String peer, byte[] data) {
-		
+		ArrayBuffer arr = ArrayBuffer.create(data.length);
+		Uint8Array.create(arr).set(data);
+		rtcLANServer.sendPacketToRemoteClient(peer, arr);
 	}
 	
 	public static final void serverLANDisconnectPeer(String peer) {
-		
+		rtcLANServer.signalRemoteDisconnect(peer);
 	}
 	
 }

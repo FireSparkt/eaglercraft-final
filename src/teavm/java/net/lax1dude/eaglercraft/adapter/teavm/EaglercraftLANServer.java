@@ -5,6 +5,10 @@ import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.ArrayBuffer;
 
 public interface EaglercraftLANServer extends JSObject {
+
+	final int PEERSTATE_FAILED = 0;
+	final int PEERSTATE_SUCCESS = 1;
+	final int PEERSTATE_LOADING = 2;
 	
 	boolean LANServerSupported();
 	
@@ -24,7 +28,19 @@ public interface EaglercraftLANServer extends JSObject {
 	
 	void setRemoteClientPacketHandler(PeerPacketHandler cb);
 	
-	void ssendPacketToRemoteClient(String peerId, ArrayBuffer buffer);
+	void sendPacketToRemoteClient(String peerId, ArrayBuffer buffer);
+
+	void resetPeerStates();
+
+	int getPeerState();
+
+	int getPeerStateConnect();
+
+	int getPeerStateInitial();
+
+	int getPeerStateDesc();
+
+	int getPeerStateIce();
 	
 	void signalRemoteConnect(String peerId);
 	
@@ -32,7 +48,7 @@ public interface EaglercraftLANServer extends JSObject {
 	
 	void signalRemoteICECandidate(String peerId, String candidate);
 	
-	void disconnectRemotePeer(String peerId);
+	void signalRemoteDisconnect(String peerId);
 
 	@JSFunctor
 	public static interface ICECandidateHandler extends JSObject {
