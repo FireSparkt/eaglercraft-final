@@ -68,9 +68,34 @@ class GuiSlotServer extends GuiSlot {
 	protected void drawSlot(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {
 		if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers()) {
 			this.func_77247_d(par1, par2, par3, par4, par5Tessellator);
+		}else {
+			this.func_77249_c(par1, par2, par3, par4, par5Tessellator);
 		}
 	}
-	
+
+	private void func_77249_c(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {
+		this.parentGui.drawCenteredString(this.parentGui.fontRenderer,
+				StatCollector.translateToLocal("lanServer.scanning"), this.parentGui.width / 2, par3 + 6, 16777215);
+		String var6;
+
+		switch (GuiMultiplayer.getTicksOpened(this.parentGui) / 3 % 4) {
+		case 0:
+		default:
+			var6 = "O o o";
+			break;
+
+		case 1:
+		case 3:
+			var6 = "o O o";
+			break;
+
+		case 2:
+			var6 = "o o O";
+		}
+
+		this.parentGui.drawCenteredString(this.parentGui.fontRenderer, var6, this.parentGui.width / 2, par3 + 18, 8421504);
+	}
+
 	private static final TextureLocation icons = new TextureLocation("/gui/icons.png");
 	
 	private void func_77247_d(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {

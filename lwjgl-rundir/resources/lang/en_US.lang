@@ -249,9 +249,22 @@ lanServer.title=LAN World
 lanServer.scanning=Scanning for games on your local network
 lanServer.start=Start LAN World
 lanServer.otherPlayers=Settings for Other Players
-mcoServer.title=Minecraft Online World
+mcoServer.title=yeeeeeee
 addServer.SSLWarn1=you are on an https: page!
 addServer.SSLWarn2=html5 will only allow wss://
+directConnect.prompt=What would you like to do?
+directConnect.lanWorld=Join LAN World
+directConnect.lanWorldCode=Enter Join Code:
+directConnect.serverJoin=Connect to Server
+directConnect.lanWorldJoin=Join World
+directConnect.lanWorldRelay=Network Settings
+
+networkSettings.title=LAN World Relay Servers
+networkSettings.add=Add Relay
+networkSettings.delete=Delete Relay
+networkSettings.default=Set Primary
+networkSettings.refresh=Refresh
+networkSettings.loadDefaults=Load Defaults
 
 multiplayer.title=Play Multiplayer
 multiplayer.connect=Connect

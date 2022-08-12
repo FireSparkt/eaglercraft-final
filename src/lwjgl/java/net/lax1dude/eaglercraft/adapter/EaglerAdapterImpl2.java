@@ -73,6 +73,7 @@ import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.PKT;
+import net.lax1dude.eaglercraft.RelayQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
@@ -1698,6 +1699,57 @@ public class EaglerAdapterImpl2 {
 	 * I'm pretty sure my IntBuffers address this problem but if byte order glitches (such as corrupted textures) appear then change to true
 	 */
 	public static final boolean isBigEndian() {
+		return false;
+	}
+	
+	private static final RelayQuery dummyRelayQuery = new RelayQuery() {
+
+		@Override
+		public boolean isQueryOpen() {
+			return false;
+		}
+
+		@Override
+		public boolean isQueryFailed() {
+			return false;
+		}
+
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public int getVersion() {
+			return 1;
+		}
+
+		@Override
+		public String getComment() {
+			return "this is a dummy";
+		}
+
+		@Override
+		public String getBrand() {
+			return "lax1dude";
+		}
+
+		@Override
+		public long getPing() {
+			return 10l;
+		}
+
+		@Override
+		public VersionMismatch getCompatible() {
+			return VersionMismatch.COMPATIBLE;
+		}
+		
+	};
+
+	public static final RelayQuery openRelayQuery(String addr) {
+		return dummyRelayQuery;
+	}
+	
+	public static final boolean glNeedsAnisotropicFix() {
 		return false;
 	}
 	

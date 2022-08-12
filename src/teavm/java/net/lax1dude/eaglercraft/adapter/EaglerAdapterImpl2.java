@@ -91,6 +91,7 @@ import net.lax1dude.eaglercraft.ExpiringSet;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
+import net.lax1dude.eaglercraft.RelayQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
@@ -2930,6 +2931,10 @@ public class EaglerAdapterImpl2 {
 			endianWasChecked = true;
 		}
 		return !isLittleEndian;
+	}
+	
+	public static final RelayQuery openRelayQuery(String addr) {
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	private static EaglercraftLANClient rtcLANClient = null;

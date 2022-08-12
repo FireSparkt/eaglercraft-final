@@ -29,6 +29,8 @@ public class IntegratedServer {
 	private static boolean isPaused = false;
 	private static List<String> integratedServerTPS = new LinkedList();
 	
+	public static final RelayManager relayManager = new RelayManager();
+	
 	public static List<String> getTPS() {
 		return integratedServerTPS;
 	}

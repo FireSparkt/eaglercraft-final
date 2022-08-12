@@ -31,7 +31,7 @@ public class GuiScreenDirectConnect extends GuiScreen {
 		this.buttonList.clear();
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 12, var1.translateKey("selectServer.select")));
 		this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12, var1.translateKey("gui.cancel")));
-		this.serverTextField = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 116, 200, 20);
+		this.serverTextField = new GuiTextField(this.fontRenderer, this.width / 2 - 100, this.height / 4 + 27, 200, 20);
 		this.serverTextField.setMaxStringLength(128);
 		this.serverTextField.setFocused(true);
 		this.serverTextField.setText(this.mc.gameSettings.lastServer);
@@ -89,10 +89,10 @@ public class GuiScreenDirectConnect extends GuiScreen {
 		StringTranslate var4 = StringTranslate.getInstance();
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, var4.translateKey("selectServer.direct"), this.width / 2, this.height / 4 - 60 + 20, 16777215);
-		this.drawString(this.fontRenderer, var4.translateKey("addServer.enterIp"), this.width / 2 - 100, 100, 10526880);
+		this.drawString(this.fontRenderer, var4.translateKey("addServer.enterIp"), this.width / 2 - 100, this.height / 4 + 12, 10526880);
 		if(EaglerAdapter.isSSLPage()) {
-			this.drawCenteredString(this.fontRenderer, var4.translateKey("addServer.SSLWarn1"), this.width / 2, 116 + 28, 0xccccff);
-			this.drawCenteredString(this.fontRenderer, var4.translateKey("addServer.SSLWarn2"), this.width / 2, 116 + 40, 0xccccff);
+			this.drawCenteredString(this.fontRenderer, var4.translateKey("addServer.SSLWarn1"), this.width / 2, this.height / 4 + 30 + 28, 0xccccff);
+			this.drawCenteredString(this.fontRenderer, var4.translateKey("addServer.SSLWarn2"), this.width / 2, this.height / 4 + 30 + 40, 0xccccff);
 		}
 		this.serverTextField.drawTextBox();
 		super.drawScreen(par1, par2, par3);

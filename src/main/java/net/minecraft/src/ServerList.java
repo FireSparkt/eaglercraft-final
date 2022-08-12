@@ -14,6 +14,7 @@ import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.LocalStorageManager;
+import net.lax1dude.eaglercraft.RelayEntry;
 import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.minecraft.client.Minecraft;
@@ -113,7 +114,30 @@ public class ServerList {
 				forcedServers.add(newServer);
 			}
 		}
-		
+
+		ConfigConstants.relays = new ArrayList();
+		JSONArray relays = json.optJSONArray("relays");
+		if(relays != null) {
+			for(int i = 0, l = relays.length(); i < l; ++i) {
+				JSONObject relay = relays.getJSONObject(i);
+				String addr = relay.optString("url", null);
+				if(addr == null) {
+					addr = relay.optString("address", null);
+					if(addr == null) {
+						addr = relay.getString("addr");
+					}
+				}
+				String comment = relay.optString("name", null);
+				if(comment == null) {
+					comment = relay.optString("comment", "Default Relay");
+				}
+				boolean primary = relay.optBoolean("default", false);
+				if(!primary) {
+					primary = relay.optBoolean("primary", false);
+				}
+				ConfigConstants.relays.add(new RelayEntry(addr, comment, primary));
+			}
+		}
 		
 	}
 
