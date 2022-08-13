@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,6 +19,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import net.lax1dude.eaglercraft.sp.relay.pkt.*;
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket07LocalWorlds.LocalWorld;
 
 public class EaglerSPRelay extends WebSocketServer {
 
@@ -47,10 +49,10 @@ public class EaglerSPRelay extends WebSocketServer {
 				try {
 					long millis = System.currentTimeMillis();
 					synchronized(pendingConnections) {
-						Iterator<Entry<WebSocket,Long>> itr = pendingConnections.entrySet().iterator();
+						Iterator<Entry<WebSocket,PendingConnection>> itr = pendingConnections.entrySet().iterator();
 						while(itr.hasNext()) {
-							Entry<WebSocket,Long> etr = itr.next();
-							if(millis - etr.getValue().longValue() > 1000l) {
+							Entry<WebSocket,PendingConnection> etr = itr.next();
+							if(millis - etr.getValue().openTime > 1000l) {
 								etr.getKey().close();
 								itr.remove();
 							}
@@ -60,7 +62,7 @@ public class EaglerSPRelay extends WebSocketServer {
 						Iterator<EaglerSPClient> itr = clientConnections.values().iterator();
 						while(itr.hasNext()) {
 							EaglerSPClient cl = itr.next();
-							if(millis - cl.createdOn > 6000l) {
+							if(millis - cl.createdOn > 500l) {
 								cl.disconnect(IPacketFEDisconnectClient.TYPE_TIMEOUT, "Took too long to connect!");
 							}
 						}
@@ -94,12 +96,25 @@ public class EaglerSPRelay extends WebSocketServer {
 	private EaglerSPRelay(InetSocketAddress addr) {
 		super(addr);
 	}
+	
+	private static class PendingConnection {
+		
+		private final long openTime;
+		private final String address;
+		
+		public PendingConnection(long openTime, String address) {
+			this.openTime = openTime;
+			this.address = address;
+		}
+		
+	}
 
-	private static final Map<WebSocket,Long> pendingConnections = new HashMap();
+	private static final Map<WebSocket,PendingConnection> pendingConnections = new HashMap();
 	private static final Map<String,EaglerSPClient> clientIds = new HashMap();
 	private static final Map<WebSocket,EaglerSPClient> clientConnections = new HashMap();
 	private static final Map<String,EaglerSPServer> serverCodes = new HashMap();
 	private static final Map<WebSocket,EaglerSPServer> serverConnections = new HashMap();
+	private static final Map<String,List<EaglerSPServer>> serverAddressSets = new HashMap();
 
 	@Override
 	public void onStart() {
@@ -109,27 +124,36 @@ public class EaglerSPRelay extends WebSocketServer {
 	
 	@Override
 	public void onOpen(WebSocket arg0, ClientHandshake arg1) {
+		String addr;
+		long millis = System.currentTimeMillis();
+		if(config.isEnableRealIpHeader() && arg1.hasFieldValue("X-Real-IP")) {
+			addr = arg1.getFieldValue("X-Real-IP").toLowerCase();
+		}else {
+			addr = arg0.getRemoteSocketAddress().getAddress().getHostAddress().toLowerCase();
+		}
+		arg0.setAttachment(addr);
+		PendingConnection waiting = new PendingConnection(millis, addr);
+		logger.debug("[{}]: Connection opened", arg0.getRemoteSocketAddress());
 		synchronized(pendingConnections) {
-			logger.debug("[{}]: Connection opened", arg0.getRemoteSocketAddress());
-			pendingConnections.put(arg0, System.currentTimeMillis());
+			pendingConnections.put(arg0, waiting);
 		}
 	}
 
 	@Override
 	public void onMessage(WebSocket arg0, ByteBuffer arg1) {
 		DataInputStream sid = new DataInputStream(new ByteBufferInputStream(arg1));
-		boolean waiting;
+		PendingConnection waiting;
 		synchronized(pendingConnections) {
-			waiting = pendingConnections.remove(arg0) != null;
+			waiting = pendingConnections.remove(arg0);
 		}
 		try {
 			IPacket pkt = IPacket.readPacket(sid);
-			if(waiting) {
+			if(waiting != null) {
 				if(pkt instanceof IPacket00Handshake) {
 					IPacket00Handshake ipkt = (IPacket00Handshake)pkt;
 					if(ipkt.connectionVersion != Constants.protocolVersion) {
 						logger.debug("[{}]: Connected with unsupported protocol version: {} (supported "
-								+ "version: {})", arg0.getRemoteSocketAddress(), Constants.protocolVersion);
+								+ "version: {})", arg0.getAttachment(), Constants.protocolVersion);
 						if(ipkt.connectionVersion < Constants.protocolVersion) {
 							arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_PROTOCOL_VERSION,
 									"Outdated Client! (v" + Constants.protocolVersion + " req)")));
@@ -141,7 +165,7 @@ public class EaglerSPRelay extends WebSocketServer {
 						return;
 					}
 					if(ipkt.connectionType == 0x01) {
-						logger.debug("[{}]: Connected as a server", arg0.getRemoteSocketAddress());
+						logger.debug("[{}]: Connected as a server", arg0.getAttachment());
 						EaglerSPServer srv;
 						synchronized(serverCodes) {
 							int j = 0;
@@ -149,7 +173,7 @@ public class EaglerSPRelay extends WebSocketServer {
 							do {
 								if(++j > 100) {
 									logger.error("Error: relay is running out of codes!");
-									logger.error("Closing connection to {}", arg0.getRemoteSocketAddress());
+									logger.error("Closing connection to {}", arg0.getAttachment());
 									arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_INTERNAL_ERROR,
 											"Internal Server Error")));
 									arg0.close();
@@ -157,20 +181,28 @@ public class EaglerSPRelay extends WebSocketServer {
 								}
 								code = config.generateCode();
 							}while(serverCodes.containsKey(code));
-							srv = new EaglerSPServer(arg0, code);
+							srv = new EaglerSPServer(arg0, code, ipkt.connectionCode, waiting.address);
 							serverCodes.put(code, srv);
 							ipkt.connectionCode = code;
 							arg0.send(IPacket.writePacket(ipkt));
-							logger.debug("[{}][Relay -> Server] PKT 0x00: Assign join code: {}", arg0.getRemoteSocketAddress(), code);
+							logger.debug("[{}][Relay -> Server] PKT 0x00: Assign join code: {}", arg0.getAttachment(), code);
 						}
 						synchronized(serverConnections) {
 							serverConnections.put(arg0, srv);
 						}
+						synchronized(serverAddressSets) {
+							List<EaglerSPServer> lst = serverAddressSets.get(srv.serverAddress);
+							if(lst == null) {
+								lst = new ArrayList();
+								serverAddressSets.put(srv.serverAddress, lst);
+							}
+							lst.add(srv);
+						}
 						srv.send(new IPacket01ICEServers(EaglerSPRelayConfigRelayList.relayServers));
-						logger.debug("[{}][Relay -> Server] PKT 0x01: Send ICE server list to server", arg0.getRemoteSocketAddress());
+						logger.debug("[{}][Relay -> Server] PKT 0x01: Send ICE server list to server", arg0.getAttachment());
 					}else if(ipkt.connectionType == 0x02) {
 						String code = ipkt.connectionCode;
-						logger.debug("[{}]: Connected as a client, requested server code: {}", arg0.getRemoteSocketAddress(), code);
+						logger.debug("[{}]: Connected as a client, requested server code: {}", arg0.getAttachment(), code);
 						if(code.length() != config.getCodeLength()) {
 							logger.debug("The code '{}' is invalid because it's the wrong length, disconnecting");
 							arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_CODE_LENGTH,
@@ -204,17 +236,25 @@ public class EaglerSPRelay extends WebSocketServer {
 								clientConnections.put(arg0, cl);
 							}
 							cl.send(new IPacket01ICEServers(EaglerSPRelayConfigRelayList.relayServers));
-							logger.debug("[{}][Relay -> Client] PKT 0x01: Send ICE server list to client", arg0.getRemoteSocketAddress());
+							logger.debug("[{}][Relay -> Client] PKT 0x01: Send ICE server list to client", arg0.getAttachment());
 						}
+					}else if(ipkt.connectionType == 0x02) {
+						logger.debug("[{}]: Pinging the server", arg0.getAttachment());
+						arg0.send(IPacket.writePacket(new IPacket69Pong(Constants.protocolVersion, config.getComment(), Constants.versionBrand)));
+						arg0.close();
+					}else if(ipkt.connectionType == 0x03) {
+						logger.debug("[{}]: Polling the server for other worlds", arg0.getAttachment());
+						arg0.send(IPacket.writePacket(new IPacket07LocalWorlds(getLocalWorlds(waiting.address))));
+						arg0.close();
 					}else {
-						logger.debug("[{}]: Unknown connection type: {}", arg0.getRemoteSocketAddress(), ipkt.connectionType);
+						logger.debug("[{}]: Unknown connection type: {}", arg0.getAttachment(), ipkt.connectionType);
 						arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_ILLEGAL_OPERATION,
 								"Unexpected Init Packet")));
 						arg0.close();
 					}
 				}else {
 					logger.debug("[{}]: Pending connection did not send a 0x00 packet to identify "
-							+ "as a client or server", arg0.getRemoteSocketAddress());
+							+ "as a client or server", arg0.getAttachment());
 					arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_ILLEGAL_OPERATION,
 							"Unexpected Init Packet")));
 					arg0.close();
@@ -226,7 +266,7 @@ public class EaglerSPRelay extends WebSocketServer {
 				}
 				if(srv != null) {
 					if(!srv.handle(pkt)) {
-						logger.debug("[{}]: Server sent invalid packet: {}", arg0.getRemoteSocketAddress(), pkt.getClass().getSimpleName());
+						logger.debug("[{}]: Server sent invalid packet: {}", arg0.getAttachment(), pkt.getClass().getSimpleName());
 						arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_INVALID_PACKET,
 								"Invalid Packet Recieved")));
 						arg0.close();
@@ -238,13 +278,13 @@ public class EaglerSPRelay extends WebSocketServer {
 					}
 					if(cl != null) {
 						if(cl.handle(pkt)) {
-							logger.debug("[{}]: Client sent invalid packet: {}", arg0.getRemoteSocketAddress(), pkt.getClass().getSimpleName());
+							logger.debug("[{}]: Client sent invalid packet: {}", arg0.getAttachment(), pkt.getClass().getSimpleName());
 							arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_INVALID_PACKET,
 									"Invalid Packet Recieved")));
 							arg0.close();
 						}
 					}else {
-						logger.debug("[{}]: Connection has no client/server attached to it!", arg0.getRemoteSocketAddress());
+						logger.debug("[{}]: Connection has no client/server attached to it!", arg0.getAttachment());
 						arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_ILLEGAL_OPERATION,
 								"Internal Server Error")));
 						arg0.close();
@@ -252,14 +292,14 @@ public class EaglerSPRelay extends WebSocketServer {
 				}
 			}
 		}catch(Throwable t) {
-			logger.error("[{}]: Failed to handle binary frame: {}", arg0.getRemoteSocketAddress(), t);
+			logger.error("[{}]: Failed to handle binary frame: {}", arg0.getAttachment(), t);
 			arg0.close();
 		}
 	}
 
 	@Override
 	public void onMessage(WebSocket arg0, String arg1) {
-		logger.debug("[{}]: Sent a text frame, disconnecting", arg0.getRemoteSocketAddress());
+		logger.debug("[{}]: Sent a text frame, disconnecting", arg0.getAttachment());
 		arg0.close();
 	}
 
@@ -270,7 +310,7 @@ public class EaglerSPRelay extends WebSocketServer {
 			srv = serverConnections.remove(arg0);
 		}
 		if(srv != null) {
-			logger.debug("[{}]: Server closed, code: {}", arg0.getRemoteSocketAddress(), srv.code);
+			logger.debug("[{}]: Server closed, code: {}", arg0.getAttachment(), srv.code);
 			synchronized(serverCodes) {
 				serverCodes.remove(srv.code);
 			}
@@ -282,8 +322,15 @@ public class EaglerSPRelay extends WebSocketServer {
 			while(itr.hasNext()) {
 				EaglerSPClient cl = itr.next();
 				if(cl.server == srv) {
-					logger.debug("[{}]: Disconnecting client: {} (id: ", cl.socket.getRemoteSocketAddress(), cl.id);
+					logger.debug("[{}]: Disconnecting client: {} (id: ", cl.socket.getAttachment(), cl.id);
 					cl.socket.close();
+				}
+			}
+			synchronized(serverAddressSets) {
+				List<EaglerSPServer> lst = serverAddressSets.get(srv.serverAddress);
+				lst.remove(srv);
+				if(lst.size() == 0) {
+					serverAddressSets.remove(srv.serverAddress);
 				}
 			}
 		}else {
@@ -292,22 +339,41 @@ public class EaglerSPRelay extends WebSocketServer {
 				cl = clientConnections.remove(arg0);
 			}
 			if(cl != null) {
-				logger.debug("[{}]: Client closed, id: {}", arg0.getRemoteSocketAddress(), cl.id);
+				logger.debug("[{}]: Client closed, id: {}", arg0.getAttachment(), cl.id);
 				synchronized(clientIds) {
 					clientIds.remove(cl.id);
 				}
 				cl.server.handleClientDisconnect(cl);
 			}else {
-				logger.debug("[{}]: Connection Closed: {} ", arg0.getRemoteSocketAddress());
+				logger.debug("[{}]: Connection Closed: {} ", arg0.getAttachment());
 			}
 		}
 	}
 
 	@Override
 	public void onError(WebSocket arg0, Exception arg1) {
-		logger.error("[{}]: Exception thrown: {}", arg0.getRemoteSocketAddress(), arg1.toString());
+		logger.error("[{}]: Exception thrown: {}", arg0.getAttachment(), arg1.toString());
 		logger.debug(arg1);
 		arg0.close();
+	}
+	
+	private List<IPacket07LocalWorlds.LocalWorld> getLocalWorlds(String addr) {
+		List<IPacket07LocalWorlds.LocalWorld> lst = new ArrayList();
+		synchronized(serverAddressSets) {
+			List<EaglerSPServer> srvs = serverAddressSets.get(addr);
+			if(srvs != null) {
+				if(srvs.size() == 0) {
+					serverAddressSets.remove(addr);
+				}else {
+					for(EaglerSPServer s : srvs) {
+						if(!s.serverHidden) {
+							lst.add(new LocalWorld(s.serverName, s.code));
+						}
+					}
+				}
+			}
+		}
+		return lst;
 	}
 
 }

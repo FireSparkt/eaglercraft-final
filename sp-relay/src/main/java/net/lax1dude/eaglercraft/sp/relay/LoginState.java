@@ -14,7 +14,7 @@ public enum LoginState {
 		if(client.state != state) {
 			String msg = "client is in state " + client.state.name() + " when it was supposed to be " + state.name();
 			client.disconnect(IPacketFEDisconnectClient.TYPE_INVALID_OPERATION, msg);
-			EaglerSPRelay.logger.debug("[{}][Relay -> Client] PKT 0xFE: TYPE_INVALID_OPERATION: {}", client.socket.getRemoteSocketAddress(), msg);
+			EaglerSPRelay.logger.debug("[{}][Relay -> Client] PKT 0xFE: TYPE_INVALID_OPERATION: {}", client.socket.getAttachment(), msg);
 			return false;
 		}else {
 			return true;

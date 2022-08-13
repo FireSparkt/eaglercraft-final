@@ -20,11 +20,27 @@ public class EaglerSPServer {
 	public final WebSocket socket;
 	public final String code;
 	public final Map<String,EaglerSPClient> clients;
+	public final String serverName;
+	public final String serverAddress;
+	public final boolean serverHidden;
 	
-	EaglerSPServer(WebSocket sock, String code) {
+	EaglerSPServer(WebSocket sock, String code, String serverName, String serverAddress) {
 		this.socket = sock;
 		this.code = code;
 		this.clients = new HashMap();
+		
+		if(serverName.endsWith(";1")) {
+			this.serverHidden = true;
+			serverName = serverName.substring(0, serverName.length() - 2);
+		}else if(serverName.endsWith(";0")) {
+			this.serverHidden = false;
+			serverName = serverName.substring(0, serverName.length() - 2);
+		}else {
+			this.serverHidden = false;
+		}
+		
+		this.serverName = serverName;
+		this.serverAddress = serverAddress;
 	}
 	
 	public void send(IPacket packet) {
@@ -32,7 +48,7 @@ public class EaglerSPServer {
 			try {
 				this.socket.send(IPacket.writePacket(packet));
 			}catch(IOException ex) {
-				EaglerSPRelay.logger.debug("Error sending data to {}", this.socket.getRemoteSocketAddress());
+				EaglerSPRelay.logger.debug("Error sending data to {}", this.serverAddress);
 				EaglerSPRelay.logger.debug(ex);
 				try {
 					this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_INTERNAL_ERROR,
@@ -42,7 +58,7 @@ public class EaglerSPServer {
 				this.socket.close();
 			}
 		}else {
-			EaglerSPRelay.logger.debug("WARNING: Tried to send data to {} after the connection closed.", this.socket.getRemoteSocketAddress());
+			EaglerSPRelay.logger.debug("WARNING: Tried to send data to {} after the connection closed.", this.serverAddress);
 		}
 	}
 	
@@ -54,7 +70,7 @@ public class EaglerSPServer {
 				if(LoginState.assertEquals(cl, LoginState.SENT_ICE_CANDIDATE)) {
 					cl.state = LoginState.RECIEVED_ICE_CANIDATE;
 					cl.handleServerICECandidate(packet);
-					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x03: ICECandidate", cl.socket.getRemoteSocketAddress());
+					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x03: ICECandidate", cl.socket.getAttachment());
 				}
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,
@@ -68,7 +84,7 @@ public class EaglerSPServer {
 				if(LoginState.assertEquals(cl, LoginState.SENT_DESCRIPTION)) {
 					cl.state = LoginState.RECIEVED_DESCRIPTION;
 					cl.handleServerDescription(packet);
-					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x04: Description", cl.socket.getRemoteSocketAddress());
+					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x04: Description", cl.socket.getAttachment());
 				}
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,
@@ -80,7 +96,7 @@ public class EaglerSPServer {
 			EaglerSPClient cl = clients.get(packet.clientId);
 			if(cl != null) {
 				cl.handleServerDisconnectClient(packet);
-				EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0xFE: Disconnect: {}: {}", cl.socket.getRemoteSocketAddress(),
+				EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0xFE: Disconnect: {}: {}", cl.socket.getAttachment(),
 						packet.code, packet.reason);
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,
@@ -96,7 +112,7 @@ public class EaglerSPServer {
 		synchronized(clients) {
 			clients.put(client.id, client);
 			send(new IPacket02NewClient(client.id));
-			EaglerSPRelay.logger.debug("[{}][Relay -> Server] PKT 0x02: Notify server of the client, id: {}", socket.getRemoteSocketAddress(), client.id);
+			EaglerSPRelay.logger.debug("[{}][Relay -> Server] PKT 0x02: Notify server of the client, id: {}", serverAddress, client.id);
 		}
 	}
 	

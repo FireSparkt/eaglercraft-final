@@ -29,6 +29,8 @@ public class IPacket {
 		register(0x04, IPacket04Description.class);
 		register(0x05, IPacket05ClientSuccess.class);
 		register(0x06, IPacket06ClientFailure.class);
+		register(0x07, IPacket07LocalWorlds.class);
+		register(0x69, IPacket69Pong.class);
 		register(0xFE, IPacketFEDisconnectClient.class);
 		register(0xFF, IPacketFFErrorCode.class);
 	}

@@ -26,6 +26,7 @@ public class EaglerSPRelayConfig {
 	private String originWhitelist = "";
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
+	private String serverComment = "Eags. Public LAN Relay";
 
 	public void load(File conf) {
 		if(!conf.isFile()) {
@@ -38,7 +39,7 @@ public class EaglerSPRelayConfig {
 			boolean gotRateLimitEnable = false, gotRateLimitPeriod = false;
 			boolean gotRateLimitLimit = false, gotRateLimitLockoutLimit = false;
 			boolean gotRateLimitLockoutDuration = false, gotOriginWhitelist = false;
-			boolean gotEnableRealIpHeader = false, gotAddress = false;
+			boolean gotEnableRealIpHeader = false, gotAddress = false, gotComment = false;
 			Throwable t2 = null;
 			try(BufferedReader reader = new BufferedReader(new FileReader(conf))) {
 				String s;
@@ -158,6 +159,9 @@ public class EaglerSPRelayConfig {
 								t2 = t;
 								break;
 							}
+						}else if(ss[0].equalsIgnoreCase("server-comment")) {
+							serverComment = ss[1];
+							gotComment = true;
 						}
 					}
 				}
@@ -173,7 +177,7 @@ public class EaglerSPRelayConfig {
 					!gotCodeMixCase || !gotConnectionsPerIP || !gotRateLimitEnable ||
 					!gotRateLimitPeriod || !gotRateLimitLimit || !gotRateLimitLockoutLimit ||
 					!gotRateLimitLockoutDuration || !gotOriginWhitelist ||
-					!gotEnableRealIpHeader || !gotAddress) {
+					!gotEnableRealIpHeader || !gotAddress || !gotComment) {
 				EaglerSPRelay.logger.warn("Updating config file: {}", conf.getAbsoluteFile());
 				save(conf);
 			}
@@ -206,7 +210,8 @@ public class EaglerSPRelayConfig {
 			w.println("ratelimit-lockout-limit=" + rateLimitLockoutLimit);
 			w.println("ratelimit-lockout-duration=" + rateLimitLockoutDuration);
 			w.println("origin-whitelist=" + originWhitelist);
-			w.print("enable-real-ip-header=" + enableRealIpHeader);
+			w.println("enable-real-ip-header=" + enableRealIpHeader);
+			w.print("server-comment=" + serverComment);
 		}catch(IOException t) {
 			EaglerSPRelay.logger.error("Failed to write config file: {}", conf.getAbsoluteFile());
 			EaglerSPRelay.logger.error(t);
@@ -277,6 +282,10 @@ public class EaglerSPRelayConfig {
 
 	public boolean isEnableRealIpHeader() {
 		return enableRealIpHeader;
+	}
+
+	public String getComment() {
+		return serverComment;
 	}
 	
 	public String generateCode() {

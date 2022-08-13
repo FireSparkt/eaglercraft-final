@@ -12,7 +12,7 @@ public class Util {
 	}
 	
 	public static String sock2String(InetSocketAddress sock) {
-		return sock.getAddress().getHostAddress() + sock.getPort();
+		return sock.getAddress().getHostAddress() + ":" + sock.getPort();
 	}
 	
 }
