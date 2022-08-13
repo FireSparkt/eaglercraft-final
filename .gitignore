@@ -8,6 +8,8 @@ eaglercraftbungee/bin
 eaglercraftbungee/rundir
 eaglercraftbungee/test
 eaglercraftbungee/minecrafthtml5bungee.iml
+eaglercraftbungee/src/main/java/META-INF
+eaglercraftbungee/out
 epkcompiler/bin
 spigot-server/world*
 eaglercraftbungee/rundir
@@ -24,3 +26,8 @@ sp-server/bin
 stable-download/_repl*
 lwjgl-rundir/_eagstorage*
 *.bak
+sp-relay/sp-relay.iml
+sp-relay/out
+sp-relay/test
+sp-relay/.idea
+sp-relay/src/main/java/META-INF

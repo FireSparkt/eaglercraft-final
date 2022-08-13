@@ -578,7 +578,6 @@ window.initializeLANServer = (() => {
 			this.ICEServers = [];
 			this.hasInit = false;
 			this.peerList = new Map();
-			this.readyState = READYSTATE_NONE;
 			this.peerState = PEERSTATE_LOADING;
 			this.peerStateConnect = PEERSTATE_LOADING;
 			this.peerStateInitial = PEERSTATE_LOADING;

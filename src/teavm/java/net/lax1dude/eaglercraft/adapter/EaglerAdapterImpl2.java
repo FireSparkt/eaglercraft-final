@@ -2932,9 +2932,52 @@ public class EaglerAdapterImpl2 {
 		}
 		return !isLittleEndian;
 	}
+
+	private static final RelayQuery dummyRelayQuery = new RelayQuery() {
+
+		@Override
+		public boolean isQueryOpen() {
+			return false;
+		}
+
+		@Override
+		public boolean isQueryFailed() {
+			return false;
+		}
+
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public int getVersion() {
+			return 1;
+		}
+
+		@Override
+		public String getComment() {
+			return "this is a dummy";
+		}
+
+		@Override
+		public String getBrand() {
+			return "lax1dude";
+		}
+
+		@Override
+		public long getPing() {
+			return 10l;
+		}
+
+		@Override
+		public VersionMismatch getCompatible() {
+			return VersionMismatch.COMPATIBLE;
+		}
+
+	};
 	
 	public static final RelayQuery openRelayQuery(String addr) {
-		throw new UnsupportedOperationException("TODO");
+		return dummyRelayQuery;
 	}
 
 	private static EaglercraftLANClient rtcLANClient = null;
