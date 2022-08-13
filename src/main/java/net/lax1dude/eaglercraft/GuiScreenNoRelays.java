@@ -4,11 +4,11 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.StringTranslate;
 
-public class GuiNoRelays extends GuiScreen {
+public class GuiScreenNoRelays extends GuiScreen {
 	
 	private GuiScreen parent;
 	
-	public GuiNoRelays(GuiScreen parent) {
+	public GuiScreenNoRelays(GuiScreen parent) {
 		this.parent = parent;
 	}
 

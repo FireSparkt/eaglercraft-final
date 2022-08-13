@@ -28,7 +28,7 @@ public class GuiScreenCreateWorldSelection extends GuiScreen {
 	
 	public void updateScreen() {
 		if(EaglerAdapter.getFileChooserResultAvailable() && (isImportingEPK || isImportingMCA)) {
-			this.mc.displayGuiScreen(new GuiNameWorldImport(mainmenu, EaglerAdapter.getFileChooserResultName(), isImportingEPK ? 0 : (isImportingMCA ? 1 : -1)));
+			this.mc.displayGuiScreen(new GuiScreenNameWorldImport(mainmenu, EaglerAdapter.getFileChooserResultName(), isImportingEPK ? 0 : (isImportingMCA ? 1 : -1)));
 			isImportingEPK = isImportingMCA = false;
 		}
 	}

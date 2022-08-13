@@ -6,7 +6,7 @@ import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiTextField;
 import net.minecraft.src.StringTranslate;
 
-public class GuiNameWorldImport extends GuiScreen {
+public class GuiScreenNameWorldImport extends GuiScreen {
 	private GuiScreen parentGuiScreen;
 	private GuiTextField theGuiTextField;
 	private int importFormat;
@@ -16,7 +16,7 @@ public class GuiNameWorldImport extends GuiScreen {
 	private boolean definetlyTimeToImport = false;
 	private boolean isImporting = false;
 	
-	public GuiNameWorldImport(GuiScreen menu, String name, int format) {
+	public GuiScreenNameWorldImport(GuiScreen menu, String name, int format) {
 		this.parentGuiScreen = menu;
 		this.importFormat = format;
 		this.oldName = name;
