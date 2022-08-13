@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.RelayEntry;
 import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
@@ -67,6 +68,7 @@ public class ServerList {
 				tag.setBoolean("default", true);
 				forcedServers.add(ServerData.getServerDataFromNBTCompound(tag));
 			}
+			ConfigConstants.relays = new ArrayList();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -162,6 +164,7 @@ public class ServerList {
 			this.servers.add(dat);
 			this.allServers.add(dat);
 		}
+		IntegratedServer.relayManager.load(LocalStorageManager.gameSettingsStorage.getTagList("relays"));
 	}
 
 	/**

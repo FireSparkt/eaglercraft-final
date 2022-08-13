@@ -1,9 +1,11 @@
 package net.lax1dude.eaglercraft;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.src.EnumChatFormatting;
 import net.minecraft.src.Gui;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
+import net.minecraft.src.GuiScreenConfirmation;
 import net.minecraft.src.StringTranslate;
 
 public class GuiScreenRelay extends GuiScreen {
@@ -11,13 +13,12 @@ public class GuiScreenRelay extends GuiScreen {
 	private final GuiScreen screen;
 	private GuiSlotRelay slots;
 	private boolean hasPinged;
+	private boolean addingNew = false;
+	private boolean deleting = false;
 	int selected;
 
-	private GuiButton addRelay;
 	private GuiButton deleteRelay;
 	private GuiButton setPrimary;
-	private GuiButton refresh;
-	private GuiButton loadDefault;
 	
 	private String tooltipString = null;
 	
@@ -29,12 +30,12 @@ public class GuiScreenRelay extends GuiScreen {
 		selected = -1;
 		StringTranslate var1 = StringTranslate.getInstance();
 		buttonList.clear();
-		buttonList.add(new GuiButton(0, this.width / 2 + 54, this.height - 28, 100, 20, var1.translateKey("gui.cancel")));
-		buttonList.add(addRelay = new GuiButton(1, this.width / 2 - 154, this.height - 52, 100, 20, var1.translateKey("networkSettings.add")));
+		buttonList.add(new GuiButton(0, this.width / 2 + 54, this.height - 28, 100, 20, var1.translateKey("gui.done")));
+		buttonList.add(new GuiButton(1, this.width / 2 - 154, this.height - 52, 100, 20, var1.translateKey("networkSettings.add")));
 		buttonList.add(deleteRelay = new GuiButton(2, this.width / 2 - 50, this.height - 52, 100, 20, var1.translateKey("networkSettings.delete")));
 		buttonList.add(setPrimary = new GuiButton(3, this.width / 2 + 54, this.height - 52, 100, 20, var1.translateKey("networkSettings.default")));
-		buttonList.add(refresh = new GuiButton(4, this.width / 2 - 50, this.height - 28, 100, 20, var1.translateKey("networkSettings.refresh")));
-		buttonList.add(loadDefault = new GuiButton(5, this.width / 2 - 154, this.height - 28, 100, 20, var1.translateKey("networkSettings.loadDefaults")));
+		buttonList.add(new GuiButton(4, this.width / 2 - 50, this.height - 28, 100, 20, var1.translateKey("networkSettings.refresh")));
+		buttonList.add(new GuiButton(5, this.width / 2 - 154, this.height - 28, 100, 20, var1.translateKey("networkSettings.loadDefaults")));
 		updateButtons();
 		this.slots = new GuiSlotRelay(this);
 		if(!hasPinged) {
@@ -45,28 +46,37 @@ public class GuiScreenRelay extends GuiScreen {
 	
 	void updateButtons() {
 		if(selected < 0) {
-			addRelay.enabled = false;
 			deleteRelay.enabled = false;
 			setPrimary.enabled = false;
-			loadDefault.enabled = false;
 		}else {
-			addRelay.enabled = true;
 			deleteRelay.enabled = true;
 			setPrimary.enabled = true;
-			loadDefault.enabled = true;
 		}
 	}
 	
 	public void actionPerformed(GuiButton btn) {
 		if(btn.id == 0) {
 			mc.displayGuiScreen(screen);
-		} else if(btn.id == 4) {
-			slots.relayManager.ping();
+		} else if(btn.id == 1) {
+			addingNew = true;
+			mc.displayGuiScreen(new GuiScreenAddRelay(this));
+		} else if(btn.id == 2) {
+			StringTranslate var1 = StringTranslate.getInstance();
+			if(selected >= 0) {
+				RelayServer srv = IntegratedServer.relayManager.get(selected);
+				mc.displayGuiScreen(new GuiScreenConfirmation(this,  var1.translateKey("networkSettings.delete"), var1.translateKey("addRelay.removeText1"),
+						EnumChatFormatting.GRAY + "'" + srv.comment + "' (" + srv.address + ")", selected));
+				deleting = true;
+			}
 		} else if(btn.id == 3) {
 			if(selected >= 0) {
 				slots.relayManager.setPrimary(selected);
 				selected = 0;
 			}
+		} else if(btn.id == 4) {
+			slots.relayManager.ping();
+		} else if(btn.id == 5) {
+			slots.relayManager.loadDefaults();
 		}
 	}
 	
@@ -106,6 +116,30 @@ public class GuiScreenRelay extends GuiScreen {
 	
 	void setToolTip(String str) {
 		tooltipString = str;
+	}
+
+	String addNewName;
+	String addNewAddr;
+	boolean addNewPrimary;
+
+	public void confirmClicked(boolean par1, int par2) {
+		if(par1) {
+			if(addingNew) {
+				IntegratedServer.relayManager.addNew(addNewAddr, addNewName, addNewPrimary);
+				addNewAddr = null;
+				addNewName = null;
+				addNewPrimary = false;
+				selected = -1;
+				updateButtons();
+			}else if(deleting) {
+				IntegratedServer.relayManager.remove(par2);
+				selected = -1;
+				updateButtons();
+			}
+		}
+		addingNew = false;
+		deleting = false;
+		this.mc.displayGuiScreen(this);
 	}
 	
 	static Minecraft getMinecraft(GuiScreenRelay screen) {

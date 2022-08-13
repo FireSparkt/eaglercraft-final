@@ -266,6 +266,17 @@ networkSettings.default=Set Primary
 networkSettings.refresh=Refresh
 networkSettings.loadDefaults=Load Defaults
 
+addRelay.title=Add New Relay
+addRelay.name=Relay Comment
+addRelay.address=Relay Address
+addRelay.add=Add Relay
+addRelay.primary=Set Primary
+addRelay.removeText1=Do you want to remove this relay?
+
+noRelay.title=No Relays are Configured!
+noRelay.noRelay1=LAN Unavailable: No Relays Configured!
+noRelay.noRelay2=Click '§nNetwork Settings§r' to fix
+
 multiplayer.title=Play Multiplayer
 multiplayer.connect=Connect
 multiplayer.info1=Minecraft Multiplayer is currently not finished, but there

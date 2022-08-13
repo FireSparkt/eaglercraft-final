@@ -13,18 +13,12 @@ public class RelayManager {
 	private final List<RelayServer> relays = new ArrayList();
 	private long lastPingThrough = 0l;
 	
-	public RelayManager() {
-		relays.add(new RelayServer("wss://addr1/", "relay #1", true));
-		relays.add(new RelayServer("wss://addr2/", "relay #2", false));
-		relays.add(new RelayServer("wss://addr3/", "relay #3", false));
-	}
-	
 	public void load(NBTTagList relayConfig) {
 		relays.clear();
 		if(relayConfig.tagCount() > 0) {
 			boolean gotAPrimary = false;
 			for(int i = 0, l = relayConfig.tagCount(); i < l; ++i) {
-				NBTBase relay = relayConfig.tagAt(l);
+				NBTBase relay = relayConfig.tagAt(i);
 				if(relay instanceof NBTTagCompound) {
 					NBTTagCompound relayee = (NBTTagCompound) relay;
 					boolean p = relayee.getBoolean("primary");
@@ -45,6 +39,20 @@ public class RelayManager {
 			}
 		}
 		sort();
+	}
+	
+	public void save() {
+		NBTTagList lst = new NBTTagList();
+		for(int i = 0, l = relays.size(); i < l; ++i) {
+			RelayServer srv = relays.get(i);
+			NBTTagCompound etr = new NBTTagCompound();
+			etr.setString("addr", srv.address);
+			etr.setString("comment", srv.comment);
+			etr.setBoolean("primary", srv.isPrimary());
+			lst.appendTag(etr);
+		}
+		LocalStorageManager.gameSettingsStorage.setTag("relays", lst);
+		LocalStorageManager.saveStorageG();
 	}
 	
 	private void sort() {
@@ -112,11 +120,30 @@ public class RelayManager {
 		int i = relays.size();
 		relays.add(new RelayServer(addr, comment, false));
 		if(primary) {
-			setPrimary(i);
+			setPrimary0(i);
 		}
+		save();
+	}
+	
+	public void addNew(String addr, String comment, boolean primary) {
+		lastPingThrough = 0l;
+		int i = relays.size();
+		int j = primary || i == 0 ? 0 : 1;
+		RelayServer newServer = new RelayServer(addr, comment, false);
+		relays.add(j, newServer);
+		newServer.ping();
+		if(primary) {
+			setPrimary0(j);
+		}
+		save();
+	}
+	
+	public void setPrimary(int idx) {
+		setPrimary0(idx);
+		save();
 	}
 
-	public void setPrimary(int idx) {
+	private void setPrimary0(int idx) {
 		if(idx >= 0 && idx < relays.size()) {
 			for(int i = 0, l = relays.size(); i < l; ++i) {
 				RelayServer srv = relays.get(i);
@@ -134,6 +161,7 @@ public class RelayManager {
 		RelayServer srv = relays.remove(idx);
 		srv.close();
 		sort();
+		save();
 	}
 	
 	public RelayServer getPrimary() {
@@ -145,6 +173,7 @@ public class RelayManager {
 				}
 			}
 			sort();
+			save();
 			return getPrimary();
 		}else {
 			return null;
@@ -196,6 +225,38 @@ public class RelayManager {
 		}else {
 			return null;
 		}
+	}
+	
+	public void loadDefaults() {
+		int setPrimary = relays.size();
+		eee: for(RelayEntry etr : ConfigConstants.relays) {
+			for(RelayServer exEtr : relays) {
+				if(exEtr.address.equalsIgnoreCase(etr.address)) {
+					continue eee;
+				}
+			}
+			relays.add(new RelayServer(etr));
+		}
+		setPrimary(setPrimary);
+	}
+	
+	public String makeNewRelayName() {
+		String str = "Relay Server #" + (relays.size() + 1);
+		for(int i = relays.size() + 2, l = relays.size() + 50; i < l; ++i) {
+			if(str.equalsIgnoreCase("Relay Server #" + i)) {
+				str = "Relay Server #" + (i + 1);
+			}
+		}
+		eee: while(true) {
+			for(int i = 0, l = relays.size(); i < l; ++i) {
+				if(str.equalsIgnoreCase(relays.get(i).comment)) {
+					str = str + "_";
+					continue eee;
+				}
+			}
+			break;
+		}
+		return str;
 	}
 	
 }
