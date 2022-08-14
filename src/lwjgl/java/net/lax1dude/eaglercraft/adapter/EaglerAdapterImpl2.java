@@ -1742,6 +1742,11 @@ public class EaglerAdapterImpl2 {
 		public VersionMismatch getCompatible() {
 			return VersionMismatch.COMPATIBLE;
 		}
+
+		@Override
+		public RateLimit isQueryRateLimit() {
+			return RateLimit.NONE;
+		}
 		
 	};
 

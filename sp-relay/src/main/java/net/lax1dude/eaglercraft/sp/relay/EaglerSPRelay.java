@@ -321,11 +321,11 @@ public class EaglerSPRelay extends WebSocketServer {
 								cl.send(new IPacket01ICEServers(EaglerSPRelayConfigRelayList.relayServers));
 								logger.debug("[{}][Relay -> Client] PKT 0x01: Send ICE server list to client", arg0.getAttachment());
 							}
-						}else if(ipkt.connectionType == 0x02) {
+						}else if(ipkt.connectionType == 0x03) {
 							logger.debug("[{}]: Pinging the server", arg0.getAttachment());
 							arg0.send(IPacket.writePacket(new IPacket69Pong(Constants.protocolVersion, config.getComment(), Constants.versionBrand)));
 							arg0.close();
-						}else if(ipkt.connectionType == 0x03) {
+						}else if(ipkt.connectionType == 0x04) {
 							logger.debug("[{}]: Polling the server for other worlds", arg0.getAttachment());
 							arg0.send(IPacket.writePacket(new IPacket07LocalWorlds(getLocalWorlds(waiting.address))));
 							arg0.close();
@@ -485,7 +485,6 @@ public class EaglerSPRelay extends WebSocketServer {
 				sock.close();
 				return false;
 			}else if(l == RateLimit.LOCKOUT) {
-				sock.send(IPacketFEDisconnectClient.ratelimitPacketLocked);
 				sock.close();
 				return false;
 			}else {

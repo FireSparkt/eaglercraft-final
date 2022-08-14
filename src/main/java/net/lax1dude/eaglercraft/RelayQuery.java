@@ -1,5 +1,7 @@
 package net.lax1dude.eaglercraft;
 
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
+
 public interface RelayQuery {
 	
 	public static enum VersionMismatch {
@@ -11,6 +13,7 @@ public interface RelayQuery {
 
 	public boolean isQueryOpen();
 	public boolean isQueryFailed();
+	public RateLimit isQueryRateLimit();
 	public void close();
 	
 	public int getVersion();
