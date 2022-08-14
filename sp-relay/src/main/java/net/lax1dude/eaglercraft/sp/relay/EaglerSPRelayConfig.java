@@ -17,12 +17,22 @@ public class EaglerSPRelayConfig {
 	private int codeLength = 5;
 	private String codeChars = "abcdefghijklmnopqrstuvwxyz0123456789$%&*+?!";
 	private boolean codeMixCase = false;
-	private int connectionsPerIP = 256;
-	private boolean rateLimitEnable = false;
-	private int rateLimitPeriod = 128;
-	private int rateLimitLimit = 48;
-	private int rateLimitLockoutLimit = 64;
-	private int rateLimitLockoutDuration = 600;
+	
+	private int connectionsPerIP = 128;
+	private int worldsPerIP = 32;
+	
+	private boolean openRateLimitEnable = true;
+	private int openRateLimitPeriod = 192;
+	private int openRateLimitLimit = 32;
+	private int openRateLimitLockoutLimit = 48;
+	private int openRateLimitLockoutDuration = 600;
+	
+	private boolean pingRateLimitEnable = true;
+	private int pingRateLimitPeriod = 256;
+	private int pingRateLimitLimit = 128;
+	private int pingRateLimitLockoutLimit = 192;
+	private int pingRateLimitLockoutDuration = 300;
+	
 	private String originWhitelist = "";
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
@@ -35,11 +45,17 @@ public class EaglerSPRelayConfig {
 		}else {
 			EaglerSPRelay.logger.info("Loading config file: {}", conf.getAbsoluteFile());
 			boolean gotPort = false, gotCodeLength = false, gotCodeChars = false;
-			boolean gotCodeMixCase = false, gotConnectionsPerIP = false;
-			boolean gotRateLimitEnable = false, gotRateLimitPeriod = false;
-			boolean gotRateLimitLimit = false, gotRateLimitLockoutLimit = false;
-			boolean gotRateLimitLockoutDuration = false, gotOriginWhitelist = false;
-			boolean gotEnableRealIpHeader = false, gotAddress = false, gotComment = false;
+			boolean gotCodeMixCase = false;
+			boolean gotConnectionsPerIP = false, gotWorldsPerIP = false,
+					gotOpenRateLimitEnable = false, gotOpenRateLimitPeriod = false,
+					gotOpenRateLimitLimit = false, gotOpenRateLimitLockoutLimit = false,
+					gotOpenRateLimitLockoutDuration = false;
+			boolean gotPingRateLimitEnable = false, gotPingRateLimitPeriod = false,
+					gotPingRateLimitLimit = false, gotPingRateLimitLockoutLimit = false,
+					gotPingRateLimitLockoutDuration = false;
+			boolean gotOriginWhitelist = false, gotEnableRealIpHeader = false,
+					gotAddress = false, gotComment = false;
+			
 			Throwable t2 = null;
 			try(BufferedReader reader = new BufferedReader(new FileReader(conf))) {
 				String s;
@@ -86,6 +102,66 @@ public class EaglerSPRelayConfig {
 								t2 = t;
 								break;
 							}
+						}else if(ss[0].equalsIgnoreCase("worlds-per-ip")) {
+							try {
+								worldsPerIP = Integer.parseInt(ss[1]);
+								gotWorldsPerIP = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid worlds-per-ip {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
+						}else if(ss[0].equalsIgnoreCase("world-ratelimit-enable")) {
+							try {
+								openRateLimitEnable = getBooleanValue(ss[1]);
+								gotOpenRateLimitEnable = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid world-ratelimit-enable {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
+						}else if(ss[0].equalsIgnoreCase("world-ratelimit-period")) {
+							try {
+								openRateLimitPeriod = Integer.parseInt(ss[1]);
+								gotOpenRateLimitPeriod = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid world-ratelimit-period {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
+						}else if(ss[0].equalsIgnoreCase("world-ratelimit-limit")) {
+							try {
+								openRateLimitLimit = Integer.parseInt(ss[1]);
+								gotOpenRateLimitLimit = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid world-ratelimit-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
+						}else if(ss[0].equalsIgnoreCase("world-ratelimit-lockout-limit")) {
+							try {
+								openRateLimitLockoutLimit = Integer.parseInt(ss[1]);
+								gotOpenRateLimitLockoutLimit = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid world-ratelimit-lockout-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
+						}else if(ss[0].equalsIgnoreCase("world-ratelimit-lockout-duration")) {
+							try {
+								openRateLimitLockoutDuration = Integer.parseInt(ss[1]);
+								gotOpenRateLimitLockoutDuration = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid world-ratelimit-lockout-duration {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
 						}else if(ss[0].equalsIgnoreCase("connections-per-ip")) {
 							try {
 								connectionsPerIP = Integer.parseInt(ss[1]);
@@ -96,52 +172,52 @@ public class EaglerSPRelayConfig {
 								t2 = t;
 								break;
 							}
-						}else if(ss[0].equalsIgnoreCase("ratelimit-enable")) {
+						}else if(ss[0].equalsIgnoreCase("ping-ratelimit-enable")) {
 							try {
-								rateLimitEnable = getBooleanValue(ss[1]);
-								gotRateLimitEnable = true;
+								pingRateLimitEnable = getBooleanValue(ss[1]);
+								gotPingRateLimitEnable = true;
 							}catch(Throwable t) {
-								EaglerSPRelay.logger.warn("Invalid rate-limit-enable {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn("Invalid ping-ratelimit-enable {} in conf {}", ss[1], conf.getAbsoluteFile());
 								EaglerSPRelay.logger.warn(t);
 								t2 = t;
 								break;
 							}
-						}else if(ss[0].equalsIgnoreCase("ratelimit-period")) {
+						}else if(ss[0].equalsIgnoreCase("ping-ratelimit-period")) {
 							try {
-								rateLimitPeriod = Integer.parseInt(ss[1]);
-								gotRateLimitPeriod = true;
+								pingRateLimitPeriod = Integer.parseInt(ss[1]);
+								gotPingRateLimitPeriod = true;
 							}catch(Throwable t) {
-								EaglerSPRelay.logger.warn("Invalid ratelimit-period {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn("Invalid ping-ratelimit-period {} in conf {}", ss[1], conf.getAbsoluteFile());
 								EaglerSPRelay.logger.warn(t);
 								t2 = t;
 								break;
 							}
-						}else if(ss[0].equalsIgnoreCase("ratelimit-limit")) {
+						}else if(ss[0].equalsIgnoreCase("ping-ratelimit-limit")) {
 							try {
-								rateLimitLimit = Integer.parseInt(ss[1]);
-								gotRateLimitLimit = true;
+								pingRateLimitLimit = Integer.parseInt(ss[1]);
+								gotPingRateLimitLimit = true;
 							}catch(Throwable t) {
-								EaglerSPRelay.logger.warn("Invalid ratelimit-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn("Invalid ping-ratelimit-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
 								EaglerSPRelay.logger.warn(t);
 								t2 = t;
 								break;
 							}
-						}else if(ss[0].equalsIgnoreCase("ratelimit-lockout-limit")) {
+						}else if(ss[0].equalsIgnoreCase("ping-ratelimit-lockout-limit")) {
 							try {
-								rateLimitLockoutLimit = Integer.parseInt(ss[1]);
-								gotRateLimitLockoutLimit = true;
+								pingRateLimitLockoutLimit = Integer.parseInt(ss[1]);
+								gotPingRateLimitLockoutLimit = true;
 							}catch(Throwable t) {
-								EaglerSPRelay.logger.warn("Invalid ratelimit-lockout-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn("Invalid ping-ratelimit-lockout-limit {} in conf {}", ss[1], conf.getAbsoluteFile());
 								EaglerSPRelay.logger.warn(t);
 								t2 = t;
 								break;
 							}
-						}else if(ss[0].equalsIgnoreCase("ratelimit-lockout-duration")) {
+						}else if(ss[0].equalsIgnoreCase("ping-ratelimit-lockout-duration")) {
 							try {
-								rateLimitLockoutDuration = Integer.parseInt(ss[1]);
-								gotRateLimitLockoutDuration = true;
+								pingRateLimitLockoutDuration = Integer.parseInt(ss[1]);
+								gotPingRateLimitLockoutDuration = true;
 							}catch(Throwable t) {
-								EaglerSPRelay.logger.warn("Invalid ratelimit-lockout-duration {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn("Invalid ping-ratelimit-lockout-duration {} in conf {}", ss[1], conf.getAbsoluteFile());
 								EaglerSPRelay.logger.warn(t);
 								t2 = t;
 								break;
@@ -174,10 +250,14 @@ public class EaglerSPRelayConfig {
 				t2 = t;
 			}
 			if(t2 != null || !gotPort || !gotCodeLength || !gotCodeChars ||
-					!gotCodeMixCase || !gotConnectionsPerIP || !gotRateLimitEnable ||
-					!gotRateLimitPeriod || !gotRateLimitLimit || !gotRateLimitLockoutLimit ||
-					!gotRateLimitLockoutDuration || !gotOriginWhitelist ||
-					!gotEnableRealIpHeader || !gotAddress || !gotComment) {
+					!gotCodeMixCase || !gotWorldsPerIP || !gotOpenRateLimitEnable ||
+					!gotOpenRateLimitPeriod || !gotOpenRateLimitLimit ||
+					!gotOpenRateLimitLockoutLimit || !gotOpenRateLimitLockoutDuration ||
+					!gotConnectionsPerIP || !gotPingRateLimitEnable ||
+					!gotPingRateLimitPeriod || !gotPingRateLimitLimit ||
+					!gotPingRateLimitLockoutLimit || !gotPingRateLimitLockoutDuration ||
+					!gotOriginWhitelist || !gotEnableRealIpHeader || !gotAddress ||
+					!gotComment) {
 				EaglerSPRelay.logger.warn("Updating config file: {}", conf.getAbsoluteFile());
 				save(conf);
 			}
@@ -204,11 +284,17 @@ public class EaglerSPRelayConfig {
 			w.println("code-chars=" + codeChars);
 			w.println("code-mix-case=" + codeMixCase);
 			w.println("connections-per-ip=" + connectionsPerIP);
-			w.println("ratelimit-enable=" + rateLimitEnable);
-			w.println("ratelimit-period=" + rateLimitPeriod);
-			w.println("ratelimit-limit=" + rateLimitLimit);
-			w.println("ratelimit-lockout-limit=" + rateLimitLockoutLimit);
-			w.println("ratelimit-lockout-duration=" + rateLimitLockoutDuration);
+			w.println("ping-ratelimit-enable=" + pingRateLimitEnable);
+			w.println("ping-ratelimit-period=" + pingRateLimitPeriod);
+			w.println("ping-ratelimit-limit=" + pingRateLimitLimit);
+			w.println("ping-ratelimit-lockout-limit=" + pingRateLimitLockoutLimit);
+			w.println("ping-ratelimit-lockout-duration=" + pingRateLimitLockoutDuration);
+			w.println("worlds-per-ip=" + worldsPerIP);
+			w.println("world-ratelimit-enable=" + openRateLimitEnable);
+			w.println("world-ratelimit-period=" + openRateLimitPeriod);
+			w.println("world-ratelimit-limit=" + openRateLimitLimit);
+			w.println("world-ratelimit-lockout-limit=" + openRateLimitLockoutLimit);
+			w.println("world-ratelimit-lockout-duration=" + openRateLimitLockoutDuration);
 			w.println("origin-whitelist=" + originWhitelist);
 			w.println("enable-real-ip-header=" + enableRealIpHeader);
 			w.print("server-comment=" + serverComment);
@@ -252,24 +338,48 @@ public class EaglerSPRelayConfig {
 		return connectionsPerIP;
 	}
 
-	public boolean isRateLimitEnable() {
-		return rateLimitEnable;
+	public boolean isPingRateLimitEnable() {
+		return pingRateLimitEnable;
 	}
 
-	public int getRateLimitPeriod() {
-		return rateLimitPeriod;
+	public int getPingRateLimitPeriod() {
+		return pingRateLimitPeriod;
 	}
 
-	public int getRateLimitLimit() {
-		return rateLimitLimit;
+	public int getPingRateLimitLimit() {
+		return pingRateLimitLimit;
 	}
 
-	public int getRateLimitLockoutLimit() {
-		return rateLimitLockoutLimit;
+	public int getPingRateLimitLockoutLimit() {
+		return pingRateLimitLockoutLimit;
 	}
 
-	public int getRateLimitLockoutDuration() {
-		return rateLimitLockoutDuration;
+	public int getPingRateLimitLockoutDuration() {
+		return pingRateLimitLockoutDuration;
+	}
+
+	public int getWorldsPerIP() {
+		return worldsPerIP;
+	}
+
+	public boolean isWorldRateLimitEnable() {
+		return openRateLimitEnable;
+	}
+
+	public int getWorldRateLimitPeriod() {
+		return openRateLimitPeriod;
+	}
+
+	public int getWorldRateLimitLimit() {
+		return openRateLimitLimit;
+	}
+
+	public int getWorldRateLimitLockoutLimit() {
+		return openRateLimitLockoutLimit;
+	}
+
+	public int getWorldRateLimitLockoutDuration() {
+		return openRateLimitLockoutDuration;
 	}
 
 	public String getOriginWhitelist() {
@@ -278,6 +388,23 @@ public class EaglerSPRelayConfig {
 
 	public String[] getOriginWhitelistArray() {
 		return originWhitelistArray;
+	}
+	
+	public boolean getIsWhitelisted(String domain) {
+		domain = domain.toLowerCase();
+		for(int i = 0; i < originWhitelistArray.length; ++i) {
+			String etr = originWhitelistArray[i].toLowerCase();
+			if(etr.startsWith("*")) {
+				if(domain.endsWith(etr.substring(1))) {
+					return true;
+				}
+			}else {
+				if(domain.equals(etr)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public boolean isEnableRealIpHeader() {

@@ -3,6 +3,7 @@ package net.lax1dude.eaglercraft.sp.relay.pkt;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class IPacketFEDisconnectClient extends IPacket {
 
@@ -41,5 +42,10 @@ public class IPacketFEDisconnectClient extends IPacket {
 	public int packetLength() {
 		return -1;
 	}
+
+	public static final ByteBuffer ratelimitPacketTooMany = ByteBuffer.wrap(new byte[] { (byte)0xFC, (byte)0x00 });
+	public static final ByteBuffer ratelimitPacketBlock = ByteBuffer.wrap(new byte[] { (byte)0xFC, (byte)0x01 });
+	public static final ByteBuffer ratelimitPacketBlockLock = ByteBuffer.wrap(new byte[] { (byte)0xFC, (byte)0x02 });
+	public static final ByteBuffer ratelimitPacketLocked = ByteBuffer.wrap(new byte[] { (byte)0xFC, (byte)0x03 });
 	
 }

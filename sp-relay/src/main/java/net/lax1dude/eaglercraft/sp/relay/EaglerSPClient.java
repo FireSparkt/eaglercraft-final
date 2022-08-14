@@ -20,12 +20,14 @@ public class EaglerSPClient {
 	public final long createdOn;
 	public boolean serverNotifiedOfClose = false;
 	public LoginState state = LoginState.INIT;
+	public final String address;
 	
-	EaglerSPClient(WebSocket sock, EaglerSPServer srv, String id) {
+	EaglerSPClient(WebSocket sock, EaglerSPServer srv, String id, String addr) {
 		this.socket = sock;
 		this.server = srv;
 		this.id = id;
 		this.createdOn = System.currentTimeMillis();
+		this.address = addr;
 	}
 	
 	public void send(IPacket packet) {
