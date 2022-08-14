@@ -93,9 +93,11 @@ import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.RelayQuery;
+import net.lax1dude.eaglercraft.RelayServerSocket;
 import net.lax1dude.eaglercraft.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANServer;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
@@ -2984,6 +2986,7 @@ public class EaglerAdapterImpl2 {
 				connectionOpenedAt = 0l;
 				sock = null;
 				open = false;
+				failed = true;
 				return;
 			}
 			sock = s;
@@ -3245,6 +3248,7 @@ public class EaglerAdapterImpl2 {
 			}catch(Throwable t) {
 				sock = null;
 				open = false;
+				failed = true;
 				return;
 			}
 			sock = s;
@@ -3382,6 +3386,11 @@ public class EaglerAdapterImpl2 {
 		public List<LocalWorld> getWorlds() {
 			return worlds;
 		}
+
+		@Override
+		public RelayQuery.VersionMismatch getCompatible() {
+			return versError;
+		}
 		
 	}
 	
@@ -3416,7 +3425,11 @@ public class EaglerAdapterImpl2 {
 		public List<LocalWorld> getWorlds() {
 			return new ArrayList(0);
 		}
-		
+
+		@Override
+		public RelayQuery.VersionMismatch getCompatible() {
+			return RelayQuery.VersionMismatch.COMPATIBLE;
+		}
 	}
 	
 	public static final RelayWorldsQuery openRelayWorldsQuery(String addr) {
@@ -3433,6 +3446,214 @@ public class EaglerAdapterImpl2 {
 		}
 		
 		return new RelayWorldsQueryImpl(addr);
+	}
+	
+	private static class RelayServerSocketImpl implements RelayServerSocket {
+		
+		private final WebSocket sock;
+		private final String uri;
+
+		private boolean open;
+		private boolean closed;
+		private boolean failed;
+		
+		private boolean hasRecievedAnyData;
+
+		private final List<Throwable> exceptions = new LinkedList();
+		private final List<IPacket> packets = new LinkedList();
+		
+		private RelayServerSocketImpl(String uri) {
+			this.uri = uri;
+			WebSocket s = null;
+			try {
+				s = WebSocket.create(uri);
+				s.setBinaryType("arraybuffer");
+				open = false;
+				closed = false;
+				failed = false;
+			}catch(Throwable t) {
+				exceptions.add(t);
+				sock = null;
+				open = false;
+				closed = true;
+				failed = true;
+				return;
+			}
+			sock = s;
+			sock.onOpen(new EventListener<MessageEvent>() {
+				@Override
+				public void handleEvent(MessageEvent evt) {
+					open = true;
+				}
+			});
+			sock.onMessage(new EventListener<MessageEvent>() {
+				@Override
+				public void handleEvent(MessageEvent evt) {
+					if(evt.getData() != null && !isString(evt.getData())) {
+						hasRecievedAnyData = true;
+						Uint8Array buf = Uint8Array.create(evt.getDataAsArray());
+						byte[] arr = new byte[buf.getLength()];
+						for(int i = 0; i < arr.length; ++i) {
+							arr[i] = (byte)buf.get(i);
+						}
+						try {
+							packets.add(IPacket.readPacket(new DataInputStream(new ByteArrayInputStream(arr))));
+						} catch (IOException e) {
+							exceptions.add(e);
+							System.err.println("Relay Socket Error: " + e.toString());
+							e.printStackTrace();
+							open = false;
+							failed = true;
+							closed = true;
+							sock.close();
+						}
+					}
+				}
+			});
+			sock.onClose(new EventListener<CloseEvent>() {
+				@Override
+				public void handleEvent(CloseEvent evt) {
+					if(!hasRecievedAnyData) {
+						failed = true;
+					}
+					open = false;
+					closed = true;
+				}
+			});
+		}
+
+		@Override
+		public boolean isOpen() {
+			return open;
+		}
+
+		@Override
+		public boolean isClosed() {
+			return closed;
+		}
+
+		@Override
+		public void close() {
+			if(open && sock != null) {
+				sock.close();
+			}
+			open = false;
+			closed = true;
+		}
+
+		@Override
+		public boolean isFailed() {
+			return failed;
+		}
+
+		@Override
+		public Throwable getException() {
+			if(exceptions.size() > 0) {
+				return exceptions.remove(0);
+			}else {
+				return null;
+			}
+		}
+
+		@Override
+		public void writePacket(IPacket pkt) {
+			try {
+				nativeBinarySend(sock, convertToArrayBuffer(IPacket.writePacket(pkt)));
+			} catch (Throwable e) {
+				System.err.println("Relay connection error: " + e.toString());
+				e.printStackTrace();
+				exceptions.add(e);
+				failed = true;
+				open = false;
+				closed = true;
+				sock.close();
+			}
+		}
+
+		@Override
+		public IPacket readPacket() {
+			if(packets.size() > 0) {
+				return packets.remove(0);
+			}else {
+				return null;
+			}
+		}
+		
+		@Override
+		public RateLimit getRatelimitHistory() {
+			if(relayQueryBlocked.containsKey(uri)) {
+				return RateLimit.LOCKED;
+			}
+			if(relayQueryLimited.containsKey(uri)) {
+				return RateLimit.BLOCKED;
+			}
+			return RateLimit.NONE;
+		}
+		
+	}
+	
+	private static class RelayServerSocketRatelimitDummy implements RelayServerSocket {
+		
+		private final RateLimit limit;
+		
+		private RelayServerSocketRatelimitDummy(RateLimit limit) {
+			this.limit = limit;
+		}
+		
+		@Override
+		public boolean isOpen() {
+			return false;
+		}
+
+		@Override
+		public boolean isClosed() {
+			return true;
+		}
+
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public boolean isFailed() {
+			return true;
+		}
+
+		@Override
+		public Throwable getException() {
+			return null;
+		}
+
+		@Override
+		public void writePacket(IPacket pkt) {
+		}
+
+		@Override
+		public IPacket readPacket() {
+			return null;
+		}
+		
+		@Override
+		public RateLimit getRatelimitHistory() {
+			return limit;
+		}
+		
+	}
+	
+	public static final RelayServerSocket openRelayConnection(String addr) {
+		long millis = System.currentTimeMillis();
+		
+		Long l = relayQueryBlocked.get(addr);
+		if(l != null && millis - l.longValue() < 60000l) {
+			return new RelayServerSocketRatelimitDummy(RateLimit.LOCKED);
+		}
+		
+		l = relayQueryLimited.get(addr);
+		if(l != null && millis - l.longValue() < 10000l) {
+			return new RelayServerSocketRatelimitDummy(RateLimit.BLOCKED);
+		}
+		
+		return new RelayServerSocketImpl(addr);
 	}
 
 	private static EaglercraftLANClient rtcLANClient = null;

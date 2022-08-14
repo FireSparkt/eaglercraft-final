@@ -11,16 +11,16 @@ public interface RelayQuery {
 		}
 	}
 
-	public boolean isQueryOpen();
-	public boolean isQueryFailed();
-	public RateLimit isQueryRateLimit();
-	public void close();
+	boolean isQueryOpen();
+	boolean isQueryFailed();
+	RateLimit isQueryRateLimit();
+	void close();
 	
-	public int getVersion();
-	public String getComment();
-	public String getBrand();
-	public long getPing();
+	int getVersion();
+	String getComment();
+	String getBrand();
+	long getPing();
 
-	public VersionMismatch getCompatible();
+	VersionMismatch getCompatible();
 
 }
