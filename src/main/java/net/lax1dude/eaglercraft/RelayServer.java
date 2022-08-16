@@ -15,6 +15,7 @@ public class RelayServer {
 	private VersionMismatch queriedCompatible;
 	private long ping = 0l;
 	private long workingPing = 0l;
+	public long lastPing = 0l;
 
 	public RelayServer(String address, String comment, boolean primary) {
 		this.address = address;
@@ -95,6 +96,7 @@ public class RelayServer {
 				queriedCompatible = query.getCompatible();
 				workingPing = ping;
 			}
+			lastPing = System.currentTimeMillis();
 			query = null;
 		}
 	}
@@ -109,6 +111,10 @@ public class RelayServer {
 			queriedCompatible = VersionMismatch.UNKNOWN;
 			ping = 0l;
 		}
+	}
+	
+	public RelayServerSocket openSocket() {
+		return EaglerAdapter.openRelayConnection(address);
 	}
 	
 }

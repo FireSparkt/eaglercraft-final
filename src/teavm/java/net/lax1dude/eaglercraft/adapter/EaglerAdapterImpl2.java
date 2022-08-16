@@ -3578,6 +3578,15 @@ public class EaglerAdapterImpl2 {
 				return null;
 			}
 		}
+
+		@Override
+		public IPacket nextPacket() {
+			if(packets.size() > 0) {
+				return packets.get(0);
+			}else {
+				return null;
+			}
+		}
 		
 		@Override
 		public RateLimit getRatelimitHistory() {
@@ -3632,6 +3641,11 @@ public class EaglerAdapterImpl2 {
 		public IPacket readPacket() {
 			return null;
 		}
+
+		@Override
+		public IPacket nextPacket() {
+			return null;
+		}
 		
 		@Override
 		public RateLimit getRatelimitHistory() {
@@ -3670,6 +3684,9 @@ public class EaglerAdapterImpl2 {
 	public static final int LAN_CLIENT_CONNECTING = 1;
 	public static final int LAN_CLIENT_CONNECTED = 2;
 	
+	private static String clientICECandidate = null;
+	private static String clientDescription = null;
+	
 	public static final boolean clientLANSupported() {
 		return rtcLANClient.LANClientSupported();
 	}
@@ -3680,13 +3697,13 @@ public class EaglerAdapterImpl2 {
 			rtcLANClient.setDescriptionHandler(new EaglercraftLANClient.DescriptionHandler() {
 				@Override
 				public void call(String description) {
-
+					clientDescription = description;
 				}
 			});
 			rtcLANClient.setICECandidateHandler(new EaglercraftLANClient.ICECandidateHandler() {
 				@Override
 				public void call(String candidate) {
-
+					clientICECandidate = candidate;
 				}
 			});
 			rtcLANClient.setRemoteDataChannelHandler(new EaglercraftLANClient.ClientSignalHandler() {
@@ -3732,6 +3749,43 @@ public class EaglerAdapterImpl2 {
 	
 	public static final byte[] clientLANReadPacket() {
 		return clientLANPacketBuffer.size() > 0 ? clientLANPacketBuffer.remove(0) : null;
+	}
+	
+	public static final void clientLANSetICEServersAndConnect(String[] servers) {
+		rtcLANClient.setICEServers(servers);
+	}
+	
+	public static final void clearLANClientState() {
+		clientICECandidate = null;
+		clientDescription = null;
+	}
+	
+	public static final String clientLANAwaitICECandidate() {
+		if(clientICECandidate != null) {
+			String ret = clientICECandidate;
+			clientICECandidate = null;
+			return ret;
+		}else {
+			return null;
+		}
+	}
+	
+	public static final String clientLANAwaitDescription() {
+		if(clientDescription != null) {
+			String ret = clientDescription;
+			clientDescription = null;
+			return ret;
+		}else {
+			return null;
+		}
+	}
+	
+	public static final void clientLANSetICECandidate(String candidate) {
+		rtcLANClient.signalRemoteICECandidate(candidate);
+	}
+	
+	public static final void clientLANSetDescription(String description) {
+		rtcLANClient.signalRemoteDescription(description);
 	}
 	
 	private static EaglercraftLANServer rtcLANServer = null;

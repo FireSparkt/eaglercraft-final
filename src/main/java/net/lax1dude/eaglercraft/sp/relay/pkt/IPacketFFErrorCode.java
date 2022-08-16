@@ -15,6 +15,27 @@ public class IPacketFFErrorCode extends IPacket {
 	public static final int TYPE_SERVER_DISCONNECTED = 0x06;
 	public static final int TYPE_UNKNOWN_CLIENT = 0x07;
 	
+	public static final String[] packetTypes = new String[0x08];
+	
+	static {
+		packetTypes[TYPE_INTERNAL_ERROR] = "TYPE_INTERNAL_ERROR";
+		packetTypes[TYPE_PROTOCOL_VERSION] = "TYPE_PROTOCOL_VERSION";
+		packetTypes[TYPE_INVALID_PACKET] = "TYPE_INVALID_PACKET";
+		packetTypes[TYPE_ILLEGAL_OPERATION] = "TYPE_ILLEGAL_OPERATION";
+		packetTypes[TYPE_CODE_LENGTH] = "TYPE_CODE_LENGTH";
+		packetTypes[TYPE_INCORRECT_CODE] = "TYPE_INCORRECT_CODE";
+		packetTypes[TYPE_SERVER_DISCONNECTED] = "TYPE_SERVER_DISCONNECTED";
+		packetTypes[TYPE_UNKNOWN_CLIENT] = "TYPE_UNKNOWN_CLIENT";
+	}
+	
+	public static String code2string(int i) {
+		if(i >= 0 || i < packetTypes.length) {
+			return packetTypes[i];
+		}else {
+			return "UNKNOWN";
+		}
+	}
+	
 	public int code;
 	public String desc;
 	

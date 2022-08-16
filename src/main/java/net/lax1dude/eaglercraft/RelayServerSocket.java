@@ -15,6 +15,7 @@ public interface RelayServerSocket {
 	void writePacket(IPacket pkt);
 	
 	IPacket readPacket();
+	IPacket nextPacket();
 	
 	RateLimit getRatelimitHistory();
 	

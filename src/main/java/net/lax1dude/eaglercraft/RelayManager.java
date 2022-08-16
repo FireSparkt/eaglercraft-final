@@ -1,9 +1,13 @@
 package net.lax1dude.eaglercraft;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket;
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket00Handshake;
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacketFFErrorCode;
 import net.minecraft.src.NBTBase;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
@@ -180,44 +184,100 @@ public class RelayManager {
 		}
 	}
 	
-	public RelayServer getWorkingRelay(Consumer<String> progressCallback) {
+	private RelayServerSocket connectHandshake(RelayServer relay, int type, String code) {
+		RelayServerSocket sock = relay.openSocket();
+		while(!sock.isClosed()) {
+			if(sock.isOpen()) {
+				sock.writePacket(new IPacket00Handshake(type, IntegratedServer.preferredRelayVersion, code));
+				while(!sock.isClosed()) {
+					IPacket pkt = sock.nextPacket();
+					if(pkt != null) {
+						if(pkt instanceof IPacket00Handshake) {
+							return sock;
+						}else if(pkt instanceof IPacketFFErrorCode) {
+							IPacketFFErrorCode ipkt = (IPacketFFErrorCode) pkt;
+							System.err.println("Relay [" + relay.address + "] failed: " + IPacketFFErrorCode.code2string(ipkt.code) +
+									"(" + ipkt.code + "): " + ipkt.desc);
+							Throwable t;
+							while((t = sock.getException()) != null) {
+								t.printStackTrace();
+							}
+							sock.close();
+							return null;
+						}else {
+							System.err.println("Relay [" + relay.address + "] unexpected packet: " + pkt.getClass().getSimpleName());
+							sock.close();
+							return null;
+						}
+					}
+					try {
+						Thread.sleep(20l);
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			try {
+				Thread.sleep(20l);
+			} catch (InterruptedException e) {
+			}
+		}
+		System.err.println("Relay [" + relay.address + "] connection failed!");
+		Throwable t;
+		while((t = sock.getException()) != null) {
+			t.printStackTrace();
+		}
+		return null;
+	}
+	
+	private final List<RelayServer> brokenServers = new LinkedList();
+
+	public RelayServerSocket getWorkingRelay(Consumer<String> progressCallback, int type, String code) {
+		brokenServers.clear();
 		if(relays.size() > 0) {
 			long millis = System.currentTimeMillis();
-			if(millis - lastPingThrough > 10000l) {
+			if(millis - lastPingThrough < 10000l) {
 				RelayServer relay = getPrimary();
 				if(relay.getPing() > 0l && relay.getPingCompatible().isCompatible()) {
-					return relay;
+					progressCallback.accept(relay.address);
+					RelayServerSocket sock = connectHandshake(relay, type, code);
+					if(sock != null) {
+						return sock;
+					}else {
+						brokenServers.add(relay);
+					}
 				}
 				for(int i = 0, l = relays.size(); i < l; ++i) {
 					RelayServer relayEtr = relays.get(i);
 					if(relayEtr != relay) {
 						if(relayEtr.getPing() > 0l && relayEtr.getPingCompatible().isCompatible()) {
-							return relayEtr;
+							progressCallback.accept(relayEtr.address);
+							RelayServerSocket sock = connectHandshake(relayEtr, type, code);
+							if(sock != null) {
+								return sock;
+							}else {
+								brokenServers.add(relayEtr);
+							}
 						}
 					}
 				}
 			}
-			return getWorkingRelayActive(progressCallback);
+			return getWorkingCodeRelayActive(progressCallback, type, code);
 		}else {
 			return null;
 		}
 	}
 	
-	private RelayServer getWorkingRelayActive(Consumer<String> progressCallback) {
+	private RelayServerSocket getWorkingCodeRelayActive(Consumer<String> progressCallback, int type, String code) {
 		if(relays.size() > 0) {
-			RelayServer relay = getPrimary();
-			progressCallback.accept(relay.address);
-			relay.pingBlocking();
-			if(relay.getPing() > 0l && relay.getPingCompatible().isCompatible()) {
-				return relay;
-			}
 			for(int i = 0, l = relays.size(); i < l; ++i) {
-				RelayServer relayEtr = relays.get(i);
-				if(relayEtr != relay) {
-					progressCallback.accept(relayEtr.address);
-					relayEtr.pingBlocking();
-					if(relayEtr.getPing() > 0l && relayEtr.getPingCompatible().isCompatible()) {
-						return relayEtr;
+				RelayServer srv = relays.get(i);
+				if(!brokenServers.contains(srv)) {
+					progressCallback.accept(srv.address);
+					RelayServerSocket sock = connectHandshake(srv, type, code);
+					if(sock != null) {
+						return sock;
+					}else {
+						brokenServers.add(srv);
 					}
 				}
 			}
