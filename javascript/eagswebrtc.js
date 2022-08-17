@@ -398,6 +398,9 @@ window.initializeLANClient = (() => {
 		
 		signalRemoteConnect() {
 			const self = this;
+			if(self.readyState === READYSTATE_CONNECTED || self.readyState === READYSTATE_CONNECTING) {
+				signalRemoteDisconnect();
+			}
 			this.peerConnection.addEventListener("icecandidate", (evt) => {
 				if(evt.candidate) {
 					self.iceCandidateHandler(JSON.stringify({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate }));

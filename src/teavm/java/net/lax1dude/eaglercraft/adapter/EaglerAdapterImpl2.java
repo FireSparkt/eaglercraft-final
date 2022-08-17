@@ -3686,6 +3686,8 @@ public class EaglerAdapterImpl2 {
 	
 	private static String clientICECandidate = null;
 	private static String clientDescription = null;
+	private static boolean clientDataChannelOpen = false;
+	private static boolean clientDataChannelClosed = false;
 	
 	public static final boolean clientLANSupported() {
 		return rtcLANClient.LANClientSupported();
@@ -3709,7 +3711,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANClient.setRemoteDataChannelHandler(new EaglercraftLANClient.ClientSignalHandler() {
 				@Override
 				public void call() {
-					// basically useless, ignore for now.
+					clientDataChannelOpen = true;
 				}
 			});
 			rtcLANClient.setRemotePacketHandler(new EaglercraftLANClient.RemotePacketHandler() {
@@ -3726,7 +3728,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANClient.setRemoteDisconnectHandler(new EaglercraftLANClient.ClientSignalHandler() {
 				@Override
 				public void call() {
-					// disconnected
+					clientDataChannelClosed = true;
 				}
 			});
 		}
@@ -3753,11 +3755,14 @@ public class EaglerAdapterImpl2 {
 	
 	public static final void clientLANSetICEServersAndConnect(String[] servers) {
 		rtcLANClient.setICEServers(servers);
+		rtcLANClient.signalRemoteConnect();
 	}
-	
+
 	public static final void clearLANClientState() {
 		clientICECandidate = null;
 		clientDescription = null;
+		clientDataChannelOpen = false;
+		clientDataChannelClosed = false;
 	}
 	
 	public static final String clientLANAwaitICECandidate() {
@@ -3778,6 +3783,19 @@ public class EaglerAdapterImpl2 {
 		}else {
 			return null;
 		}
+	}
+	
+	public static final boolean clientLANAwaitChannel() {
+		if(clientDataChannelOpen) {
+			clientDataChannelOpen = false;
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	public static final boolean clientLANClosed() {
+		return clientDataChannelClosed;
 	}
 	
 	public static final void clientLANSetICECandidate(String candidate) {
@@ -3842,7 +3860,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANServer.setRemoteClientDisconnectHandler(new EaglercraftLANServer.ClientSignalHandler() {
 				@Override
 				public void call() {
-					// disconnected
+					clientDataChannelClosed = true;
 				}
 			});
 		}
