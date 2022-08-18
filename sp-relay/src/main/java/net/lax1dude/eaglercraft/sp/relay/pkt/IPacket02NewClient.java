@@ -11,6 +11,9 @@ public class IPacket02NewClient extends IPacket {
 		this.clientId = clientId;
 	}
 	
+	public IPacket02NewClient() {
+	}
+	
 	public void write(DataOutputStream output) throws IOException {
 		writeASCII8(output, clientId);
 	}

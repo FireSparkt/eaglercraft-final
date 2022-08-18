@@ -48,11 +48,11 @@ public class RelayServer {
 	}
 	
 	public String getPingComment() {
-		return queriedComment;
+		return queriedComment == null ? "" : queriedComment;
 	}
 	
 	public String getPingVendor() {
-		return queriedVendor;
+		return queriedVendor == null ? "" : queriedVendor;
 	}
 	
 	public VersionMismatch getPingCompatible() {

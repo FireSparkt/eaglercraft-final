@@ -70,7 +70,7 @@ public class EaglerSPServer {
 				if(LoginState.assertEquals(cl, LoginState.SENT_ICE_CANDIDATE)) {
 					cl.state = LoginState.RECIEVED_ICE_CANIDATE;
 					cl.handleServerICECandidate(packet);
-					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x03: ICECandidate", cl.socket.getAttachment());
+					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x03: ICECandidate", (String) cl.socket.getAttachment());
 				}
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,
@@ -84,7 +84,7 @@ public class EaglerSPServer {
 				if(LoginState.assertEquals(cl, LoginState.SENT_DESCRIPTION)) {
 					cl.state = LoginState.RECIEVED_DESCRIPTION;
 					cl.handleServerDescription(packet);
-					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x04: Description", cl.socket.getAttachment());
+					EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0x04: Description", (String) cl.socket.getAttachment());
 				}
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,
@@ -96,7 +96,7 @@ public class EaglerSPServer {
 			EaglerSPClient cl = clients.get(packet.clientId);
 			if(cl != null) {
 				cl.handleServerDisconnectClient(packet);
-				EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0xFE: Disconnect: {}: {}", cl.socket.getAttachment(),
+				EaglerSPRelay.logger.debug("[{}][Server -> Relay -> Client] PKT 0xFE: Disconnect: {}: {}", (String) cl.socket.getAttachment(),
 						packet.code, packet.reason);
 			}else {
 				this.socket.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_UNKNOWN_CLIENT,

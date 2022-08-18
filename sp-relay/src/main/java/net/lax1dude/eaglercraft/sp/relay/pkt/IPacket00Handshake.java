@@ -30,12 +30,13 @@ public class IPacket00Handshake extends IPacket {
 	@Override
 	public void write(DataOutputStream output) throws IOException {
 		output.write(connectionType);
+		output.write(connectionVersion);
 		IPacket.writeASCII8(output, connectionCode);
 	}
 	
 	@Override
 	public int packetLength() {
-		return 1 + (connectionCode != null ? 1 + connectionCode.length() : 0);
+		return 1 + 1 + (connectionCode != null ? 1 + connectionCode.length() : 0);
 	}
 
 }

@@ -30,6 +30,7 @@ public class IPacket00Handshake extends IPacket {
 	@Override
 	public void write(DataOutputStream output) throws IOException {
 		output.write(connectionType);
+		output.write(connectionVersion);
 		IPacket.writeASCII8(output, connectionCode);
 	}
 	

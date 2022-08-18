@@ -17,6 +17,9 @@ public class IPacket69Pong extends IPacket {
 		this.comment = comment;
 		this.brand = brand;
 	}
+
+	public IPacket69Pong() {
+	}
 	
 	public void write(DataOutputStream output) throws IOException {
 		output.write(protcolVersion);

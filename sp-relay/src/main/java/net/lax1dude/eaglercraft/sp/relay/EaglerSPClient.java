@@ -35,13 +35,13 @@ public class EaglerSPClient {
 			try {
 				this.socket.send(IPacket.writePacket(packet));
 			}catch(IOException ex) {
-				EaglerSPRelay.logger.debug("Error sending data to {}", this.socket.getAttachment());
+				EaglerSPRelay.logger.debug("Error sending data to {}", (String) this.socket.getAttachment());
 				EaglerSPRelay.logger.debug(ex);
 				disconnect(IPacketFEDisconnectClient.TYPE_INTERNAL_ERROR, "Internal Server Error");
 				this.socket.close();
 			}
 		}else {
-			EaglerSPRelay.logger.debug("WARNING: Tried to send data to {} after the connection closed.", this.socket.getAttachment());
+			EaglerSPRelay.logger.debug("WARNING: Tried to send data to {} after the connection closed.", (String) this.socket.getAttachment());
 		}
 	}
 	
@@ -50,21 +50,21 @@ public class EaglerSPClient {
 			if(LoginState.assertEquals(this, LoginState.INIT)) {
 				state = LoginState.SENT_ICE_CANDIDATE;
 				server.handleClientICECandidate(this, (IPacket03ICECandidate)packet);
-				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x03: ICECandidate", socket.getAttachment());
+				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x03: ICECandidate", (String) socket.getAttachment());
 			}
 			return true;
 		}else if(packet instanceof IPacket04Description) {
 			if(LoginState.assertEquals(this, LoginState.RECIEVED_ICE_CANIDATE)) {
 				state = LoginState.SENT_DESCRIPTION;
 				server.handleClientDescription(this, (IPacket04Description)packet);
-				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x04: Description", socket.getAttachment());
+				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x04: Description", (String) socket.getAttachment());
 			}
 			return true;
 		}else if(packet instanceof IPacket05ClientSuccess) {
 			if(LoginState.assertEquals(this, LoginState.RECIEVED_DESCRIPTION)) {
 				state = LoginState.FINISHED;
 				server.handleClientSuccess(this, (IPacket05ClientSuccess)packet);
-				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientSuccess", socket.getAttachment());
+				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientSuccess", (String) socket.getAttachment());
 				disconnect(IPacketFEDisconnectClient.TYPE_FINISHED_SUCCESS, "Successful connection");
 			}
 			return true;
@@ -72,7 +72,7 @@ public class EaglerSPClient {
 			if(LoginState.assertEquals(this, LoginState.RECIEVED_DESCRIPTION)) {
 				state = LoginState.FINISHED;
 				server.handleClientFailure(this, (IPacket06ClientFailure)packet);
-				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientFailure", socket.getAttachment());
+				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientFailure", (String) socket.getAttachment());
 				disconnect(IPacketFEDisconnectClient.TYPE_FINISHED_FAILED, "Failed connection");
 			}
 			return true;
@@ -103,7 +103,7 @@ public class EaglerSPClient {
 			send(pkt);
 			socket.close();
 		}
-		EaglerSPRelay.logger.debug("[{}][Relay -> Client] PKT 0xFE: #{} {}", socket.getAttachment(), code, reason);
+		EaglerSPRelay.logger.debug("[{}][Relay -> Client] PKT 0xFE: #{} {}", (String) socket.getAttachment(), code, reason);
 	}
 	
 	public static final int clientCodeLength = 16;
