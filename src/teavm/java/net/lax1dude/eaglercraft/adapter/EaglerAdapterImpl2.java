@@ -85,11 +85,13 @@ import org.teavm.jso.workers.Worker;
 
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.Base64;
+import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglerProfile;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
 import net.lax1dude.eaglercraft.ExpiringSet;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.LANPeerEvent;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.RelayQuery;
@@ -1848,6 +1850,9 @@ public class EaglerAdapterImpl2 {
 		if(IntegratedServer.doesChannelExist(EaglerProfile.username) && IntegratedServer.isWorldRunning()) {
 			return true;
 		}
+		if(!EaglerAdapter.clientLANClosed()) {
+			return true;
+		}
 		if(sock == null || sock.getReadyState() == 3) {
 			sockIsConnecting = false;
 		}
@@ -3599,6 +3604,11 @@ public class EaglerAdapterImpl2 {
 			return RateLimit.NONE;
 		}
 		
+		@Override
+		public String getURI() {
+			return uri;
+		}
+		
 	}
 	
 	private static class RelayServerSocketRatelimitDummy implements RelayServerSocket {
@@ -3650,6 +3660,11 @@ public class EaglerAdapterImpl2 {
 		@Override
 		public RateLimit getRatelimitHistory() {
 			return limit;
+		}
+		
+		@Override
+		public String getURI() {
+			return "<disconnected>";
 		}
 		
 	}
@@ -3812,38 +3827,34 @@ public class EaglerAdapterImpl2 {
 	private static native EaglercraftLANServer startRTCLANServer();
 
 	private static boolean serverLANinit = false;
-	private static final List<LANPeerPacket> serverLANPacketBuffer = new ArrayList<>();
+	private static final List<LANPeerEvent> serverLANEventBuffer = new LinkedList<>();
 	
 	public static final boolean serverLANSupported() {
 		return rtcLANServer.LANServerSupported();
 	}
 	
-	public static final String serverLANInitializeServer(String relay) {
+	public static final void serverLANInitializeServer(String[] servers) {
+		serverLANEventBuffer.clear();
+		rtcLANServer.setICEServers(servers);
 		rtcLANServer.initializeServer();
 		if(!serverLANinit) {
 			serverLANinit = true;
 			rtcLANServer.setDescriptionHandler(new EaglercraftLANServer.DescriptionHandler() {
 				@Override
 				public void call(String peerId, String candidate) {
-
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerDisconnectEvent(peerId));
 				}
 			});
 			rtcLANServer.setICECandidateHandler(new EaglercraftLANServer.ICECandidateHandler() {
 				@Override
 				public void call(String peerId, String candidate) {
-
-				}
-			});
-			rtcLANServer.setRecieveCodeHandler(new EaglercraftLANServer.CodeHandler() {
-				@Override
-				public void call(String code) {
-
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerDisconnectEvent(peerId));
 				}
 			});
 			rtcLANServer.setRemoteClientDataChannelHandler(new EaglercraftLANServer.ClientSignalHandler() {
 				@Override
-				public void call() {
-					// unused
+				public void call(String peerId) {
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerDataChannelEvent(peerId));
 				}
 			});
 			rtcLANServer.setRemoteClientPacketHandler(new EaglercraftLANServer.PeerPacketHandler() {
@@ -3854,18 +3865,16 @@ public class EaglerAdapterImpl2 {
 					for(int i = 0; i < ret.length; ++i) {
 						ret[i] = (byte) array.get(i);
 					}
-					serverLANPacketBuffer.add(new LANPeerPacket(peerId, ret));
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerPacketEvent(peerId, ret));
 				}
 			});
 			rtcLANServer.setRemoteClientDisconnectHandler(new EaglercraftLANServer.ClientSignalHandler() {
 				@Override
-				public void call() {
-					clientDataChannelClosed = true;
+				public void call(String peerId) {
+					serverLANEventBuffer.add(new LANPeerEvent.LANPeerDisconnectEvent(peerId));
 				}
 			});
 		}
-		// todo: java-side: register in relay & return code!!
-		return null;
 	}
 	
 	public static final boolean serverLANServerOpen() {
@@ -3877,45 +3886,58 @@ public class EaglerAdapterImpl2 {
 		// todo: java-side: disconnect from relay server
 	}
 	
-	public static interface LANConnectionEvent {
-		
-		public String getPeerName();
-		
-		public void accept();
-		
-		public void reject();
-		
+	public static final LANPeerEvent serverLANGetEvent() {
+		return serverLANEventBuffer.size() > 0 ? serverLANEventBuffer.remove(0) : null;
 	}
 	
-	public static final LANConnectionEvent serverLANGetConnectionEvent() {
-		return null;
-	}
-	
-	public static final String serverLANGetDisconnectEvent() {
-		return null;
-	}
-	
-	public static class LANPeerPacket {
-		
-		public final String peer;
-		
-		public final byte[] packet;
-
-		protected LANPeerPacket(String peer, byte[] packet) {
-			this.peer = peer;
-			this.packet = packet;
+	public static final LANPeerEvent serverLANGetEvent(String clientId) {
+		if(serverLANEventBuffer.size() > 0) {
+			Iterator<LANPeerEvent> i = serverLANEventBuffer.iterator();
+			while(i.hasNext()) {
+				LANPeerEvent evt = i.next();
+				if(evt.getPeerId().equals(clientId)) {
+					i.remove();
+					return evt;
+				}
+			}
+			return null;
+		}else {
+			return null;
 		}
-		
 	}
 	
-	public static final LANPeerPacket serverLANReadPacket() {
-		return serverLANPacketBuffer.size() > 0 ? serverLANPacketBuffer.remove(0) : null;
+	public static final <T extends LANPeerEvent> T serverLANGetEvent(String clientId, Class<T> eventType) {
+		if(serverLANEventBuffer.size() > 0) {
+			Iterator<LANPeerEvent> i = serverLANEventBuffer.iterator();
+			while(i.hasNext()) {
+				LANPeerEvent evt = i.next();
+				if(evt.getPeerId().equals(clientId) && eventType.isInstance(evt)) {
+					i.remove();
+					return (T)evt;
+				}
+			}
+			return null;
+		}else {
+			return null;
+		}
 	}
 
 	public static final void serverLANWritePacket(String peer, byte[] data) {
 		ArrayBuffer arr = ArrayBuffer.create(data.length);
 		Uint8Array.create(arr).set(data);
 		rtcLANServer.sendPacketToRemoteClient(peer, arr);
+	}
+	
+	public static final void serverLANCreatePeer(String peer) {
+		rtcLANServer.signalRemoteConnect(peer);
+	}
+	
+	public static final void serverLANPeerICECandidates(String peer, String iceCandidates) {
+		rtcLANServer.signalRemoteICECandidate(peer, iceCandidates);
+	}
+	
+	public static final void serverLANPeerDescription(String peer, String description) {
+		rtcLANServer.signalRemoteDescription(peer, description);
 	}
 	
 	public static final void serverLANDisconnectPeer(String peer) {

@@ -35,7 +35,7 @@ public class IPacket00Handshake extends IPacket {
 	
 	@Override
 	public int packetLength() {
-		return 1 + 1 + (connectionCode != null ? 1 + connectionCode.length() : 0);
+		return 1 + (connectionCode != null ? 1 + connectionCode.length() : 0);
 	}
 
 }

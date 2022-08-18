@@ -6,6 +6,7 @@ import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.GuiScreenSkinCapeSettings;
 import net.lax1dude.eaglercraft.GuiVoiceMenu;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.IntegratedServerLAN;
 import net.minecraft.client.Minecraft;
 
 public class GuiIngameMenu extends GuiScreen {
@@ -31,7 +32,7 @@ public class GuiIngameMenu extends GuiScreen {
 		this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + var1, StatCollector.translateToLocal("menu.returnToGame")));
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.options")));
 		GuiButton var3;
-		this.buttonList.add(var3 = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServer.isHostingLAN() ? "menu.closeLan" : "menu.shareToLan")));
+		this.buttonList.add(var3 = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServerLAN.isHostingLAN() ? "menu.closeLan" : "menu.shareToLan")));
 		var3.enabled = mc.isSingleplayer();
 		this.buttonList.add(new GuiButton(8, 3, 3, 120, 20, StatCollector.translateToLocal("menu.skinCapeSettings")));
 	}
@@ -64,8 +65,8 @@ public class GuiIngameMenu extends GuiScreen {
 			break;
 
 		case 7:
-			if (IntegratedServer.isHostingLAN()) {
-				IntegratedServer.closeLAN();
+			if (IntegratedServerLAN.isHostingLAN()) {
+				IntegratedServerLAN.closeLAN();
 				this.mc.displayGuiScreen((GuiScreen) null);
 				this.mc.setIngameFocus();
 				this.mc.sndManager.resumeAllSounds();

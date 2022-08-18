@@ -432,18 +432,8 @@ public class IntegratedServer {
 		sendIPCPacket(new IPCPacket0CPlayerChannel(channel, false));
 	}
 
-	private static boolean hostingLAN = false;
-
-	public static final String shareToLAN(EnumGameType gameType, boolean allowCommands) {
-		hostingLAN = true;
-		return "yee";
+	public static void configureLAN(EnumGameType enumGameType, boolean allowCommands) {
+		sendIPCPacket(new IPCPacket17ConfigureLAN(enumGameType.getID(), allowCommands));
 	}
-
-	public static final void closeLAN() {
-		hostingLAN = false;
-	}
-
-	public static final boolean isHostingLAN() {
-		return hostingLAN;
-	}
+	
 }

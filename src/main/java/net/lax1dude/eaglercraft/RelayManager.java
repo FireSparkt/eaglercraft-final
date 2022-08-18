@@ -241,7 +241,9 @@ public class RelayManager {
 					progressCallback.accept(relay.address);
 					RelayServerSocket sock = connectHandshake(relay, type, code);
 					if(sock != null) {
-						return sock;
+						if(!sock.isFailed()) {
+							return sock;
+						}
 					}else {
 						brokenServers.add(relay);
 					}
@@ -253,7 +255,9 @@ public class RelayManager {
 							progressCallback.accept(relayEtr.address);
 							RelayServerSocket sock = connectHandshake(relayEtr, type, code);
 							if(sock != null) {
-								return sock;
+								if(!sock.isFailed()) {
+									return sock;
+								}
 							}else {
 								brokenServers.add(relayEtr);
 							}
@@ -275,7 +279,9 @@ public class RelayManager {
 					progressCallback.accept(srv.address);
 					RelayServerSocket sock = connectHandshake(srv, type, code);
 					if(sock != null) {
-						return sock;
+						if(!sock.isFailed()) {
+							return sock;
+						}
 					}else {
 						brokenServers.add(srv);
 					}

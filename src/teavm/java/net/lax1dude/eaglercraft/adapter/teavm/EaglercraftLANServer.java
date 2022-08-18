@@ -14,8 +14,6 @@ public interface EaglercraftLANServer extends JSObject {
 	
 	void initializeServer();
 	
-	void setRecieveCodeHandler(CodeHandler cb);
-	
 	void setICEServers(String[] urls);
 	
 	void setICECandidateHandler(ICECandidateHandler cb);
@@ -56,18 +54,13 @@ public interface EaglercraftLANServer extends JSObject {
 	}
 	
 	@JSFunctor
-	public static interface CodeHandler extends JSObject {
-		void call(String code);
-	}
-	
-	@JSFunctor
 	public static interface DescriptionHandler extends JSObject {
 		void call(String peerId, String candidate);
 	}
 	
 	@JSFunctor
 	public static interface ClientSignalHandler extends JSObject {
-		void call();
+		void call(String peerId);
 	}
 	
 	@JSFunctor

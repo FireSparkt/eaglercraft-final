@@ -208,7 +208,7 @@ public class EaglerSPRelay extends WebSocketServer {
 					IPacket00Handshake ipkt = (IPacket00Handshake)pkt;
 					if(ipkt.connectionVersion != Constants.protocolVersion) {
 						logger.debug("[{}]: Connected with unsupported protocol version: {} (supported "
-								+ "version: {})", arg0.getAttachment(), Constants.protocolVersion);
+								+ "version: {})", arg0.getAttachment(), ipkt.connectionVersion, Constants.protocolVersion);
 						if(ipkt.connectionVersion < Constants.protocolVersion) {
 							arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_PROTOCOL_VERSION,
 									"Outdated Client! (v" + Constants.protocolVersion + " req)")));

@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.IntegratedServerLAN;
 
 public class GuiShareToLan extends GuiScreen {
 	/**
@@ -77,11 +78,16 @@ public class GuiShareToLan extends GuiScreen {
 			this.func_74088_g();
 		} else if (par1GuiButton.id == 101) {
 			this.mc.displayGuiScreen((GuiScreen) null);
-			String var2 = IntegratedServer.shareToLAN(EnumGameType.getByName(this.gameMode), this.allowCommands);
+			LoadingScreenRenderer ls = mc.loadingScreen;
+			IntegratedServer.configureLAN(EnumGameType.getByName(this.gameMode), this.allowCommands);
+			String code = IntegratedServerLAN.shareToLAN((str) -> ls.displayProgressMessage(str), null, false);
+			
+			//TODO: handle code success or failure, redirect to relay list on failure, on success store code and relay and display in pause menu
+			//TODO: must call IntegratedServer.configureLAN(mc.theWorld.getGameType(), false); when world is closed
+			
 			String var3;
-
-			if (var2 != null) {
-				var3 = StatCollector.translateToLocalFormatted("commands.publish.started", var2);
+			if (code != null) {
+				var3 = StatCollector.translateToLocalFormatted("commands.publish.started", code);
 			} else {
 				var3 = StatCollector.translateToLocal("commands.publish.failed");
 			}

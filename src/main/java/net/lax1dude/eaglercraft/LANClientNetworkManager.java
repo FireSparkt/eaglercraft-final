@@ -90,6 +90,10 @@ public class LANClientNetworkManager implements INetworkManager {
 								connectState = SENT_ICE_CANDIDATE;
 								continue mainLoop;
 							}
+							try {
+								Thread.sleep(20l);
+							} catch (InterruptedException e) {
+							}
 						}while(System.currentTimeMillis() - lm > 3000l);
 
 						// no ice candidates were sent
@@ -127,6 +131,10 @@ public class LANClientNetworkManager implements INetworkManager {
 								connectState = SENT_DESCRIPTION;
 								continue mainLoop;
 							}
+							try {
+								Thread.sleep(20l);
+							} catch (InterruptedException e) {
+							}
 						}while(System.currentTimeMillis() - lm > 3000l);
 						
 						// no description was sent
@@ -162,6 +170,10 @@ public class LANClientNetworkManager implements INetworkManager {
 								sock.close();
 								return new LANClientNetworkManager(displayCode, displayRelay);
 								
+							}
+							try {
+								Thread.sleep(20l);
+							} catch (InterruptedException e) {
 							}
 						}while(System.currentTimeMillis() - lm > 3000l);
 						

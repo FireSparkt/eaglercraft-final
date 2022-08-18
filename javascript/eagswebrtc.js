@@ -601,10 +601,6 @@ window.initializeLANServer = (() => {
 			// nothing to do!
 		}
 		
-		setRecieveCodeHandler(cb) {
-			// not yet implemented!
-		}
-		
 		setICEServers(urls) {
 			this.ICEServers.length = 0;
 			for(var i = 0; i < urls.length; ++i) {
@@ -701,7 +697,7 @@ window.initializeLANServer = (() => {
 						try {
 							thePeer.disconnect();
 						}catch(e) {}
-						this.remoteClientDisconnectHandler(peerId, quiet);
+						this.remoteClientDisconnectHandler(peerId);
 					}
                 }
                 this.peerList.clear();
@@ -713,7 +709,7 @@ window.initializeLANServer = (() => {
 				try {
 					thePeer.disconnect();
 				}catch(e) {}
-				this.remoteClientDisconnectHandler(peerId, quiet);
+				this.remoteClientDisconnectHandler(peerId);
 			}
 		}
 		

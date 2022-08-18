@@ -48,6 +48,9 @@ public class ServerConfigurationManager {
 	 * hardcoded to max at 200 players
 	 */
 	private int playerPingIndex = 0;
+	
+	private EnumGameType lanGamemode = EnumGameType.SURVIVAL;
+	private boolean lanCheats = false;
 
 	public ServerConfigurationManager(MinecraftServer par1MinecraftServer) {
 		this.mcServer = par1MinecraftServer;
@@ -521,7 +524,7 @@ public class ServerConfigurationManager {
 	 * Returns true if the specific player is allowed to use commands.
 	 */
 	public boolean areCommandsAllowed(String par1Str) {
-		return this.ops.contains(par1Str.trim().toLowerCase())
+		return lanCheats || this.ops.contains(par1Str.trim().toLowerCase())
 				|| this.mcServer.isSinglePlayer() && this.mcServer.worldServers[0].getWorldInfo().areCommandsAllowed()
 						&& this.mcServer.getServerOwner().equalsIgnoreCase(par1Str)
 				|| this.commandsAllowedForAll;
@@ -820,14 +823,18 @@ public class ServerConfigurationManager {
 	}
 
 	private void func_72381_a(EntityPlayerMP par1EntityPlayerMP, EntityPlayerMP par2EntityPlayerMP, World par3World) {
-		if (par2EntityPlayerMP != null) {
-			par1EntityPlayerMP.theItemInWorldManager
-					.setGameType(par2EntityPlayerMP.theItemInWorldManager.getGameType());
-		} else if (this.gameType != null) {
-			par1EntityPlayerMP.theItemInWorldManager.setGameType(this.gameType);
-		}
+		if(par1EntityPlayerMP.username.equals(mcServer.getServerOwner())) {
+			if (par2EntityPlayerMP != null) {
+				par1EntityPlayerMP.theItemInWorldManager
+						.setGameType(par2EntityPlayerMP.theItemInWorldManager.getGameType());
+			} else if (this.gameType != null) {
+				par1EntityPlayerMP.theItemInWorldManager.setGameType(this.gameType);
+			}
 
-		par1EntityPlayerMP.theItemInWorldManager.initializeGameType(par3World.getWorldInfo().getGameType());
+			par1EntityPlayerMP.theItemInWorldManager.initializeGameType(par3World.getWorldInfo().getGameType());
+		}else {
+			par1EntityPlayerMP.theItemInWorldManager.setGameType(lanGamemode);
+		}
 	}
 
 	/**
@@ -845,5 +852,10 @@ public class ServerConfigurationManager {
 	public void sendChatMsg(String par1Str) {
 		this.mcServer.logInfo(par1Str);
 		this.sendPacketToAllPlayers(new Packet3Chat(par1Str));
+	}
+
+	public void configureLAN(int gamemode, boolean cheats) {
+		lanGamemode = EnumGameType.getByID(gamemode);
+		lanCheats = cheats;
 	}
 }

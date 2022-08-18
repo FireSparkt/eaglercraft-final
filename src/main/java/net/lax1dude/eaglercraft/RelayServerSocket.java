@@ -19,4 +19,6 @@ public interface RelayServerSocket {
 	
 	RateLimit getRatelimitHistory();
 	
+	String getURI();
+	
 }

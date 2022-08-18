@@ -12,6 +12,7 @@ public class IPacketFEDisconnectClient extends IPacket {
 	public static final int TYPE_TIMEOUT = 0x02;
 	public static final int TYPE_INVALID_OPERATION = 0x03;
 	public static final int TYPE_INTERNAL_ERROR = 0x04;
+	public static final int TYPE_SERVER_DISCONNECT = 0x05;
 	public static final int TYPE_UNKNOWN = 0xFF;
 	
 	public String clientId;

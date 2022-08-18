@@ -658,6 +658,11 @@ public class IntegratedServer {
 							}
 						}
 						break;
+					case IPCPacket17ConfigureLAN.ID: {
+							IPCPacket17ConfigureLAN pkt = (IPCPacket17ConfigureLAN)packet;
+							currentProcess.getConfigurationManager().configureLAN(pkt.gamemode, pkt.cheats);
+						}
+						break;
 					default:
 						System.err.println("IPC packet type 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "' was not handled");
 						sendTaskFailed();
