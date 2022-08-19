@@ -76,29 +76,29 @@ public class LANClientNetworkManager implements INetworkManager {
 						
 						// process
 						EaglerAdapter.clientLANSetICEServersAndConnect(servers.toArray(new String[servers.size()]));
-						
+
 						// await result
 						long lm = System.currentTimeMillis();
 						do {
-							String c = EaglerAdapter.clientLANAwaitICECandidate();
+							String c = EaglerAdapter.clientLANAwaitDescription();
 							if(c != null) {
-								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client sent ICE candidate");
-								
-								// 'this.iceCandidateHandler' was called, send result:
-								sock.writePacket(new IPacket03ICECandidate("", c));
-								
-								connectState = SENT_ICE_CANDIDATE;
+								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client sent description");
+
+								// 'this.descriptionHandler' was called, send result:
+								sock.writePacket(new IPacket04Description("", c));
+
+								connectState = SENT_DESCRIPTION;
 								continue mainLoop;
 							}
 							try {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm > 3000l);
+						}while(System.currentTimeMillis() - lm < 3000l);
 
-						// no ice candidates were sent
+						// no description was sent
 						sock.close();
-						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client provide ICE candidate timeout");
+						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client provide description timeout");
 						return null;
 						
 					}else {
@@ -121,25 +121,25 @@ public class LANClientNetworkManager implements INetworkManager {
 						// await result
 						long lm = System.currentTimeMillis();
 						do {
-							String c = EaglerAdapter.clientLANAwaitDescription();
-							if(c != null) {
-								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client sent description");
-								
-								// 'this.descriptionHandler' was called, send result:
-								sock.writePacket(new IPacket04Description("", c));
-								
-								connectState = SENT_DESCRIPTION;
-								continue mainLoop;
+							if(EaglerAdapter.clientLANAwaitChannel()) {
+								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client opened data channel");
+
+								// 'this.remoteDataChannelHandler' was called, success
+								sock.writePacket(new IPacket05ClientSuccess(ipkt.peerId));
+								sock.close();
+								return new LANClientNetworkManager(displayCode, displayRelay);
+
 							}
 							try {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm > 3000l);
-						
-						// no description was sent
+						}while(System.currentTimeMillis() - lm < 3000l);
+
+						// no channel was opened
+						sock.writePacket(new IPacket06ClientFailure());
 						sock.close();
-						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client provide description timeout");
+						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client open data channel timeout");
 						return null;
 						
 					}else {
@@ -152,36 +152,35 @@ public class LANClientNetworkManager implements INetworkManager {
 					if(connectState == SENT_DESCRIPTION) {
 						
 						// %%%%%%  Process IPacket04Description  %%%%%%
-						
-						IPacket03ICECandidate ipkt = (IPacket03ICECandidate) pkt;
+
+						IPacket04Description ipkt = (IPacket04Description) pkt;
 						
 						// process
 						System.out.println("Relay [" + displayRelay + "|" + displayCode + "] recieved server description");
-						EaglerAdapter.clientLANSetDescription(ipkt.candidate);
+						EaglerAdapter.clientLANSetDescription(ipkt.description);
 
 						// await result
 						long lm = System.currentTimeMillis();
 						do {
-							if(EaglerAdapter.clientLANAwaitChannel()) {
-								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client opened data channel");
-								
-								// 'this.remoteDataChannelHandler' was called, success
-								sock.writePacket(new IPacket05ClientSuccess());
-								sock.close();
-								return new LANClientNetworkManager(displayCode, displayRelay);
-								
+							String c = EaglerAdapter.clientLANAwaitICECandidate();
+							if(c != null) {
+								System.out.println("Relay [" + displayRelay + "|" + displayCode + "] client sent ICE candidate");
+
+								// 'this.iceCandidateHandler' was called, send result:
+								sock.writePacket(new IPacket03ICECandidate("", c));
+
+								connectState = SENT_ICE_CANDIDATE;
+								continue mainLoop;
 							}
 							try {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm > 3000l);
-						
-						// no channel was opened
-						sock.writePacket(new IPacket06ClientFailure());
+						}while(System.currentTimeMillis() - lm < 3000l);
+
+						// no ice candidates were sent
 						sock.close();
-						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client open data channel timeout");
-						
+						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client provide ICE candidate timeout");
 						return null;
 						
 					}else {

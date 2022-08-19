@@ -368,7 +368,7 @@ public class EaglerSPRelay extends WebSocketServer {
 						cl = clientConnections.get(arg0);
 					}
 					if(cl != null) {
-						if(cl.handle(pkt)) {
+						if(!cl.handle(pkt)) {
 							logger.debug("[{}]: Client sent invalid packet: {}", (String) arg0.getAttachment(), pkt.getClass().getSimpleName());
 							arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_INVALID_PACKET,
 									"Invalid Packet Recieved")));

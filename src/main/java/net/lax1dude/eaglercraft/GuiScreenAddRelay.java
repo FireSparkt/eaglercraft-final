@@ -32,18 +32,18 @@ public class GuiScreenAddRelay extends GuiScreen {
 		StringTranslate var1 = StringTranslate.getInstance();
 		EaglerAdapter.enableRepeatEvents(true);
 		this.buttonList.clear();
+		this.parentGui.addNewName = IntegratedServer.relayManager.makeNewRelayName();
+		this.parentGui.addNewAddr = "";
+		this.parentGui.addNewPrimary = IntegratedServer.relayManager.count() == 0;
 		int sslOff = EaglerAdapter.isSSLPage() ? 36 : 0;
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 12 + sslOff, var1.translateKey("addRelay.add")));
 		this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12 + sslOff, var1.translateKey("gui.cancel")));
-		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, 142, var1.translateKey("addRelay.primary") + ": " + var1.translateKey("gui.no")));
+		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, 142, var1.translateKey("addRelay.primary") + ": " + (this.parentGui.addNewPrimary ? var1.translateKey("gui.yes") : var1.translateKey("gui.no"))));
 		this.serverName = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 106, 200, 20);
 		this.serverAddress = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 66, 200, 20);
 		this.serverAddress.setMaxStringLength(128);
 		this.serverAddress.setFocused(true);
 		((GuiButton) this.buttonList.get(0)).enabled = this.serverAddress.getText().length() > 0 && this.serverAddress.getText().split(":").length > 0 && this.serverName.getText().length() > 0;
-		this.parentGui.addNewName = IntegratedServer.relayManager.makeNewRelayName();
-		this.parentGui.addNewAddr = "";
-		this.parentGui.addNewPrimary = IntegratedServer.relayManager.count() == 0;
 		this.serverName.setText(this.parentGui.addNewName);
 	}
 

@@ -84,7 +84,7 @@ public class EaglerSPRelayConfigRelayList {
 				}else if(isTURNHead) {
 					addType = RelayType.TURN;
 				}else if(line.startsWith("url")) {
-					int spidx = line.indexOf('=');
+					int spidx = line.indexOf('=') + 1;
 					if(spidx < 3) {
 						EaglerSPRelay.logger.error("Error: Invalid line in {}: ", line);
 					}else {
@@ -96,7 +96,7 @@ public class EaglerSPRelayConfigRelayList {
 						}
 					}
 				}else if(line.startsWith("username")) {
-					int spidx = line.indexOf('=');
+					int spidx = line.indexOf('=') + 1;
 					if(spidx < 8) {
 						EaglerSPRelay.logger.error("Error: Invalid line in {}: ", line);
 					}else {
@@ -108,7 +108,7 @@ public class EaglerSPRelayConfigRelayList {
 						}
 					}
 				}else if(line.startsWith("password")) {
-					int spidx = line.indexOf('=');
+					int spidx = line.indexOf('=') + 1;
 					if(spidx < 8) {
 						EaglerSPRelay.logger.error("Error: Invalid line in {}: ", line);
 					}else {

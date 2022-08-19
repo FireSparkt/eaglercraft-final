@@ -47,21 +47,21 @@ public class EaglerSPClient {
 	
 	public boolean handle(IPacket packet) throws IOException {
 		if(packet instanceof IPacket03ICECandidate) {
-			if(LoginState.assertEquals(this, LoginState.INIT)) {
+			if(LoginState.assertEquals(this, LoginState.RECIEVED_DESCRIPTION)) {
 				state = LoginState.SENT_ICE_CANDIDATE;
 				server.handleClientICECandidate(this, (IPacket03ICECandidate)packet);
 				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x03: ICECandidate", (String) socket.getAttachment());
 			}
 			return true;
 		}else if(packet instanceof IPacket04Description) {
-			if(LoginState.assertEquals(this, LoginState.RECIEVED_ICE_CANIDATE)) {
+			if(LoginState.assertEquals(this, LoginState.INIT)) {
 				state = LoginState.SENT_DESCRIPTION;
 				server.handleClientDescription(this, (IPacket04Description)packet);
 				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x04: Description", (String) socket.getAttachment());
 			}
 			return true;
 		}else if(packet instanceof IPacket05ClientSuccess) {
-			if(LoginState.assertEquals(this, LoginState.RECIEVED_DESCRIPTION)) {
+			if(LoginState.assertEquals(this, LoginState.RECIEVED_ICE_CANIDATE)) {
 				state = LoginState.FINISHED;
 				server.handleClientSuccess(this, (IPacket05ClientSuccess)packet);
 				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientSuccess", (String) socket.getAttachment());
@@ -69,7 +69,7 @@ public class EaglerSPClient {
 			}
 			return true;
 		}else if(packet instanceof IPacket06ClientFailure) {
-			if(LoginState.assertEquals(this, LoginState.RECIEVED_DESCRIPTION)) {
+			if(LoginState.assertEquals(this, LoginState.RECIEVED_ICE_CANIDATE)) {
 				state = LoginState.FINISHED;
 				server.handleClientFailure(this, (IPacket06ClientFailure)packet);
 				EaglerSPRelay.logger.debug("[{}][Client -> Relay -> Server] PKT 0x05: ClientFailure", (String) socket.getAttachment());
@@ -96,7 +96,7 @@ public class EaglerSPClient {
 	public void disconnect(int code, String reason) {
 		IPacket pkt = new IPacketFEDisconnectClient(id, code, reason);
 		if(!serverNotifiedOfClose) {
-			server.send(pkt);
+			if (code != IPacketFEDisconnectClient.TYPE_FINISHED_SUCCESS) server.send(pkt);
 			serverNotifiedOfClose = true;
 		}
 		if(this.socket.isOpen()) {

@@ -347,7 +347,6 @@ window.initializeLANClient = (() => {
 				}
 				if(this.peerConnection != null) {
 					this.peerConnection.close();
-					this.peerConnection = null;
 				}
 				this.peerConnection = new RTCPeerConnection({ iceServers: this.ICEServers, optional: [ { DtlsSrtpKeyAgreement: true } ] });
 				this.readyState = READYSTATE_CONNECTING;
@@ -398,21 +397,31 @@ window.initializeLANClient = (() => {
 		
 		signalRemoteConnect() {
 			const self = this;
-			if(self.readyState === READYSTATE_CONNECTED || self.readyState === READYSTATE_CONNECTING) {
-				signalRemoteDisconnect();
-			}
+
 			this.peerConnection.addEventListener("icecandidate", (evt) => {
 				if(evt.candidate) {
 					self.iceCandidateHandler(JSON.stringify({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate }));
 				}
 			});
 
+			/*
 			this.peerConnection.addEventListener("datachannel", (evt) => {
 				self.channel = evt.channel;
 				self.remoteDataChannelHandler(self.channel);
 				evt.channel.addEventListener("message", (evt) => {
 					self.remotePacketHandler(evt.data);
 				});
+			});
+			*/
+
+			this.channel = this.peerConnection.createDataChannel("lan");
+
+			this.channel.addEventListener("open", (evt) => {
+				self.remoteDataChannelHandler(self.channel);
+			});
+
+			this.channel.addEventListener("message", (evt) => {
+				self.remotePacketHandler(evt.data);
 			});
 
 			this.peerConnection.createOffer((desc) => {
@@ -443,11 +452,23 @@ window.initializeLANClient = (() => {
 		}
 		
 		signalRemoteDescription(descJSON) {
-			this.peerConnection.setRemoteDescription(descJSON);
+			try {
+				this.peerConnection.setRemoteDescription(JSON.parse(descJSON));
+			} catch (e) {
+				console.error(e);
+				this.readyState = READYSTATE_FAILED;
+				this.signalRemoteDisconnect();
+			}
 		}
 		
 		signalRemoteICECandidate(candidate) {
-			this.peerConnection.addICECandidate(candidate);
+			try {
+				this.peerConnection.addIceCandidate(JSON.parse(candidate));
+			} catch (e) {
+				console.error(e);
+				this.readyState = READYSTATE_FAILED;
+				this.signalRemoteDisconnect();
+			}
 		}
 
 		signalRemoteDisconnect() {
@@ -455,7 +476,9 @@ window.initializeLANClient = (() => {
 				this.dataChannel.close();
 				this.dataChannel = null;
 			}
-			this.peerConnection.close();
+			if(this.peerConnection != null) {
+				this.peerConnection.close();
+			}
 			this.remoteDisconnectHandler();
 			this.readyState = READYSTATE_DISCONNECTED;
 		}
@@ -497,14 +520,24 @@ window.initializeLANServer = (() => {
 				}
 			});
 
+			/*
 			this.dataChannel = this.peerConnection.createDataChannel("lan");
 
 			this.dataChannel.addEventListener("open", (evt) => {
-				self.client.remoteClientDataChannelHandler(self.peerId, this.dataChannel);
+				self.client.remoteClientDataChannelHandler(self.peerId, self.dataChannel);
 			});
 
 			this.dataChannel.addEventListener("message", (evt) => {
 				self.client.remoteClientPacketHandler(self.peerId, evt.data);
+			});
+			*/
+
+			this.peerConnection.addEventListener("datachannel", (evt) => {
+				self.dataChannel = evt.channel;
+				self.client.remoteClientDataChannelHandler(self.peerId, self.dataChannel);
+				self.dataChannel.addEventListener("message", (evt) => {
+					self.client.remoteClientPacketHandler(self.peerId, evt.data);
+				});
 			});
 
 			this.peerConnection.addEventListener("connectionstatechange", (evt) => {

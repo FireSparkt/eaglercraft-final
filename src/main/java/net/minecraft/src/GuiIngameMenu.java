@@ -14,6 +14,8 @@ public class GuiIngameMenu extends GuiScreen {
 
 	private GuiVoiceMenu voiceMenu;
 
+	private GuiButton lanButton;
+
 	public GuiIngameMenu() {
 		voiceMenu = new GuiVoiceMenu(this);
 	}
@@ -32,9 +34,8 @@ public class GuiIngameMenu extends GuiScreen {
 
 		this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + var1, StatCollector.translateToLocal("menu.returnToGame")));
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.options")));
-		GuiButton var3;
-		this.buttonList.add(var3 = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServerLAN.isHostingLAN() ? "menu.closeLan" : "menu.shareToLan")));
-		var3.enabled = mc.isSingleplayer();
+		this.buttonList.add(lanButton = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServerLAN.isHostingLAN() ? "menu.closeLan" : "menu.shareToLan")));
+		lanButton.enabled = mc.isSingleplayer();
 		this.buttonList.add(new GuiButton(8, 3, 3, 120, 20, StatCollector.translateToLocal("menu.skinCapeSettings")));
 	}
 
@@ -71,9 +72,7 @@ public class GuiIngameMenu extends GuiScreen {
 				IntegratedServerLAN.closeLAN();
 				IntegratedServer.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
 				this.mc.thePlayer.sendChatToPlayer(StatCollector.translateToLocal("lanServer.closed"));
-				this.mc.displayGuiScreen((GuiScreen) null);
-				this.mc.setIngameFocus();
-				this.mc.sndManager.resumeAllSounds();
+				this.lanButton.displayString = StatCollector.translateToLocal("menu.shareToLan");
 			} else {
 				if(IntegratedServer.relayManager.count() == 0) {
 					this.mc.displayGuiScreen(new GuiScreenNoRelays(this, "noRelay.title"));

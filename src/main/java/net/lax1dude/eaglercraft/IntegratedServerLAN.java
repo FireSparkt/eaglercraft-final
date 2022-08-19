@@ -59,7 +59,7 @@ public class IntegratedServerLAN {
 					Thread.sleep(50l);
 				} catch (InterruptedException e) {
 				}
-			}while(System.currentTimeMillis() - millis > 1000l);
+			}while(System.currentTimeMillis() - millis < 1000l);
 			System.out.println("Relay [" + sock.getURI() + "] relay provide ICE servers timeout");
 			closeLAN();
 			return null;
@@ -80,6 +80,7 @@ public class IntegratedServerLAN {
 			lanRelaySocket = null;
 			currentCode = null;
 		}
+		EaglerAdapter.serverLANCloseServer();
 		cleanupLAN();
 	}
 	
@@ -100,7 +101,7 @@ public class IntegratedServerLAN {
 	public static void updateLANServer() {
 		if(lanRelaySocket != null) {
 			IPacket pkt;
-			while((pkt = lanRelaySocket.nextPacket()) != null) {
+			while((pkt = lanRelaySocket.readPacket()) != null) {
 				if(pkt instanceof IPacket02NewClient) {
 					IPacket02NewClient ipkt = (IPacket02NewClient) pkt;
 					if(clients.containsKey(ipkt.clientId)) {
@@ -180,10 +181,11 @@ public class IntegratedServerLAN {
 		
 		protected LANClient(String clientId) {
 			this.clientId = clientId;
+			EaglerAdapter.serverLANCreatePeer(clientId);
 		}
 		
 		protected void handleICECandidates(String candidates) {
-			if(state == PRE) {
+			if(state == SENT_DESCRIPTION) {
 				EaglerAdapter.serverLANPeerICECandidates(clientId, candidates);
 				long millis = System.currentTimeMillis();
 				do {
@@ -205,7 +207,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis > 3000l);
+				}while(System.currentTimeMillis() - millis < 3000l);
 				System.err.println("Getting server ICE candidates for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -214,7 +216,7 @@ public class IntegratedServerLAN {
 		}
 		
 		protected void handleDescription(String description) {
-			if(state == SENT_ICE_CANDIDATE) {
+			if(state == PRE) {
 				EaglerAdapter.serverLANPeerDescription(clientId, description);
 				long millis = System.currentTimeMillis();
 				do {
@@ -236,7 +238,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis > 3000l);
+				}while(System.currentTimeMillis() - millis < 3000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -245,7 +247,7 @@ public class IntegratedServerLAN {
 		}
 		
 		protected void handleSuccess() {
-			if(state == SENT_DESCRIPTION) {
+			if(state == SENT_ICE_CANDIDATE) {
 				long millis = System.currentTimeMillis();
 				do {
 					LANPeerEvent evt;
@@ -253,6 +255,9 @@ public class IntegratedServerLAN {
 						if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
 							EaglerAdapter.enableChannel("NET|" + clientId);
 							state = CONNECTED;
+							return;
+						}else if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+							// ignore
 							return;
 						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
 							System.err.println("LAN client '" + clientId + "' disconnected while waiting for connection");
@@ -266,7 +271,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis > 3000l);
+				}while(System.currentTimeMillis() - millis < 3000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -275,7 +280,7 @@ public class IntegratedServerLAN {
 		}
 		
 		protected void handleFailure() {
-			if(state == SENT_DESCRIPTION) {
+			if(state == SENT_ICE_CANDIDATE) {
 				System.err.println("Client '" + clientId + "' failed to connect");
 				disconnect();
 			}else {
@@ -312,7 +317,10 @@ public class IntegratedServerLAN {
 					EaglerAdapter.disableChannel("NET|" + clientId);
 				}
 				state = CLOSED;
-				lanRelaySocket.writePacket(new IPacketFEDisconnectClient(clientId, IPacketFEDisconnectClient.TYPE_SERVER_DISCONNECT, "Connection Closed"));
+				if (lanRelaySocket != null) {
+					lanRelaySocket.writePacket(new IPacketFEDisconnectClient(clientId, IPacketFEDisconnectClient.TYPE_SERVER_DISCONNECT, "Connection Closed"));
+				}
+				EaglerAdapter.serverLANDisconnectPeer(clientId);
 				dead = true;
 			}
 		}

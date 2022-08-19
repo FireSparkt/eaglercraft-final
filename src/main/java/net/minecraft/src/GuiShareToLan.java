@@ -22,11 +22,11 @@ public class GuiShareToLan extends GuiScreen {
 	private String gameMode = "survival";
 
 	/** True if 'Allow Cheats' is currently enabled */
-	private boolean allowCommands;
+	private boolean allowCommands = false;
 	
 	private final GuiNetworkSettingsButton relaysButton;
 	
-	private boolean hiddenToggle;
+	private boolean hiddenToggle = false;
 	
 	private GuiTextField codeTextField;
 
@@ -102,7 +102,7 @@ public class GuiShareToLan extends GuiScreen {
 		} else if (par1GuiButton.id == 103) {
 			this.allowCommands = !this.allowCommands;
 			this.func_74088_g();
-		}  else if (par1GuiButton.id == 104) {
+		}  else if (par1GuiButton.id == 105) {
 			this.hiddenToggle = !this.hiddenToggle;
 			this.func_74088_g();
 		} else if (par1GuiButton.id == 101) {
