@@ -3,6 +3,7 @@ package net.minecraft.src;
 import net.lax1dude.eaglercraft.AbortedException;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.GuiScreenNoRelays;
 import net.lax1dude.eaglercraft.GuiScreenSkinCapeSettings;
 import net.lax1dude.eaglercraft.GuiVoiceMenu;
 import net.lax1dude.eaglercraft.IntegratedServer;
@@ -66,12 +67,19 @@ public class GuiIngameMenu extends GuiScreen {
 
 		case 7:
 			if (IntegratedServerLAN.isHostingLAN()) {
+				this.mc.lanState = false;
 				IntegratedServerLAN.closeLAN();
+				IntegratedServer.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
+				this.mc.thePlayer.sendChatToPlayer(StatCollector.translateToLocal("lanServer.closed"));
 				this.mc.displayGuiScreen((GuiScreen) null);
 				this.mc.setIngameFocus();
 				this.mc.sndManager.resumeAllSounds();
 			} else {
-				this.mc.displayGuiScreen(new GuiShareToLan(this));
+				if(IntegratedServer.relayManager.count() == 0) {
+					this.mc.displayGuiScreen(new GuiScreenNoRelays(this, "noRelay.title"));
+				}else {
+					this.mc.displayGuiScreen(new GuiShareToLan(this));
+				}
 			}
 			break;
 			
@@ -98,9 +106,9 @@ public class GuiIngameMenu extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, "Game menu", this.width / 2, 40, 16777215);
 		super.drawScreen(par1, par2, par3);
+		StringTranslate var1 = StringTranslate.getInstance();
 		if(par1 >= 3 && par1 < 123 && par2 >= 3 && par2 < 23) {
 			int c = 0xCCCC66;
-			StringTranslate var1 = StringTranslate.getInstance();
 			EaglerAdapter.glPushMatrix();
 			EaglerAdapter.glTranslatef(126.0f, 6.0f, 0.0f);
 			EaglerAdapter.glScalef(0.8f, 0.8f, 0.8f);
@@ -108,8 +116,39 @@ public class GuiIngameMenu extends GuiScreen {
 			this.drawString(fontRenderer, var1.translateKey("menu.skinCapeSettingsNote1"), 0, 9, c);
 			EaglerAdapter.glPopMatrix();
 		}
-		
+
 		drawString(fontRenderer, "Eaglercraft: " + ConfigConstants.version, 6, 27, 0x999999);
+		
+		if(IntegratedServerLAN.isHostingLAN()) {
+			String str = var1.translateKey("lanServer.pauseMenu0");
+			drawString(fontRenderer, str, 6, 52, 0xFFFF55);
+			
+			if(mc.gameSettings.hideJoinCode) {
+				EaglerAdapter.glPushMatrix();
+				EaglerAdapter.glTranslatef(7.0f, 67.0f, 0.0f);
+				EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
+				str = var1.translateKey("lanServer.showCode");
+				int w = fontRenderer.getStringWidth(str);
+				boolean hover = par1 > 6 && par1 < 8 + w * 3 / 4 && par2 > 66 && par2 < 67 + 8;
+				drawString(fontRenderer, EnumChatFormatting.UNDERLINE + str, 0, 0, hover ? 0xEEEEAA : 0xCCCC55);
+				EaglerAdapter.glPopMatrix();
+			}else {
+				int w = fontRenderer.getStringWidth(str);
+				EaglerAdapter.glPushMatrix();
+				EaglerAdapter.glTranslatef(6 + w + 3, 53, 0.0f);
+				EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
+				str = var1.translateKey("lanServer.hideCode");
+				int w2 = fontRenderer.getStringWidth(str);
+				boolean hover = par1 > 6 + w + 2 && par1 < 6 + w + 3 + w2 * 3 / 4 && par2 > 53 - 1 && par2 < 53 + 6;
+				drawString(fontRenderer, EnumChatFormatting.UNDERLINE + str, 0, 0, hover ? 0xEEEEAA : 0xCCCC55);
+				EaglerAdapter.glPopMatrix();
+				
+				drawString(fontRenderer, EnumChatFormatting.GRAY + var1.translateKey("lanServer.pauseMenu1") + " " +
+						EnumChatFormatting.RESET + IntegratedServerLAN.getCurrentURI(), 6, 67, 0xFFFFFF);
+				drawString(fontRenderer, EnumChatFormatting.GRAY + var1.translateKey("lanServer.pauseMenu2") + " " +
+						EnumChatFormatting.RESET + IntegratedServerLAN.getCurrentCode(), 6, 77, 0xFFFFFF);
+			}
+		}
 		
 		try {
 			if(!mc.isSingleplayer()) {
@@ -148,6 +187,30 @@ public class GuiIngameMenu extends GuiScreen {
 		try {
 			if(!mc.isSingleplayer()) {
 				voiceMenu.mouseClicked(par1, par2, par3);
+			}
+			if(par3 == 0) {
+				StringTranslate var1 = StringTranslate.getInstance();
+				
+				if(mc.gameSettings.hideJoinCode) {
+					String str = var1.translateKey("lanServer.showCode");
+					int w = fontRenderer.getStringWidth(str);
+					if(par1 > 6 && par1 < 8 + w * 3 / 4 && par2 > 66 && par2 < 67 + 8) {
+						mc.gameSettings.hideJoinCode = false;
+						mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+						mc.gameSettings.saveOptions();
+					}
+				}else {
+					String str = var1.translateKey("lanServer.pauseMenu0");
+					int w = fontRenderer.getStringWidth(str);
+					str = var1.translateKey("lanServer.hideCode");
+					int w2 = fontRenderer.getStringWidth(str);
+					if(par1 > 6 + w + 2 && par1 < 6 + w + 3 + w2 * 3 / 4 && par2 > 53 - 1 && par2 < 53 + 6) {
+						mc.gameSettings.hideJoinCode = true;
+						mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+						mc.gameSettings.saveOptions();
+					}
+				}
+				
 			}
 			super.mouseClicked(par1, par2, par3);
 		}catch(AbortedException ex) {

@@ -259,12 +259,28 @@ directConnect.serverJoin=Connect to Server
 directConnect.lanWorldJoin=Join World
 directConnect.lanWorldRelay=Network Settings
 
+lanServer.pauseMenu0=Sharing to LAN
+lanServer.pauseMenu1=Relay URL:
+lanServer.pauseMenu2=Join Code:
+
+lanServer.worldName=World Name:
+lanServer.hidden=Hidden:
+lanServer.hideCode=hide details
+lanServer.showCode=show details
+lanServer.opened=LAN world opened on $relay$, join code is §a$code$
+lanServer.closed=LAN world closed
+lanServer.pleaseWait=Please Wait...
+lanServer.relayDisconnected=Error: connection to LAN relay was lost, you must re-share the world to invide more people
+
 networkSettings.title=LAN World Relay Servers
 networkSettings.add=Add Relay
 networkSettings.delete=Delete Relay
 networkSettings.default=Set Primary
 networkSettings.refresh=Refresh
 networkSettings.loadDefaults=Load Defaults
+networkSettings.relayTimeout=Connection Timeout:
+networkSettings.relayTimeoutChange=change
+networkSettings.relayTimeoutTitle=Change Connection Timeout
 
 addRelay.title=Add New Relay
 addRelay.name=Relay Comment
@@ -274,8 +290,13 @@ addRelay.primary=Set Primary
 addRelay.removeText1=Do you want to remove this relay?
 
 noRelay.title=No Relays are Configured!
+noRelay.titleFail=No Working Relays Available!
 noRelay.noRelay1=LAN Unavailable: No Relays Configured!
 noRelay.noRelay2=Click '§nNetwork Settings§r' to fix
+noRelay.worldNotFound1=Could not locate '§c$code$§r'!
+noRelay.worldNotFound2=Make sure to add the '§f$code$§r' world's relay URL
+noRelay.worldNotFound3=to the relay list 'Network Settings' to connect
+noRelay.worldFail=Failed to connect to '$code$'!
 
 multiplayer.title=Play Multiplayer
 multiplayer.connect=Connect

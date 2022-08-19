@@ -55,6 +55,11 @@ public class NetClientHandler extends NetHandler {
 	/** RNG. */
 	EaglercraftRandom rand = new EaglercraftRandom();
 
+	public NetClientHandler(Minecraft par1Minecraft, INetworkManager mgr) throws IOException {
+		this.mc = par1Minecraft;
+		this.netManager = mgr;
+	}
+
 	public NetClientHandler(Minecraft par1Minecraft, String channel) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = IntegratedServer.openConnection(channel, this);

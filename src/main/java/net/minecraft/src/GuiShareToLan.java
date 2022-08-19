@@ -1,5 +1,7 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.GuiNetworkSettingsButton;
+import net.lax1dude.eaglercraft.GuiScreenNoRelays;
 import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.IntegratedServerLAN;
 
@@ -11,6 +13,7 @@ public class GuiShareToLan extends GuiScreen {
 	private final GuiScreen parentScreen;
 	private GuiButton buttonAllowCommandsToggle;
 	private GuiButton buttonGameMode;
+	private GuiButton buttonHiddenToggle;
 
 	/**
 	 * The currently selected game mode. One of 'survival', 'creative', or
@@ -20,9 +23,16 @@ public class GuiShareToLan extends GuiScreen {
 
 	/** True if 'Allow Cheats' is currently enabled */
 	private boolean allowCommands;
+	
+	private final GuiNetworkSettingsButton relaysButton;
+	
+	private boolean hiddenToggle;
+	
+	private GuiTextField codeTextField;
 
 	public GuiShareToLan(GuiScreen par1GuiScreen) {
 		this.parentScreen = par1GuiScreen;
+		this.relaysButton = new GuiNetworkSettingsButton(this);
 	}
 
 	/**
@@ -34,10 +44,16 @@ public class GuiShareToLan extends GuiScreen {
 				StatCollector.translateToLocal("lanServer.start")));
 		this.buttonList.add(new GuiButton(102, this.width / 2 + 5, this.height - 28, 150, 20,
 				StatCollector.translateToLocal("gui.cancel")));
-		this.buttonList.add(this.buttonGameMode = new GuiButton(104, this.width / 2 - 155, 100, 150, 20,
+		this.buttonList.add(this.buttonGameMode = new GuiButton(104, this.width / 2 - 155, 160, 150, 20,
 				StatCollector.translateToLocal("selectWorld.gameMode")));
-		this.buttonList.add(this.buttonAllowCommandsToggle = new GuiButton(103, this.width / 2 + 5, 100, 150, 20,
+		this.buttonList.add(this.buttonAllowCommandsToggle = new GuiButton(103, this.width / 2 + 5, 160, 150, 20,
 				StatCollector.translateToLocal("selectWorld.allowCommands")));
+		this.buttonList.add(this.buttonHiddenToggle = new GuiButton(105, this.width / 2 - 75, 190, 150, 20,
+				StatCollector.translateToLocal("lanServer.hidden")));
+		this.codeTextField = new GuiTextField(this.fontRenderer, this.width / 2 - 100, 100, 200, 20);
+		this.codeTextField.setText(mc.thePlayer.username + "'s World");
+		this.codeTextField.setFocused(true);
+		this.codeTextField.setMaxStringLength(252);
 		this.func_74088_g();
 	}
 
@@ -46,12 +62,22 @@ public class GuiShareToLan extends GuiScreen {
 				+ StatCollector.translateToLocal("selectWorld.gameMode." + this.gameMode);
 		this.buttonAllowCommandsToggle.displayString = StatCollector.translateToLocal("selectWorld.allowCommands")
 				+ " ";
+		this.buttonHiddenToggle.displayString = StatCollector.translateToLocal("lanServer.hidden")
+				+ " ";
 
 		if (this.allowCommands) {
 			this.buttonAllowCommandsToggle.displayString = this.buttonAllowCommandsToggle.displayString
 					+ StatCollector.translateToLocal("options.on");
 		} else {
 			this.buttonAllowCommandsToggle.displayString = this.buttonAllowCommandsToggle.displayString
+					+ StatCollector.translateToLocal("options.off");
+		}
+		
+		if(this.hiddenToggle) {
+			this.buttonHiddenToggle.displayString = this.buttonHiddenToggle.displayString
+					+ StatCollector.translateToLocal("options.on");
+		} else {
+			this.buttonHiddenToggle.displayString = this.buttonHiddenToggle.displayString
 					+ StatCollector.translateToLocal("options.off");
 		}
 	}
@@ -76,23 +102,29 @@ public class GuiShareToLan extends GuiScreen {
 		} else if (par1GuiButton.id == 103) {
 			this.allowCommands = !this.allowCommands;
 			this.func_74088_g();
+		}  else if (par1GuiButton.id == 104) {
+			this.hiddenToggle = !this.hiddenToggle;
+			this.func_74088_g();
 		} else if (par1GuiButton.id == 101) {
+			String worldName = this.codeTextField.getText().trim();
+			if(worldName.length() == 0) {
+				worldName = mc.thePlayer.username + "'s World";
+			}
+			if(worldName.length() >= 252) {
+				worldName = worldName.substring(0, 252);
+			}
 			this.mc.displayGuiScreen((GuiScreen) null);
 			LoadingScreenRenderer ls = mc.loadingScreen;
 			IntegratedServer.configureLAN(EnumGameType.getByName(this.gameMode), this.allowCommands);
-			String code = IntegratedServerLAN.shareToLAN((str) -> ls.displayProgressMessage(str), null, false);
-			
-			//TODO: handle code success or failure, redirect to relay list on failure, on success store code and relay and display in pause menu
-			//TODO: must call IntegratedServer.configureLAN(mc.theWorld.getGameType(), false); when world is closed
-			
-			String var3;
+			String code = IntegratedServerLAN.shareToLAN((str) -> ls.resetProgresAndWorkingMessage(str), worldName, hiddenToggle);
 			if (code != null) {
-				var3 = StatCollector.translateToLocalFormatted("commands.publish.started", code);
+				this.mc.ingameGUI.getChatGUI().printChatMessage(StringTranslate.getInstance().translateKey("lanServer.opened")
+						.replace("$relay$", IntegratedServerLAN.getCurrentURI()).replace("$code$", code));
+				this.mc.lanState = true;
 			} else {
-				var3 = StatCollector.translateToLocal("commands.publish.failed");
+				IntegratedServer.configureLAN(mc.theWorld.getWorldInfo().getGameType(), false);
+				this.mc.displayGuiScreen(new GuiScreenNoRelays(this, "noRelay.titleFail"));
 			}
-
-			this.mc.ingameGUI.getChatGUI().printChatMessage(var3);
 		}
 	}
 
@@ -103,8 +135,29 @@ public class GuiShareToLan extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, StatCollector.translateToLocal("lanServer.title"), this.width / 2,
 				50, 16777215);
+		this.drawCenteredString(this.fontRenderer, StatCollector.translateToLocal("lanServer.worldName"), this.width / 2,
+				82, 16777215);
 		this.drawCenteredString(this.fontRenderer, StatCollector.translateToLocal("lanServer.otherPlayers"),
-				this.width / 2, 82, 16777215);
+				this.width / 2, 142, 16777215);
 		super.drawScreen(par1, par2, par3);
+		this.relaysButton.drawScreen(par1, par2);
+		this.codeTextField.drawTextBox();
 	}
+	
+	public void mouseClicked(int par1, int par2, int par3) {
+		super.mouseClicked(par1, par2, par3);
+		this.relaysButton.mouseClicked(par1, par2, par3);
+		this.codeTextField.mouseClicked(par1, par2, par3);
+	}
+	
+	protected void keyTyped(char c, int k) {
+		super.keyTyped(c, k);
+		this.codeTextField.textboxKeyTyped(c, k);
+	}
+	
+	public void updateScreen() {
+		super.updateScreen();
+		this.codeTextField.updateCursorCounter();
+	}
+	
 }

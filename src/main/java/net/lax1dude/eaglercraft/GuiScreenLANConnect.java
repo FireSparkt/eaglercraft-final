@@ -28,17 +28,17 @@ public class GuiScreenLANConnect extends GuiScreen {
 		this.codeTextField.setMaxStringLength(48);
 		this.codeTextField.setFocused(true);
 		this.codeTextField.setText(lastCode);
-		((GuiButton) this.buttonList.get(0)).enabled = this.codeTextField.getText().length() > 0;
+		((GuiButton) this.buttonList.get(0)).enabled = this.codeTextField.getText().trim().length() > 0;
 	}
 
 	public void onGuiClosed() {
 		EaglerAdapter.enableRepeatEvents(false);
-		lastCode = this.codeTextField.getText();
+		lastCode = this.codeTextField.getText().trim();
 	}
 	
 	protected void keyTyped(char par1, int par2) {
 		if (this.codeTextField.textboxKeyTyped(par1, par2)) {
-			((GuiButton) this.buttonList.get(0)).enabled = this.codeTextField.getText().length() > 0;
+			((GuiButton) this.buttonList.get(0)).enabled = this.codeTextField.getText().trim().length() > 0;
 		} else if (par2 == 28) {
 			this.actionPerformed((GuiButton) this.buttonList.get(0));
 		}
@@ -67,6 +67,8 @@ public class GuiScreenLANConnect extends GuiScreen {
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if(par1GuiButton.id == 1) {
 			mc.displayGuiScreen(parent);
+		}else if(par1GuiButton.id == 0) {
+			mc.displayGuiScreen(new GuiScreenLANConnecting(parent, this.codeTextField.getText().trim()));
 		}
 	}
 	

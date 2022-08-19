@@ -13,6 +13,7 @@ import net.lax1dude.eaglercraft.GuiScreenSingleplayerConnecting;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.GuiVoiceOverlay;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.IntegratedServerLAN;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WorkerNetworkManager;
@@ -76,6 +77,7 @@ import net.minecraft.src.RenderManager;
 import net.minecraft.src.ScaledResolution;
 import net.minecraft.src.ServerData;
 import net.minecraft.src.SoundManager;
+import net.minecraft.src.StatCollector;
 import net.minecraft.src.StatStringFormatKeyInv;
 import net.minecraft.src.StringTranslate;
 import net.minecraft.src.TextureManager;
@@ -236,6 +238,8 @@ public class Minecraft implements Runnable {
 	public GuiVoiceOverlay voiceOverlay;
 
 	private int messageOnLoginCounter = 0;
+	
+	public boolean lanState = false;
 	
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
@@ -490,26 +494,6 @@ public class Minecraft implements Runnable {
 				}
 			}
 		}
-		/*
-		t1 = System.currentTimeMillis();
-		for(int i = 0; i < 8; i++) {
-			float f = 1.0f - ((float)(System.currentTimeMillis() - t1) / 136f);
-			f = 0.25f + f * f * 0.75f;
-			EaglerAdapter.glClearColor(f, f, f, 1.0F);
-			EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
-			EaglerAdapter.glFlush();
-			EaglerAdapter.updateDisplay();
-			
-			long t = t1 + 17 + 17*i - System.currentTimeMillis();
-			if(t > 0) {
-				try {
-					Thread.sleep(t);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		*/
 		
 		EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
 		showWarningText();
@@ -1155,11 +1139,19 @@ public class Minecraft implements Runnable {
 		this.mcProfiler.startSection("stats");
 		this.mcProfiler.endStartSection("gui");
 		
-		this.isGamePaused = this.isSingleplayer() && this.theWorld != null && this.thePlayer != null && this.currentScreen != null && this.currentScreen.doesGuiPauseGame();
+		this.isGamePaused = this.isSingleplayer() && this.theWorld != null && this.thePlayer != null && this.currentScreen != null
+				&& this.currentScreen.doesGuiPauseGame() && !IntegratedServerLAN.isHostingLAN();
 		
 		if(wasPaused != isGamePaused) {
 			IntegratedServer.setPaused(this.isGamePaused);
 			wasPaused = isGamePaused;
+		}
+		
+		if(lanState && !IntegratedServerLAN.isHostingLAN()) {
+			lanState = false;
+			if(thePlayer != null) {
+				thePlayer.sendChatToPlayer(EnumChatFormatting.RED + StatCollector.translateToLocal("lanServer.relayDisconnected"));
+			}
 		}
 		
 		if (!this.isGamePaused) {
@@ -1590,6 +1582,7 @@ public class Minecraft implements Runnable {
 			if (this.texturePackList.getIsDownloading()) {
 				this.texturePackList.onDownloadFinished();
 			}
+			this.lanState = false;
 			IntegratedServer.unloadWorld();
 			this.setServerData((ServerData) null);
 			this.integratedServerIsRunning = false;
@@ -1650,26 +1643,6 @@ public class Minecraft implements Runnable {
 	public void setNetManager(INetworkManager nm) {
 		this.myNetworkManager = nm;
 	}
-	
-	/*
-	public void installResource(String par1Str, File par2File) {
-		int var3 = par1Str.indexOf("/");
-		String var4 = par1Str.substring(0, var3);
-		par1Str = par1Str.substring(var3 + 1);
-
-		if (var4.equalsIgnoreCase("sound3")) {
-			this.sndManager.addSound(par1Str, par2File);
-		} else if (var4.equalsIgnoreCase("streaming")) {
-			this.sndManager.addStreaming(par1Str, par2File);
-		} else if (!var4.equalsIgnoreCase("music") && !var4.equalsIgnoreCase("newmusic")) {
-			if (var4.equalsIgnoreCase("lang")) {
-				StringTranslate.getInstance().func_94519_a(par1Str, par2File);
-			}
-		} else {
-			this.sndManager.addMusic(par1Str, par2File);
-		}
-	}
-	*/
 
 	/**
 	 * A String of renderGlobal.getDebugInfoRenders

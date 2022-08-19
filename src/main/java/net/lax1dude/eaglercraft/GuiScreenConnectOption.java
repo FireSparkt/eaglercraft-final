@@ -37,7 +37,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		}else if(par1GuiButton.id == 2) {
 			GuiScreen scn = new GuiScreenLANConnect(guiScreen);
 			if(IntegratedServer.relayManager.count() == 0) {
-				mc.displayGuiScreen(new GuiScreenNoRelays(guiScreen));
+				mc.displayGuiScreen(new GuiScreenNoRelays(guiScreen, "noRelay.title"));
 			}else {
 				mc.displayGuiScreen(scn);
 			}

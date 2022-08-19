@@ -114,9 +114,13 @@ public class EaglerSPRelay extends WebSocketServer {
 				logger.info("Shutting down...");
 				instance.stop();
 				System.exit(0);
+			}else if(s.equalsIgnoreCase("reset")) {
+				logger.info("Clearing all ratelimits");
+				if(pingRateLimiter != null) pingRateLimiter.reset();
+				if(worldRateLimiter != null) worldRateLimiter.reset();
 			}else {
 				logger.info("Unknown command: {}", s);
-				logger.info("Type 'stop' to exit, 'reload' to reload config");
+				logger.info("Type 'stop' to exit" + ((worldRateLimiter != null || pingRateLimiter != null) ? ", 'reset' to clear ratelimits" : ""));
 			}
 		}
 		
@@ -149,7 +153,7 @@ public class EaglerSPRelay extends WebSocketServer {
 	@Override
 	public void onStart() {
 		logger.info("Listening on {}", getAddress());
-		logger.info("Type 'stop' to exit");
+		logger.info("Type 'stop' to exit" + ((worldRateLimiter != null || pingRateLimiter != null) ? ", 'reset' to clear ratelimits" : ""));
 	}
 	
 	@Override
@@ -284,6 +288,9 @@ public class EaglerSPRelay extends WebSocketServer {
 										"The join code is the wrong length, it should be " + config.getCodeLength() + " chars long")));
 								arg0.close();
 							}else {
+								if(!config.isCodeMixCase()) {
+									code = code.toLowerCase();
+								}
 								EaglerSPServer srv;
 								synchronized(serverCodes) {
 									srv = serverCodes.get(code);
@@ -424,30 +431,30 @@ public class EaglerSPRelay extends WebSocketServer {
 			synchronized(clientConnections) {
 				cl = clientConnections.remove(arg0);
 			}
-			synchronized(clientAddressSets) {
-				List<EaglerSPClient> lst = clientAddressSets.get(cl.address);
-				if(lst != null) {
-					lst.remove(cl);
-					if(lst.size() == 0) {
-						clientAddressSets.remove(cl.address);
+			if(cl != null) {
+				synchronized(clientAddressSets) {
+					List<EaglerSPClient> lst = clientAddressSets.get(cl.address);
+					if(lst != null) {
+						lst.remove(cl);
+						if(lst.size() == 0) {
+							clientAddressSets.remove(cl.address);
+						}
 					}
 				}
-			}
-			if(cl != null) {
 				logger.debug("[{}]: Client closed, id: {}", (String) arg0.getAttachment(), cl.id);
 				synchronized(clientIds) {
 					clientIds.remove(cl.id);
 				}
 				cl.server.handleClientDisconnect(cl);
 			}else {
-				logger.debug("[{}]: Connection Closed: {} ", (String) arg0.getAttachment());
+				logger.debug("[{}]: Connection Closed", (String) arg0.getAttachment());
 			}
 		}
 	}
 
 	@Override
 	public void onError(WebSocket arg0, Exception arg1) {
-		logger.error("[{}]: Exception thrown: {}", (String) arg0.getAttachment(), arg1.toString());
+		logger.error("[{}]: Exception thrown: {}", (arg0 == null ? "SERVER" : (String) arg0.getAttachment()), arg1.toString());
 		logger.debug(arg1);
 		arg0.close();
 	}

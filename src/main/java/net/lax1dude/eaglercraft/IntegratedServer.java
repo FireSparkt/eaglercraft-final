@@ -120,6 +120,7 @@ public class IntegratedServer {
 			statusState = IntegratedState.WORLD_UNLOADING;
 			sendIPCPacket(new IPCPacket01StopServer());
 		}
+		IntegratedServerLAN.closeLAN();
 	}
 	
 	public static void autoSave() {
@@ -258,6 +259,9 @@ public class IntegratedServer {
 	public static void processICP() {
 		
 		if(!EaglerAdapter.isIntegratedServerAlive()) {
+			if(IntegratedServerLAN.isHostingLAN()) {
+				IntegratedServerLAN.closeLAN();
+			}
 			return;
 		}
 		
@@ -388,6 +392,10 @@ public class IntegratedServer {
 				System.err.println("Failed to process IPC packet type 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "'");
 				t.printStackTrace();
 			}
+		}
+		
+		if(IntegratedServerLAN.isHostingLAN()) {
+			IntegratedServerLAN.updateLANServer();
 		}
 	}
 	

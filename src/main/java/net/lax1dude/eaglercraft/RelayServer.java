@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft;
 
 import net.lax1dude.eaglercraft.RelayQuery.VersionMismatch;
+import net.minecraft.client.Minecraft;
 
 public class RelayServer {
 	
@@ -114,7 +115,7 @@ public class RelayServer {
 	}
 	
 	public RelayServerSocket openSocket() {
-		return EaglerAdapter.openRelayConnection(address);
+		return EaglerAdapter.openRelayConnection(address, Minecraft.getMinecraft().gameSettings.relayTimeout * 1000);
 	}
 	
 }

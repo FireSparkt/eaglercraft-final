@@ -89,7 +89,7 @@ public class IPacket {
 			if(j < 0) {
 				return null;
 			}
-			ret[i] = (char)is.read();
+			ret[i] = (char)j;
 		}
 		return new String(ret);
 	}

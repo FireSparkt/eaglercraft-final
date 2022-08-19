@@ -1,6 +1,7 @@
 package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
+import net.lax1dude.eaglercraft.IntegratedServer;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.minecraft.client.Minecraft;
 
@@ -140,6 +141,9 @@ public class GameSettings {
 	public float voiceListenVolume = 0.5f;
 	public float voiceSpeakVolume = 0.5f;
 	public int voicePTTKey = 47;
+	
+	public boolean hideJoinCode = false;
+	public int relayTimeout = 4;
 
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
@@ -528,6 +532,8 @@ public class GameSettings {
 			if(yee.hasKey("voicePTTKey")) voicePTTKey = yee.getInteger("voicePTTKey");
 			if(yee.hasKey("voiceListenRadius")) voiceListenRadius = yee.getInteger("voiceListenRadius");
 			if(yee.hasKey("difficulty")) difficulty = yee.getByte("difficulty");
+			if(yee.hasKey("hideJoinCode")) hideJoinCode = yee.getBoolean("hideJoinCode");
+			if(yee.hasKey("relayTimeout")) relayTimeout = yee.getByte("relayTimeout");
 			
 			if(voiceListenRadius < 5) voiceListenRadius = 5;
 			else if(voiceListenRadius > 22) voiceListenRadius = 22;
@@ -541,6 +547,8 @@ public class GameSettings {
 			}
 	
 			KeyBinding.resetKeyBindingArrayAndHash();
+
+			IntegratedServer.relayManager.load(LocalStorageManager.gameSettingsStorage.getTagList("relays"));
 		}
 	}
 
@@ -602,6 +610,8 @@ public class GameSettings {
 		yee.setInteger("voicePTTKey", voicePTTKey);
 		yee.setInteger("voiceListenRadius", voiceListenRadius);
 		yee.setByte("difficulty", (byte)difficulty);
+		yee.setBoolean("hideJoinCode", hideJoinCode);
+		yee.setByte("relayTimeout", (byte)relayTimeout);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

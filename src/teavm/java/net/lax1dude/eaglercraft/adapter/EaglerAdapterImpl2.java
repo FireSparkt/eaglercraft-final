@@ -3467,7 +3467,7 @@ public class EaglerAdapterImpl2 {
 		private final List<Throwable> exceptions = new LinkedList();
 		private final List<IPacket> packets = new LinkedList();
 		
-		private RelayServerSocketImpl(String uri) {
+		private RelayServerSocketImpl(String uri, int timeout) {
 			this.uri = uri;
 			WebSocket s = null;
 			try {
@@ -3525,6 +3525,17 @@ public class EaglerAdapterImpl2 {
 					closed = true;
 				}
 			});
+			Window.setTimeout(new TimerHandler() {
+
+				@Override
+				public void onTimer() {
+					if(!open && !closed) {
+						closed = true;
+						sock.close();
+					}
+				}
+				
+			}, timeout);
 		}
 
 		@Override
@@ -3669,7 +3680,7 @@ public class EaglerAdapterImpl2 {
 		
 	}
 	
-	public static final RelayServerSocket openRelayConnection(String addr) {
+	public static final RelayServerSocket openRelayConnection(String addr, int timeout) {
 		long millis = System.currentTimeMillis();
 		
 		Long l = relayQueryBlocked.get(addr);
@@ -3682,7 +3693,7 @@ public class EaglerAdapterImpl2 {
 			return new RelayServerSocketRatelimitDummy(RateLimit.BLOCKED);
 		}
 		
-		return new RelayServerSocketImpl(addr);
+		return new RelayServerSocketImpl(addr, timeout);
 	}
 
 	private static EaglercraftLANClient rtcLANClient = null;
@@ -3759,9 +3770,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void clientLANSendPacket(byte[] pkt) {
-		ArrayBuffer arr = ArrayBuffer.create(pkt.length);
-		Uint8Array.create(arr).set(pkt);
-		rtcLANClient.sendPacketToServer(arr);
+		rtcLANClient.sendPacketToServer(convertToArrayBuffer(pkt));
 	}
 	
 	public static final byte[] clientLANReadPacket() {

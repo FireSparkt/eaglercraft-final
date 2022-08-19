@@ -12,8 +12,11 @@ import net.lax1dude.eaglercraft.sp.relay.pkt.*;
 public class IntegratedServerLAN {
 
 	private static RelayServerSocket lanRelaySocket = null;
+	
+	private static String currentCode = null;
 
 	public static String shareToLAN(Consumer<String> progressCallback, String worldName, boolean worldHidden) {
+		currentCode = null;
 		RelayServerSocket sock = IntegratedServer.relayManager.getWorkingRelay((str) -> progressCallback.accept("Connecting: " + str),
 				IntegratedServer.preferredRelayVersion, worldName + (worldHidden ? ";1" : ";0"));
 		if(sock == null) {
@@ -45,7 +48,7 @@ public class IntegratedServerLAN {
 							servers.add(srv.getICEString());
 						}
 						EaglerAdapter.serverLANInitializeServer(servers.toArray(new String[servers.size()]));
-						return code;
+						return currentCode = code;
 					}else {
 						System.err.println("Relay [" + sock.getURI() + "] unexpected packet: " + pkt.getClass().getSimpleName());
 						closeLAN();
@@ -62,11 +65,20 @@ public class IntegratedServerLAN {
 			return null;
 		}
 	}
+	
+	public static String getCurrentURI() {
+		return lanRelaySocket == null ? "<disconnected>" : lanRelaySocket.getURI();
+	}
+	
+	public static String getCurrentCode() {
+		return currentCode == null ? "<undefined>" : currentCode;
+	}
 
 	public static void closeLAN() {
 		if(lanRelaySocket != null) {
 			lanRelaySocket.close();
 			lanRelaySocket = null;
+			currentCode = null;
 		}
 		cleanupLAN();
 	}
@@ -142,6 +154,7 @@ public class IntegratedServerLAN {
 			}
 			if(lanRelaySocket.isClosed()) {
 				lanRelaySocket = null;
+				currentCode = null;
 				cleanupLAN();
 			}else {
 				Iterator<LANClient> itr = clients.values().iterator();

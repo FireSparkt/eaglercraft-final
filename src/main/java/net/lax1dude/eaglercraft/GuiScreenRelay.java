@@ -22,6 +22,8 @@ public class GuiScreenRelay extends GuiScreen {
 	
 	private String tooltipString = null;
 	
+	private long lastRefresh = 0l;
+	
 	public GuiScreenRelay(GuiScreen screen) {
 		this.screen = screen;
 	}
@@ -56,6 +58,7 @@ public class GuiScreenRelay extends GuiScreen {
 	
 	public void actionPerformed(GuiButton btn) {
 		if(btn.id == 0) {
+			IntegratedServer.relayManager.save();
 			mc.displayGuiScreen(screen);
 		} else if(btn.id == 1) {
 			addingNew = true;
@@ -74,9 +77,20 @@ public class GuiScreenRelay extends GuiScreen {
 				selected = 0;
 			}
 		} else if(btn.id == 4) {
-			slots.relayManager.ping();
+			long millis = System.currentTimeMillis();
+			if(millis - lastRefresh > 700l) {
+				lastRefresh = millis;
+				slots.relayManager.ping();
+			}
+			lastRefresh += 60l;
 		} else if(btn.id == 5) {
 			slots.relayManager.loadDefaults();
+			long millis = System.currentTimeMillis();
+			if(millis - lastRefresh > 700l) {
+				lastRefresh = millis;
+				slots.relayManager.ping();
+			}
+			lastRefresh += 60l;
 		}
 	}
 	
@@ -110,8 +124,37 @@ public class GuiScreenRelay extends GuiScreen {
 			tooltipString = null;
 		}
 		
-		this.drawCenteredString(this.fontRenderer, var4.translateKey("networkSettings.title"), this.width / 2, 16, 16777215);
+		this.drawCenteredString(fontRenderer, var4.translateKey("networkSettings.title"), this.width / 2, 16, 16777215);
+		
+		String str = var4.translateKey("networkSettings.relayTimeout") + " " + mc.gameSettings.relayTimeout;
+		int w = fontRenderer.getStringWidth(str);
+		this.drawString(fontRenderer, str, 3, 3, 0xDDDDDD);
+		
+		EaglerAdapter.glPushMatrix();
+		EaglerAdapter.glTranslatef(w + 7, 4, 0.0f);
+		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
+		str = EnumChatFormatting.UNDERLINE + var4.translateKey("networkSettings.relayTimeoutChange");
+		int w2 = fontRenderer.getStringWidth(str);
+		boolean b = par1 > w + 5 && par1 < w + 7 + w2 * 3 / 4 && par2 > 3 && par2 < 11;
+		this.drawString(fontRenderer, EnumChatFormatting.UNDERLINE + var4.translateKey("networkSettings.relayTimeoutChange"), 0, 0, b ? 0xCCCCCC : 0x999999);
+		EaglerAdapter.glPopMatrix();
+		
 		super.drawScreen(par1, par2, par3);
+	}
+
+	protected void mouseClicked(int par1, int par2, int par3) {
+		super.mouseClicked(par1, par2, par3);
+		if(par3 == 0) {
+			StringTranslate var4 = StringTranslate.getInstance();
+			String str = var4.translateKey("networkSettings.relayTimeout") + " " + mc.gameSettings.relayTimeout;
+			int w = fontRenderer.getStringWidth(str);
+			str = var4.translateKey("networkSettings.relayTimeoutChange");
+			int w2 = fontRenderer.getStringWidth(str);
+			if(par1 > w + 5 && par1 < w + 7 + w2 * 3 / 4 && par2 > 3 && par2 < 11) {
+				this.mc.displayGuiScreen(new GuiScreenChangeRelayTimeout(this));
+				this.mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+			}
+		}
 	}
 	
 	void setToolTip(String str) {

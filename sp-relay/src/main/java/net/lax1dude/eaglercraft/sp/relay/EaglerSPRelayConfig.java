@@ -15,7 +15,7 @@ public class EaglerSPRelayConfig {
 	private String address = "0.0.0.0";
 	private int port = 6699;
 	private int codeLength = 5;
-	private String codeChars = "abcdefghijklmnopqrstuvwxyz0123456789$%&*+?!";
+	private String codeChars = "abcdefghijklmnopqrstuvwxyz0123456789";
 	private boolean codeMixCase = false;
 	
 	private int connectionsPerIP = 128;
@@ -60,8 +60,10 @@ public class EaglerSPRelayConfig {
 			try(BufferedReader reader = new BufferedReader(new FileReader(conf))) {
 				String s;
 				while((s = reader.readLine()) != null) {
-					String[] ss = s.trim().split("=", 2);
+					String[] ss = s.trim().split(":", 2);
 					if(ss.length == 2) {
+						ss[0] = ss[0].trim();
+						ss[1] = ss[1].trim();
 						if(ss[0].equalsIgnoreCase("port")) {
 							try {
 								port = Integer.parseInt(ss[1]);
@@ -278,26 +280,27 @@ public class EaglerSPRelayConfig {
 	
 	public void save(File conf) {
 		try(PrintWriter w = new PrintWriter(new FileOutputStream(conf))) {
-			w.println("address=" + address);
-			w.println("port=" + port);
-			w.println("code-length=" + codeLength);
-			w.println("code-chars=" + codeChars);
-			w.println("code-mix-case=" + codeMixCase);
-			w.println("connections-per-ip=" + connectionsPerIP);
-			w.println("ping-ratelimit-enable=" + pingRateLimitEnable);
-			w.println("ping-ratelimit-period=" + pingRateLimitPeriod);
-			w.println("ping-ratelimit-limit=" + pingRateLimitLimit);
-			w.println("ping-ratelimit-lockout-limit=" + pingRateLimitLockoutLimit);
-			w.println("ping-ratelimit-lockout-duration=" + pingRateLimitLockoutDuration);
-			w.println("worlds-per-ip=" + worldsPerIP);
-			w.println("world-ratelimit-enable=" + openRateLimitEnable);
-			w.println("world-ratelimit-period=" + openRateLimitPeriod);
-			w.println("world-ratelimit-limit=" + openRateLimitLimit);
-			w.println("world-ratelimit-lockout-limit=" + openRateLimitLockoutLimit);
-			w.println("world-ratelimit-lockout-duration=" + openRateLimitLockoutDuration);
-			w.println("origin-whitelist=" + originWhitelist);
-			w.println("enable-real-ip-header=" + enableRealIpHeader);
-			w.print("server-comment=" + serverComment);
+			w.println("[EaglerSPRelay]");
+			w.println("address: " + address);
+			w.println("port: " + port);
+			w.println("code-length: " + codeLength);
+			w.println("code-chars: " + codeChars);
+			w.println("code-mix-case: " + codeMixCase);
+			w.println("connections-per-ip: " + connectionsPerIP);
+			w.println("ping-ratelimit-enable: " + pingRateLimitEnable);
+			w.println("ping-ratelimit-period: " + pingRateLimitPeriod);
+			w.println("ping-ratelimit-limit: " + pingRateLimitLimit);
+			w.println("ping-ratelimit-lockout-limit: " + pingRateLimitLockoutLimit);
+			w.println("ping-ratelimit-lockout-duration: " + pingRateLimitLockoutDuration);
+			w.println("worlds-per-ip: " + worldsPerIP);
+			w.println("world-ratelimit-enable: " + openRateLimitEnable);
+			w.println("world-ratelimit-period: " + openRateLimitPeriod);
+			w.println("world-ratelimit-limit: " + openRateLimitLimit);
+			w.println("world-ratelimit-lockout-limit: " + openRateLimitLockoutLimit);
+			w.println("world-ratelimit-lockout-duration: " + openRateLimitLockoutDuration);
+			w.println("origin-whitelist: " + originWhitelist);
+			w.println("enable-real-ip-header: " + enableRealIpHeader);
+			w.print("server-comment: " + serverComment);
 		}catch(IOException t) {
 			EaglerSPRelay.logger.error("Failed to write config file: {}", conf.getAbsoluteFile());
 			EaglerSPRelay.logger.error(t);

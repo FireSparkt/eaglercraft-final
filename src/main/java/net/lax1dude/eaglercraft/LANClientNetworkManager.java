@@ -39,7 +39,7 @@ public class LANClientNetworkManager implements INetworkManager {
 	
 	public static LANClientNetworkManager connectToWorld(RelayServerSocket sock, String displayCode, String displayRelay) {
 		EaglerAdapter.clearLANClientState();
-		int connectState = -1;
+		int connectState = PRE;
 		IPacket pkt;
 		mainLoop: while(!sock.isClosed()) {
 			if((pkt = sock.readPacket()) != null) {
@@ -245,36 +245,43 @@ public class LANClientNetworkManager implements INetworkManager {
 
 	@Override
 	public void processReadPackets() {
+		
+		/*
+		 * Alright some really weird shit is up with TeaVM here, if you put the try/catch
+		 * around the full inner body of the while loop, the compiler fails with no error
+		 * message, just a vague stack trace. But making a multi-catch around just
+		 * readPacketData and processPacket has no issues
+		 * 
+		 * You'e welcome for the two hours of my time and single line changes I made
+		 * in a fuck ton of irrelevant files leading up to this bullshit revelation
+		 */
+		
 		if(this.theNetHandler != null) {
 			byte[] data;
 			while((data = EaglerAdapter.clientLANReadPacket()) != null) {
+				ByteArrayInputStream bai = new ByteArrayInputStream(data);
+				int pktId = bai.read();
+				
+				if(pktId == -1) {
+					System.err.println("Recieved invalid '-1' packet");
+					continue;
+				}
+				
+				Packet pkt = Packet.getNewPacket(pktId);
+				
+				if(pkt == null) {
+					System.err.println("Recieved invalid '" + pktId + "' packet");
+					continue;
+				}
+				
 				try {
-					ByteArrayInputStream bai = new ByteArrayInputStream(data);
-					int pktId = bai.read();
-					
-					if(pktId == -1) {
-						System.err.println("Recieved invalid '-1' packet");
-						continue;
-					}
-					
-					Packet pkt = Packet.getNewPacket(pktId);
-					
-					if(pkt == null) {
-						System.err.println("Recieved invalid '" + pktId + "' packet");
-						continue;
-					}
-					
 					pkt.readPacketData(new DataInputStream(bai));
-					
-					try {
-						pkt.processPacket(theNetHandler);
-					}catch(Throwable t) {
-						System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' from remote LAN world");
-						t.printStackTrace();
-					}
-					
+					pkt.processPacket(theNetHandler);
 				}catch(IOException ex) {
 					System.err.println("Could not deserialize a " + data.length + " byte long minecraft packet of type '" + (data.length <= 0 ? -1 : (int)(data[0] & 0xFF)) + "' from remote LAN world");
+				}catch(Throwable t) {
+					System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' from remote LAN world");
+					t.printStackTrace();
 				}
 			}
 		}
