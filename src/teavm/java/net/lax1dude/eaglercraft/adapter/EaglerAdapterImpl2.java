@@ -3704,12 +3704,6 @@ public class EaglerAdapterImpl2 {
 	private static boolean clientLANinit = false;
 	private static final List<byte[]> clientLANPacketBuffer = new ArrayList<>();
 	
-	public static final int LAN_CLIENT_INIT_FAILED = -2;
-	public static final int LAN_CLIENT_FAILED = -1;
-	public static final int LAN_CLIENT_DISCONNECTED = 0;
-	public static final int LAN_CLIENT_CONNECTING = 1;
-	public static final int LAN_CLIENT_CONNECTED = 2;
-	
 	private static String clientICECandidate = null;
 	private static String clientDescription = null;
 	private static boolean clientDataChannelOpen = false;
@@ -3885,17 +3879,9 @@ public class EaglerAdapterImpl2 {
 			});
 		}
 	}
-	
-	public static final boolean serverLANServerOpen() {
-		return true;
-	}
 
 	public static final void serverLANCloseServer() {
 		rtcLANServer.signalRemoteDisconnect("");
-	}
-	
-	public static final LANPeerEvent serverLANGetEvent() {
-		return serverLANEventBuffer.size() > 0 ? serverLANEventBuffer.remove(0) : null;
 	}
 	
 	public static final LANPeerEvent serverLANGetEvent(String clientId) {
@@ -3906,22 +3892,6 @@ public class EaglerAdapterImpl2 {
 				if(evt.getPeerId().equals(clientId)) {
 					i.remove();
 					return evt;
-				}
-			}
-			return null;
-		}else {
-			return null;
-		}
-	}
-	
-	public static final <T extends LANPeerEvent> T serverLANGetEvent(String clientId, Class<T> eventType) {
-		if(serverLANEventBuffer.size() > 0) {
-			Iterator<LANPeerEvent> i = serverLANEventBuffer.iterator();
-			while(i.hasNext()) {
-				LANPeerEvent evt = i.next();
-				if(evt.getPeerId().equals(clientId) && eventType.isInstance(evt)) {
-					i.remove();
-					return (T)evt;
 				}
 			}
 			return null;

@@ -404,16 +404,6 @@ window.initializeLANClient = (() => {
 				}
 			});
 
-			/*
-			this.peerConnection.addEventListener("datachannel", (evt) => {
-				self.channel = evt.channel;
-				self.remoteDataChannelHandler(self.channel);
-				evt.channel.addEventListener("message", (evt) => {
-					self.remotePacketHandler(evt.data);
-				});
-			});
-			*/
-
 			this.channel = this.peerConnection.createDataChannel("lan");
 
 			this.channel.addEventListener("open", (evt) => {
@@ -421,8 +411,9 @@ window.initializeLANClient = (() => {
 			});
 
 			this.channel.addEventListener("message", (evt) => {
+				console.log(evt.data);
 				self.remotePacketHandler(evt.data);
-			});
+			}, false);
 
 			this.peerConnection.createOffer((desc) => {
 				const selfDesc = desc;
@@ -520,24 +511,13 @@ window.initializeLANServer = (() => {
 				}
 			});
 
-			/*
-			this.dataChannel = this.peerConnection.createDataChannel("lan");
-
-			this.dataChannel.addEventListener("open", (evt) => {
-				self.client.remoteClientDataChannelHandler(self.peerId, self.dataChannel);
-			});
-
-			this.dataChannel.addEventListener("message", (evt) => {
-				self.client.remoteClientPacketHandler(self.peerId, evt.data);
-			});
-			*/
-
 			this.peerConnection.addEventListener("datachannel", (evt) => {
 				self.dataChannel = evt.channel;
 				self.client.remoteClientDataChannelHandler(self.peerId, self.dataChannel);
 				self.dataChannel.addEventListener("message", (evt) => {
+					console.log(evt.data);
 					self.client.remoteClientPacketHandler(self.peerId, evt.data);
-				});
+				}, false);
 			});
 
 			this.peerConnection.addEventListener("connectionstatechange", (evt) => {
@@ -669,6 +649,7 @@ window.initializeLANServer = (() => {
 		sendPacketToRemoteClient(peerId, buffer) {
 			var thePeer = this.peerList.get(peerId);
 			if((typeof thePeer !== "undefined") && thePeer !== null) {
+				console.log(123);
 				thePeer.dataChannel.send(buffer);
 			}
 		}

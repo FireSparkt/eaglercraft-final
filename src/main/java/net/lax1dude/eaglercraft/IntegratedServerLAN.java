@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0CPlayerChannel;
 import net.lax1dude.eaglercraft.sp.relay.pkt.*;
 
 public class IntegratedServerLAN {
@@ -251,13 +252,14 @@ public class IntegratedServerLAN {
 				long millis = System.currentTimeMillis();
 				do {
 					LANPeerEvent evt;
-					if((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
+					while((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null && evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
+						// skip ice candidates
+					}
+					if(evt != null) {
 						if(evt instanceof LANPeerEvent.LANPeerDataChannelEvent) {
 							EaglerAdapter.enableChannel("NET|" + clientId);
+							IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, true));
 							state = CONNECTED;
-							return;
-						}else if(evt instanceof LANPeerEvent.LANPeerICECandidateEvent) {
-							// ignore
 							return;
 						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
 							System.err.println("LAN client '" + clientId + "' disconnected while waiting for connection");
@@ -305,8 +307,10 @@ public class IntegratedServerLAN {
 					}
 				}
 				if(state == CONNECTED) {
-					PKT pk = EaglerAdapter.recieveFromIntegratedServer(clientId);
-					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
+					PKT pk;
+					while((pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
+						EaglerAdapter.serverLANWritePacket(clientId, pk.data);
+					}
 				}
 			}
 		}
@@ -314,6 +318,7 @@ public class IntegratedServerLAN {
 		protected void disconnect() {
 			if(!dead) {
 				if(state == CONNECTED) {
+					IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(clientId, false));
 					EaglerAdapter.disableChannel("NET|" + clientId);
 				}
 				state = CLOSED;
