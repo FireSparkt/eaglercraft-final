@@ -3718,7 +3718,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void clientLANCloseConnection() {
-		rtcLANClient.signalRemoteDisconnect();
+		rtcLANClient.signalRemoteDisconnect(false);
 	}
 	
 	public static final void clientLANSendPacket(byte[] pkt) {
@@ -3770,7 +3770,7 @@ public class EaglerAdapterImpl2 {
 		}
 		rtcLANClient.setICEServers(servers);
 		if(clientLANReadyState() == rtcLANClient.READYSTATE_CONNECTED || clientLANReadyState() == rtcLANClient.READYSTATE_CONNECTING) {
-			rtcLANClient.signalRemoteDisconnect();
+			rtcLANClient.signalRemoteDisconnect(true);
 		}
 		rtcLANClient.initializeClient();
 		rtcLANClient.signalRemoteConnect();

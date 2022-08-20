@@ -251,7 +251,7 @@ public class LANClientNetworkManager implements INetworkManager {
 		 * message, just a vague stack trace. But making a multi-catch around just
 		 * readPacketData and processPacket has no issues
 		 * 
-		 * You'e welcome for the two hours of my time and single line changes I made
+		 * You're welcome for the two hours of my time and single line changes I made
 		 * in a fuck ton of irrelevant files leading up to this bullshit revelation
 		 */
 		

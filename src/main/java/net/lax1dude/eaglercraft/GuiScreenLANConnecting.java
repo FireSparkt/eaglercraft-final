@@ -63,6 +63,7 @@ public class GuiScreenLANConnecting extends GuiScreen {
 			try {
 				netHandler = new NetClientHandler(mc, netMgr);
 				this.mc.setNetManager(netMgr);
+				netMgr.setNetHandler(netHandler);
 				netHandler.addToSendQueue(new Packet2ClientProtocol(61, EaglerProfile.username, "127.0.0.1", mc.gameSettings.renderDistance));
 			} catch (IOException e) {
 				this.mc.displayGuiScreen(new GuiDisconnected(parent, "connect.failed", "disconnect.genericReason", "could not create nethandler", ""));

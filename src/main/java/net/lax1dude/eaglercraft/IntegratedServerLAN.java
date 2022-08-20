@@ -293,24 +293,20 @@ public class IntegratedServerLAN {
 		protected void update() {
 			if(state == CONNECTED) {
 				LANPeerEvent evt;
-				while((evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
-					if(state == CONNECTED) {
-						if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
-							EaglerAdapter.sendToIntegratedServer(clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
-						}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
-							System.err.println("LAN client '" + clientId + "' disconnected");
-							disconnect();
-						}else {
-							System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
-							disconnect();
-						}
+				while(state == CONNECTED && (evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
+					if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
+						EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
+					}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
+						System.err.println("LAN client '" + clientId + "' disconnected");
+						disconnect();
+					}else {
+						System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
+						disconnect();
 					}
 				}
-				if(state == CONNECTED) {
-					PKT pk;
-					while((pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
-						EaglerAdapter.serverLANWritePacket(clientId, pk.data);
-					}
+				PKT pk;
+				while(state == CONNECTED && (pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
+					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
 				}
 			}
 		}

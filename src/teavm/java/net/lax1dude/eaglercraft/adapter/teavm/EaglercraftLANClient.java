@@ -38,7 +38,7 @@ public interface EaglercraftLANClient extends JSObject {
 	
 	void signalRemoteICECandidate(String candidate);
 
-	void signalRemoteDisconnect();
+	void signalRemoteDisconnect(boolean quiet);
 
 	@JSFunctor
 	public static interface ICECandidateHandler extends JSObject {
