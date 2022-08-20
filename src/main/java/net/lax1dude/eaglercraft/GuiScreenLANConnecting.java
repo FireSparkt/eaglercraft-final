@@ -16,6 +16,8 @@ public class GuiScreenLANConnecting extends GuiScreen {
 	
 	private boolean completed = false;
 	
+	private NetClientHandler netHandler = null;
+	
 	public GuiScreenLANConnecting(GuiScreen parent, String code) {
 		this.parent = parent;
 		this.code = code;
@@ -23,6 +25,12 @@ public class GuiScreenLANConnecting extends GuiScreen {
 
 	public boolean doesGuiPauseGame() {
 		return false;
+	}
+	
+	public void updateScreen() {
+		if(netHandler != null) {
+			netHandler.processReadPackets();
+		}
 	}
 	
 	public void drawScreen(int par1, int par2, float par3) {
@@ -53,7 +61,7 @@ public class GuiScreenLANConnecting extends GuiScreen {
 			completed = true;
 			
 			try {
-				NetClientHandler netHandler = new NetClientHandler(mc, netMgr);
+				netHandler = new NetClientHandler(mc, netMgr);
 				this.mc.setNetManager(netMgr);
 				netHandler.addToSendQueue(new Packet2ClientProtocol(61, EaglerProfile.username, "127.0.0.1", mc.gameSettings.renderDistance));
 			} catch (IOException e) {
