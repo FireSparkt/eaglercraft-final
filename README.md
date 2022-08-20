@@ -1,8 +1,8 @@
 # Eaglercraft
 
-### Note: someone got eags.us suspended for copyright infringement, use [https://eaglercraft.us/](https://eaglercraft.us/) for now (until it gets deleted too)
+### Note: someone got eags.us suspended for copyright infringement, use [https://eaglercraft.net/](https://eaglercraft.net/) for now (until it gets deleted too)
 
-### Client: [https://eaglercraft.us/](https://eaglercraft.us/)
+### Client: [https://eaglercraft.net/](https://eaglercraft.net/)
 
 ### Offline Download: [Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
@@ -12,13 +12,13 @@
 
 ![eaglercraft](https://cdn.discordapp.com/attachments/378764518081429506/964047481849643018/new_github_screenshot.png)
 
-### Official Demo URL: [https://eaglercraft.us/](https://eaglercraft.us/)
+### Official Demo URL: [https://eaglercraft.net/](https://eaglercraft.net/)
 
 ### Download Locally: [stable-download/Offline_Download_Version.html](https://github.com/LAX1DUDE/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
 (right click the link and press 'Save link as...' to download the file)
 
-### Play Minecraft Beta Singleplayer: use [https://eaglercraft.us/beta/](https://eaglercraft.us/beta/) for now until I fix eags.us
+### Play Minecraft Beta Singleplayer: use [https://eaglercraft.net/beta/](https://eaglercraft.net/beta/) for now until I fix eags.us
 
 **For any questions you can join the discord server and hit me up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
 
