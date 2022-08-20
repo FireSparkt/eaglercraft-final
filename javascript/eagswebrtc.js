@@ -411,7 +411,7 @@ window.initializeLANClient = (() => {
                     		self.iceCandidateHandler(JSON.stringify(iceCandidates));
                     		iceCandidates.length = 0;
                     	}
-                    }, 1500);
+                    }, 3000);
                     iceCandidates.push({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate });
 				}
 			});
@@ -533,7 +533,7 @@ window.initializeLANServer = (() => {
                     		self.client.iceCandidateHandler(self.peerId, JSON.stringify(iceCandidates));
                     		iceCandidates.length = 0;
                     	}
-                    }, 1500);
+                    }, 3000);
                     iceCandidates.push({ sdpMLineIndex: evt.candidate.sdpMLineIndex, candidate: evt.candidate.candidate });
 				}
 			});

@@ -82,7 +82,7 @@ public class EaglerSPRelay extends WebSocketServer {
 						Iterator<EaglerSPClient> itr = clientConnections.values().iterator();
 						while(itr.hasNext()) {
 							EaglerSPClient cl = itr.next();
-							if(millis - cl.createdOn > 6900l) {
+							if(millis - cl.createdOn > 10000l) {
 								cl.disconnect(IPacketFEDisconnectClient.TYPE_TIMEOUT, "Took too long to connect!");
 							}
 						}
