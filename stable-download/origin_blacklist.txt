@@ -26,6 +26,7 @@
 .*oxgaming.*repl\.co$
 .*olproject\.ml$
 .*prof.*aming\.repl\.co$
+.*sucks\.repl\.co$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.eags\.us).*eags\.us$
