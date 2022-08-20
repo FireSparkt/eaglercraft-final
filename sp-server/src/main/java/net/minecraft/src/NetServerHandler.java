@@ -53,6 +53,7 @@ public class NetServerHandler extends NetHandler {
 	private static int hashCounter = 0;
 
 	public NetServerHandler(MinecraftServer par1, INetworkManager par2, EntityPlayerMP par3) {
+		this.hash = ++hashCounter;
 		this.mcServer = par1;
 		this.netManager = par2;
 		this.playerEntity = par3;

@@ -392,7 +392,7 @@ window.initializeLANClient = (() => {
 		}
 		
 		sendPacketToServer(buffer) {
-			if(this.dataChannel.readyState == "open") {
+			if(this.dataChannel != null && this.dataChannel.readyState == "open") {
 				this.dataChannel.send(buffer);
 			}else {
 				this.signalRemoteDisconnect(false);
@@ -681,7 +681,7 @@ window.initializeLANServer = (() => {
 		sendPacketToRemoteClient(peerId, buffer) {
 			var thePeer = this.peerList.get(peerId);
 			if((typeof thePeer !== "undefined") && thePeer !== null) {
-				if(thePeer.dataChannel.readyState == "open") {
+				if(thePeer.dataChannel != null && thePeer.dataChannel.readyState == "open") {
 					thePeer.dataChannel.send(buffer);
 				}else {
 					this.signalRemoteDisconnect(peerId);

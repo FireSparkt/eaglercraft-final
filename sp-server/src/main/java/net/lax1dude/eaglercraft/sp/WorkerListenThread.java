@@ -12,8 +12,8 @@ import net.minecraft.src.NetHandler;
 public class WorkerListenThread {
 	/** Reference to the MinecraftServer object. */
 	private final MinecraftServer mcServer;
-	private final HashSet connections = new HashSet();
-	private final HashMap<String, WorkerNetworkManager> channels = new HashMap();
+	private final HashSet<NetHandler> connections = new HashSet<>();
+	private final HashMap<String, WorkerNetworkManager> channels = new HashMap<>();
 
 	/** Whether the network listener object is listening. */
 	public volatile boolean isListening = false;
@@ -33,8 +33,7 @@ public class WorkerListenThread {
 
 	public void stopListening() {
 		this.isListening = false;
-		List<String> names = new ArrayList();
-		names.addAll(channels.keySet());
+		List<String> names = new ArrayList<>(channels.keySet());
 		for(int i = 0, l = names.size(); i < l; ++i) {
 			closeChannel(names.get(i));
 		}
@@ -66,8 +65,9 @@ public class WorkerListenThread {
 	
 	private void deleteDeadConnections() {
 		Iterator<NetHandler> itr = this.connections.iterator();
-		while(itr.hasNext()) {
-			if(((NetHandler)itr.next()).shouldBeRemoved()) {
+		while (itr.hasNext()) {
+			NetHandler handler = itr.next();
+			if (handler.shouldBeRemoved()) {
 				itr.remove();
 				//System.out.println("[Client][REMOVEDEAD]");
 			}
@@ -81,7 +81,7 @@ public class WorkerListenThread {
 		
 		deleteDeadConnections();
 		
-		for (NetHandler var2 : (HashSet<NetHandler>)this.connections) {
+		for (NetHandler var2 : this.connections) {
 			var2.handlePackets();
 		}
 		

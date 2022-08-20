@@ -87,7 +87,7 @@ public class ServerConfigurationManager {
 		this.playerLoggedIn(par2EntityPlayerMP);
 		var7.setPlayerLocation(par2EntityPlayerMP.posX, par2EntityPlayerMP.posY, par2EntityPlayerMP.posZ,
 				par2EntityPlayerMP.rotationYaw, par2EntityPlayerMP.rotationPitch);
-		this.mcServer.getNetworkThread().addPlayer(var7);
+		//this.mcServer.getNetworkThread().addPlayer(var7);
 		var7.sendPacket(new Packet4UpdateTime(var5.getTotalWorldTime(), var5.getWorldTime()));
 
 		//if (this.mcServer.getTexturePack().length() > 0) {
