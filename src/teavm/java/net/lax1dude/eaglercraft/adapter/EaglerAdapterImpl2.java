@@ -209,6 +209,7 @@ public class EaglerAdapterImpl2 {
 	private static EventListener wheel = null;
 	private static String[] identifier = new String[0];
 	private static String integratedServerScript = "worker_bootstrap.js";
+	private static boolean anisotropicFilteringSupported = false;
 	
 	public static final String[] getIdentifier() {
 		return identifier;
@@ -265,7 +266,7 @@ public class EaglerAdapterImpl2 {
 		//String agent = getString("window.navigator.userAgent").toLowerCase();
 		//if(agent.contains("windows")) isAnisotropicPatched = false;
 		
-		webgl.getExtension("EXT_texture_filter_anisotropic");
+		anisotropicFilteringSupported = webgl.getExtension("EXT_texture_filter_anisotropic") != null;
 		
 		win.addEventListener("contextmenu", contextmenu = new EventListener<MouseEvent>() {
 			@Override
@@ -633,6 +634,9 @@ public class EaglerAdapterImpl2 {
 		} 
 	}
 	
+	public static final boolean anisotropicFilteringSupported() {
+		return anisotropicFilteringSupported;
+	}
 	public static final void _wglEnable(int p1) {
 		webgl.enable(p1);
 	}
@@ -975,7 +979,7 @@ public class EaglerAdapterImpl2 {
 		return getNavString("platform").toLowerCase().contains("win");
 	}
 	public static final boolean glNeedsAnisotropicFix() {
-		return DetectAnisotropicGlitch.detectGlitch();
+		return anisotropicFilteringSupported && DetectAnisotropicGlitch.detectGlitch();
 	}
 
 	private static HTMLCanvasElement imageLoadCanvas = null;

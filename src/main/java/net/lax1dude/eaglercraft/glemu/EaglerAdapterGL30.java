@@ -685,6 +685,9 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	}
 
 	public static final void glTexParameterf(int p1, int p2, float p3) {
+		if(p2 == GL_TEXTURE_MAX_ANISOTROPY && !anisotropicFilteringSupported()) {
+			return;
+		}
 		if (selectedTex == 0 && boundTexture0 != null && p2 == GL_TEXTURE_MAX_ANISOTROPY) {
 			boundTexture0.anisotropic = p3 > 1.0f;
 		}
