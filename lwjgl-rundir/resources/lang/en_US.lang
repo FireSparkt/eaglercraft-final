@@ -255,6 +255,7 @@ addServer.SSLWarn2=html5 will only allow wss://
 directConnect.prompt=What would you like to do?
 directConnect.lanWorld=Join LAN World
 directConnect.lanWorldCode=Enter Join Code:
+directConnect.networkSettingsNote=Click 'Network Settings' to add a relay URL
 directConnect.serverJoin=Connect to Server
 directConnect.lanWorldJoin=Join World
 directConnect.lanWorldRelay=Network Settings

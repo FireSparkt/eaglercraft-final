@@ -26,13 +26,15 @@ public class WorkerNetworkManager implements INetworkManager {
 	public void setNetHandler(NetHandler var1) {
 		theNetHandler = var1;
 	}
+	
+	private ByteArrayOutputStream sendBuffer = new ByteArrayOutputStream();
 
 	@Override
 	public void addToSendQueue(Packet var1) {
 		try {
-			ByteArrayOutputStream bao = new ByteArrayOutputStream(var1.getPacketSize() + 1);
-			Packet.writePacket(var1, new DataOutputStream(bao));
-			EaglerAdapter.sendToIntegratedServer("NET|" + ipcChannel, bao.toByteArray());
+			sendBuffer.reset();
+			Packet.writePacket(var1, new DataOutputStream(sendBuffer));
+			EaglerAdapter.sendToIntegratedServer("NET|" + ipcChannel, sendBuffer.toByteArray());
 		}catch(IOException e) {
 			System.err.println("Failed to serialize minecraft packet '" + var1.getClass().getSimpleName() + "' for IPC channel 'NET|" + ipcChannel + "'");
 			e.printStackTrace();

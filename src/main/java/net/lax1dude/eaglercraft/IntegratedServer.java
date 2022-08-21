@@ -394,9 +394,7 @@ public class IntegratedServer {
 			}
 		}
 		
-		if(IntegratedServerLAN.isHostingLAN()) {
-			IntegratedServerLAN.updateLANServer();
-		}
+		IntegratedServerLAN.updateLANServer();
 	}
 	
 	public static void sendIPCPacket(IPCPacketBase pkt) {

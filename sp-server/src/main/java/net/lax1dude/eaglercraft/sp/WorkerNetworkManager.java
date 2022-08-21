@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.INetworkManager;
 import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetLoginHandler;
+import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
 
 public class WorkerNetworkManager implements INetworkManager {
@@ -112,6 +113,9 @@ public class WorkerNetworkManager implements INetworkManager {
 			listenThread.closeChannel(ipcChannel);
 			IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(ipcChannel, false));
 		}
+		if(theNetHandler != null && (theNetHandler instanceof NetServerHandler)) {
+			((NetServerHandler)theNetHandler).kickPlayer(null);
+		}
 		isAlive = false;
 	}
 
@@ -125,6 +129,9 @@ public class WorkerNetworkManager implements INetworkManager {
 		if(isAlive) {
 			listenThread.closeChannel(ipcChannel);
 			IntegratedServer.sendIPCPacket(new IPCPacket0CPlayerChannel(ipcChannel, false));
+		}
+		if(theNetHandler != null && (theNetHandler instanceof NetServerHandler)) {
+			((NetServerHandler)theNetHandler).kickPlayer(null);
 		}
 		isAlive = false;
 	}

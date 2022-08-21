@@ -224,13 +224,15 @@ public class LANClientNetworkManager implements INetworkManager {
 	public void setNetHandler(NetHandler var1) {
 		theNetHandler = var1;
 	}
+	
+	private ByteArrayOutputStream sendBuffer = new ByteArrayOutputStream();
 
 	@Override
 	public void addToSendQueue(Packet var1) {
 		try {
-			ByteArrayOutputStream bao = new ByteArrayOutputStream(var1.getPacketSize() + 1);
-			Packet.writePacket(var1, new DataOutputStream(bao));
-			EaglerAdapter.clientLANSendPacket(bao.toByteArray());
+			sendBuffer.reset();
+			Packet.writePacket(var1, new DataOutputStream(sendBuffer));
+			EaglerAdapter.clientLANSendPacket(sendBuffer.toByteArray());
 		}catch(IOException e) {
 			System.err.println("Failed to serialize minecraft packet '" + var1.getClass().getSimpleName() + "' to remote LAN world");
 			e.printStackTrace();

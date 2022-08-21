@@ -156,17 +156,14 @@ public class IntegratedServerLAN {
 			}
 			if(lanRelaySocket.isClosed()) {
 				lanRelaySocket = null;
-				currentCode = null;
-				cleanupLAN();
-			}else {
-				Iterator<LANClient> itr = clients.values().iterator();
-				while(itr.hasNext()) {
-					LANClient cl = itr.next();
-					cl.update();
-					if(cl.dead) {
-						itr.remove();
-					}
-				}
+			}
+		}
+		Iterator<LANClient> itr = clients.values().iterator();
+		while(itr.hasNext()) {
+			LANClient cl = itr.next();
+			cl.update();
+			if(cl.dead) {
+				itr.remove();
 			}
 		}
 	}
@@ -292,21 +289,21 @@ public class IntegratedServerLAN {
 		
 		protected void update() {
 			if(state == CONNECTED) {
+				PKT pk;
+				while(state == CONNECTED && (pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
+					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
+				}
 				LANPeerEvent evt;
 				while(state == CONNECTED && (evt = EaglerAdapter.serverLANGetEvent(clientId)) != null) {
 					if(evt instanceof LANPeerEvent.LANPeerPacketEvent) {
 						EaglerAdapter.sendToIntegratedServer("NET|" + clientId, ((LANPeerEvent.LANPeerPacketEvent)evt).payload);
 					}else if(evt instanceof LANPeerEvent.LANPeerDisconnectEvent) {
-						System.err.println("LAN client '" + clientId + "' disconnected");
+						System.out.println("LAN client '" + clientId + "' disconnected");
 						disconnect();
 					}else {
 						System.err.println("LAN client '" + clientId + "' had an accident: " + evt.getClass().getSimpleName());
 						disconnect();
 					}
-				}
-				PKT pk;
-				while(state == CONNECTED && (pk = EaglerAdapter.recieveFromIntegratedServer("NET|" + clientId)) != null) {
-					EaglerAdapter.serverLANWritePacket(clientId, pk.data);
 				}
 			}
 		}
@@ -318,9 +315,6 @@ public class IntegratedServerLAN {
 					EaglerAdapter.disableChannel("NET|" + clientId);
 				}
 				state = CLOSED;
-				if (lanRelaySocket != null) {
-					lanRelaySocket.writePacket(new IPacketFEDisconnectClient(clientId, IPacketFEDisconnectClient.TYPE_SERVER_DISCONNECT, "Connection Closed"));
-				}
 				EaglerAdapter.serverLANDisconnectPeer(clientId);
 				dead = true;
 			}

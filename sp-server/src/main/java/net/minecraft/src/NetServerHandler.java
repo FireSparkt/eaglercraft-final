@@ -108,13 +108,15 @@ public class NetServerHandler extends NetHandler {
 	 */
 	public void kickPlayer(String par1Str) {
 		if (!this.connectionClosed) {
+			this.connectionClosed = true;
 			this.playerEntity.mountEntityAndWakeUp();
-			this.sendPacket(new Packet255KickDisconnect(par1Str));
+			if(par1Str != null) {
+				this.sendPacket(new Packet255KickDisconnect(par1Str));
+			}
 			this.netManager.serverShutdown();
 			this.mcServer.getConfigurationManager().sendPacketToAllPlayers(
 					new Packet3Chat(EnumChatFormatting.YELLOW + this.playerEntity.username + " left the game."));
 			this.mcServer.getConfigurationManager().playerLoggedOut(this.playerEntity);
-			this.connectionClosed = true;
 		}
 	}
 

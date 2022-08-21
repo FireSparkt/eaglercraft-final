@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.NetHandler;
+import net.minecraft.src.NetServerHandler;
 
 public class WorkerListenThread {
 	/** Reference to the MinecraftServer object. */

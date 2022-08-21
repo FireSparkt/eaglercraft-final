@@ -59,6 +59,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRenderer, var4.translateKey("selectServer.direct"), this.width / 2, this.height / 4 - 60 + 20, 16777215);
 		this.drawString(this.fontRenderer, var4.translateKey("directConnect.lanWorldCode"), this.width / 2 - 100, this.height / 4 + 12, 10526880);
+		this.drawCenteredString(this.fontRenderer, var4.translateKey("directConnect.networkSettingsNote"), this.width / 2, this.height / 4 + 67, 10526880);
 		this.codeTextField.drawTextBox();
 		super.drawScreen(xx, yy, pt);
 		this.relaysButton.drawScreen(xx, yy);
