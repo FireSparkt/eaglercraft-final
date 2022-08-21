@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -184,7 +185,7 @@ public class RelayManager {
 		}
 	}
 	
-	private RelayServerSocket connectHandshake(RelayServer relay, int type, String code) {
+	public RelayServerSocket connectHandshake(RelayServer relay, int type, String code) {
 		RelayServerSocket sock = relay.openSocket();
 		while(!sock.isClosed()) {
 			if(sock.isOpen()) {
@@ -323,6 +324,17 @@ public class RelayManager {
 			break;
 		}
 		return str;
+	}
+	
+	public RelayServer getByURI(String uri) {
+		Iterator<RelayServer> itr = relays.iterator();
+		while(itr.hasNext()) {
+			RelayServer rl = itr.next();
+			if(rl.address.equals(uri)) {
+				return rl;
+			}
+		}
+		return null;
 	}
 	
 }

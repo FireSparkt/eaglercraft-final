@@ -30,7 +30,7 @@ public class IPacket07LocalWorlds extends IPacket {
 			i = 255;
 		}
 		output.write(i);
-		for(int j = 0; j < i; ++i) {
+		for(int j = 0; j < i; ++j) {
 			LocalWorld w = worldsList.get(j);
 			writeASCII8(output, w.worldName);
 			writeASCII8(output, w.worldCode);

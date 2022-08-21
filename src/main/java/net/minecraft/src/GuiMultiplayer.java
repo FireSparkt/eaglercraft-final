@@ -1,12 +1,16 @@
 package net.minecraft.src;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.GuiNetworkSettingsButton;
 import net.lax1dude.eaglercraft.GuiScreenConnectOption;
+import net.lax1dude.eaglercraft.GuiScreenLANConnecting;
+import net.lax1dude.eaglercraft.LANServerList;
+import net.lax1dude.eaglercraft.LANServerList.LanServer;
+import net.lax1dude.eaglercraft.RelayServer;
 
 public class GuiMultiplayer extends GuiScreen {
 	/** Number of outstanding ThreadPollServers threads */
@@ -57,7 +61,7 @@ public class GuiMultiplayer extends GuiScreen {
 
 	/** How many ticks this Gui is already opened */
 	private int ticksOpened;
-	private List listofLanServers = Collections.emptyList();
+	private static LANServerList lanServerList = null;
 
 	private static long lastCooldown = 0l;
 	private static long lastRefresh = 0l;
@@ -70,6 +74,9 @@ public class GuiMultiplayer extends GuiScreen {
 		this.parentScreen = par1GuiScreen;
 		this.relaysButton = new GuiNetworkSettingsButton(this);
 		isLockedOut = false;
+		if(lanServerList != null) {
+			lanServerList.forceRefresh();
+		}
 	}
 	
 	public static void tickRefreshCooldown() {
@@ -115,6 +122,13 @@ public class GuiMultiplayer extends GuiScreen {
 					internetServerList.loadServerList();
 				}
 			}
+			if(lanServerList == null) {
+				lanServerList = new LANServerList();
+			}else {
+				if(testIfCanRefresh()) {
+					lanServerList.forceRefresh();
+				}
+			}
 			this.serverSlotContainer = new GuiSlotServer(this);
 		} else {
 			this.serverSlotContainer.func_77207_a(this.width, this.height, 32, this.height - 64);
@@ -147,6 +161,7 @@ public class GuiMultiplayer extends GuiScreen {
 	public void updateScreen() {
 		super.updateScreen();
 		internetServerList.updateServerPing();
+		lanServerList.update();
 		++this.ticksOpened;
 	}
 
@@ -351,11 +366,25 @@ public class GuiMultiplayer extends GuiScreen {
 	 * Join server by slot index
 	 */
 	private void joinServer(int par1) {
-		this.connectToServer(this.internetServerList.getServerData(par1));
+		if (par1 < internetServerList.countServers()) {
+			this.connectToServer(this.internetServerList.getServerData(par1));
+		} else {
+			par1 -= internetServerList.countServers();
+
+			if (par1 < lanServerList.countServers()) {
+				LanServer var2 = lanServerList.getServer(par1);
+				connectToLAN("Connecting to '" + var2.getLanServerMotd() + "'...", var2.getLanServerCode(), var2.getLanServerRelay());
+			}
+		}
 	}
 
 	private void connectToServer(ServerData par1ServerData) {
 		this.mc.displayGuiScreen(new GuiConnecting(this, this.mc, par1ServerData));
+	}
+	
+	private void connectToLAN(String text, String code, RelayServer uri) {
+		this.mc.loadingScreen.resetProgresAndWorkingMessage(text);
+		this.mc.displayGuiScreen(new GuiScreenLANConnecting(this, code, uri));
 	}
 
 	protected void func_74007_a(String par1Str, int par2, int par3) {
@@ -394,15 +423,15 @@ public class GuiMultiplayer extends GuiScreen {
 	}
 
 	static ServerList getInternetServerList(GuiMultiplayer par0GuiMultiplayer) {
-		return par0GuiMultiplayer.internetServerList;
+		return internetServerList;
 	}
 
-	static List getListOfLanServers(GuiMultiplayer par0GuiMultiplayer) {
-		return par0GuiMultiplayer.listofLanServers;
+	static LANServerList getListOfLanServers(GuiMultiplayer par0GuiMultiplayer) {
+		return lanServerList;
 	}
 
 	static int getSelectedServer(GuiMultiplayer par0GuiMultiplayer) {
-		int i = internetServerList.countServers();
+		int i = internetServerList.countServers() + lanServerList.countServers();
 		if(par0GuiMultiplayer.selectedServer >= i && par0GuiMultiplayer.selectedServer > 0) {
 			par0GuiMultiplayer.selectedServer = i - 1;
 		}
@@ -464,4 +493,5 @@ public class GuiMultiplayer extends GuiScreen {
 	static String getAndSetLagTooltip(GuiMultiplayer par0GuiMultiplayer, String par1Str) {
 		return par0GuiMultiplayer.lagTooltip = par1Str;
 	}
+
 }

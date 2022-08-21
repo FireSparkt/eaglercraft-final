@@ -2,6 +2,7 @@ package net.minecraft.src;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.IntegratedServer;
+import net.lax1dude.eaglercraft.LANServerList.LanServer;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ class GuiSlotServer extends GuiSlot {
 	 * Gets the size of the current slot list.
 	 */
 	protected int getSize() {
-		return GuiMultiplayer.getInternetServerList(this.parentGui).countServers() + GuiMultiplayer.getListOfLanServers(this.parentGui).size() + 1;
+		return GuiMultiplayer.getInternetServerList(this.parentGui).countServers() + GuiMultiplayer.getListOfLanServers(this.parentGui).countServers() + 1;
 	}
 
 	/**
@@ -30,7 +31,7 @@ class GuiSlotServer extends GuiSlot {
 	 * clicked or not
 	 */
 	protected void elementClicked(int par1, boolean par2) {
-		if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers() + GuiMultiplayer.getListOfLanServers(this.parentGui).size()) {
+		if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers() + GuiMultiplayer.getListOfLanServers(this.parentGui).countServers()) {
 			int var3 = GuiMultiplayer.getSelectedServer(this.parentGui);
 			GuiMultiplayer.getAndSetSelectedServer(this.parentGui, par1);
 			ServerData var4 = GuiMultiplayer.getInternetServerList(this.parentGui).countServers() > par1 ? GuiMultiplayer.getInternetServerList(this.parentGui).getServerData(par1) : null;
@@ -69,8 +70,27 @@ class GuiSlotServer extends GuiSlot {
 	protected void drawSlot(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {
 		if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers()) {
 			this.func_77247_d(par1, par2, par3, par4, par5Tessellator);
-		}else {
+		} else if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers()
+				+ GuiMultiplayer.getListOfLanServers(this.parentGui).countServers()) {
+			this.func_77248_b(par1, par2, par3, par4, par5Tessellator);
+		} else {
 			this.func_77249_c(par1, par2, par3, par4, par5Tessellator);
+		}
+	}
+	
+	private void func_77248_b(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {
+		LanServer var6 = (LanServer) GuiMultiplayer.getListOfLanServers(this.parentGui)
+				.getServer(par1 - GuiMultiplayer.getInternetServerList(this.parentGui).countServers());
+		this.parentGui.drawString(this.parentGui.fontRenderer, StatCollector.translateToLocal("lanServer.title"),
+				par2 + 2, par3 + 1, 16777215);
+		this.parentGui.drawString(this.parentGui.fontRenderer, var6.getLanServerMotd(), par2 + 2, par3 + 12, 8421504);
+
+		if (this.parentGui.mc.gameSettings.hideServerAddress) {
+			this.parentGui.drawString(this.parentGui.fontRenderer,
+					StatCollector.translateToLocal("selectServer.hiddenAddress"), par2 + 2, par3 + 12 + 11, 3158064);
+		} else {
+			this.parentGui.drawString(this.parentGui.fontRenderer, var6.getLanServerCode(), par2 + 2, par3 + 12 + 11,
+					0x558822);
 		}
 	}
 

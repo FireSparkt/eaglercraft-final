@@ -13,6 +13,7 @@ public class GuiScreenLANConnecting extends GuiScreen {
 
 	private final GuiScreen parent;
 	private final String code;
+	private final RelayServer relay;
 	
 	private boolean completed = false;
 	
@@ -21,6 +22,13 @@ public class GuiScreenLANConnecting extends GuiScreen {
 	public GuiScreenLANConnecting(GuiScreen parent, String code) {
 		this.parent = parent;
 		this.code = code;
+		this.relay = null;
+	}
+	
+	public GuiScreenLANConnecting(GuiScreen parent, String code, RelayServer relay) {
+		this.parent = parent;
+		this.code = code;
+		this.relay = relay;
 	}
 
 	public boolean doesGuiPauseGame() {
@@ -45,7 +53,12 @@ public class GuiScreenLANConnecting extends GuiScreen {
 			String message = st.translateKey("lanServer.pleaseWait");
 			this.drawString(fontRenderer, message, (this.width - this.fontRenderer.getStringWidth(message)) / 2, this.height / 3 + 10, 0xFFFFFF);
 			
-			RelayServerSocket sock = IntegratedServer.relayManager.getWorkingRelay((str) -> ls.resetProgresAndWorkingMessage("Connecting: " + str), 0x02, code);
+			RelayServerSocket sock;
+			if(relay == null) {
+				sock = IntegratedServer.relayManager.getWorkingRelay((str) -> ls.resetProgresAndWorkingMessage("Connecting: " + str), 0x02, code);
+			}else {
+				sock = IntegratedServer.relayManager.connectHandshake(relay, 0x02, code);
+			}
 			if(sock == null) {
 				this.mc.displayGuiScreen(new GuiScreenNoRelays(parent, st.translateKey("noRelay.worldNotFound1").replace("$code$", code),
 						st.translateKey("noRelay.worldNotFound2").replace("$code$", code), st.translateKey("noRelay.worldNotFound3")));
