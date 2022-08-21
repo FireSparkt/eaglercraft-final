@@ -11,6 +11,8 @@ import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0CPlayerChannel;
 import net.lax1dude.eaglercraft.sp.relay.pkt.*;
 
 public class IntegratedServerLAN {
+	
+	public static final List<String> currentICEServers = new ArrayList();
 
 	private static RelayServerSocket lanRelaySocket = null;
 	
@@ -42,13 +44,13 @@ public class IntegratedServerLAN {
 					if(pkt instanceof IPacket01ICEServers) {
 						IPacket01ICEServers ipkt = (IPacket01ICEServers)pkt;
 						System.out.println("Relay [" + sock.getURI() + "] provided ICE servers:");
-						List<String> servers = new ArrayList();
+						currentICEServers.clear();
 						for(net.lax1dude.eaglercraft.sp.relay.pkt.ICEServerSet.RelayServer srv : ipkt.servers) {
 							System.out.println("Relay [" + sock.getURI() + "]     " + srv.type.name()
 									+ ": " + srv.address);
-							servers.add(srv.getICEString());
+							currentICEServers.add(srv.getICEString());
 						}
-						EaglerAdapter.serverLANInitializeServer(servers.toArray(new String[servers.size()]));
+						EaglerAdapter.serverLANInitializeServer(currentICEServers.toArray(new String[currentICEServers.size()]));
 						return currentCode = code;
 					}else {
 						System.err.println("Relay [" + sock.getURI() + "] unexpected packet: " + pkt.getClass().getSimpleName());

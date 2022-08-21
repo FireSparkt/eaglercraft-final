@@ -93,7 +93,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	public void updateScreen() {
 		super.updateScreen();
-		if(!mc.isSingleplayer()) {
+		if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 			voiceMenu.updateScreen();
 		}
 	}
@@ -150,7 +150,7 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 		
 		try {
-			if(!mc.isSingleplayer()) {
+			if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 				if(voiceMenu.isBlockingInput()) {
 					super.drawScreen(0, 0, par3);
 				}else {
@@ -171,7 +171,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	protected void keyTyped(char par1, int par2) {
 		try {
-			if(!mc.isSingleplayer()) {
+			if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 				voiceMenu.keyTyped(par1, par2);
 			}
 			super.keyTyped(par1, par2);
@@ -184,7 +184,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 */
 	protected void mouseClicked(int par1, int par2, int par3) {
 		try {
-			if(!mc.isSingleplayer()) {
+			if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 				voiceMenu.mouseClicked(par1, par2, par3);
 			}
 			if(par3 == 0) {
@@ -223,7 +223,7 @@ public class GuiIngameMenu extends GuiScreen {
 	
 	protected void mouseMovedOrUp(int par1, int par2, int par3) {
 		try {
-			if(!mc.isSingleplayer()) {
+			if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 				voiceMenu.mouseMovedOrUp(par1, par2, par3);
 			}
 			super.mouseMovedOrUp(par1, par2, par3);

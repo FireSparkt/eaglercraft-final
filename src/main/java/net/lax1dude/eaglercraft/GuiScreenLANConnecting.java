@@ -6,6 +6,7 @@ import net.minecraft.src.GuiDisconnected;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.LoadingScreenRenderer;
 import net.minecraft.src.NetClientHandler;
+import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.Packet2ClientProtocol;
 import net.minecraft.src.StringTranslate;
 
@@ -78,6 +79,8 @@ public class GuiScreenLANConnecting extends GuiScreen {
 				this.mc.setNetManager(netMgr);
 				netMgr.setNetHandler(netHandler);
 				netHandler.addToSendQueue(new Packet2ClientProtocol(61, EaglerProfile.username, "127.0.0.1", mc.gameSettings.renderDistance));
+				netHandler.addToSendQueue(new Packet250CustomPayload("EAG|MySkin", EaglerProfile.getSkinPacket()));
+				netHandler.addToSendQueue(new Packet250CustomPayload("EAG|MyCape", EaglerProfile.getCapePacket()));
 			} catch (IOException e) {
 				this.mc.displayGuiScreen(new GuiDisconnected(parent, "connect.failed", "disconnect.genericReason", "could not create nethandler", ""));
 				e.printStackTrace();

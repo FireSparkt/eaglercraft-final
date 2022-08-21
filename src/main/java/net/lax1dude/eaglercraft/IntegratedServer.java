@@ -439,7 +439,7 @@ public class IntegratedServer {
 	}
 
 	public static void configureLAN(EnumGameType enumGameType, boolean allowCommands) {
-		sendIPCPacket(new IPCPacket17ConfigureLAN(enumGameType.getID(), allowCommands));
+		sendIPCPacket(new IPCPacket17ConfigureLAN(enumGameType.getID(), allowCommands, IntegratedServerLAN.currentICEServers));
 	}
 	
 }

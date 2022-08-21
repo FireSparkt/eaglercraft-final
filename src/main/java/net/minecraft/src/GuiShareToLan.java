@@ -115,9 +115,9 @@ public class GuiShareToLan extends GuiScreen {
 			}
 			this.mc.displayGuiScreen((GuiScreen) null);
 			LoadingScreenRenderer ls = mc.loadingScreen;
-			IntegratedServer.configureLAN(EnumGameType.getByName(this.gameMode), this.allowCommands);
 			String code = IntegratedServerLAN.shareToLAN((str) -> ls.resetProgresAndWorkingMessage(str), worldName, hiddenToggle);
 			if (code != null) {
+				IntegratedServer.configureLAN(EnumGameType.getByName(this.gameMode), this.allowCommands);
 				this.mc.ingameGUI.getChatGUI().printChatMessage(StringTranslate.getInstance().translateKey("lanServer.opened")
 						.replace("$relay$", IntegratedServerLAN.getCurrentURI()).replace("$code$", code));
 				this.mc.lanState = true;

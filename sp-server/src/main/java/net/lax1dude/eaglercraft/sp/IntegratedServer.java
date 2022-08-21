@@ -106,11 +106,11 @@ public class IntegratedServer {
 	public static void throwExceptionToClient(String msg, Throwable t) {
 		String str = t.toString();
 		System.err.println("Exception was raised to client: " + str);
+		t.printStackTrace();
 		List<String> arr = new LinkedList();
 		for(StackTraceElement e : t.getStackTrace()) {
 			String st = e.toString();
 			arr.add(st);
-			System.err.println("    " + st);
 		}
 		sendIPCPacket(new IPCPacket15ThrowException(str, arr));
 	}
@@ -660,7 +660,7 @@ public class IntegratedServer {
 						break;
 					case IPCPacket17ConfigureLAN.ID: {
 							IPCPacket17ConfigureLAN pkt = (IPCPacket17ConfigureLAN)packet;
-							currentProcess.getConfigurationManager().configureLAN(pkt.gamemode, pkt.cheats);
+							currentProcess.getConfigurationManager().configureLAN(pkt.gamemode, pkt.cheats, pkt.iceServers);
 						}
 						break;
 					default:

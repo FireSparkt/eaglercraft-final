@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.lax1dude.eaglercraft.sp.EaglercraftRandom;
+import net.lax1dude.eaglercraft.sp.SkinsPlugin;
+import net.lax1dude.eaglercraft.sp.VoiceChatPlugin;
 import net.minecraft.server.MinecraftServer;
 
 public class NetServerHandler extends NetHandler {
@@ -1004,6 +1006,12 @@ public class NetServerHandler extends NetHandler {
 						}
 					} else {
 						var14.updateItemName("");
+					}
+				} else {
+					if(!SkinsPlugin.handleMessage(playerEntity, par1Packet250CustomPayload)) {
+						if(!VoiceChatPlugin.handleMessage(playerEntity, par1Packet250CustomPayload)) {
+							System.err.println("Unexpected Packet250CustomPayload: '" + par1Packet250CustomPayload.channel + "'");
+						}
 					}
 				}
 			}

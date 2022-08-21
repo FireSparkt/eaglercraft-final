@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.lax1dude.eaglercraft.sp.SkinsPlugin;
+import net.lax1dude.eaglercraft.sp.VoiceChatPlugin;
 import net.minecraft.server.MinecraftServer;
 
 public class ServerConfigurationManager {
@@ -89,6 +91,7 @@ public class ServerConfigurationManager {
 				par2EntityPlayerMP.rotationYaw, par2EntityPlayerMP.rotationPitch);
 		//this.mcServer.getNetworkThread().addPlayer(var7);
 		var7.sendPacket(new Packet4UpdateTime(var5.getTotalWorldTime(), var5.getWorldTime()));
+		VoiceChatPlugin.handleConnect(par2EntityPlayerMP);
 
 		//if (this.mcServer.getTexturePack().length() > 0) {
 		//	par2EntityPlayerMP.requestTexturePackLoad(this.mcServer.getTexturePack(), this.mcServer.textureSize());
@@ -231,6 +234,8 @@ public class ServerConfigurationManager {
 		var2.getPlayerManager().removePlayer(par1EntityPlayerMP);
 		this.playerEntityList.remove(par1EntityPlayerMP);
 		this.sendPacketToAllPlayers(new Packet201PlayerInfo(par1EntityPlayerMP.username, false, 9999));
+		SkinsPlugin.handleDisconnect(par1EntityPlayerMP);
+		VoiceChatPlugin.handleDisconnect(par1EntityPlayerMP);
 	}
 
 	/**
@@ -238,7 +243,16 @@ public class ServerConfigurationManager {
 	 * on success, or an error message
 	 */
 	public String allowUserToConnect(String par2Str) {
-		return this.playerEntityList.size() >= this.maxPlayers ? "The server is full!" : null;
+		if(this.playerEntityList.size() >= this.maxPlayers) {
+			return "The server is full!";
+		}else {
+			for(EntityPlayerMP pp : (List<EntityPlayerMP>)this.playerEntityList) {
+				if(pp.username.equals(par2Str)) {
+					return "Someone with your username is already on this world";
+				}
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -854,8 +868,9 @@ public class ServerConfigurationManager {
 		this.sendPacketToAllPlayers(new Packet3Chat(par1Str));
 	}
 
-	public void configureLAN(int gamemode, boolean cheats) {
+	public void configureLAN(int gamemode, boolean cheats, List<String> iceServers) {
 		lanGamemode = EnumGameType.getByID(gamemode);
 		lanCheats = cheats;
+		VoiceChatPlugin.activate(iceServers);
 	}
 }

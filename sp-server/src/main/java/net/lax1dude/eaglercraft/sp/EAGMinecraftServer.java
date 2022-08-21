@@ -88,9 +88,18 @@ public class EAGMinecraftServer extends MinecraftServer {
 
 	@Override
 	protected boolean startServer() throws IOException {
+		SkinsPlugin.reset();
+		VoiceChatPlugin.reset();
 		this.loadAllWorlds(folderName, 0l, newWorldSettings);
 		this.lastTick = System.currentTimeMillis();
 		return true;
+	}
+
+	@Override
+	public void stopServer() {
+		super.stopServer();
+		SkinsPlugin.reset();
+		VoiceChatPlugin.reset();
 	}
 
 	@Override

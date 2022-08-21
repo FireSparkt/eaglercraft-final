@@ -58,16 +58,22 @@ public class NetClientHandler extends NetHandler {
 	public NetClientHandler(Minecraft par1Minecraft, INetworkManager mgr) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = mgr;
+		initializeVCHooks();
 	}
 
 	public NetClientHandler(Minecraft par1Minecraft, String channel) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = IntegratedServer.openConnection(channel, this);
+		initializeVCHooks();
 	}
 
 	public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3) throws IOException {
 		this.mc = par1Minecraft;
 		this.netManager = new WebsocketNetworkManager(par2Str, null, this);
+		initializeVCHooks();
+	}
+	
+	private void initializeVCHooks() {
 		EaglerAdapter.clearVoiceAvailableStatus();
 		EaglerAdapter.setVoiceSignalHandler(new Consumer<byte[]>() {
 			@Override
@@ -77,13 +83,6 @@ public class NetClientHandler extends NetHandler {
 		});
 		if (EaglerAdapter.getVoiceChannel() != Voice.VoiceChannel.NONE) EaglerAdapter.sendInitialVoice();
 	}
-
-	//public NetClientHandler(Minecraft par1Minecraft, String par2Str, int par3, GuiScreen par4GuiScreen) throws IOException {
-	//	this.mc = par1Minecraft;
-	//	this.field_98183_l = par4GuiScreen;
-	//	Socket var5 = new Socket(InetAddress.getByName(par2Str), par3);
-	//	this.netManager = new TcpConnection(var5, "Client", this);
-	//}
 
 	/**
 	 * sets netManager and worldClient to null
