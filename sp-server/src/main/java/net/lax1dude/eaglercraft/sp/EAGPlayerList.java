@@ -19,6 +19,7 @@ public class EAGPlayerList extends ServerConfigurationManager {
 			this.hostPlayerNBT = new NBTTagCompound();
 			par1EntityPlayerMP.writeToNBT(hostPlayerNBT);
 		}
+		super.writePlayerData(par1EntityPlayerMP);
 	}
 	
 	public NBTTagCompound getHostPlayerData() {
