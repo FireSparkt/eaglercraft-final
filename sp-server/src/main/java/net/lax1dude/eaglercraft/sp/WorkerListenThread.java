@@ -29,7 +29,9 @@ public class WorkerListenThread {
 	 */
 	public void addPlayer(NetHandler par1NetServerHandler) {
 		System.out.println("[Server][ADDPLAYER][" + par1NetServerHandler.getClass().getSimpleName() + "]");
-		this.connections.add(par1NetServerHandler);
+		synchronized(this.connections) {
+			this.connections.add(par1NetServerHandler);
+		}
 	}
 
 	public void stopListening() {
@@ -79,15 +81,17 @@ public class WorkerListenThread {
 	 * Handles all incoming connections and packets
 	 */
 	public void handleNetworkListenThread() {
-		
-		deleteDeadConnections();
-		
-		for (NetHandler var2 : this.connections) {
-			var2.handlePackets();
+		synchronized(this.connections) {
+			
+			deleteDeadConnections();
+			
+			for (NetHandler var2 : this.connections) {
+				var2.handlePackets();
+			}
+			
+			deleteDeadConnections();
+			
 		}
-		
-		deleteDeadConnections();
-		
 	}
 
 	public MinecraftServer getServer() {
