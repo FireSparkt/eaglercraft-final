@@ -144,7 +144,7 @@ public class VoiceChatPlugin {
 							dos2.write(sig);
 							dos2.writeUTF(user);
 							dos2.writeUTF(data);
-							player.playerNetServerHandler.sendPacket(new Packet250CustomPayload("EAG|Voice", baos2.toByteArray()));
+							voicePlayers.get(targetUser2).playerNetServerHandler.sendPacket(new Packet250CustomPayload("EAG|Voice", baos2.toByteArray()));
 						}
 						break;
 					default:
@@ -163,7 +163,6 @@ public class VoiceChatPlugin {
 	
 	public static void activate(List<String> ice) {
 		if(iceServers.size() == 0) {
-			iceServers.clear();
 			iceServers.addAll(ice);
 			for(Object o : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
 				handleConnect((EntityPlayerMP) o);

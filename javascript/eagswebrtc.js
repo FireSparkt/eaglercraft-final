@@ -68,7 +68,7 @@ window.initializeVoiceClient = (() => {
 					self.client.signalDisconnect(self.peerId);
 				});
 			}
-			
+
 			this.peerConnection.addEventListener("connectionstatechange", (evt) => {
 				if(self.peerConnection.connectionState === 'disconnected') {
 					self.client.signalDisconnect(self.peerId);
@@ -254,7 +254,7 @@ window.initializeVoiceClient = (() => {
 		}
 
 		signalConnect(peerId, offer) {
-			if (!this.hasInit) initializeDevices();
+			if (!this.hasInit) this.initializeDevices();
 			try {
 					const peerConnection = new RTCPeerConnection({ iceServers: this.ICEServers, optional: [ { DtlsSrtpKeyAgreement: true } ] });
 					const peerInstance = new EaglercraftVoicePeer(this, peerId, peerConnection, offer);
