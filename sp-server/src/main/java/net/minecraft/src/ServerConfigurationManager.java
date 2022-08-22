@@ -297,7 +297,9 @@ public class ServerConfigurationManager {
 				.removePlayerEntityDangerously(par1EntityPlayerMP);
 		ChunkCoordinates var4 = par1EntityPlayerMP.getBedLocation();
 		boolean var5 = par1EntityPlayerMP.isSpawnForced();
-		par1EntityPlayerMP.dimension = par2;
+		if (teleport) {
+			par1EntityPlayerMP.dimension = par2;
+		}
 		Object var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension));
 
 		EntityPlayerMP var7 = new EntityPlayerMP(this.mcServer,
