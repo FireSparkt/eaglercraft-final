@@ -90,8 +90,10 @@ public class PlayerManager {
 		if(player.mcServer.getServerOwner().equals(player.username)) {
 			cycleAllRenderDistance(player);
 		}else {
-			removePlayer(player);
-			addPlayer(player);
+			// these 2 are called within recreatePlayerEntity
+			// removePlayer(player);
+			player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, 0, true, false);
+			// addPlayer(player.playerNetServerHandler.playerEntity);
 		}
 	}
 	
@@ -101,8 +103,10 @@ public class PlayerManager {
 		curList.addAll(players);
 		for(int i = 0, l = curList.size(); i < l; ++i) {
 			EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
-			removePlayer(playerReload);
-			addPlayer(playerReload);
+			// these 2 are called within recreatePlayerEntity
+			// removePlayer(playerReload);
+			playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
+			// addPlayer(playerReload.playerNetServerHandler.playerEntity);
 		}
 	}
 

@@ -286,6 +286,9 @@ public class ServerConfigurationManager {
 	 * Called on respawn
 	 */
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3) {
+		return recreatePlayerEntity(par1EntityPlayerMP, par2, par3, false);
+	}
+	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3, boolean teleport) {
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
@@ -312,12 +315,20 @@ public class ServerConfigurationManager {
 					this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension), var4, var5);
 
 			if (var9 != null) {
-				var7.setLocationAndAngles((double) ((float) var9.posX + 0.5F), (double) ((float) var9.posY + 0.1F),
-						(double) ((float) var9.posZ + 0.5F), 0.0F, 0.0F);
+				if (teleport) {
+					var7.setLocationAndAngles((double) ((float) var9.posX + 0.5F), (double) ((float) var9.posY + 0.1F),
+							(double) ((float) var9.posZ + 0.5F), 0.0F, 0.0F);
+				}
 				var7.setSpawnChunk(var4, var5);
 			} else {
-				var7.playerNetServerHandler.sendPacket(new Packet70GameEvent(0, 0));
+				if (teleport) {
+					var7.playerNetServerHandler.sendPacket(new Packet70GameEvent(0, 0));
+				}
 			}
+		}
+
+		if (!teleport) {
+			var7.setLocationAndAngles(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw, par1EntityPlayerMP.rotationPitch);
 		}
 
 		var8.theChunkProviderServer.loadChunk((int) var7.posX >> 4, (int) var7.posZ >> 4);
@@ -332,7 +343,9 @@ public class ServerConfigurationManager {
 		var9 = var8.getSpawnPoint();
 		var7.playerNetServerHandler.setPlayerLocation(var7.posX, var7.posY, var7.posZ, var7.rotationYaw,
 				var7.rotationPitch);
-		var7.playerNetServerHandler.sendPacket(new Packet6SpawnPosition(var9.posX, var9.posY, var9.posZ));
+		if (teleport) {
+			var7.playerNetServerHandler.sendPacket(new Packet6SpawnPosition(var9.posX, var9.posY, var9.posZ));
+		}
 		var7.playerNetServerHandler
 				.sendPacket(new Packet43Experience(var7.experience, var7.experienceTotal, var7.experienceLevel));
 		this.updateTimeAndWeatherForPlayer(var7, var8);
