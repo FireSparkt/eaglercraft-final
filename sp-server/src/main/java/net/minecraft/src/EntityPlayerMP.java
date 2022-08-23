@@ -713,6 +713,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	 */
 	public void clonePlayer(EntityPlayer par1EntityPlayer, boolean par2) {
 		super.clonePlayer(par1EntityPlayer, par2);
+		this.renderDistance = ((EntityPlayerMP)par1EntityPlayer).renderDistance;
 		this.lastExperience = -1;
 		this.lastHealth = -1;
 		this.lastFoodLevel = -1;

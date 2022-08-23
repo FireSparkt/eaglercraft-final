@@ -90,23 +90,32 @@ public class PlayerManager {
 		if(player.mcServer.getServerOwner().equals(player.username)) {
 			cycleAllRenderDistance(player);
 		}else {
-			// these 2 are called within recreatePlayerEntity
-			// removePlayer(player);
-			player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, 0, true, false);
-			// addPlayer(player.playerNetServerHandler.playerEntity);
+			if(player.lastRenderDistance != player.renderDistance) {
+				// these 2 are called within recreatePlayerEntity
+				// removePlayer(player);
+				player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, 0, true, false);
+				player = player.playerNetServerHandler.playerEntity;
+				player.lastRenderDistance = player.renderDistance;
+				// addPlayer(player.playerNetServerHandler.playerEntity);
+			}
 		}
 	}
 	
 	public void cycleAllRenderDistance(EntityPlayerMP player) {
-		player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
-		List curList = new ArrayList();
-		curList.addAll(players);
-		for(int i = 0, l = curList.size(); i < l; ++i) {
-			EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
-			// these 2 are called within recreatePlayerEntity
-			// removePlayer(playerReload);
-			playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
-			// addPlayer(playerReload.playerNetServerHandler.playerEntity);
+		if(player.lastRenderDistance != player.renderDistance) {
+			player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
+			player.lastRenderDistance = player.renderDistance;
+			List curList = new ArrayList();
+			curList.addAll(players);
+			for(int i = 0, l = curList.size(); i < l; ++i) {
+				EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
+				// these 2 are called within recreatePlayerEntity
+				// removePlayer(playerReload);
+				playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
+				playerReload = playerReload.playerNetServerHandler.playerEntity;
+				playerReload.lastRenderDistance = playerReload.renderDistance;
+				// addPlayer(playerReload.playerNetServerHandler.playerEntity);
+			}
 		}
 	}
 

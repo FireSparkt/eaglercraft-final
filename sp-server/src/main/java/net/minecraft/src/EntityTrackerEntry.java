@@ -469,7 +469,7 @@ public class EntityTrackerEntry {
 	public void removeTrackedPlayerSymmetric(EntityPlayerMP par1EntityPlayerMP) {
 		if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
 			this.trackingPlayers.remove(par1EntityPlayerMP);
-			System.out.println(this.trackedEntity.getEntityName() + ": removeTrackedPlayerSymmetric");
+			//System.out.println(this.trackedEntity.getEntityName() + ": removeTrackedPlayerSymmetric");
 			par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
 		}
 	}
