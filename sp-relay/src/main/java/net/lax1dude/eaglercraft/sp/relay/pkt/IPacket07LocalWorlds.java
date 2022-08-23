@@ -25,15 +25,19 @@ public class IPacket07LocalWorlds extends IPacket {
 	}
 
 	public void write(DataOutputStream output) throws IOException {
-		int i = worldsList.size();
-		if(i > 255) {
-			i = 255;
-		}
-		output.write(i);
-		for(int j = 0; j < i; ++j) {
-			LocalWorld w = worldsList.get(j);
-			writeASCII8(output, w.worldName);
-			writeASCII8(output, w.worldCode);
+		if(worldsList == null) {
+			output.write(0);
+		}else {
+			int i = worldsList.size();
+			if(i > 255) {
+				i = 255;
+			}
+			output.write(i);
+			for(int j = 0; j < i; ++j) {
+				LocalWorld w = worldsList.get(j);
+				writeASCII8(output, w.worldName);
+				writeASCII8(output, w.worldCode);
+			}
 		}
 	}
 	

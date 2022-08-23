@@ -87,5 +87,11 @@ class EnumOptionsHelper {
 		} catch (NoSuchFieldError var10) {
 			;
 		}
+
+		try {
+			enumOptionsMappingHelperArray[EnumOptions.ADDERALL.ordinal()] = 17;
+		} catch (NoSuchFieldError var10) {
+			;
+		}
 	}
 }

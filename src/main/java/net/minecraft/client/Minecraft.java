@@ -1147,7 +1147,7 @@ public class Minecraft implements Runnable {
 			wasPaused = isGamePaused;
 		}
 		
-		if(lanState && !IntegratedServerLAN.isHostingLAN()) {
+		if(lanState && !IntegratedServerLAN.isLANOpen()) {
 			lanState = false;
 			if(thePlayer != null) {
 				thePlayer.sendChatToPlayer(EnumChatFormatting.RED + StatCollector.translateToLocal("lanServer.relayDisconnected"));

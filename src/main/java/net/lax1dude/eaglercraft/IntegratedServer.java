@@ -259,7 +259,7 @@ public class IntegratedServer {
 	public static void processICP() {
 		
 		if(!EaglerAdapter.isIntegratedServerAlive()) {
-			if(IntegratedServerLAN.isHostingLAN()) {
+			if(IntegratedServerLAN.isLANOpen()) {
 				IntegratedServerLAN.closeLAN();
 			}
 			return;

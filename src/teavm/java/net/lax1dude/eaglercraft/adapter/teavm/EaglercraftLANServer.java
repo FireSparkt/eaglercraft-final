@@ -47,6 +47,8 @@ public interface EaglercraftLANServer extends JSObject {
 	void signalRemoteICECandidate(String peerId, String candidate);
 	
 	void signalRemoteDisconnect(String peerId);
+	
+	int countPeers();
 
 	@JSFunctor
 	public static interface ICECandidateHandler extends JSObject {

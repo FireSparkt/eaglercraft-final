@@ -3926,4 +3926,8 @@ public class EaglerAdapterImpl2 {
 		rtcLANServer.signalRemoteDisconnect(peer);
 	}
 	
+	public static final int countPeers() {
+		return rtcLANServer.countPeers();
+	}
+	
 }

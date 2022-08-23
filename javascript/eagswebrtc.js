@@ -742,7 +742,7 @@ window.initializeLANServer = (() => {
 			if(peerId.length == 0) {
 				for(const thePeer of this.peerList.values()) {
                 	if((typeof thePeer !== "undefined") && thePeer !== null) {
-						this.peerList.delete(thePeer);
+						this.peerList.delete(peerId);
 						try {
 							thePeer.disconnect();
 						}catch(e) {}
@@ -754,12 +754,16 @@ window.initializeLANServer = (() => {
 			}
 			var thePeer = this.peerList.get(peerId);
 			if((typeof thePeer !== "undefined") && thePeer !== null) {
-				this.peerList.delete(thePeer);
+				this.peerList.delete(peerId);
 				try {
 					thePeer.disconnect();
 				}catch(e) {}
 				this.remoteClientDisconnectHandler(peerId);
 			}
+		}
+		
+		countPeers() {
+			return this.peerList.size;
 		}
 		
 	};

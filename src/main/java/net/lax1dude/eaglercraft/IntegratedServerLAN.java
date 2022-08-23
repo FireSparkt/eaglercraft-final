@@ -96,6 +96,10 @@ public class IntegratedServerLAN {
 	}
 
 	public static boolean isHostingLAN() {
+		return lanRelaySocket != null || EaglerAdapter.countPeers() > 0;
+	}
+
+	public static boolean isLANOpen() {
 		return lanRelaySocket != null;
 	}
 	

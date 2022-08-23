@@ -144,6 +144,8 @@ public class GameSettings {
 	
 	public boolean hideJoinCode = false;
 	public int relayTimeout = 4;
+	
+	public boolean adderall = false;
 
 	public GameSettings(Minecraft par1Minecraft) {
 		this.keyBindings = new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory,
@@ -359,6 +361,10 @@ public class GameSettings {
 				this.mc.toggleFullscreen();
 			}
 		}
+		
+		if (par1EnumOptions == EnumOptions.ADDERALL) {
+			this.adderall = !this.adderall;
+		}
 
 		this.saveOptions();
 	}
@@ -418,6 +424,9 @@ public class GameSettings {
 			
 		case 15:
 			return this.enableFog;
+			
+		case 17:
+			return this.adderall;
 
 		default:
 			return false;
@@ -534,6 +543,7 @@ public class GameSettings {
 			if(yee.hasKey("difficulty")) difficulty = yee.getByte("difficulty");
 			if(yee.hasKey("hideJoinCode")) hideJoinCode = yee.getBoolean("hideJoinCode");
 			if(yee.hasKey("relayTimeout")) relayTimeout = yee.getByte("relayTimeout");
+			if(yee.hasKey("adderall")) adderall = yee.getBoolean("adderall");
 			
 			if(voiceListenRadius < 5) voiceListenRadius = 5;
 			else if(voiceListenRadius > 22) voiceListenRadius = 22;
@@ -612,6 +622,7 @@ public class GameSettings {
 		yee.setByte("difficulty", (byte)difficulty);
 		yee.setBoolean("hideJoinCode", hideJoinCode);
 		yee.setByte("relayTimeout", (byte)relayTimeout);
+		yee.setBoolean("adderall", adderall);
 		
 		for (int var4 = 0; var4 < this.keyBindings.length; ++var4) {
 			yee.setInteger(keyBindings[var4].keyDescription, keyBindings[var4].keyCode);

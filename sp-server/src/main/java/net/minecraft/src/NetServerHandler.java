@@ -664,8 +664,7 @@ public class NetServerHandler extends NetHandler {
 	public void handleClientCommand(Packet205ClientCommand par1Packet205ClientCommand) {
 		if (par1Packet205ClientCommand.forceRespawn == 1) {
 			if (this.playerEntity.playerConqueredTheEnd) {
-				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0,
-						true);
+				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, true, true);
 			} else if (this.playerEntity.getServerForPlayer().getWorldInfo().isHardcoreModeEnabled()) {
 				if (this.mcServer.isSinglePlayer()
 						&& this.playerEntity.username.equals(this.mcServer.getServerOwner())) {
@@ -678,8 +677,7 @@ public class NetServerHandler extends NetHandler {
 					return;
 				}
 
-				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0,
-						false);
+				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, false, true);
 			}
 		}
 	}

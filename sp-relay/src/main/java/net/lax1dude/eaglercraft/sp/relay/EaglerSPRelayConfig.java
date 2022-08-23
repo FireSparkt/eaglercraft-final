@@ -36,6 +36,7 @@ public class EaglerSPRelayConfig {
 	private String originWhitelist = "";
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
+	private boolean enableShowLocals = true;
 	private String serverComment = "Eags. Public LAN Relay";
 
 	public void load(File conf) {
@@ -54,7 +55,7 @@ public class EaglerSPRelayConfig {
 					gotPingRateLimitLimit = false, gotPingRateLimitLockoutLimit = false,
 					gotPingRateLimitLockoutDuration = false;
 			boolean gotOriginWhitelist = false, gotEnableRealIpHeader = false,
-					gotAddress = false, gotComment = false;
+					gotAddress = false, gotComment = false, gotShowLocals = false;
 			
 			Throwable t2 = null;
 			try(BufferedReader reader = new BufferedReader(new FileReader(conf))) {
@@ -237,6 +238,16 @@ public class EaglerSPRelayConfig {
 								t2 = t;
 								break;
 							}
+						}else if(ss[0].equalsIgnoreCase("show-local-worlds")) {
+							try {
+								enableShowLocals = getBooleanValue(ss[1]);
+								gotShowLocals = true;
+							}catch(Throwable t) {
+								EaglerSPRelay.logger.warn("Invalid show-local-worlds {} in conf {}", ss[1], conf.getAbsoluteFile());
+								EaglerSPRelay.logger.warn(t);
+								t2 = t;
+								break;
+							}
 						}else if(ss[0].equalsIgnoreCase("server-comment")) {
 							serverComment = ss[1];
 							gotComment = true;
@@ -259,7 +270,7 @@ public class EaglerSPRelayConfig {
 					!gotPingRateLimitPeriod || !gotPingRateLimitLimit ||
 					!gotPingRateLimitLockoutLimit || !gotPingRateLimitLockoutDuration ||
 					!gotOriginWhitelist || !gotEnableRealIpHeader || !gotAddress ||
-					!gotComment) {
+					!gotComment || !gotShowLocals) {
 				EaglerSPRelay.logger.warn("Updating config file: {}", conf.getAbsoluteFile());
 				save(conf);
 			}
@@ -300,6 +311,7 @@ public class EaglerSPRelayConfig {
 			w.println("world-ratelimit-lockout-duration: " + openRateLimitLockoutDuration);
 			w.println("origin-whitelist: " + originWhitelist);
 			w.println("enable-real-ip-header: " + enableRealIpHeader);
+			w.println("show-local-worlds: " + isEnableShowLocals());
 			w.print("server-comment: " + serverComment);
 		}catch(IOException t) {
 			EaglerSPRelay.logger.error("Failed to write config file: {}", conf.getAbsoluteFile());
@@ -432,6 +444,10 @@ public class EaglerSPRelayConfig {
 			}
 		}
 		return new String(ret);
+	}
+
+	public boolean isEnableShowLocals() {
+		return enableShowLocals;
 	}
 	
 }

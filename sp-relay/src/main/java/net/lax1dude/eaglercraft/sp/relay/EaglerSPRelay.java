@@ -334,7 +334,11 @@ public class EaglerSPRelay extends WebSocketServer {
 							arg0.close();
 						}else if(ipkt.connectionType == 0x04) {
 							logger.debug("[{}]: Polling the server for other worlds", (String) arg0.getAttachment());
-							arg0.send(IPacket.writePacket(new IPacket07LocalWorlds(getLocalWorlds(waiting.address))));
+							if(config.isEnableShowLocals()) {
+								arg0.send(IPacket.writePacket(new IPacket07LocalWorlds(getLocalWorlds(waiting.address))));
+							}else {
+								arg0.send(IPacket.writePacket(new IPacket07LocalWorlds(null)));
+							}
 							arg0.close();
 						}else {
 							logger.debug("[{}]: Unknown connection type: {}", (String) arg0.getAttachment(), ipkt.connectionType);

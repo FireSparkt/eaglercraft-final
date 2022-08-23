@@ -34,7 +34,7 @@ public class GuiIngameMenu extends GuiScreen {
 
 		this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + var1, StatCollector.translateToLocal("menu.returnToGame")));
 		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal("menu.options")));
-		this.buttonList.add(lanButton = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServerLAN.isHostingLAN() ? "menu.closeLan" : "menu.shareToLan")));
+		this.buttonList.add(lanButton = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + var1, 98, 20, StatCollector.translateToLocal(IntegratedServerLAN.isLANOpen() ? "menu.closeLan" : "menu.shareToLan")));
 		lanButton.enabled = mc.isSingleplayer();
 		this.buttonList.add(new GuiButton(8, 3, 3, 120, 20, StatCollector.translateToLocal("menu.skinCapeSettings")));
 	}
@@ -67,7 +67,7 @@ public class GuiIngameMenu extends GuiScreen {
 			break;
 
 		case 7:
-			if (IntegratedServerLAN.isHostingLAN()) {
+			if (IntegratedServerLAN.isLANOpen()) {
 				this.mc.lanState = false;
 				IntegratedServerLAN.closeLAN();
 				IntegratedServer.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
@@ -118,7 +118,7 @@ public class GuiIngameMenu extends GuiScreen {
 
 		drawString(fontRenderer, "Eaglercraft: " + ConfigConstants.version, 6, 27, 0x999999);
 		
-		if(IntegratedServerLAN.isHostingLAN()) {
+		if(IntegratedServerLAN.isLANOpen()) {
 			String str = var1.translateKey("lanServer.pauseMenu0");
 			drawString(fontRenderer, str, 6, 52, 0xFFFF55);
 			

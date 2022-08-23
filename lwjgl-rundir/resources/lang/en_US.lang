@@ -476,6 +476,7 @@ options.framebufferAntialias.msaa4=MSAA4
 options.framebufferAntialias.msaa8=MSAA8
 options.patchAnisotropic=Fix ANGLE bug #4994
 options.chunkUpdates=Chunk Update per FPS
+options.adderall=Adderall
 
 performance.max=Max FPS
 performance.balanced=Balanced

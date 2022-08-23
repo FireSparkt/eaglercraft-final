@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.GuiScreenBackupWorld;
 import net.lax1dude.eaglercraft.GuiScreenCreateWorldSelection;
+import net.lax1dude.eaglercraft.GuiScreenLANConnect;
 import net.lax1dude.eaglercraft.GuiScreenSingleplayerLoading;
 import net.lax1dude.eaglercraft.IntegratedServer;
 
@@ -239,7 +241,29 @@ public class GuiSelectWorld extends GuiScreen {
 	public void drawScreen(int par1, int par2, float par3) {
 		this.worldSlotContainer.drawScreen(par1, par2, par3);
 		this.drawCenteredString(this.fontRenderer, this.screenTitle, this.width / 2, 20, 16777215);
+		
+		EaglerAdapter.glPushMatrix();
+		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
+		
+		String text = StringTranslate.getInstance().translateKey("directConnect.lanWorld");
+		int w = mc.fontRenderer.getStringWidth(text);
+		boolean hover = par1 > 1 && par2 > 1 && par1 < (w * 3 / 4) + 7 && par2 < 12;
+		
+		drawString(mc.fontRenderer, EnumChatFormatting.UNDERLINE + text, 5, 5, hover ? 0xFFEEEE22 : 0xFFCCCCCC);
+		
+		EaglerAdapter.glPopMatrix();
+		
 		super.drawScreen(par1, par2, par3);
+	}
+	
+	public void mouseClicked(int xx, int yy, int btn) {
+		String text = StringTranslate.getInstance().translateKey("directConnect.lanWorld");
+		int w = mc.fontRenderer.getStringWidth(text);
+		if(xx > 2 && yy > 2 && xx < (w * 3 / 4) + 5 && yy < 12) {
+			mc.displayGuiScreen(new GuiScreenLANConnect(this));
+			mc.sndManager.playSoundFX("random.click", 1.0F, 1.0F);
+		}
+		super.mouseClicked(xx, yy, btn);
 	}
 
 	/**
