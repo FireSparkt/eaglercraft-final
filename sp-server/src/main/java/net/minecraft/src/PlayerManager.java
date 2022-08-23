@@ -91,12 +91,9 @@ public class PlayerManager {
 			player = cycleAllRenderDistance(player);
 		}else {
 			if(player.lastRenderDistance != player.renderDistance) {
-				// these 2 are called within recreatePlayerEntity
-				// removePlayer(player);
+				player.lastRenderDistance = player.renderDistance;
 				player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, 0, true, false);
 				player = player.playerNetServerHandler.playerEntity;
-				player.lastRenderDistance = player.renderDistance;
-				// addPlayer(player.playerNetServerHandler.playerEntity);
 			}
 		}
 		return player;
@@ -112,14 +109,11 @@ public class PlayerManager {
 				EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
 				boolean returnThisOne = playerReload.equals(player);
 				if (playerReload.lastRenderDistance != player.renderDistance) {
-					// these 2 are called within recreatePlayerEntity
-					// removePlayer(playerReload);
+					playerReload.lastRenderDistance = playerReload.renderDistance = player.renderDistance;
 					playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
 					playerReload = playerReload.playerNetServerHandler.playerEntity;
-					playerReload.lastRenderDistance = playerReload.renderDistance;
 				}
 				if (returnThisOne) player = playerReload;
-				// addPlayer(playerReload.playerNetServerHandler.playerEntity);
 			}
 		}
 		return player;

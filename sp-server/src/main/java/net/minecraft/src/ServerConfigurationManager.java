@@ -247,7 +247,7 @@ public class ServerConfigurationManager {
 			return "The server is full!";
 		}else {
 			for(EntityPlayerMP pp : (List<EntityPlayerMP>)this.playerEntityList) {
-				if(pp.username.equals(par2Str)) {
+				if(pp.username.equalsIgnoreCase(par2Str)) {
 					return "Someone with your username is already on this world";
 				}
 			}
