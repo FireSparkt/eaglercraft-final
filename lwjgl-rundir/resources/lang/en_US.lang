@@ -1307,6 +1307,7 @@ commands.banlist.players=There are %d total banned players:
 commands.banlist.usage=/banlist [ips|players]
 commands.kick.success=Kicked %s from the game
 commands.kick.success.reason=Kicked %s from the game: '%s'
+commands.kick.owner=You cannot kick the world owner!
 commands.kick.usage=/kick <player> [reason ...]
 commands.op.success=Opped %s
 commands.op.usage=/op <player>

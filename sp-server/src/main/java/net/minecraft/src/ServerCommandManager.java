@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 
 public class ServerCommandManager extends CommandHandler implements IAdminCommand {
 	public ServerCommandManager() {
+		this.registerCommand(new CommandKick());
 		this.registerCommand(new CommandTime());
 		this.registerCommand(new CommandGameMode());
 		this.registerCommand(new CommandDifficulty());
