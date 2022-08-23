@@ -86,9 +86,9 @@ public class PlayerManager {
 		}
 	}
 	
-	public void cycleRenderDistance(EntityPlayerMP player) {
+	public EntityPlayerMP cycleRenderDistance(EntityPlayerMP player) {
 		if(player.mcServer.getServerOwner().equals(player.username)) {
-			cycleAllRenderDistance(player);
+			player = cycleAllRenderDistance(player);
 		}else {
 			if(player.lastRenderDistance != player.renderDistance) {
 				// these 2 are called within recreatePlayerEntity
@@ -99,9 +99,10 @@ public class PlayerManager {
 				// addPlayer(player.playerNetServerHandler.playerEntity);
 			}
 		}
+		return player;
 	}
 	
-	public void cycleAllRenderDistance(EntityPlayerMP player) {
+	public EntityPlayerMP cycleAllRenderDistance(EntityPlayerMP player) {
 		if(player.lastRenderDistance != player.renderDistance) {
 			player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
 			player.lastRenderDistance = player.renderDistance;
@@ -109,14 +110,19 @@ public class PlayerManager {
 			curList.addAll(players);
 			for(int i = 0, l = curList.size(); i < l; ++i) {
 				EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
-				// these 2 are called within recreatePlayerEntity
-				// removePlayer(playerReload);
-				playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
-				playerReload = playerReload.playerNetServerHandler.playerEntity;
-				playerReload.lastRenderDistance = playerReload.renderDistance;
+				boolean returnThisOne = playerReload.equals(player);
+				if (playerReload.lastRenderDistance != player.renderDistance) {
+					// these 2 are called within recreatePlayerEntity
+					// removePlayer(playerReload);
+					playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
+					playerReload = playerReload.playerNetServerHandler.playerEntity;
+					playerReload.lastRenderDistance = playerReload.renderDistance;
+				}
+				if (returnThisOne) player = playerReload;
 				// addPlayer(playerReload.playerNetServerHandler.playerEntity);
 			}
 		}
+		return player;
 	}
 
 	/**
@@ -141,16 +147,16 @@ public class PlayerManager {
 		}
 
 		this.players.add(par1EntityPlayerMP);
-		this.filterChunkLoadQueue(par1EntityPlayerMP);
+		this.filterChunkLoadQueue(par1EntityPlayerMP); // above, it sets lastRenderDistance to renderDistance, meaning this never recreates the player.
 	}
 
 	/**
 	 * Removes all chunks from the given player's chunk load queue that are not in
 	 * viewing range of the player.
 	 */
-	public void filterChunkLoadQueue(EntityPlayerMP par1EntityPlayerMP) {
+	public EntityPlayerMP filterChunkLoadQueue(EntityPlayerMP par1EntityPlayerMP) {
 		if(par1EntityPlayerMP.lastRenderDistance != par1EntityPlayerMP.renderDistance) {
-			cycleRenderDistance(par1EntityPlayerMP);
+			par1EntityPlayerMP = cycleRenderDistance(par1EntityPlayerMP);
 		}
 		ArrayList var2 = new ArrayList(par1EntityPlayerMP.loadedChunks);
 		int var3 = 0;
@@ -195,6 +201,7 @@ public class PlayerManager {
 				par1EntityPlayerMP.loadedChunks.add(var9);
 			}
 		}
+		return par1EntityPlayerMP;
 	}
 
 	/**
@@ -211,6 +218,8 @@ public class PlayerManager {
 
 				if (var6 != null) {
 					var6.removePlayer(par1EntityPlayerMP);
+					// long var7 = ((long) var4 + 2147483647L) | (((long) var5 + 2147483647L) << 32);
+					// this.freePlayerInstance(var7);
 				}
 			}
 		}
@@ -228,9 +237,9 @@ public class PlayerManager {
 	/**
 	 * update chunks around a player being moved by server logic (e.g. cart, boat)
 	 */
-	public void updateMountedMovingPlayer(final EntityPlayerMP par1EntityPlayerMP) {
+	public EntityPlayerMP updateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
 		if(par1EntityPlayerMP.renderDistance != par1EntityPlayerMP.lastRenderDistance) {
-			cycleRenderDistance(par1EntityPlayerMP);
+			par1EntityPlayerMP = cycleRenderDistance(par1EntityPlayerMP);
 		}
 		int var2 = (int) par1EntityPlayerMP.posX >> 4;
 		int var3 = (int) par1EntityPlayerMP.posZ >> 4;
@@ -262,11 +271,12 @@ public class PlayerManager {
 					}
 				}
 
-				this.filterChunkLoadQueue(par1EntityPlayerMP);
+				par1EntityPlayerMP = this.filterChunkLoadQueue(par1EntityPlayerMP);
 				par1EntityPlayerMP.managedPosX = par1EntityPlayerMP.posX;
 				par1EntityPlayerMP.managedPosZ = par1EntityPlayerMP.posZ;
 			}
 		}
+		return par1EntityPlayerMP;
 	}
 
 	public boolean isPlayerWatchingChunk(EntityPlayerMP par1EntityPlayerMP, int par2, int par3) {

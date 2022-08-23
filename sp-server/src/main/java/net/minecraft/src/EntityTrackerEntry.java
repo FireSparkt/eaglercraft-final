@@ -268,12 +268,20 @@ public class EntityTrackerEntry {
 	}
 
 	public void sendDestroyEntityPacketToTrackedPlayers() {
+		sendDestroyEntityPacketToTrackedPlayers(false);
+	}
+
+	public void sendDestroyEntityPacketToTrackedPlayers(boolean asap) {
 		Iterator var1 = this.trackingPlayers.iterator();
 
 		while (var1.hasNext()) {
 			EntityPlayerMP var2 = (EntityPlayerMP) var1.next();
 			//System.out.println(this.trackedEntity.getEntityName() + ": sendDestroyEntityPacketToTrackedPlayers");
-			var2.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			if (asap) {
+				var2.playerNetServerHandler.sendPacket(new Packet29DestroyEntity(Integer.valueOf(this.trackedEntity.entityId)));
+			} else {
+				var2.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			}
 		}
 	}
 

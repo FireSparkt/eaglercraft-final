@@ -139,22 +139,11 @@ public class EaglerSPRelayConfigRelayList {
 	}
 	
 	private static void add(String filename, Collection<RelayServer> loading, RelayType type, String url, String user, String pass) {
-		if(type == RelayType.STUN) {
-			if(url == null) {
-				EaglerSPRelay.logger.error("Error: Invalid [STUN] in {}, missing 'url'", filename);
-			}else {
-				loading.add(new RelayServer(RelayType.STUN, url));
-			}
-		}else if(type == RelayType.TURN) {
-			if(url == null) {
-				EaglerSPRelay.logger.error("Error: Invalid [TURN] in {}, missing 'url'", filename);
-			}else if(user == null) {
-				EaglerSPRelay.logger.error("Error: Invalid [TURN] in {}, missing 'user' for {}", filename, url);
-			}else if(pass == null) {
-				EaglerSPRelay.logger.error("Error: Invalid [TURN] in {}, missing 'pass' for {}", filename, url);
-			}else {
-				loading.add(new RelayServer(RelayType.TURN, url, user, pass));
-			}
+
+		if(url == null) {
+			EaglerSPRelay.logger.error("Error: Invalid [STUN] in {}, missing 'url'", filename);
+		}else {
+			loading.add(new RelayServer(type, url, user, pass));
 		}
 	}
 	

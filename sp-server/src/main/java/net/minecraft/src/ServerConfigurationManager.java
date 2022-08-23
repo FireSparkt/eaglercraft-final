@@ -213,8 +213,8 @@ public class ServerConfigurationManager {
 	 * using player's dimension, update their movement when in a vehicle (e.g. cart,
 	 * boat)
 	 */
-	public void serverUpdateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
-		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().updateMountedMovingPlayer(par1EntityPlayerMP);
+	public EntityPlayerMP serverUpdateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
+		return par1EntityPlayerMP.getServerForPlayer().getPlayerManager().updateMountedMovingPlayer(par1EntityPlayerMP);
 	}
 
 	/**
@@ -286,11 +286,11 @@ public class ServerConfigurationManager {
 	 * Called on respawn
 	 */
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3) {
-		return recreatePlayerEntity(par1EntityPlayerMP, par2, par3, false);
+		return recreatePlayerEntity(par1EntityPlayerMP, par2, par3, true);
 	}
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3, boolean teleport) {
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
 		this.playerEntityList.remove(par1EntityPlayerMP);
 		this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension)
@@ -339,6 +339,15 @@ public class ServerConfigurationManager {
 			var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
 		}
 
+		if (!teleport) {
+			// see https://wiki.vg/index.php?title=Protocol&oldid=1092
+			// footnotes of packet Respawn (0x09)
+			var7.playerNetServerHandler.sendPacket(new Packet9Respawn(((var7.dimension + 2) % 3) - 1,
+					(byte) var7.worldObj.difficultySetting, var7.worldObj.getWorldInfo().getTerrainType(),
+					var7.worldObj.getHeight(), var7.theItemInWorldManager.getGameType()));
+			var7.playerNetServerHandler.setPlayerLocation(var7.posX, var7.posY, var7.posZ, var7.rotationYaw,
+					var7.rotationPitch);
+		}
 		var7.playerNetServerHandler.sendPacket(new Packet9Respawn(var7.dimension,
 				(byte) var7.worldObj.difficultySetting, var7.worldObj.getWorldInfo().getTerrainType(),
 				var7.worldObj.getHeight(), var7.theItemInWorldManager.getGameType()));

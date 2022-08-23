@@ -188,7 +188,7 @@ public class NetServerHandler extends NetHandler {
 						this.playerEntity.ridingEntity.updateRiderPosition();
 					}
 
-					this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
+					this.playerEntity = this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
 					this.lastPosX = this.playerEntity.posX;
 					this.lastPosY = this.playerEntity.posY;
 					this.lastPosZ = this.playerEntity.posZ;
@@ -329,7 +329,7 @@ public class NetServerHandler extends NetHandler {
 				}
 
 				this.playerEntity.onGround = par1Packet10Flying.onGround;
-				this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
+				this.playerEntity = this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
 				this.playerEntity.handleFalling(this.playerEntity.posY - var3, par1Packet10Flying.onGround);
 			}
 		}
@@ -664,7 +664,7 @@ public class NetServerHandler extends NetHandler {
 	public void handleClientCommand(Packet205ClientCommand par1Packet205ClientCommand) {
 		if (par1Packet205ClientCommand.forceRespawn == 1) {
 			if (this.playerEntity.playerConqueredTheEnd) {
-				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, true, true);
+				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, true);
 			} else if (this.playerEntity.getServerForPlayer().getWorldInfo().isHardcoreModeEnabled()) {
 				if (this.mcServer.isSinglePlayer()
 						&& this.playerEntity.username.equals(this.mcServer.getServerOwner())) {
@@ -677,7 +677,7 @@ public class NetServerHandler extends NetHandler {
 					return;
 				}
 
-				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, false, true);
+				this.playerEntity = this.mcServer.getConfigurationManager().recreatePlayerEntity(this.playerEntity, 0, false);
 			}
 		}
 	}

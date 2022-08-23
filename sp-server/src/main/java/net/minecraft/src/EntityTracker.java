@@ -128,6 +128,9 @@ public class EntityTracker {
 	}
 
 	public void untrackEntity(Entity par1Entity) {
+		untrackEntity(par1Entity, false);
+	}
+	public void untrackEntity(Entity par1Entity, boolean asap) {
 		if (par1Entity instanceof EntityPlayerMP) {
 			EntityPlayerMP var2 = (EntityPlayerMP) par1Entity;
 			Iterator var3 = this.trackedEntities.iterator();
@@ -142,7 +145,7 @@ public class EntityTracker {
 
 		if (var5 != null) {
 			this.trackedEntities.remove(var5);
-			var5.sendDestroyEntityPacketToTrackedPlayers();
+			var5.sendDestroyEntityPacketToTrackedPlayers(asap);
 		}
 	}
 

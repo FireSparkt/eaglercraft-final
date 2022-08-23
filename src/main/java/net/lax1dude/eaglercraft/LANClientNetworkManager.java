@@ -137,7 +137,7 @@ public class LANClientNetworkManager implements INetworkManager {
 						}while(System.currentTimeMillis() - lm < 3000l);
 
 						// no channel was opened
-						sock.writePacket(new IPacket06ClientFailure());
+						sock.writePacket(new IPacket06ClientFailure(ipkt.peerId));
 						sock.close();
 						System.err.println("Relay [" + displayRelay + "|" + displayCode + "] client open data channel timeout");
 						return null;
