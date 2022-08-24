@@ -297,9 +297,8 @@ public class ServerConfigurationManager {
 				.removePlayerEntityDangerously(par1EntityPlayerMP);
 		ChunkCoordinates var4 = par1EntityPlayerMP.getBedLocation();
 		boolean var5 = par1EntityPlayerMP.isSpawnForced();
-		if (teleport) {
-			par1EntityPlayerMP.dimension = par2;
-		}
+		int startDim = par1EntityPlayerMP.dimension;
+		par1EntityPlayerMP.dimension = par2;
 		Object var6 = new ItemInWorldManager(this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension));
 
 		EntityPlayerMP var7 = new EntityPlayerMP(this.mcServer,
@@ -339,7 +338,7 @@ public class ServerConfigurationManager {
 			var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
 		}
 
-		if (!teleport) {
+		if (startDim != par2) {
 			// see https://wiki.vg/index.php?title=Protocol&oldid=1092
 			// footnotes of packet Respawn (0x09)
 			var7.playerNetServerHandler.sendPacket(new Packet9Respawn(((var7.dimension + 2) % 3) - 1,

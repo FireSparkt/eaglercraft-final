@@ -816,7 +816,9 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		var2 = (var2 >> 5) + 2;
 
 		if (var2 > 3 && var2 < 15) {
-			this.renderDistance = var2 > 10 ? 10 : var2;
+			EntityPlayerMP fard = this.mcServer.getConfigurationManager().getPlayerEntity(this.mcServer.getServerOwner());
+			int maxRenderDistance = fard == null ? 10 : (fard.renderDistance > 10 ? 10 : fard.renderDistance);
+			this.renderDistance = var2 > maxRenderDistance ? maxRenderDistance : var2;
 			if(this.lastRenderDistance != this.renderDistance) {
 				if(this.mcServer.isSinglePlayer() && this.mcServer.getServerOwner().equals(this.username)) {
 					for(int i = 0; i < this.mcServer.worldServers.length; ++i) {

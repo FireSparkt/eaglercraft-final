@@ -92,7 +92,7 @@ public class PlayerManager {
 		}else {
 			if(player.lastRenderDistance != player.renderDistance) {
 				player.lastRenderDistance = player.renderDistance;
-				player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, 0, true, false);
+				player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, player.dimension, true, false);
 				player = player.playerNetServerHandler.playerEntity;
 			}
 		}
@@ -110,7 +110,7 @@ public class PlayerManager {
 				boolean returnThisOne = playerReload.equals(player);
 				if (playerReload.lastRenderDistance != player.renderDistance) {
 					playerReload.lastRenderDistance = playerReload.renderDistance = player.renderDistance;
-					playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, 0, true, false);
+					playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, playerReload.dimension, true, false);
 					playerReload = playerReload.playerNetServerHandler.playerEntity;
 				}
 				if (returnThisOne) player = playerReload;

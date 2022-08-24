@@ -44,11 +44,17 @@ public class CommandServerTp extends CommandBase {
 						throw new PlayerNotFoundException();
 					}
 
-					var3.mountEntity((Entity) null);
+					// var3.mountEntity((Entity) null);
 
 					if (var11.worldObj != var3.worldObj) {
-						var3.travelToTheEnd(var11.dimension);
+						notifyAdmins(par1ICommandSender, "commands.tp.notSameDimension", new Object[0]);
+						return;
+						// var3.mcServer.getConfigurationManager().transferPlayerToDimension(var3, var11.dimension);
+						// var3.playerNetServerHandler.playerEntity = var3.mcServer.getConfigurationManager().recreatePlayerEntity(var3, var11.dimension, true, false);
+						// var3 = var3.playerNetServerHandler.playerEntity;
 					}
+
+					var3.mountEntity((Entity) null);
 					
 					var3.playerNetServerHandler.setPlayerLocation(var11.posX, var11.posY, var11.posZ, var11.rotationYaw,
 							var11.rotationPitch);
