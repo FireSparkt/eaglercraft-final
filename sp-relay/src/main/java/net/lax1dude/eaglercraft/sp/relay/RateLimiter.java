@@ -35,7 +35,7 @@ public class RateLimiter {
 					locked = false;
 				}
 			}else {
-				long p = RateLimiter.this.period;
+				long p = RateLimiter.this.period / RateLimiter.this.limit;
 				int breaker = 0;
 				while(millis - timer > p) {
 					timer += p;

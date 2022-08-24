@@ -2742,6 +2742,8 @@ public class EaglerAdapterImpl2 {
 		private boolean open;
 		private boolean alive;
 		private String uriString;
+		private long pingStart;
+		private long pingTimer;
 		
 		private final WebSocket sock;
 		
@@ -2749,6 +2751,8 @@ public class EaglerAdapterImpl2 {
 			type = type_;
 			uriString = uri;
 			alive = false;
+			pingStart = -1l;
+			pingTimer = -1l;
 			WebSocket s = null;
 			try {
 				s = WebSocket.create(uri);
@@ -2757,9 +2761,9 @@ public class EaglerAdapterImpl2 {
 			}catch(Throwable t) {
 				open = false;
 				if(EaglerAdapterImpl2.blockedAddresses.contains(uriString)) {
-					queryResponses.add(new QueryResponse(true));
+					queryResponses.add(new QueryResponse(true, -1l));
 				}else if(EaglerAdapterImpl2.rateLimitedAddresses.contains(uriString)) {
-					queryResponses.add(new QueryResponse(false));
+					queryResponses.add(new QueryResponse(false, -1l));
 				}
 				sock = null;
 				return;
@@ -2769,6 +2773,7 @@ public class EaglerAdapterImpl2 {
 				sock.onOpen(new EventListener<MessageEvent>() {
 					@Override
 					public void handleEvent(MessageEvent evt) {
+						pingStart = System.currentTimeMillis();
 						sock.send("Accept: " + type);
 					}
 				});
@@ -2778,9 +2783,9 @@ public class EaglerAdapterImpl2 {
 						open = false;
 						if(!alive) {
 							if(EaglerAdapterImpl2.blockedAddresses.contains(uriString)) {
-								queryResponses.add(new QueryResponse(true));
+								queryResponses.add(new QueryResponse(true, pingTimer));
 							}else if(EaglerAdapterImpl2.rateLimitedAddresses.contains(uriString)) {
-								queryResponses.add(new QueryResponse(false));
+								queryResponses.add(new QueryResponse(false, pingTimer));
 							}
 						}
 					}
@@ -2789,21 +2794,24 @@ public class EaglerAdapterImpl2 {
 					@Override
 					public void handleEvent(MessageEvent evt) {
 						alive = true;
+						if(pingTimer == -1) {
+							pingTimer = System.currentTimeMillis() - pingStart;
+						}
 						if(isString(evt.getData())) {
 							try {
 								String str = evt.getDataAsString();
 								if(str.equalsIgnoreCase("BLOCKED")) {
 									EaglerAdapterImpl2.rateLimitedAddresses.add(uriString);
-									queryResponses.add(new QueryResponse(false));
+									queryResponses.add(new QueryResponse(false, pingTimer));
 									sock.close();
 									return;
 								}else if(str.equalsIgnoreCase("LOCKED")) {
 									EaglerAdapterImpl2.blockedAddresses.add(uriString);
-									queryResponses.add(new QueryResponse(true));
+									queryResponses.add(new QueryResponse(true, pingTimer));
 									sock.close();
 									return;
 								}else {
-									QueryResponse q = new QueryResponse(new JSONObject(str));
+									QueryResponse q = new QueryResponse(new JSONObject(str), pingTimer);
 									if(q.rateLimitStatus != null) {
 										if(q.rateLimitStatus == RateLimit.BLOCKED) {
 											EaglerAdapterImpl2.rateLimitedAddresses.add(uriString);
@@ -2976,7 +2984,8 @@ public class EaglerAdapterImpl2 {
 		private String brand = "<no brand>";
 		
 		private long connectionOpenedAt;
-		private int connectionPing = -1;
+		private long connectionPingStart = -1;
+		private long connectionPingTimer = -1;
 		
 		private RateLimit rateLimitStatus = RateLimit.NONE;
 		
@@ -3003,6 +3012,7 @@ public class EaglerAdapterImpl2 {
 				@Override
 				public void handleEvent(MessageEvent evt) {
 					try {
+						connectionPingStart = System.currentTimeMillis();
 						nativeBinarySend(sock, convertToArrayBuffer(
 								IPacket.writePacket(new IPacket00Handshake(0x03, IntegratedServer.preferredRelayVersion, ""))
 						));
@@ -3046,7 +3056,9 @@ public class EaglerAdapterImpl2 {
 									if(pkt instanceof IPacket69Pong) {
 										IPacket69Pong ipkt = (IPacket69Pong)pkt;
 										versError = RelayQuery.VersionMismatch.COMPATIBLE;
-										connectionPing = (int)(System.currentTimeMillis() - connectionOpenedAt);
+										if(connectionPingTimer == -1) {
+											connectionPingTimer = System.currentTimeMillis() - connectionPingStart;
+										}
 										vers = ipkt.protcolVersion;
 										comment = ipkt.comment;
 										brand = ipkt.brand;
@@ -3128,7 +3140,6 @@ public class EaglerAdapterImpl2 {
 		@Override
 		public void close() {
 			if(sock != null && open) {
-				connectionPing = -1;
 				sock.close();
 			}
 			open = false;
@@ -3151,7 +3162,7 @@ public class EaglerAdapterImpl2 {
 
 		@Override
 		public long getPing() {
-			return connectionPing;
+			return connectionPingTimer < 1 ? 1 : connectionPingTimer;
 		}
 
 		@Override

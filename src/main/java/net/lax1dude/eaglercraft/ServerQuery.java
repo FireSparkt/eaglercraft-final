@@ -19,8 +19,10 @@ public interface ServerQuery {
 		public final boolean serverCracked;
 		public final RateLimit rateLimitStatus;
 		public final boolean rateLimitIsTCP;
-		public QueryResponse(JSONObject obj) {
+		public final long ping;
+		public QueryResponse(JSONObject obj, long ping) {
 			this.responseType = obj.getString("type").toLowerCase();
+			this.ping = ping;
 			if(this.responseType.equals("blocked") || this.responseType.equals("locked")) {
 				this.responseData = null;
 				this.serverVersion = "Unknown";
@@ -43,7 +45,8 @@ public interface ServerQuery {
 				this.rateLimitIsTCP = false;
 			}
 		}
-		public QueryResponse(boolean lockedNotBlocked) {
+		public QueryResponse(boolean lockedNotBlocked, long ping) {
+			this.ping = ping;
 			this.responseType = lockedNotBlocked ? "locked" : "blocked";
 			this.responseData = null;
 			this.serverVersion = "Unknown";
