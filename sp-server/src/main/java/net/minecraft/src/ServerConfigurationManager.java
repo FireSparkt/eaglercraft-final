@@ -283,6 +283,19 @@ public class ServerConfigurationManager {
 	}
 
 	/**
+	 * Called on render distance change
+	 */
+	public void updateOnRenderDistanceChange(EntityPlayerMP par1EntityPlayerMP) {
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
+		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
+		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().addPlayer(par1EntityPlayerMP);
+		for (Object loadedChunk : par1EntityPlayerMP.loadedChunks) {
+			Chunk chunk = (Chunk) loadedChunk;
+			par1EntityPlayerMP.getServerForPlayer().getEntityTracker().func_85172_a(par1EntityPlayerMP, chunk);
+		}
+	}
+
+	/**
 	 * Called on respawn
 	 */
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3) {
@@ -307,6 +320,9 @@ public class ServerConfigurationManager {
 		var7.playerNetServerHandler = par1EntityPlayerMP.playerNetServerHandler;
 		var7.clonePlayer(par1EntityPlayerMP, par3);
 		var7.entityId = par1EntityPlayerMP.entityId;
+		if (!teleport) {
+			var7.capabilities = par1EntityPlayerMP.capabilities;
+		}
 		WorldServer var8 = this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension);
 		this.func_72381_a(var7, par1EntityPlayerMP, var8);
 		ChunkCoordinates var9;
@@ -334,8 +350,10 @@ public class ServerConfigurationManager {
 
 		var8.theChunkProviderServer.loadChunk((int) var7.posX >> 4, (int) var7.posZ >> 4);
 
-		while (!var8.getCollidingBoundingBoxes(var7, var7.boundingBox).isEmpty()) {
-			var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
+		if (teleport) {
+			while (!var8.getCollidingBoundingBoxes(var7, var7.boundingBox).isEmpty()) {
+				var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
+			}
 		}
 
 		if (startDim != par2) {

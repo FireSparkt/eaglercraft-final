@@ -136,11 +136,15 @@ public class NetLoginHandler extends NetHandler {
 		if (var1 != null) {
 			this.kickUser(var1);
 		} else {
-			EntityPlayerMP fard = this.mcServer.getConfigurationManager().getPlayerEntity(this.mcServer.getServerOwner());
-			int maxRenderDistance = fard == null ? 10 : (fard.renderDistance > 10 ? 10 : fard.renderDistance);
 			EntityPlayerMP var2 = this.mcServer.getConfigurationManager().createPlayerForUser(this.clientUsername);
 			if (var2 != null) {
-				var2.renderDistance = var2.lastRenderDistance = (this.viewDistance > maxRenderDistance && !this.mcServer.getServerOwner().equals(this.clientUsername)) ? maxRenderDistance : this.viewDistance;
+				if (this.mcServer.getServerOwner().equals(this.clientUsername)) {
+					var2.renderDistance = this.viewDistance;
+				} else {
+					EntityPlayerMP fard = this.mcServer.getConfigurationManager().getPlayerEntity(this.mcServer.getServerOwner());
+					int maxRenderDistance = fard == null ? 10 : (fard.renderDistance > 10 ? 10 : fard.renderDistance);
+					var2.renderDistance = this.viewDistance > maxRenderDistance ? maxRenderDistance : this.viewDistance;
+				}
 				this.mcServer.getConfigurationManager().initializeConnectionToPlayer(this.myTCPConnection, var2);
 			}else {
 				this.kickUser("Could not construct EntityPlayerMP for '" + var1 + "'");
