@@ -139,9 +139,8 @@ public class EaglerSPRelayConfigRelayList {
 	}
 	
 	private static void add(String filename, Collection<RelayServer> loading, RelayType type, String url, String user, String pass) {
-
 		if(url == null) {
-			EaglerSPRelay.logger.error("Error: Invalid [STUN] in {}, missing 'url'", filename);
+			EaglerSPRelay.logger.error("Error: Invalid relay in {}, missing 'url'", filename);
 		}else {
 			loading.add(new RelayServer(type, url, user, pass));
 		}

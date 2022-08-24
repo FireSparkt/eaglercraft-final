@@ -24,15 +24,14 @@ public class IPacket01ICEServers extends IPacket {
 			RelayServer srv = itr.next();
 			if(srv.type == RelayType.STUN) {
 				output.write('S');
-				writeASCII16(output, srv.address);
 			}else if(srv.type == RelayType.TURN) {
 				output.write('T');
-				writeASCII16(output, srv.address);
-				writeASCII8(output, srv.username);
-				writeASCII8(output, srv.password);
 			}else {
 				throw new IOException("Unknown/Unsupported Relay Type: " + srv.type.name());
 			}
+			writeASCII16(output, srv.address);
+			writeASCII8(output, srv.username);
+			writeASCII8(output, srv.password);
 		}
 	}
 	

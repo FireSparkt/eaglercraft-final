@@ -28,12 +28,10 @@ public class ICEServerSet {
 		}
 
 		public String getICEString() {
-			if(type == RelayType.STUN) {
+			if(username == null) {
 				return address;
-			}else if(type == RelayType.TURN) {
-				return address + ";" + username + ";" + password;
 			}else {
-				throw new IllegalStateException("Unknown relay type: " + (type == null ? "null" : type.name()));
+				return address + ";" + username + ";" + password;
 			}
 		}
 		

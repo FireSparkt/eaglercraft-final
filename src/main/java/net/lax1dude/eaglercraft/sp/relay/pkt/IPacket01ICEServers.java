@@ -18,22 +18,20 @@ public class IPacket01ICEServers extends IPacket {
 		int l = input.readUnsignedShort();
 		for(int i = 0; i < l; ++i) {
 			char type = (char)input.read();
+			ICEServerSet.RelayType typeEnum;
 			if(type == 'S') {
-				servers.add(new ICEServerSet.RelayServer(
-						ICEServerSet.RelayType.STUN,
-						readASCII16(input),
-						null, null
-				));
+				typeEnum = ICEServerSet.RelayType.STUN;
 			}else if(type == 'T') {
-				servers.add(new ICEServerSet.RelayServer(
-						ICEServerSet.RelayType.TURN,
-						readASCII16(input),
-						readASCII8(input),
-						readASCII8(input)
-				));
+				typeEnum = ICEServerSet.RelayType.TURN;
 			}else {
 				throw new IOException("Unknown/Unsupported Relay Type: '" + type + "'");
 			}
+			servers.add(new ICEServerSet.RelayServer(
+					typeEnum,
+					readASCII16(input),
+					readASCII8(input),
+					readASCII8(input)
+			));
 		}
 	}
 	

@@ -71,7 +71,7 @@ public class GuiScreenLANConnecting extends GuiScreen {
 				
 				LANClientNetworkManager netMgr = LANClientNetworkManager.connectToWorld(sock, code, sock.getURI());
 				if(netMgr == null) {
-					this.mc.displayGuiScreen(new GuiDisconnected(parent, "connect.failed", "disconnect.genericReason", "noRelay.worldFail", ""));
+					this.mc.displayGuiScreen(new GuiDisconnected(parent, "connect.failed", "disconnect.genericReason", st.translateKey("noRelay.worldFail"), ""));
 					return;
 				}
 				
