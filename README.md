@@ -84,9 +84,9 @@ Keep both the first and second terminal window you opened, just minimize them do
 
 ## Singleplayer?
 
-I successfully created Singleplayer for this version of eaglercraft and it works 100%, **but after many rounds of very thorough testing**, I found that TeaVM is unable to optimize certain aspects of terrain generation and world ticking as well as it can optimize the rendering for a multiplayer-only build. On an [i9-11900K]( https://www.cpubenchmark.net/cpu.php?cpu=Intel+Core+i9-11900K+%40+3.50GHz&id=3904) a render distance of 'Tiny' struggles to pass 12 TPS while standing still, and drops below 1 TPS as soon as a couple new chunks have to be generated and trigger lighting updates. The playerbase of this game **will bother me every f\*\*king day if what I release as singleplayer is not perfect** and therefore singleplayer will remain private indefinetly and I will not answer any further questions about it or share the source code unless you are just looking to repurpose some of the base OS emulation code.
+**You can play the singleplayer fork here, which has not yet been merged: [https://eaglercraft.net/new_singleplayer/](https://eaglercraft.net/new_singleplayer/)**
 
-**You can play Minecraft Beta singleplayer here: [https://g.eags.us/eaglercraft/singleplayer_test/](https://g.eags.us/eaglercraft/singleplayer_test/)**
+You can play Minecraft Beta here: [https://eaglercraft.net/beta/](https://eaglercraft.net/beta/)
 
 ## How does it work?
 
