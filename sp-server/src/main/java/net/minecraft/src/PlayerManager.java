@@ -102,7 +102,7 @@ public class PlayerManager {
 	public EntityPlayerMP cycleAllRenderDistance(EntityPlayerMP player) {
 		if(player.lastRenderDistance != player.renderDistance) {
 			player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
-			player.lastRenderDistance = player.renderDistance;
+			// player.lastRenderDistance = player.renderDistance;
 			List curList = new ArrayList();
 			curList.addAll(players);
 			for(int i = 0, l = curList.size(); i < l; ++i) {
