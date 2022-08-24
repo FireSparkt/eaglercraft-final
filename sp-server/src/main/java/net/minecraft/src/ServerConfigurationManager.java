@@ -286,7 +286,7 @@ public class ServerConfigurationManager {
 	 * Called on render distance change
 	 */
 	public void updateOnRenderDistanceChange(EntityPlayerMP par1EntityPlayerMP) {
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().addPlayer(par1EntityPlayerMP);
