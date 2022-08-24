@@ -87,7 +87,12 @@ public class NetLoginHandler extends NetHandler {
 
 	public void handleClientProtocol(Packet2ClientProtocol par1Packet2ClientProtocol) {
 		this.clientUsername = par1Packet2ClientProtocol.getUsername();
-		this.viewDistance = par1Packet2ClientProtocol.getViewDistance();
+		int var2 = 64 << 3 - par1Packet2ClientProtocol.getViewDistance();
+		if(var2 > 400) {
+			var2 = 400;
+		}
+		var2 = (var2 >> 5) + 2;
+		this.viewDistance = var2;
 		System.out.println("[Server][HANDSHAKE][" + this.clientUsername + "]");
 
 		if (!this.clientUsername.equals(StringUtils.stripControlCodes(this.clientUsername))) {
@@ -134,8 +139,8 @@ public class NetLoginHandler extends NetHandler {
 			EntityPlayerMP fard = this.mcServer.getConfigurationManager().getPlayerEntity(this.mcServer.getServerOwner());
 			int maxRenderDistance = fard == null ? 10 : (fard.renderDistance > 10 ? 10 : fard.renderDistance);
 			EntityPlayerMP var2 = this.mcServer.getConfigurationManager().createPlayerForUser(this.clientUsername);
-			var2.renderDistance = var2.lastRenderDistance = (this.viewDistance > maxRenderDistance && !this.mcServer.getServerOwner().equals(this.clientUsername)) ? maxRenderDistance : this.viewDistance;
 			if (var2 != null) {
+				var2.renderDistance = var2.lastRenderDistance = (this.viewDistance > maxRenderDistance && !this.mcServer.getServerOwner().equals(this.clientUsername)) ? maxRenderDistance : this.viewDistance;
 				this.mcServer.getConfigurationManager().initializeConnectionToPlayer(this.myTCPConnection, var2);
 			}else {
 				this.kickUser("Could not construct EntityPlayerMP for '" + var1 + "'");
