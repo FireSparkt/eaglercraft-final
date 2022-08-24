@@ -306,6 +306,8 @@ public class RenderPlayer extends RenderLiving {
 						msh.texture.bindTexture();
 						if (par1EntityPlayer.hurtTime > 0 || par1EntityPlayer.deathTime > 0) {
 							EaglerAdapter.glColor4f(1.2f, 0.8F, 0.8F, 1.0F);
+						}else {
+							EaglerAdapter.glColor4f(1.0f, 1.0F, 1.0F, 1.0F);
 						}
 					}
 					EaglerAdapter.drawHighPoly(msh.limbsModel[i].getModel());
