@@ -312,6 +312,7 @@ public class IntegratedServer {
 							case IPCPacket07ImportWorld.ID:
 							case IPCPacket12FileWrite.ID:
 							case IPCPacket13FileCopyMove.ID:
+							case IPCPacket18ClearPlayers.ID:
 								statusState = IntegratedState.WORLD_NONE;
 								break;
 							default:
@@ -440,6 +441,12 @@ public class IntegratedServer {
 
 	public static void configureLAN(EnumGameType enumGameType, boolean allowCommands) {
 		sendIPCPacket(new IPCPacket17ConfigureLAN(enumGameType.getID(), allowCommands, IntegratedServerLAN.currentICEServers));
+	}
+
+	public static void clearPlayerData(String worldName) {
+		ensureReady();
+		statusState = IntegratedState.WORLD_CLEAR_PLAYERS;
+		sendIPCPacket(new IPCPacket18ClearPlayers(worldName));
 	}
 	
 }

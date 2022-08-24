@@ -659,10 +659,15 @@ public class IntegratedServer {
 						}
 						break;
 					case IPCPacket17ConfigureLAN.ID: {
-							IPCPacket17ConfigureLAN pkt = (IPCPacket17ConfigureLAN)packet;
-							currentProcess.getConfigurationManager().configureLAN(pkt.gamemode, pkt.cheats, pkt.iceServers);
-						}
-						break;
+						IPCPacket17ConfigureLAN pkt = (IPCPacket17ConfigureLAN)packet;
+						currentProcess.getConfigurationManager().configureLAN(pkt.gamemode, pkt.cheats, pkt.iceServers);
+					}
+					break;
+					case IPCPacket18ClearPlayers.ID: {
+						SYS.VFS.deleteFiles("worlds/" + ((IPCPacket18ClearPlayers)packet).worldName + "/player");
+						sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacket18ClearPlayers.ID));
+					}
+					break;
 					default:
 						System.err.println("IPC packet type 0x" + Integer.toHexString(id) + " class '" + packet.getClass().getSimpleName() + "' was not handled");
 						sendTaskFailed();

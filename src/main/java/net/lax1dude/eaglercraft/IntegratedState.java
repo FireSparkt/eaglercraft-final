@@ -25,6 +25,7 @@ public class IntegratedState {
 	public static final int WORLD_FILE_WRITE = 17;
 	public static final int WORLD_FILE_MOVE = 18;
 	public static final int WORLD_FILE_COPY = 19;
+	public static final int WORLD_CLEAR_PLAYERS = 20;
 	
 	public static String getStateName(int i) {
 		switch(i) {
@@ -48,6 +49,7 @@ public class IntegratedState {
 		case WORLD_FILE_WRITE: return "WORLD_FILE_WRITE";
 		case WORLD_FILE_MOVE: return "WORLD_FILE_MOVE";
 		case WORLD_FILE_COPY: return "WORLD_FILE_COPY";
+		case WORLD_CLEAR_PLAYERS: return "WORLD_CLEAR_PLAYERS";
 		default: return "INVALID";
 		}
 	}
@@ -63,6 +65,7 @@ public class IntegratedState {
 		case IPCPacket0BPause.ID: return (state == WORLD_SAVING || state == WORLD_PAUSED);
 		case IPCPacket12FileWrite.ID: return state == WORLD_FILE_WRITE;
 		case IPCPacket13FileCopyMove.ID: return (state == WORLD_FILE_MOVE || state == WORLD_FILE_COPY);
+		case IPCPacket18ClearPlayers.ID: return state == WORLD_CLEAR_PLAYERS;
 		default: return false;
 		}
 	}

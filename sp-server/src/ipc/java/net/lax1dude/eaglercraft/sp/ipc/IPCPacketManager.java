@@ -39,6 +39,7 @@ public class IPCPacketManager {
 		mappings.put(IPCPacket15ThrowException.ID, () -> new IPCPacket15ThrowException());
 		mappings.put(IPCPacket16NBTList.ID, () -> new IPCPacket16NBTList());
 		mappings.put(IPCPacket17ConfigureLAN.ID, () -> new IPCPacket17ConfigureLAN());
+		mappings.put(IPCPacket18ClearPlayers.ID, () -> new IPCPacket18ClearPlayers());
 		mappings.put(IPCPacketFFProcessKeepAlive.ID, () -> new IPCPacketFFProcessKeepAlive());
 	}
 	

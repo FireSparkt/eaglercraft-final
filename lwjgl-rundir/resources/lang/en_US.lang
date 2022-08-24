@@ -157,6 +157,11 @@ selectWorld.backup.export=Export World Backup
 selectWorld.backup.export.tooltip=Download this world as a compressed backup file
 selectWorld.backup.vanilla=Convert to Vanilla
 selectWorld.backup.vanilla.tooltip=Download this world as a vanilla 1.5.2 world
+selectWorld.backup.clearPlayerData=Delete Player Data
+selectWorld.backup.clearPlayerData.tooltip=Clears the inventories of all players except the owner
+
+selectWorld.backup.clearPlayerData.warning1=Are you sure you want to delete all player data?
+selectWorld.backup.clearPlayerData.warning2=All players in '$world$' will lose their inventories (besides $player$)
 
 selectWorld.create.title=What do you wanna do?
 selectWorld.create.create=Create New World
