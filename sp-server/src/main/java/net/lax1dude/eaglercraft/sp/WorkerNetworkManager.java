@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.UnknownFormatConversionException;
 
 import net.lax1dude.eaglercraft.sp.ipc.IPCPacket0CPlayerChannel;
 import net.minecraft.server.MinecraftServer;
@@ -94,7 +95,12 @@ public class WorkerNetworkManager implements INetworkManager {
 				//System.out.println("[Server][" + ipcChannel + "]: packet '" + pkt.getClass().getSimpleName() + "' recieved");
 				
 				try {
-					pkt.processPacket(theNetHandler);
+					try {
+						pkt.processPacket(theNetHandler);
+					} catch (UnknownFormatConversionException breuh) {
+						System.err.println("!!! 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' channel 'NET|" + ipcChannel + "' " + breuh.getMessage() + " !!!");
+						breuh.printStackTrace();
+					}
 				}catch(Throwable t) {
 					System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' on channel 'NET|" + ipcChannel + "'");
 					t.printStackTrace();

@@ -86,21 +86,23 @@ public class PlayerManager {
 		}
 	}
 	
-	public void cycleRenderDistance(EntityPlayerMP player) {
+	public EntityPlayerMP cycleRenderDistance(EntityPlayerMP player) {
 		if(player.lastRenderDistance != player.renderDistance) {
 			player.lastRenderDistance = player.renderDistance;
-			player.mcServer.getConfigurationManager().updateOnRenderDistanceChange(player);
+			player.playerNetServerHandler.playerEntity = player.mcServer.getConfigurationManager().recreatePlayerEntity(player, player.dimension, true, false);
+			player = player.playerNetServerHandler.playerEntity;
 		}
 		if(player.mcServer.getServerOwner().equals(player.username)) {
 			cycleAllRenderDistance(player);
 		}
+		return player;
 	}
 	
 	public void cycleAllRenderDistance(EntityPlayerMP player) {
 		player.mcServer.getConfigurationManager().viewDistance = player.renderDistance;
 		player.lastRenderDistance = player.renderDistance;
 		List curList = new ArrayList();
-		curList.addAll(players);
+		curList.addAll(player.mcServer.getConfigurationManager().playerEntityList);
 		curList.remove(player);
 		int limited = player.renderDistance > 10 ? 10 : player.renderDistance;
 		for(int i = 0, l = curList.size(); i < l; ++i) {
@@ -108,7 +110,8 @@ public class PlayerManager {
 			int targetRenderDist = player.renderDistance > limited ? limited : player.renderDistance;
 			if (playerReload.renderDistance != targetRenderDist) {
 				playerReload.lastRenderDistance = playerReload.renderDistance = targetRenderDist;
-				playerReload.mcServer.getConfigurationManager().updateOnRenderDistanceChange(playerReload);
+				playerReload.playerNetServerHandler.playerEntity = playerReload.mcServer.getConfigurationManager().recreatePlayerEntity(playerReload, playerReload.dimension, true, false);
+				// playerReload = playerReload.playerNetServerHandler.playerEntity;
 			}
 		}
 	}
@@ -144,7 +147,7 @@ public class PlayerManager {
 	 */
 	public EntityPlayerMP filterChunkLoadQueue(EntityPlayerMP par1EntityPlayerMP) {
 		if(par1EntityPlayerMP.lastRenderDistance != par1EntityPlayerMP.renderDistance) {
-			cycleRenderDistance(par1EntityPlayerMP);
+			par1EntityPlayerMP = cycleRenderDistance(par1EntityPlayerMP);
 		}
 		ArrayList var2 = new ArrayList(par1EntityPlayerMP.loadedChunks);
 		int var3 = 0;
@@ -227,7 +230,7 @@ public class PlayerManager {
 	 */
 	public EntityPlayerMP updateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
 		if(par1EntityPlayerMP.renderDistance != par1EntityPlayerMP.lastRenderDistance) {
-			cycleRenderDistance(par1EntityPlayerMP);
+			par1EntityPlayerMP = cycleRenderDistance(par1EntityPlayerMP);
 		}
 		int var2 = (int) par1EntityPlayerMP.posX >> 4;
 		int var3 = (int) par1EntityPlayerMP.posZ >> 4;

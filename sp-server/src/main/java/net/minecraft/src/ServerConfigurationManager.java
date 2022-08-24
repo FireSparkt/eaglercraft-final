@@ -290,13 +290,11 @@ public class ServerConfigurationManager {
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().addPlayer(par1EntityPlayerMP);
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().trackEntity(par1EntityPlayerMP);
-		/*
 		for (Object loadedChunk : par1EntityPlayerMP.loadedChunks) {
 			Chunk chunk = (Chunk) loadedChunk;
 			par1EntityPlayerMP.getServerForPlayer().getEntityTracker().func_85172_a(par1EntityPlayerMP, chunk);
 		}
-		*/
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().trackEntity(par1EntityPlayerMP);
 	}
 
 	/**
@@ -306,8 +304,8 @@ public class ServerConfigurationManager {
 		return recreatePlayerEntity(par1EntityPlayerMP, par2, par3, true);
 	}
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3, boolean teleport) {
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP, !teleport);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, !teleport);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
 		this.playerEntityList.remove(par1EntityPlayerMP);
 		this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension)

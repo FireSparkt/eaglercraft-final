@@ -137,7 +137,7 @@ public class EntityTracker {
 
 			while (var3.hasNext()) {
 				EntityTrackerEntry var4 = (EntityTrackerEntry) var3.next();
-				var4.removeFromTrackedPlayers(var2);
+				var4.removeFromTrackedPlayers(var2, asap);
 			}
 		}
 
@@ -193,11 +193,14 @@ public class EntityTracker {
 	}
 
 	public void removePlayerFromTrackers(EntityPlayerMP par1EntityPlayerMP) {
+		removePlayerFromTrackers(par1EntityPlayerMP, false);
+	}
+	public void removePlayerFromTrackers(EntityPlayerMP par1EntityPlayerMP, boolean asap) {
 		Iterator var2 = this.trackedEntities.iterator();
 
 		while (var2.hasNext()) {
 			EntityTrackerEntry var3 = (EntityTrackerEntry) var2.next();
-			var3.removeTrackedPlayerSymmetric(par1EntityPlayerMP);
+			var3.removeTrackedPlayerSymmetric(par1EntityPlayerMP, asap);
 		}
 	}
 

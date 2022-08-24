@@ -286,9 +286,16 @@ public class EntityTrackerEntry {
 	}
 
 	public void removeFromTrackedPlayers(EntityPlayerMP par1EntityPlayerMP) {
+		removeFromTrackedPlayers(par1EntityPlayerMP, false);
+	}
+	public void removeFromTrackedPlayers(EntityPlayerMP par1EntityPlayerMP, boolean asap) {
 		if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
 			//System.out.println(this.trackedEntity.getEntityName() + ": removeFromTrackedPlayers");
-			par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			if (asap) {
+				par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet29DestroyEntity(Integer.valueOf(this.trackedEntity.entityId)));
+			} else {
+				par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			}
 			this.trackingPlayers.remove(par1EntityPlayerMP);
 		}
 	}
@@ -475,10 +482,17 @@ public class EntityTrackerEntry {
 	 * us from their world.
 	 */
 	public void removeTrackedPlayerSymmetric(EntityPlayerMP par1EntityPlayerMP) {
+		removeTrackedPlayerSymmetric(par1EntityPlayerMP, false);
+	}
+	public void removeTrackedPlayerSymmetric(EntityPlayerMP par1EntityPlayerMP, boolean asap) {
 		if (this.trackingPlayers.contains(par1EntityPlayerMP)) {
 			this.trackingPlayers.remove(par1EntityPlayerMP);
 			//System.out.println(this.trackedEntity.getEntityName() + ": removeTrackedPlayerSymmetric");
-			par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			if (asap) {
+				par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet29DestroyEntity(Integer.valueOf(this.trackedEntity.entityId)));
+			} else {
+				par1EntityPlayerMP.destroyedItemsNetCache.add(Integer.valueOf(this.trackedEntity.entityId));
+			}
 		}
 	}
 }

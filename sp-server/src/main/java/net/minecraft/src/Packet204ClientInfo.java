@@ -40,11 +40,7 @@ public class Packet204ClientInfo extends Packet {
 	 * Passes this Packet on to the NetHandler for processing.
 	 */
 	public void processPacket(NetHandler par1NetHandler) {
-		try {
-			par1NetHandler.handleClientInfo(this);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+		par1NetHandler.handleClientInfo(this);
 	}
 
 	/**
