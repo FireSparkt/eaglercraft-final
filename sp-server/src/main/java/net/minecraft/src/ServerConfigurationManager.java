@@ -213,8 +213,8 @@ public class ServerConfigurationManager {
 	 * using player's dimension, update their movement when in a vehicle (e.g. cart,
 	 * boat)
 	 */
-	public EntityPlayerMP serverUpdateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
-		return par1EntityPlayerMP.getServerForPlayer().getPlayerManager().updateMountedMovingPlayer(par1EntityPlayerMP);
+	public void serverUpdateMountedMovingPlayer(EntityPlayerMP par1EntityPlayerMP) {
+		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().updateMountedMovingPlayer(par1EntityPlayerMP);
 	}
 
 	/**
@@ -289,23 +289,46 @@ public class ServerConfigurationManager {
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
-		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().addPlayer(par1EntityPlayerMP);
-		for (Object loadedChunk : par1EntityPlayerMP.loadedChunks) {
-			Chunk chunk = (Chunk) loadedChunk;
-			par1EntityPlayerMP.getServerForPlayer().getEntityTracker().func_85172_a(par1EntityPlayerMP, chunk);
+		this.playerEntityList.remove(par1EntityPlayerMP);
+
+		WorldServer var8 = this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension);
+
+		par1EntityPlayerMP.setLocationAndAngles(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw, par1EntityPlayerMP.rotationPitch);
+
+		var8.theChunkProviderServer.loadChunk((int) par1EntityPlayerMP.posX >> 4, (int) par1EntityPlayerMP.posZ >> 4);
+
+		// see https://wiki.vg/index.php?title=Protocol&oldid=1092
+		// footnotes of packet Respawn (0x09)
+		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(((par1EntityPlayerMP.dimension + 2) % 3) - 1,
+				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
+				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
+		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw,
+				par1EntityPlayerMP.rotationPitch);
+		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(par1EntityPlayerMP.dimension,
+				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
+				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
+		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw,
+				par1EntityPlayerMP.rotationPitch);
+		this.updateTimeAndWeatherForPlayer(par1EntityPlayerMP, var8);
+		this.syncPlayerInventory(par1EntityPlayerMP);
+		Iterator var6 = par1EntityPlayerMP.getActivePotionEffects().iterator();
+
+		while (var6.hasNext()) {
+			PotionEffect var7 = (PotionEffect) var6.next();
+			par1EntityPlayerMP.playerNetServerHandler
+					.sendPacket(new Packet41EntityEffect(par1EntityPlayerMP.entityId, var7));
 		}
+		var8.getPlayerManager().addPlayer(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().trackEntity(par1EntityPlayerMP);
+		this.playerEntityList.add(par1EntityPlayerMP);
 	}
 
 	/**
 	 * Called on respawn
 	 */
 	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3) {
-		return recreatePlayerEntity(par1EntityPlayerMP, par2, par3, true);
-	}
-	public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP par1EntityPlayerMP, int par2, boolean par3, boolean teleport) {
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP, !teleport);
-		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, !teleport);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP);
+		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
 		this.playerEntityList.remove(par1EntityPlayerMP);
 		this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension)
@@ -322,9 +345,6 @@ public class ServerConfigurationManager {
 		var7.playerNetServerHandler = par1EntityPlayerMP.playerNetServerHandler;
 		var7.clonePlayer(par1EntityPlayerMP, par3);
 		var7.entityId = par1EntityPlayerMP.entityId;
-		if (!teleport) {
-			var7.capabilities = par1EntityPlayerMP.capabilities;
-		}
 		WorldServer var8 = this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension);
 		this.func_72381_a(var7, par1EntityPlayerMP, var8);
 		ChunkCoordinates var9;
@@ -334,48 +354,27 @@ public class ServerConfigurationManager {
 					this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension), var4, var5);
 
 			if (var9 != null) {
-				if (teleport) {
-					var7.setLocationAndAngles((double) ((float) var9.posX + 0.5F), (double) ((float) var9.posY + 0.1F),
-							(double) ((float) var9.posZ + 0.5F), 0.0F, 0.0F);
-				}
+				var7.setLocationAndAngles((double) ((float) var9.posX + 0.5F), (double) ((float) var9.posY + 0.1F),
+						(double) ((float) var9.posZ + 0.5F), 0.0F, 0.0F);
 				var7.setSpawnChunk(var4, var5);
 			} else {
-				if (teleport) {
-					var7.playerNetServerHandler.sendPacket(new Packet70GameEvent(0, 0));
-				}
+				var7.playerNetServerHandler.sendPacket(new Packet70GameEvent(0, 0));
 			}
-		}
-
-		if (!teleport) {
-			var7.setLocationAndAngles(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw, par1EntityPlayerMP.rotationPitch);
 		}
 
 		var8.theChunkProviderServer.loadChunk((int) var7.posX >> 4, (int) var7.posZ >> 4);
 
-		if (teleport) {
-			while (!var8.getCollidingBoundingBoxes(var7, var7.boundingBox).isEmpty()) {
-				var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
-			}
+		while (!var8.getCollidingBoundingBoxes(var7, var7.boundingBox).isEmpty()) {
+			var7.setPosition(var7.posX, var7.posY + 1.0D, var7.posZ);
 		}
 
-		if (startDim != par2) {
-			// see https://wiki.vg/index.php?title=Protocol&oldid=1092
-			// footnotes of packet Respawn (0x09)
-			var7.playerNetServerHandler.sendPacket(new Packet9Respawn(((var7.dimension + 2) % 3) - 1,
-					(byte) var7.worldObj.difficultySetting, var7.worldObj.getWorldInfo().getTerrainType(),
-					var7.worldObj.getHeight(), var7.theItemInWorldManager.getGameType()));
-			var7.playerNetServerHandler.setPlayerLocation(var7.posX, var7.posY, var7.posZ, var7.rotationYaw,
-					var7.rotationPitch);
-		}
 		var7.playerNetServerHandler.sendPacket(new Packet9Respawn(var7.dimension,
 				(byte) var7.worldObj.difficultySetting, var7.worldObj.getWorldInfo().getTerrainType(),
 				var7.worldObj.getHeight(), var7.theItemInWorldManager.getGameType()));
 		var9 = var8.getSpawnPoint();
 		var7.playerNetServerHandler.setPlayerLocation(var7.posX, var7.posY, var7.posZ, var7.rotationYaw,
 				var7.rotationPitch);
-		if (teleport) {
-			var7.playerNetServerHandler.sendPacket(new Packet6SpawnPosition(var9.posX, var9.posY, var9.posZ));
-		}
+		var7.playerNetServerHandler.sendPacket(new Packet6SpawnPosition(var9.posX, var9.posY, var9.posZ));
 		var7.playerNetServerHandler
 				.sendPacket(new Packet43Experience(var7.experience, var7.experienceTotal, var7.experienceLevel));
 		this.updateTimeAndWeatherForPlayer(var7, var8);

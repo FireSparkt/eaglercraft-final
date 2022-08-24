@@ -188,7 +188,7 @@ public class NetServerHandler extends NetHandler {
 						this.playerEntity.ridingEntity.updateRiderPosition();
 					}
 
-					this.playerEntity = this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
+					this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
 					this.lastPosX = this.playerEntity.posX;
 					this.lastPosY = this.playerEntity.posY;
 					this.lastPosZ = this.playerEntity.posZ;
@@ -329,7 +329,7 @@ public class NetServerHandler extends NetHandler {
 				}
 
 				this.playerEntity.onGround = par1Packet10Flying.onGround;
-				this.playerEntity = this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
+				this.mcServer.getConfigurationManager().serverUpdateMountedMovingPlayer(this.playerEntity);
 				this.playerEntity.handleFalling(this.playerEntity.posY - var3, par1Packet10Flying.onGround);
 			}
 		}
