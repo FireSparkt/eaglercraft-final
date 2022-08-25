@@ -96,6 +96,9 @@ public class GuiIngameMenu extends GuiScreen {
 		if(!mc.isSingleplayer() || IntegratedServerLAN.isHostingLAN()) {
 			voiceMenu.updateScreen();
 		}
+		if(EaglerAdapter.isPointerLocked()) {
+			EaglerAdapter.mouseSetGrabbed(false);
+		}
 	}
 
 	/**

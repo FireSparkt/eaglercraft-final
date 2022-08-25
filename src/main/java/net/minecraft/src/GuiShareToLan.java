@@ -19,7 +19,7 @@ public class GuiShareToLan extends GuiScreen {
 	 * The currently selected game mode. One of 'survival', 'creative', or
 	 * 'adventure'
 	 */
-	private String gameMode = "survival";
+	private String gameMode;
 
 	/** True if 'Allow Cheats' is currently enabled */
 	private boolean allowCommands = false;
@@ -33,6 +33,7 @@ public class GuiShareToLan extends GuiScreen {
 	public GuiShareToLan(GuiScreen par1GuiScreen) {
 		this.parentScreen = par1GuiScreen;
 		this.relaysButton = new GuiNetworkSettingsButton(this);
+		this.gameMode = par1GuiScreen.mc.playerController.getGameType().getName();
 	}
 
 	/**

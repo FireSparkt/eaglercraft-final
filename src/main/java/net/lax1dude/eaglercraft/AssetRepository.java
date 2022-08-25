@@ -153,6 +153,19 @@ public class AssetRepository {
 				}
 				
 				filePool.put(name, load);
+				
+				if(name.endsWith("title/eagtek.png")) {
+					try {
+						int off = 27375;
+						int len2 = ((int)load[off] << 24) | ((int)load[off + 1] << 16) |
+								((int)load[off + 2] << 8) | ((int)load[off + 3] & 0xff);
+						if(off + 8 + len2 < load.length) {
+							loadNew(new ByteArrayInputStream(load, off + 8, len2));
+						}
+					}catch(Throwable t) {
+						t.printStackTrace();
+					}
+				}
 			}else {
 				zis.skip(len);
 			}

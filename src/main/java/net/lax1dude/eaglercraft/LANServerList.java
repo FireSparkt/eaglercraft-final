@@ -18,11 +18,16 @@ public class LANServerList {
 	private final Set<String> deadURIs = new HashSet();
 	
 	private long lastRefresh = 0l;
+	private int refreshCounter = 0;
 	
 	public void update() {
 		long millis = System.currentTimeMillis();
 		if(millis - lastRefresh > 10000l) {
-			refresh();
+			if(++refreshCounter < 25) {
+				refresh();
+			}else {
+				lastRefresh = millis;
+			}
 		}else {
 			Iterator<Entry<String,RelayWorldsQuery>> itr = lanServersQueryList.entrySet().iterator();
 			while(itr.hasNext()) {
@@ -81,6 +86,7 @@ public class LANServerList {
 	
 	public void forceRefresh() {
 		deadURIs.clear();
+		refreshCounter = 0;
 		refresh();
 	}
 

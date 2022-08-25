@@ -412,4 +412,9 @@ public class PlayerControllerMP {
 	public boolean extendedReach() {
 		return this.currentGameType.isCreative();
 	}
+	
+	public EnumGameType getGameType() {
+		return this.currentGameType;
+	}
+	
 }

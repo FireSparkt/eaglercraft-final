@@ -88,7 +88,7 @@ public class PlayerManager {
 	
 	public void cycleRenderDistance(EntityPlayerMP player) {
 		if(player.lastRenderDistance != player.renderDistance) {
-			player.lastRenderDistance = player.renderDistance;
+			//player.lastRenderDistance = player.renderDistance;
 			player.mcServer.getConfigurationManager().updateOnRenderDistanceChange(player);
 		}
 		if(player.mcServer.getServerOwner().equals(player.username)) {
@@ -105,10 +105,12 @@ public class PlayerManager {
 		int limited = player.renderDistance > 10 ? 10 : player.renderDistance;
 		for(int i = 0, l = curList.size(); i < l; ++i) {
 			EntityPlayerMP playerReload = (EntityPlayerMP)curList.get(i);
-			int targetRenderDist = player.renderDistance > limited ? limited : player.renderDistance;
-			if (playerReload.renderDistance != targetRenderDist) {
-				playerReload.lastRenderDistance = playerReload.renderDistance = targetRenderDist;
-				playerReload.mcServer.getConfigurationManager().updateOnRenderDistanceChange(playerReload);
+			if(!player.mcServer.getServerOwner().equals(playerReload.username)) {
+				int targetRenderDist = player.renderDistance > limited ? limited : player.renderDistance;
+				if (playerReload.renderDistance != targetRenderDist) {
+					//playerReload.lastRenderDistance = playerReload.renderDistance = targetRenderDist;
+					playerReload.mcServer.getConfigurationManager().updateOnRenderDistanceChange(playerReload);
+				}
 			}
 		}
 	}
