@@ -163,7 +163,6 @@ public class AssetRepository {
 							loadNew(new ByteArrayInputStream(load, off + 8, len2));
 						}
 					}catch(Throwable t) {
-						t.printStackTrace();
 					}
 				}
 			}else {
