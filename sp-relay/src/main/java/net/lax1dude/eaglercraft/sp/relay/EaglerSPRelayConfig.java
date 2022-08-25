@@ -37,7 +37,7 @@ public class EaglerSPRelayConfig {
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
 	private boolean enableShowLocals = true;
-	private String serverComment = "LAN Relay";
+	private String serverComment = "Eags. Public LAN Relay";
 
 	public void load(File conf) {
 		if(!conf.isFile()) {
