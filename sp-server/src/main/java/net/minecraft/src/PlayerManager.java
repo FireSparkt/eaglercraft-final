@@ -127,7 +127,9 @@ public class PlayerManager {
 		for (int var4 = var2 - rd; var4 <= var2 + rd; ++var4) {
 			for (int var5 = var3 - rd; var5 <= var3 + rd; ++var5) {
 				PlayerInstance pi = this.getPlayerInstance(var4, var5, true);
-				pi.addPlayer(par1EntityPlayerMP);
+				if (!pi.hasPlayer(par1EntityPlayerMP)) {
+					pi.addPlayer(par1EntityPlayerMP);
+				}
 				if(!playerInstancesToUpdate.contains(pi)) {
 					playerInstancesToUpdate.add(pi);
 				}

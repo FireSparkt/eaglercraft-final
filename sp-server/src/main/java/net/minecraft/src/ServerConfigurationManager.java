@@ -286,6 +286,12 @@ public class ServerConfigurationManager {
 	 * Called on render distance change
 	 */
 	public void updateOnRenderDistanceChange(EntityPlayerMP par1EntityPlayerMP) {
+		double posX = par1EntityPlayerMP.posX;
+		double posY = par1EntityPlayerMP.posY;
+		double posZ = par1EntityPlayerMP.posZ;
+		float rotationYaw = par1EntityPlayerMP.rotationYaw;
+		float rotationPitch = par1EntityPlayerMP.rotationPitch;
+
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().removePlayerFromTrackers(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().untrackEntity(par1EntityPlayerMP, true);
 		par1EntityPlayerMP.getServerForPlayer().getPlayerManager().removePlayer(par1EntityPlayerMP);
@@ -293,7 +299,7 @@ public class ServerConfigurationManager {
 
 		WorldServer var8 = this.mcServer.worldServerForDimension(par1EntityPlayerMP.dimension);
 
-		par1EntityPlayerMP.setLocationAndAngles(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw, par1EntityPlayerMP.rotationPitch);
+		par1EntityPlayerMP.setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
 
 		var8.theChunkProviderServer.loadChunk((int) par1EntityPlayerMP.posX >> 4, (int) par1EntityPlayerMP.posZ >> 4);
 
@@ -302,13 +308,12 @@ public class ServerConfigurationManager {
 		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(((par1EntityPlayerMP.dimension + 2) % 3) - 1,
 				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
 				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
-		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw,
-				par1EntityPlayerMP.rotationPitch);
+		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
 		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(par1EntityPlayerMP.dimension,
 				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
 				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
-		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(par1EntityPlayerMP.posX, par1EntityPlayerMP.posY, par1EntityPlayerMP.posZ, par1EntityPlayerMP.rotationYaw,
-				par1EntityPlayerMP.rotationPitch);
+		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
+
 		this.updateTimeAndWeatherForPlayer(par1EntityPlayerMP, var8);
 		this.syncPlayerInventory(par1EntityPlayerMP);
 		Iterator var6 = par1EntityPlayerMP.getActivePotionEffects().iterator();
@@ -318,6 +323,7 @@ public class ServerConfigurationManager {
 			par1EntityPlayerMP.playerNetServerHandler
 					.sendPacket(new Packet41EntityEffect(par1EntityPlayerMP.entityId, var7));
 		}
+		par1EntityPlayerMP.sendPlayerAbilities();
 		var8.getPlayerManager().addPlayer(par1EntityPlayerMP);
 		par1EntityPlayerMP.getServerForPlayer().getEntityTracker().trackEntity(par1EntityPlayerMP);
 		this.playerEntityList.add(par1EntityPlayerMP);

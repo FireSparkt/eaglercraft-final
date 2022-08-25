@@ -33,7 +33,12 @@ class PlayerInstance {
 	 */
 	public void addPlayer(EntityPlayerMP par1EntityPlayerMP) {
 		if (this.players.contains(par1EntityPlayerMP)) {
+			// fuck you teavm...
+			/*
 			throw new IllegalStateException("Failed to add player. " + par1EntityPlayerMP + " already is in chunk "
+					+ this.currentChunk.chunkXPos + ", " + this.currentChunk.chunkZPos);
+			*/
+			this.thePlayerManager.getMinecraftServer().getWorldLogAgent().logSevere("Failed to add player. " + par1EntityPlayerMP + " already is in chunk "
 					+ this.currentChunk.chunkXPos + ", " + this.currentChunk.chunkZPos);
 		} else {
 			this.players.add(par1EntityPlayerMP);

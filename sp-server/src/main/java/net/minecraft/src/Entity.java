@@ -1865,7 +1865,7 @@ public abstract class Entity {
 	}
 
 	public String toString() {
-		return String.format("%s[\'%s\'/%d, l=\'%s\', x=%.2f, y=%.2f, z=%.2f]",
+		return String.format("%s[\'%s\'/%d, l=\'%s\', x=%s, y=%s, z=%s]",
 				new Object[] { this.getClass().getSimpleName(), this.getEntityName(), Integer.valueOf(this.entityId),
 						this.worldObj == null ? "~NULL~" : this.worldObj.getWorldInfo().getWorldName(),
 						Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ) });

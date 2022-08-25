@@ -15,6 +15,7 @@ import net.minecraft.src.NetHandler;
 import net.minecraft.src.NetLoginHandler;
 import net.minecraft.src.NetServerHandler;
 import net.minecraft.src.Packet;
+import net.minecraft.src.Packet204ClientInfo;
 
 public class WorkerNetworkManager implements INetworkManager {
 	
@@ -95,12 +96,7 @@ public class WorkerNetworkManager implements INetworkManager {
 				//System.out.println("[Server][" + ipcChannel + "]: packet '" + pkt.getClass().getSimpleName() + "' recieved");
 				
 				try {
-					try {
-						pkt.processPacket(theNetHandler);
-					} catch (UnknownFormatConversionException breuh) {
-						System.err.println("!!! 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' channel 'NET|" + ipcChannel + "' " + breuh.getMessage() + " !!!");
-						breuh.printStackTrace();
-					}
+					pkt.processPacket(theNetHandler);
 				}catch(Throwable t) {
 					System.err.println("Could not process minecraft packet 0x" + Integer.toHexString(pkt.getPacketId()) + " class '" + pkt.getClass().getSimpleName() + "' on channel 'NET|" + ipcChannel + "'");
 					t.printStackTrace();

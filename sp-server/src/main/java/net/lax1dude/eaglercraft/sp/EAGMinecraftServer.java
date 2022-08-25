@@ -32,6 +32,7 @@ public class EAGMinecraftServer extends MinecraftServer {
 		this.setCanSpawnAnimals(true);
 		this.setCanSpawnNPCs(true);
 		this.setAllowPvp(true);
+		this.setAllowFlight(true);
 	}
 	
 	public void mainLoop() {
