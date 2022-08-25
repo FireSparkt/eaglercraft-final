@@ -22,13 +22,13 @@ public class GameSettings {
 	public float soundVolume = 1.0F;
 	public float mouseSensitivity = 0.5F;
 	public boolean invertMouse = false;
-	public int renderDistance = 1;
+	public int renderDistance = 2;
 	public boolean viewBobbing = true;
 	public boolean anaglyph = false;
 
 	/** Advanced OpenGL */
 	public boolean advancedOpengl = false;
-	public int limitFramerate = 1;
+	public int limitFramerate = 0;
 	public boolean fancyGraphics = false;
 	public boolean enableFog = true;
 
