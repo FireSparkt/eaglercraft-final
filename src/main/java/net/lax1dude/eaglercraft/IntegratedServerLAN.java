@@ -211,7 +211,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis < 3000l);
+				}while(System.currentTimeMillis() - millis < 5000l);
 				System.err.println("Getting server ICE candidates for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -242,7 +242,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis < 3000l);
+				}while(System.currentTimeMillis() - millis < 5000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {
@@ -276,7 +276,7 @@ public class IntegratedServerLAN {
 						Thread.sleep(20l);
 					} catch (InterruptedException e) {
 					}
-				}while(System.currentTimeMillis() - millis < 3000l);
+				}while(System.currentTimeMillis() - millis < 5000l);
 				System.err.println("Getting server description for '" + clientId + "' timed out!");
 				disconnect();
 			}else {

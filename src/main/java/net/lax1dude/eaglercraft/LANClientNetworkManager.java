@@ -94,7 +94,7 @@ public class LANClientNetworkManager implements INetworkManager {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm < 3000l);
+						}while(System.currentTimeMillis() - lm < 5000l);
 
 						// no description was sent
 						sock.close();
@@ -134,7 +134,7 @@ public class LANClientNetworkManager implements INetworkManager {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm < 3000l);
+						}while(System.currentTimeMillis() - lm < 5000l);
 
 						// no channel was opened
 						sock.writePacket(new IPacket06ClientFailure(ipkt.peerId));
@@ -176,7 +176,7 @@ public class LANClientNetworkManager implements INetworkManager {
 								Thread.sleep(20l);
 							} catch (InterruptedException e) {
 							}
-						}while(System.currentTimeMillis() - lm < 3000l);
+						}while(System.currentTimeMillis() - lm < 5000l);
 
 						// no ice candidates were sent
 						sock.close();
