@@ -96,35 +96,73 @@ public class ZipGenerator {
 		zOut.close();
 		
 		System.out.println("Writing 'stable-download/stable-download_repl.zip'");
-		
-		FileUtils.copyFile(new File("stable-download/stable-download.zip"), new File("stable-download/stable-download_repl.zip"));
+
+		ZipOutputStream zOutRepl = new ZipOutputStream(new FileOutputStream(new File("stable-download/stable-download_repl.zip")));
+		zOutRepl.setLevel(9);
+
+		zipFolder(zOutRepl, "web", new File("stable-download/web"), true);
+		zipFolder(zOutRepl, "java", new File("stable-download/java"));
+
+		zOutRepl.close();
 		
 	}
-	
+
 	private static void zipFolder(ZipOutputStream zOut, String pfx, File file) throws IOException {
-		zipFolder0(zOut, file.getAbsolutePath().replace('\\', '/'), pfx, file);
+		zipFolder(zOut, pfx, file, false);
 	}
-	
+
+	private static void zipFolder(ZipOutputStream zOut, String pfx, File file, boolean repl) throws IOException {
+		zipFolder0(zOut, file.getAbsolutePath().replace('\\', '/'), pfx, file, repl);
+	}
+
 	private static void zipFolder0(ZipOutputStream zOut, String pfx, String writePfx, File file) throws IOException {
+		zipFolder0(zOut, pfx, writePfx, file, false);
+	}
+
+	private static void zipFolder0(ZipOutputStream zOut, String pfx, String writePfx, File file, boolean repl) throws IOException {
+		byte[] replCache = new byte[0];
+		if(writePfx.length() > 0 && !writePfx.endsWith("/")) {
+			writePfx = writePfx + "/";
+		}
 		for(File f : file.listFiles()) {
 			if(f.isDirectory()) {
-				zipFolder0(zOut, pfx, writePfx, f);
+				zipFolder0(zOut, pfx, writePfx, f); // do not apply repl boolean to subdirs, as it only happens for this one top level directory in the web folder
 			}else if(f.isFile()) {
 				String path = f.getAbsolutePath().replace('\\', '/').replace(pfx, "");
 				if(path.startsWith("/")) {
 					path = path.substring(1);
 				}
-				if(writePfx.length() > 0 && !writePfx.endsWith("/")) {
-					writePfx = writePfx + "/";
+				if (repl && (f.getName().equals("classes.js") || f.getName().equals("eagswebrtc.js"))) {
+					if (replCache.length == 0) {
+						replCache = FileUtils.readFileToByteArray(f);
+					} else {
+						System.out.println("Concatenating 'eagswebrtc.js' onto 'classes.js'");
+						byte[] newFile = FileUtils.readFileToByteArray(f);
+						byte[] replCacheCache = replCache;
+						replCache = new byte[replCache.length + 2 + newFile.length];
+						System.arraycopy(replCacheCache, 0, replCache, 0, replCacheCache.length);
+						System.arraycopy(newFile, 0, replCache, replCacheCache.length + 2, newFile.length);
+						// add line breaks between them
+						replCache[replCacheCache.length] = 10;
+						replCache[replCacheCache.length + 1] = 10;
+					}
+				} else {
+					zipFile(zOut, writePfx + path, f);
 				}
-				zipFile(zOut, writePfx + path, f);
 			}
 		}
+		if (repl) {
+			zipFile(zOut, writePfx + "classes.js", replCache);
+		}
 	}
-	
+
 	private static void zipFile(ZipOutputStream zOut, String name, File file) throws IOException {
+		zipFile(zOut, name, FileUtils.readFileToByteArray(file));
+	}
+
+	private static void zipFile(ZipOutputStream zOut, String name, byte[] data) throws IOException {
 		zOut.putNextEntry(new ZipEntry(name));
-		IOUtils.write(FileUtils.readFileToByteArray(file), zOut);
+		IOUtils.write(data, zOut);
 	}
 
 }

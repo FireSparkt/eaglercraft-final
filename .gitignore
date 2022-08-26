@@ -31,3 +31,6 @@ sp-relay/out
 sp-relay/test
 sp-relay/.idea
 sp-relay/src/main/java/META-INF
+zip-generator/zip-generator.iml
+zip-generator/out
+zip-generator/src/main/java/META-INF
