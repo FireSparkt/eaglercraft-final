@@ -725,7 +725,7 @@ public class NetClientHandler extends NetHandler {
 			this.worldClient.isRemote = true;
 			this.mc.loadWorld(this.worldClient);
 			this.mc.thePlayer.dimension = par1Packet9Respawn.respawnDimension;
-			this.mc.displayGuiScreen(new GuiDownloadTerrain(this));
+			if (par1Packet9Respawn.worldHeight != 69) this.mc.displayGuiScreen(new GuiDownloadTerrain(this));
 		}
 
 		this.mc.setDimensionAndSpawnPlayer(par1Packet9Respawn.respawnDimension);

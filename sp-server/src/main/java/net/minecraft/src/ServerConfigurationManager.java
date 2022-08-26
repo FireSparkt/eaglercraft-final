@@ -307,11 +307,11 @@ public class ServerConfigurationManager {
 		// footnotes of packet Respawn (0x09)
 		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(((par1EntityPlayerMP.dimension + 2) % 3) - 1,
 				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
-				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
+				69, par1EntityPlayerMP.theItemInWorldManager.getGameType()));
 		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
 		par1EntityPlayerMP.playerNetServerHandler.sendPacket(new Packet9Respawn(par1EntityPlayerMP.dimension,
 				(byte) par1EntityPlayerMP.worldObj.difficultySetting, par1EntityPlayerMP.worldObj.getWorldInfo().getTerrainType(),
-				par1EntityPlayerMP.worldObj.getHeight(), par1EntityPlayerMP.theItemInWorldManager.getGameType()));
+				69, par1EntityPlayerMP.theItemInWorldManager.getGameType()));
 		par1EntityPlayerMP.playerNetServerHandler.setPlayerLocation(posX, posY, posZ, rotationYaw, rotationPitch);
 
 		this.updateTimeAndWeatherForPlayer(par1EntityPlayerMP, var8);
