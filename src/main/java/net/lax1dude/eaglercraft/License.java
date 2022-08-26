@@ -9,8 +9,9 @@ public class License {
 	 */
 	
 	static final byte[] line00 = new byte[] {
-		(byte)76,(byte)105,(byte)99,(byte)101,(byte)110,(byte)115,(byte)101,(byte)32,(byte)39,(byte)65,
-		(byte)103,(byte)114,(byte)101,(byte)101,(byte)109,(byte)101,(byte)110,(byte)116,(byte)39
+			(byte)85,(byte)115,(byte)101,(byte)32,(byte)121,(byte)111,(byte)117,(byte)114,(byte)32,(byte)98,
+			(byte)114,(byte)97,(byte)105,(byte)110,(byte)32,(byte)97,(byte)110,(byte)100,(byte)32,(byte)114,
+			(byte)101,(byte)97,(byte)100,(byte)58
 	};
 	
 	static final byte[] line10 = new byte[] {

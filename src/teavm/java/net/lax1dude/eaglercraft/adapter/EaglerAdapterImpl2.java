@@ -1548,6 +1548,7 @@ public class EaglerAdapterImpl2 {
 			canvas.requestPointerLock();
 			long t = System.currentTimeMillis();
 			if(mouseUngrabTimeout != 0) Window.clearTimeout(mouseUngrabTimeout);
+			mouseUngrabTimeout = 0;
 			if(t - mouseUngrabTimer < 3000l) {
 				mouseUngrabTimeout = Window.setTimeout(new TimerHandler() {
 					@Override
@@ -1559,6 +1560,7 @@ public class EaglerAdapterImpl2 {
 		}else {
 			mouseUngrabTimer = System.currentTimeMillis();
 			if(mouseUngrabTimeout != 0) Window.clearTimeout(mouseUngrabTimeout);
+			mouseUngrabTimeout = 0;
 			doc.exitPointerLock();
 		}
 	}

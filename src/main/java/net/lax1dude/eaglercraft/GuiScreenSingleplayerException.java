@@ -19,7 +19,7 @@ public class GuiScreenSingleplayerException extends GuiScreen {
 	}
 	
 	public void initGui() {
-		this.buttonList.add(returnToMenu = new GuiButton(0, this.width / 2 - 100, this.height / 3 + 50, StringTranslate.getInstance().translateKey("selectWorld.progress.continue")));
+		this.buttonList.add(returnToMenu = new GuiButton(0, this.width / 2 - 100, this.height / 3 + 36, StringTranslate.getInstance().translateKey("selectWorld.progress.continue")));
 	}
 	
 	public void drawScreen(int par1, int par2, float par3) {
@@ -46,19 +46,16 @@ public class GuiScreenSingleplayerException extends GuiScreen {
 		if(left < 5) left = 5;
 
 		this.drawCenteredString(fontRenderer, "An error occured while '" + StringTranslate.getInstance().translateKey(action) + "'", this.width / 2, top, 0xFFAAAA);
-
-		this.drawCenteredString(fontRenderer, "eaglercraft singleplayer is incomplete, please DO NOT report", this.width / 2, top + 22, 0xFFFFFF);
-		this.drawCenteredString(fontRenderer, "this until you obtain a stable release or you will be mocked", this.width / 2, top + 32, 0xFFFFFF);
 		
-		this.drawString(fontRenderer, exception.errorMessage, left, top + 54, 0xFFAAAA);
+		this.drawString(fontRenderer, exception.errorMessage, left, top + 20, 0xFFAAAA);
 		for(int i = 0; i < numTrace; ++i) {
-			this.drawString(fontRenderer, "   " + exception.stackTrace.get(i), left, top + 64 + i * 10, 0xFFAAAA);
+			this.drawString(fontRenderer, "   " + exception.stackTrace.get(i), left, top + 30 + i * 10, 0xFFAAAA);
 		}
 		if(numTrace >= 7) {
-			this.drawCenteredString(fontRenderer, "... " + (exception.size() - numTrace) + " remaining ...", this.width / 2, top + 64 + numTrace * 10, 0xFFAAAA);
+			this.drawCenteredString(fontRenderer, "... " + (exception.size() - numTrace) + " remaining ...", this.width / 2, top + 30 + numTrace * 10, 0xFFAAAA);
 		}
 		
-		returnToMenu.yPosition = top + 80 + numTrace * 10 + (numTrace >= 7 ? 10 : 0);
+		returnToMenu.yPosition = top + 46 + numTrace * 10 + (numTrace >= 7 ? 10 : 0);
 		
 		super.drawScreen(par1, par2, par3);
 	}
