@@ -72,13 +72,19 @@ import de.cuina.fireandfuel.CodecJLayerMP3;
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EarlyLoadScreen;
+import net.lax1dude.eaglercraft.LANPeerEvent;
 import net.lax1dude.eaglercraft.PKT;
 import net.lax1dude.eaglercraft.RelayQuery;
+import net.lax1dude.eaglercraft.RelayServerSocket;
+import net.lax1dude.eaglercraft.RelayQuery.VersionMismatch;
+import net.lax1dude.eaglercraft.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.ProgramGL;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.lwjgl.GameWindowListener;
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket;
+import net.lax1dude.eaglercraft.sp.relay.pkt.IPacket07LocalWorlds.LocalWorld;
 import net.minecraft.src.MathHelper;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
@@ -1518,6 +1524,8 @@ public class EaglerAdapterImpl2 {
 		private boolean open;
 		private boolean alive;
 		private String serverUri;
+		private long pingStart;
+		private long pingTimer;
 
 		private ServerQueryImpl(String type, URI serverUri, String serverUriString) throws IOException {
 			super(serverUri);
@@ -1525,6 +1533,8 @@ public class EaglerAdapterImpl2 {
 			this.type = type;
 			this.open = true;
 			this.alive = false;
+			this.pingStart = -1l;
+			this.pingTimer = -1l;
 			this.setConnectionLostTimeout(5);
 			this.setTcpNoDelay(true);
 			this.connect();
@@ -1564,9 +1574,9 @@ public class EaglerAdapterImpl2 {
 			if(!alive) {
 				synchronized(socketSync) {
 					if(EaglerAdapterImpl2.blockedAddresses.contains(serverUri)) {
-						queryResponses.add(new QueryResponse(true));
+						queryResponses.add(new QueryResponse(true, pingTimer));
 					}else if(EaglerAdapterImpl2.rateLimitedAddresses.contains(serverUri)) {
-						queryResponses.add(new QueryResponse(false));
+						queryResponses.add(new QueryResponse(false, pingTimer));
 					}
 				}
 			}
@@ -1583,23 +1593,26 @@ public class EaglerAdapterImpl2 {
 		public void onMessage(String arg0) {
 			this.alive = true;
 			synchronized(queryResponses) {
+				if(pingTimer == -1) {
+					pingTimer = System.currentTimeMillis() - pingStart;
+				}
 				if(arg0.equalsIgnoreCase("BLOCKED")) {
 					synchronized(socketSync) {
 						EaglerAdapterImpl2.rateLimitedAddresses.add(serverUri);
-						queryResponses.add(new QueryResponse(false));
+						queryResponses.add(new QueryResponse(false, pingTimer));
 					}
 					this.close();
 					return;
 				}else if(arg0.equalsIgnoreCase("LOCKED")) {
 					synchronized(socketSync) {
 						EaglerAdapterImpl2.blockedAddresses.add(serverUri);
-						queryResponses.add(new QueryResponse(true));
+						queryResponses.add(new QueryResponse(true, pingTimer));
 					}
 					this.close();
 					return;
 				}else {
 					try {
-						QueryResponse q = new QueryResponse(new JSONObject(arg0));
+						QueryResponse q = new QueryResponse(new JSONObject(arg0), pingTimer);
 						if(q.rateLimitStatus != null) {
 							synchronized(socketSync) {
 								if(q.rateLimitStatus == RateLimit.BLOCKED) {
@@ -1631,6 +1644,7 @@ public class EaglerAdapterImpl2 {
 		@Override
 		public void onOpen(ServerHandshake arg0) {
 			send("Accept: " + type);
+			pingStart = System.currentTimeMillis();
 		}
 
 		@Override
@@ -1754,8 +1768,200 @@ public class EaglerAdapterImpl2 {
 		return dummyRelayQuery;
 	}
 	
+	private static final RelayWorldsQuery dummyRelayWorldsQuery = new RelayWorldsQuery() {
+
+		@Override
+		public boolean isQueryOpen() {
+			return false;
+		}
+
+		@Override
+		public boolean isQueryFailed() {
+			return false;
+		}
+
+		@Override
+		public RateLimit isQueryRateLimit() {
+			return RateLimit.NONE;
+		}
+
+		@Override
+		public void close() {
+			
+		}
+
+		@Override
+		public List<LocalWorld> getWorlds() {
+			return (List<LocalWorld>)((List)emptyList);
+		}
+
+		@Override
+		public VersionMismatch getCompatible() {
+			return VersionMismatch.COMPATIBLE;
+		}
+		
+	};
+	
+	public static final RelayWorldsQuery openRelayWorldsQuery(String addr) {
+		return dummyRelayWorldsQuery;
+	}
+	
+	private static final RelayServerSocket relaySocketDummy = new RelayServerSocket() {
+
+		@Override
+		public boolean isOpen() {
+			return false;
+		}
+
+		@Override
+		public boolean isClosed() {
+			return true;
+		}
+
+		@Override
+		public void close() {
+			
+		}
+
+		@Override
+		public boolean isFailed() {
+			return false;
+		}
+
+		@Override
+		public Throwable getException() {
+			return null;
+		}
+
+		@Override
+		public void writePacket(IPacket pkt) {
+			
+		}
+
+		@Override
+		public IPacket readPacket() {
+			return null;
+		}
+
+		@Override
+		public IPacket nextPacket() {
+			return null;
+		}
+
+		@Override
+		public RateLimit getRatelimitHistory() {
+			return RateLimit.NONE;
+		}
+
+		@Override
+		public String getURI() {
+			return "undefined";
+		}
+		
+	};
+
+	public static final RelayServerSocket openRelayConnection(String addr, int timeout) {
+		return relaySocketDummy;
+	}
+	
 	public static final boolean glNeedsAnisotropicFix() {
 		return false;
+	}
+	
+	public static final boolean clientLANSupported() {
+		return false;
+	}
+	
+	public static final int clientLANReadyState() {
+		return 0;
+	}
+
+	public static final void clientLANCloseConnection() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void clientLANSendPacket(byte[] pkt) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final byte[] clientLANReadPacket() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void clientLANSetICEServersAndConnect(String[] servers) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void clearLANClientState() {
+		// no throw, just to be safe
+	}
+	
+	public static final String clientLANAwaitICECandidate() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final String clientLANAwaitDescription() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final boolean clientLANAwaitChannel() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final boolean clientLANClosed() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final void clientLANSetICECandidate(String candidate) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final void clientLANSetDescription(String description) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final boolean serverLANSupported() {
+		return false;
+	}
+	
+	public static final void serverLANInitializeServer(String[] servers) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final void serverLANCloseServer() {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final LANPeerEvent serverLANGetEvent(String clientId) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final void serverLANWritePacket(String peer, byte[] data) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final void serverLANCreatePeer(String peer) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void serverLANPeerICECandidates(String peer, String iceCandidates) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void serverLANPeerDescription(String peer, String description) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+
+	public static final void serverLANDisconnectPeer(String peer) {
+		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+	}
+	
+	public static final int countPeers() {
+		return 0;
+	}
+	
+	public static final boolean anisotropicFilteringSupported() {
+		return true;
 	}
 	
 }
