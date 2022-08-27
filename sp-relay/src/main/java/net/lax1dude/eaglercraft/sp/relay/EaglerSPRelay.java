@@ -160,8 +160,8 @@ public class EaglerSPRelay extends WebSocketServer {
 	public void onOpen(WebSocket arg0, ClientHandshake arg1) {
 		String addr;
 		long millis = System.currentTimeMillis();
-		if(config.isEnableRealIpHeader() && arg1.hasFieldValue("X-Real-IP")) {
-			addr = arg1.getFieldValue("X-Real-IP").toLowerCase();
+		if(config.isEnableRealIpHeader() && arg1.hasFieldValue(config.getRealIPHeaderName())) {
+			addr = arg1.getFieldValue(config.getRealIPHeaderName()).toLowerCase();
 		}else {
 			addr = arg0.getRemoteSocketAddress().getAddress().getHostAddress().toLowerCase();
 		}

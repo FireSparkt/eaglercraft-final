@@ -36,6 +36,7 @@ public class EaglerSPRelayConfig {
 	private String originWhitelist = "";
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
+	private String realIpHeaderName = "CF-Connecting-IP";
 	private boolean enableShowLocals = true;
 	private String serverComment = "Eags. Public LAN Relay";
 
@@ -55,7 +56,8 @@ public class EaglerSPRelayConfig {
 					gotPingRateLimitLimit = false, gotPingRateLimitLockoutLimit = false,
 					gotPingRateLimitLockoutDuration = false;
 			boolean gotOriginWhitelist = false, gotEnableRealIpHeader = false,
-					gotAddress = false, gotComment = false, gotShowLocals = false;
+					gotRealIpHeaderName = false, gotAddress = false, gotComment = false,
+					gotShowLocals = false;
 			
 			Throwable t2 = null;
 			try(BufferedReader reader = new BufferedReader(new FileReader(conf))) {
@@ -238,6 +240,9 @@ public class EaglerSPRelayConfig {
 								t2 = t;
 								break;
 							}
+						}else if(ss[0].equalsIgnoreCase("real-ip-header-name")) {
+							realIpHeaderName = ss[1];
+							gotRealIpHeaderName = true;
 						}else if(ss[0].equalsIgnoreCase("show-local-worlds")) {
 							try {
 								enableShowLocals = getBooleanValue(ss[1]);
@@ -270,7 +275,7 @@ public class EaglerSPRelayConfig {
 					!gotPingRateLimitPeriod || !gotPingRateLimitLimit ||
 					!gotPingRateLimitLockoutLimit || !gotPingRateLimitLockoutDuration ||
 					!gotOriginWhitelist || !gotEnableRealIpHeader || !gotAddress ||
-					!gotComment || !gotShowLocals) {
+					!gotComment || !gotShowLocals || !gotRealIpHeaderName) {
 				EaglerSPRelay.logger.warn("Updating config file: {}", conf.getAbsoluteFile());
 				save(conf);
 			}
@@ -310,6 +315,7 @@ public class EaglerSPRelayConfig {
 			w.println("world-ratelimit-lockout-limit: " + openRateLimitLockoutLimit);
 			w.println("world-ratelimit-lockout-duration: " + openRateLimitLockoutDuration);
 			w.println("origin-whitelist: " + originWhitelist);
+			w.println("real-ip-header-name: " + realIpHeaderName);
 			w.println("enable-real-ip-header: " + enableRealIpHeader);
 			w.println("show-local-worlds: " + isEnableShowLocals());
 			w.print("server-comment: " + serverComment);
@@ -420,6 +426,10 @@ public class EaglerSPRelayConfig {
 			}
 		}
 		return false;
+	}
+
+	public String getRealIPHeaderName() {
+		return realIpHeaderName;
 	}
 
 	public boolean isEnableRealIpHeader() {
