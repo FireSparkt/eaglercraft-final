@@ -96,73 +96,59 @@ public class ZipGenerator {
 		zOut.close();
 		
 		System.out.println("Writing 'stable-download/stable-download_repl.zip'");
+		
+		zOut = new ZipOutputStream(new FileOutputStream(new File("stable-download/stable-download_repl.zip")));
+		zOut.setLevel(9);
 
-		ZipOutputStream zOutRepl = new ZipOutputStream(new FileOutputStream(new File("stable-download/stable-download_repl.zip")));
-		zOutRepl.setLevel(9);
-
-		zipFolder(zOutRepl, "web", new File("stable-download/web"), true);
-		zipFolder(zOutRepl, "java", new File("stable-download/java"));
-
-		zOutRepl.close();
+		zipFolder(zOut, "web", new File("stable-download/web"), "web/classes.js", "web/eagswebrtc.js", "web/index.html");
+		zipFolder(zOut, "java", new File("stable-download/java"));
+		
+		zOut.putNextEntry(new ZipEntry("web/classes.js"));
+		IOUtils.write(classesJs + "\n" + classesWebRTCJs, zOut, "UTF-8");
+		
+		zOut.putNextEntry(new ZipEntry("web/index.html"));
+		IOUtils.write(FileUtils.readFileToByteArray(new File("zip-generator/repl_index.html")), zOut);
+		
+		zOut.close();
 		
 	}
-
-	private static void zipFolder(ZipOutputStream zOut, String pfx, File file) throws IOException {
-		zipFolder(zOut, pfx, file, false);
+	
+	private static void zipFolder(ZipOutputStream zOut, String pfx, File file, String... exclude) throws IOException {
+		zipFolder0(zOut, file.getAbsolutePath().replace('\\', '/'), pfx, file, exclude);
 	}
-
-	private static void zipFolder(ZipOutputStream zOut, String pfx, File file, boolean repl) throws IOException {
-		zipFolder0(zOut, file.getAbsolutePath().replace('\\', '/'), pfx, file, repl);
-	}
-
-	private static void zipFolder0(ZipOutputStream zOut, String pfx, String writePfx, File file) throws IOException {
-		zipFolder0(zOut, pfx, writePfx, file, false);
-	}
-
-	private static void zipFolder0(ZipOutputStream zOut, String pfx, String writePfx, File file, boolean repl) throws IOException {
-		byte[] replCache = new byte[0];
-		if(writePfx.length() > 0 && !writePfx.endsWith("/")) {
-			writePfx = writePfx + "/";
-		}
+	
+	private static void zipFolder0(ZipOutputStream zOut, String pfx, String writePfx, File file, String... exclude) throws IOException {
 		for(File f : file.listFiles()) {
 			if(f.isDirectory()) {
-				zipFolder0(zOut, pfx, writePfx, f); // do not apply repl boolean to subdirs, as it only happens for this one top level directory in the web folder
+				zipFolder0(zOut, pfx, writePfx, f);
 			}else if(f.isFile()) {
 				String path = f.getAbsolutePath().replace('\\', '/').replace(pfx, "");
 				if(path.startsWith("/")) {
 					path = path.substring(1);
 				}
-				if (repl && (f.getName().equals("classes.js") || f.getName().equals("eagswebrtc.js"))) {
-					if (replCache.length == 0) {
-						replCache = FileUtils.readFileToByteArray(f);
-					} else {
-						System.out.println("Concatenating 'eagswebrtc.js' onto 'classes.js'");
-						byte[] newFile = FileUtils.readFileToByteArray(f);
-						byte[] replCacheCache = replCache;
-						replCache = new byte[replCache.length + 2 + newFile.length];
-						System.arraycopy(replCacheCache, 0, replCache, 0, replCacheCache.length);
-						System.arraycopy(newFile, 0, replCache, replCacheCache.length + 2, newFile.length);
-						// add line breaks between them
-						replCache[replCacheCache.length] = 10;
-						replCache[replCacheCache.length + 1] = 10;
-					}
-				} else {
-					zipFile(zOut, writePfx + path, f);
+				if(writePfx.length() > 0 && !writePfx.endsWith("/")) {
+					writePfx = writePfx + "/";
+				}
+				path = writePfx + path;
+				if(!shouldExclude(path, exclude)) {
+					zipFile(zOut, path, f);
 				}
 			}
 		}
-		if (repl) {
-			zipFile(zOut, writePfx + "classes.js", replCache);
-		}
 	}
-
+	
 	private static void zipFile(ZipOutputStream zOut, String name, File file) throws IOException {
-		zipFile(zOut, name, FileUtils.readFileToByteArray(file));
-	}
-
-	private static void zipFile(ZipOutputStream zOut, String name, byte[] data) throws IOException {
 		zOut.putNextEntry(new ZipEntry(name));
-		IOUtils.write(data, zOut);
+		IOUtils.write(FileUtils.readFileToByteArray(file), zOut);
+	}
+	
+	private static boolean shouldExclude(String name, String... exclude) {
+		for(int i = 0; i < exclude.length; ++i) {
+			if(exclude[i].equalsIgnoreCase(name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
