@@ -15,6 +15,7 @@ import net.md_5.bungee.eaglercraft.WebSocketRateLimiter;
 public class ListenerInfo {
 	private final String hostString;
 	private final InetSocketAddress host;
+	private final InetSocketAddress javaHost;
 	private final String motd;
 	private final int maxPlayers;
 	private final int tabListSize;
@@ -23,6 +24,7 @@ public class ListenerInfo {
 	private final boolean forceDefault;
 	private final boolean websocket;
 	private final boolean forwardIp;
+	private final String forwardIpHeader;
 	private final Map<String, String> forcedHosts;
 	private final TexturePackInfo texturePack;
 	private final Class<? extends TabListHandler> tabList;
@@ -39,11 +41,17 @@ public class ListenerInfo {
 	private final WebSocketRateLimiter rateLimitQuery;
 	
 
-	public ListenerInfo(final String hostString, final InetSocketAddress host, final String motd, final int maxPlayers, final int tabListSize, final String defaultServer, final String fallbackServer, final boolean forceDefault, final boolean websocket,
-			final boolean forwardIp, final Map<String, String> forcedHosts, final TexturePackInfo texturePack, final Class<? extends TabListHandler> tabList, final String serverIcon, final MOTDCacheConfiguration cacheConfig,
-			final boolean allowMOTD, final boolean allowQuery, 	final WebSocketRateLimiter rateLimitIP, final WebSocketRateLimiter rateLimitLogin, final WebSocketRateLimiter rateLimitMOTD, final WebSocketRateLimiter rateLimitQuery) {
+	public ListenerInfo(final String hostString, final InetSocketAddress host, final InetSocketAddress javaHost,
+			final String forwardIpHeader, final String motd, final int maxPlayers, final int tabListSize,
+			final String defaultServer, final String fallbackServer, final boolean forceDefault,
+			final boolean websocket, final boolean forwardIp, final Map<String, String> forcedHosts,
+			final TexturePackInfo texturePack, final Class<? extends TabListHandler> tabList, final String serverIcon,
+			final MOTDCacheConfiguration cacheConfig, final boolean allowMOTD, final boolean allowQuery,
+			final WebSocketRateLimiter rateLimitIP, final WebSocketRateLimiter rateLimitLogin,
+			final WebSocketRateLimiter rateLimitMOTD, final WebSocketRateLimiter rateLimitQuery) {
 		this.hostString = hostString;
 		this.host = host;
+		this.javaHost = javaHost;
 		this.motd = motd;
 		this.maxPlayers = maxPlayers;
 		this.tabListSize = tabListSize;
@@ -52,6 +60,7 @@ public class ListenerInfo {
 		this.forceDefault = forceDefault;
 		this.websocket = websocket;
 		this.forwardIp = forwardIp;
+		this.forwardIpHeader = forwardIpHeader;
 		this.forcedHosts = forcedHosts;
 		this.texturePack = texturePack;
 		this.tabList = tabList;
@@ -74,6 +83,10 @@ public class ListenerInfo {
 
 	public InetSocketAddress getHost() {
 		return this.host;
+	}
+
+	public InetSocketAddress getJavaHost() {
+		return this.javaHost;
 	}
 
 	public String getMotd() {
@@ -271,6 +284,10 @@ public class ListenerInfo {
 
 	public boolean hasForwardedHeaders() {
 		return forwardIp;
+	}
+
+	public String getForwardedIPHeader() {
+		return forwardIpHeader;
 	}
 
 	public String getServerIcon() {

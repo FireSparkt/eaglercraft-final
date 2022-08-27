@@ -173,9 +173,12 @@ public class YamlConfig implements ConfigurationAdapter {
 			final boolean forceDefault = this.get("force_default_server", true, val);
 			final boolean websocket = this.get("websocket", true, val);
 			final boolean forwardIp = this.get("forward_ip", false, val);
+			final String forwardIpHeader = this.get("forward_ip_header", "X-Real-IP", val);
 			final String host = this.get("host", "0.0.0.0:25565", val);
+			final String javaHost = this.get("java_host", "null", val);
 			final int tabListSize = this.get("tab_size", 60, val);
 			final InetSocketAddress address = Util.getAddr(host);
+			final InetSocketAddress javaAddress = (javaHost.equalsIgnoreCase("null") || javaHost == null) ? null : Util.getAddr(javaHost);
 			final Map<String, String> forced = (Map<String, String>) new CaseInsensitiveMap(this.get("forced_hosts", forcedDef, val));
 			final String textureURL = this.get("texture_url", (String) null, val);
 			final int textureSize = this.get("texture_size", 16, val);
@@ -238,8 +241,9 @@ public class YamlConfig implements ConfigurationAdapter {
 			if (value == null) {
 				value = DefaultTabList.GLOBAL_PING;
 			}
-			ret.add(new ListenerInfo(host, address, motd, maxPlayers, tabListSize, defaultServer, fallbackServer, forceDefault, websocket, forwardIp,
-				forced, texture, value.clazz, serverIcon, cacheConfig, allowMOTD, allowQuery, ratelimitIP, ratelimitLogin, ratelimitMOTD, ratelimitQuery));
+			ret.add(new ListenerInfo(host, address, javaAddress, forwardIpHeader, motd, maxPlayers, tabListSize, defaultServer,
+					fallbackServer, forceDefault, websocket, forwardIp, forced, texture, value.clazz, serverIcon, cacheConfig,
+					allowMOTD, allowQuery, ratelimitIP, ratelimitLogin, ratelimitMOTD, ratelimitQuery));
 		}
 		return ret;
 	}

@@ -12,11 +12,18 @@ alert("You're not supposed to 'open' this file in your browser. Please upload th
 window.addEventListener("load", function(){
 window.eaglercraftOpts = {
 container: "game_frame", assetsURI: "assets.epk", serverWorkerURI: "worker_bootstrap.js", worldsFolder: "TEST",
-servers: [ { serverName: "Local Test Server", serverAddress: "localhost:25565", hideAddress: false } ],
+servers: [
+	{ serverName: "Local Test Server", serverAddress: "localhost:25565", hideAddress: false }
+],
+relays: [
+	{ addr: "wss://relay.deev.is/", name: "lax1dude relay #1", primary: true },
+	{ addr: "wss://relay.lax1dude.net/", name: "lax1dude relay #2" },
+	{ addr: "wss://relay.shhnowisnottheti.me/", name: "ayunami relay #1" }
+],
 mainMenu: { splashes: [
 "Darviglet!", "eaglerenophile!", "You Eagler!", "Yeeeeeee!", "yeee",
 "EEEEEEEEE!", "You Darvig!", "You Vigg!", ":>", "|>", "You Yumpster!"
-]}};
+], eaglerLogo: false }};
 (function(){
 var q = window.location.search;
 if(typeof q === 'string' && q.startsWith("?")) {

@@ -67,7 +67,14 @@ public class ServerList {
 				tag.setBoolean("default", true);
 				forcedServers.add(ServerData.getServerDataFromNBTCompound(tag));
 			}
+			
+			// NOTE: Change these asap if one goes down or is replaced, they are used by replits
+			
 			ConfigConstants.relays = new ArrayList();
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", true));
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", false));
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", false));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

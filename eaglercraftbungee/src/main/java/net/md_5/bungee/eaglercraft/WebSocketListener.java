@@ -244,12 +244,12 @@ public class WebSocketListener extends WebSocketServer {
 		}
 		InetAddress addr;
 		if(info.hasForwardedHeaders()) {
-			String s = arg1.getFieldValue("X-Real-IP");
+			String s = arg1.getFieldValue(info.getForwardedIPHeader());
 			if(s != null) {
 				try {
 					addr = InetAddress.getByName(s);
 				}catch(UnknownHostException e) {
-					System.out.println("invalid 'X-Real-IP' header - " + e.toString());
+					System.out.println("invalid '" + info.getForwardedIPHeader() + "' header - " + e.toString());
 					arg0.close();
 					return;
 				}

@@ -19,8 +19,8 @@ public class GuiScreenLicense extends GuiScreen {
 		if(beginOffset < 5) {
 			beginOffset = 5;
 		}
-		this.buttonList.add(new GuiButton(1, this.width / 2 - 120, beginOffset + 180, 115, 20, new String(License.line61)));
-		this.buttonList.add(acceptButton = new GuiButton(2, this.width / 2 + 5, beginOffset + 180, 115, 20, new String(License.line60)));
+		this.buttonList.add(new GuiButton(1, this.width / 2 - 120, beginOffset + 180, 115, 20, new String(GuiScreenChangeWorldTimeout.line61)));
+		this.buttonList.add(acceptButton = new GuiButton(2, this.width / 2 + 5, beginOffset + 180, 115, 20, new String(GuiScreenChangeWorldTimeout.line60)));
 		acceptButton.enabled = false;
 	}
 	
@@ -43,24 +43,24 @@ public class GuiScreenLicense extends GuiScreen {
 		
 		EaglerAdapter.glPushMatrix();
 		EaglerAdapter.glScalef(1.33f, 1.33f, 1.33f);
-		drawCenteredString(fontRenderer, new String(License.line00), width * 3 / 8, beginOffset * 3 / 4, 0xDDDD55);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line00), width * 3 / 8, beginOffset * 3 / 4, 0xDDDD55);
 		EaglerAdapter.glPopMatrix();
 		
-		drawCenteredString(fontRenderer, new String(License.line10), width / 2, beginOffset + 22, 0xFF7777);
-		drawCenteredString(fontRenderer, new String(License.line11), width / 2, beginOffset + 33, 0xFF7777);
-		drawCenteredString(fontRenderer, new String(License.line12), width / 2, beginOffset + 44, 0xFF7777);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line10), width / 2, beginOffset + 22, 0xFF7777);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line11), width / 2, beginOffset + 33, 0xFF7777);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line12), width / 2, beginOffset + 44, 0xFF7777);
 
-		drawCenteredString(fontRenderer, new String(License.line20), width / 2, beginOffset + 62, 0x448844);
-		drawCenteredString(fontRenderer, new String(License.line21), width / 2, beginOffset + 71, 0x448844);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line20), width / 2, beginOffset + 62, 0x448844);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line21), width / 2, beginOffset + 71, 0x448844);
 
 		EaglerAdapter.glPushMatrix();
 		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
-		drawCenteredString(fontRenderer, new String(License.line30), width * 4 / 6, (beginOffset + 89) * 4 / 3, 0x666666);
-		drawCenteredString(fontRenderer, new String(License.line31), width * 4 / 6, (beginOffset + 97) * 4 / 3, 0x999999);
-		drawCenteredString(fontRenderer, new String(License.line32), width * 4 / 6, (beginOffset + 105) * 4 / 3, 0x999999);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line30), width * 4 / 6, (beginOffset + 89) * 4 / 3, 0x666666);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line31), width * 4 / 6, (beginOffset + 97) * 4 / 3, 0x999999);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line32), width * 4 / 6, (beginOffset + 105) * 4 / 3, 0x999999);
 		EaglerAdapter.glPopMatrix();
 		
-		drawCenteredString(fontRenderer, new String(License.line40), width / 2, beginOffset + 120, 0xFF7777);
+		drawCenteredString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line40), width / 2, beginOffset + 120, 0xFF7777);
 		
 		boolean mouseOverCheck = width / 2 - 100 < mx && width / 2 - 83 > mx && beginOffset + 142 < my && beginOffset + 159 > my;
 		
@@ -87,7 +87,7 @@ public class GuiScreenLicense extends GuiScreen {
 		
 		EaglerAdapter.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		
-		drawString(fontRenderer, new String(License.line50), width / 2 - 75, beginOffset + 147, 0xEEEEEE);
+		drawString(fontRenderer, new String(GuiScreenChangeWorldTimeout.line50), width / 2 - 75, beginOffset + 147, 0xEEEEEE);
 	}
 	
 	protected void mouseClicked(int par1, int par2, int par3) {

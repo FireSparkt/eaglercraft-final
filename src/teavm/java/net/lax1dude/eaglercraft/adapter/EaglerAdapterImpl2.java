@@ -366,9 +366,11 @@ public class EaglerAdapterImpl2 {
 		voiceClient = startVoiceClient();
 		rtcLANClient = startRTCLANClient();
 		
-		if(integratedServerScript != null) {
+		//todo: safely skip startRTCLANServer() if the integrated server is disabled:
+		
+		//if(integratedServerScript != null) {
 			rtcLANServer = startRTCLANServer();
-		}
+		//}
 		
 		downloadAssetPack(assetPackageURI);
 		
