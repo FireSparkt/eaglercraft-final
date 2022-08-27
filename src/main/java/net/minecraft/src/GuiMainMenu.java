@@ -215,7 +215,9 @@ public class GuiMainMenu extends GuiScreen {
 				}
 				w = this.fontRenderer.getStringWidth("debug console") * 3 / 4;
 				if(par1 >= 0 && par1 <= (w + 4) && par2 >= 0 && par2 <= 9) {
+					/*
 					EaglerAdapter.openConsole();
+					*/
 				}
 				if(ConfigConstants.mainMenuItemLink != null) {
 					//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);
@@ -537,6 +539,7 @@ public class GuiMainMenu extends GuiScreen {
 		this.drawString(this.fontRenderer, var10, 0, 0, 16777215);
 		EaglerAdapter.glPopMatrix();
 		
+		/*
 		var10 = "debug console";
 		w = this.fontRenderer.getStringWidth(var10) * 3 / 4;
 		if(!showAck && par1 >= 0 && par1 <= (w + 4) && par2 >= 0 && par2 <= 9) {
@@ -549,6 +552,7 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glScalef(0.75f, 0.75f, 0.75f);
 		this.drawString(this.fontRenderer, var10, 0, 0, 16777215);
 		EaglerAdapter.glPopMatrix();
+		*/
 		
 		if(ConfigConstants.mainMenuItemLink != null) {
 			//drawRect((this.width - w - 4), 0, this.width, 9, 0x55200000);

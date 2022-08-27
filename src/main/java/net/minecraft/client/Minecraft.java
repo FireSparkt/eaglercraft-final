@@ -355,12 +355,6 @@ public class Minecraft implements Runnable {
 		}
 	}
 	
-	public void showWarningText() {
-		ScaledResolution var1 = new ScaledResolution(this.gameSettings, this.displayWidth, this.displayHeight);
-		String s = "warning: early beta, major problems will arise";
-		this.fontRenderer.drawString(s, (var1.getScaledWidth() - this.fontRenderer.getStringWidth(s)) / 2, var1.getScaledHeight() - 50, 0xffcccccc);
-	}
-	
 	private void showIntroAnimation() {
 		ScaledResolution var1 = new ScaledResolution(this.gameSettings, this.displayWidth, this.displayHeight);
 		EaglerAdapter.glClearColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -399,8 +393,6 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glScalef(f1, f1, 1.0f);
 			this.scaledTessellator(0, 0, 0, 0, 256, 256);
 			EaglerAdapter.glPopMatrix();
-			
-			showWarningText();
 
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
@@ -438,8 +430,6 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glScalef(f1, f1, 1.0f);
 			this.scaledTessellator(0, 0, 0, 0, 256, 256);
 			EaglerAdapter.glPopMatrix();
-			
-			showWarningText();
 
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
@@ -479,8 +469,6 @@ public class Minecraft implements Runnable {
 			EaglerAdapter.glScalef(f1, f1, 1.0f);
 			this.scaledTessellator(0, 0, 0, 0, 256, 256);
 			EaglerAdapter.glPopMatrix();
-			
-			showWarningText();
 
 			EaglerAdapter.glFlush();
 			EaglerAdapter.updateDisplay();
@@ -496,7 +484,6 @@ public class Minecraft implements Runnable {
 		}
 		
 		EaglerAdapter.glClear(EaglerAdapter.GL_COLOR_BUFFER_BIT | EaglerAdapter.GL_DEPTH_BUFFER_BIT);
-		showWarningText();
 		EaglerAdapter.glFlush();
 		EaglerAdapter.updateDisplay();
 		

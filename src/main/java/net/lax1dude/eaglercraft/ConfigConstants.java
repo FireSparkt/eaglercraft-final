@@ -6,10 +6,10 @@ public class ConfigConstants {
 	
 	public static boolean profanity = false;
 
-	public static final String version = "SP-SNAPSHOT-04";
+	public static final String version = "22w35a";
 	public static final String mainMenuString = "eaglercraft " + version;
 	
-	public static final String forkMe = "https://github.com/LAX1DUDE/eaglercraft";
+	public static final String forkMe = "https://github.com/lax1dude/eaglercraft";
 
 	public static final boolean html5build = true;
 	
