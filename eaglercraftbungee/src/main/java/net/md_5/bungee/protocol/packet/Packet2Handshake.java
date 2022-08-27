@@ -45,6 +45,14 @@ public class Packet2Handshake extends DefinedPacket {
 		this.procolVersion = (byte)b;
 	}
 
+	public void setHost(String h) {
+		this.host = h;
+	}
+
+	public void setPort(int p) {
+		this.port = p;
+	}
+
 	public String getUsername() {
 		return this.username;
 	}
