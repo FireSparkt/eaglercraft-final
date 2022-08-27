@@ -36,7 +36,7 @@ public class EaglerSPRelayConfig {
 	private String originWhitelist = "";
 	private String[] originWhitelistArray = new String[0];
 	private boolean enableRealIpHeader = false;
-	private String realIpHeaderName = "CF-Connecting-IP";
+	private String realIpHeaderName = "X-Real-IP";
 	private boolean enableShowLocals = true;
 	private String serverComment = "Eags. Public LAN Relay";
 
