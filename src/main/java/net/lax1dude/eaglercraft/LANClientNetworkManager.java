@@ -244,6 +244,8 @@ public class LANClientNetworkManager implements INetworkManager {
 		// no
 	}
 
+	private byte[] fragmentedPacket = new byte[0];
+
 	@Override
 	public void processReadPackets() {
 		
@@ -260,7 +262,25 @@ public class LANClientNetworkManager implements INetworkManager {
 		if(this.theNetHandler != null) {
 			byte[] data;
 			while((data = EaglerAdapter.clientLANReadPacket()) != null) {
-				ByteArrayInputStream bai = new ByteArrayInputStream(data);
+				byte[] fullData;
+
+				if (data[0] == 0) {
+					fullData = new byte[fragmentedPacket.length + data.length - 1];
+					System.arraycopy(fragmentedPacket, 0, fullData, 0, fragmentedPacket.length);
+					System.arraycopy(data, 1, fullData, fragmentedPacket.length, data.length - 1);
+					fragmentedPacket = new byte[0];
+				} else if (data[0] == 1) {
+					fullData = new byte[fragmentedPacket.length + data.length - 1];
+					System.arraycopy(fragmentedPacket, 0, fullData, 0, fragmentedPacket.length);
+					System.arraycopy(data, 1, fullData, fragmentedPacket.length, data.length - 1);
+					fragmentedPacket = fullData;
+					continue;
+				} else {
+					continue;
+				}
+
+				ByteArrayInputStream bai = new ByteArrayInputStream(fullData);
+
 				int pktId = bai.read();
 				
 				if(pktId == -1) {
@@ -274,7 +294,7 @@ public class LANClientNetworkManager implements INetworkManager {
 					System.err.println("Recieved invalid '" + pktId + "' packet");
 					continue;
 				}
-				
+
 				try {
 					pkt.readPacketData(new DataInputStream(bai));
 					pkt.processPacket(theNetHandler);

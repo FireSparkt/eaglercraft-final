@@ -23,7 +23,7 @@ public class LANServerList {
 	public void update() {
 		long millis = System.currentTimeMillis();
 		if(millis - lastRefresh > 10000l) {
-			if(++refreshCounter < 25) {
+			if(++refreshCounter < 10) {
 				refresh();
 			}else {
 				lastRefresh = millis;

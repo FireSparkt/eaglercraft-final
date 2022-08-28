@@ -3919,10 +3919,26 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 
+	private static final int fragmentSize = 16384;
+
 	public static final void serverLANWritePacket(String peer, byte[] data) {
-		ArrayBuffer arr = ArrayBuffer.create(data.length);
-		Uint8Array.create(arr).set(data);
-		rtcLANServer.sendPacketToRemoteClient(peer, arr);
+		if (data.length > fragmentSize) {
+			for (int i = 0; i < data.length; i += fragmentSize) {
+				byte[] fragData = new byte[((i + fragmentSize > data.length) ? (data.length % fragmentSize) : fragmentSize) + 1];
+				System.arraycopy(data, i, fragData, 1, fragData.length - 1);
+				fragData[0] = (i + fragmentSize < data.length) ? (byte) 1 : (byte) 0;
+				ArrayBuffer arr = ArrayBuffer.create(fragData.length);
+				Uint8Array.create(arr).set(fragData);
+				rtcLANServer.sendPacketToRemoteClient(peer, arr);
+			}
+		} else {
+			byte[] sendData = new byte[data.length + 1];
+			sendData[0] = 0;
+			System.arraycopy(data, 0, sendData, 1, data.length);
+			ArrayBuffer arr = ArrayBuffer.create(sendData.length);
+			Uint8Array.create(arr).set(sendData);
+			rtcLANServer.sendPacketToRemoteClient(peer, arr);
+		}
 	}
 	
 	public static final void serverLANCreatePeer(String peer) {
