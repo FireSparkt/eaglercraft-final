@@ -559,6 +559,8 @@ public class GameSettings {
 			KeyBinding.resetKeyBindingArrayAndHash();
 
 			IntegratedServer.relayManager.load(LocalStorageManager.gameSettingsStorage.getTagList("relays"));
+		}else {
+			IntegratedServer.relayManager.load(null);
 		}
 	}
 

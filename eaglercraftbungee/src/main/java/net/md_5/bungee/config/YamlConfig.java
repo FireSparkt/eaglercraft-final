@@ -346,6 +346,11 @@ public class YamlConfig implements ConfigurationAdapter {
 		Collection<String> c = this.get("voice_stun_servers", null);
 		if(c == null) {
 			c = new ArrayList();
+			c.add("stun:stun.l.google.com:19302");
+			c.add("stun:stun1.l.google.com:19302");
+			c.add("stun:stun2.l.google.com:19302");
+			c.add("stun:stun3.l.google.com:19302");
+			c.add("stun:stun4.l.google.com:19302");
 			c.add("stun:openrelay.metered.ca:80");
 			c = this.get("voice_stun_servers", c);
 		}

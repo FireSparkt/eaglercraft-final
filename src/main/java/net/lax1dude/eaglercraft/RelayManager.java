@@ -20,7 +20,7 @@ public class RelayManager {
 	
 	public void load(NBTTagList relayConfig) {
 		relays.clear();
-		if(relayConfig.tagCount() > 0) {
+		if(relayConfig != null && relayConfig.tagCount() > 0) {
 			boolean gotAPrimary = false;
 			for(int i = 0, l = relayConfig.tagCount(); i < l; ++i) {
 				NBTBase relay = relayConfig.tagAt(i);

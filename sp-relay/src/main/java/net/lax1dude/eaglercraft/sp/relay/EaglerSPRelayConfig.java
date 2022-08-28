@@ -282,7 +282,7 @@ public class EaglerSPRelayConfig {
 			String[] splitted = originWhitelist.split(";");
 			List<String> splittedList = new ArrayList();
 			for(int i = 0; i < splitted.length; ++i) {
-				splitted[i] = splitted[i].trim();
+				splitted[i] = splitted[i].trim().toLowerCase();
 				if(splitted[i].length() > 0) {
 					splittedList.add(splitted[i]);
 				}
@@ -412,20 +412,37 @@ public class EaglerSPRelayConfig {
 	}
 	
 	public boolean getIsWhitelisted(String domain) {
-		domain = domain.toLowerCase();
-		for(int i = 0; i < originWhitelistArray.length; ++i) {
-			String etr = originWhitelistArray[i].toLowerCase();
-			if(etr.startsWith("*")) {
-				if(domain.endsWith(etr.substring(1))) {
-					return true;
-				}
+		if(originWhitelistArray.length == 0) {
+			return true;
+		}else {
+			if(domain == null) {
+				domain = "null";
 			}else {
-				if(domain.equals(etr)) {
-					return true;
+				domain = domain.toLowerCase();
+				if(domain.equals("null")) {
+					domain = "offline";
+				}else {
+					if(domain.startsWith("http://")) {
+						domain = domain.substring(7);
+					}else if(domain.startsWith("https://")) {
+						domain = domain.substring(8);
+					}
 				}
 			}
+			for(int i = 0; i < originWhitelistArray.length; ++i) {
+				String etr = originWhitelistArray[i].toLowerCase();
+				if(etr.startsWith("*")) {
+					if(domain.endsWith(etr.substring(1))) {
+						return true;
+					}
+				}else {
+					if(domain.equals(etr)) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
-		return false;
 	}
 
 	public String getRealIPHeaderName() {

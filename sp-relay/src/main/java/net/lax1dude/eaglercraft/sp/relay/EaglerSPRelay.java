@@ -158,6 +158,11 @@ public class EaglerSPRelay extends WebSocketServer {
 	
 	@Override
 	public void onOpen(WebSocket arg0, ClientHandshake arg1) {
+		if(!config.getIsWhitelisted(arg1.getFieldValue("origin"))) {
+			arg0.close();
+			return;
+		}
+		
 		String addr;
 		long millis = System.currentTimeMillis();
 		if(config.isEnableRealIpHeader() && arg1.hasFieldValue(config.getRealIPHeaderName())) {
