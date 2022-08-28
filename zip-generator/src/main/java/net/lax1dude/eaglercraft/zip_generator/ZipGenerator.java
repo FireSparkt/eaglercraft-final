@@ -100,11 +100,22 @@ public class ZipGenerator {
 		zOut = new ZipOutputStream(new FileOutputStream(new File("stable-download/stable-download_repl.zip")));
 		zOut.setLevel(9);
 
-		zipFolder(zOut, "web", new File("stable-download/web"), "web/classes.js", "web/eagswebrtc.js", "web/index.html");
+		zipFolder(zOut, "web", new File("stable-download/web"), "web/classes.js", "web/classes_server.js",
+				"web/worker_bootstrap.js", "web/eagswebrtc.js", "web/index.html", "web/classes.js.map",
+				"web/classes_server.js.map");
+		
 		zipFolder(zOut, "java", new File("stable-download/java"));
 		
 		zOut.putNextEntry(new ZipEntry("web/classes.js"));
 		IOUtils.write(classesJs + "\n" + classesWebRTCJs, zOut, "UTF-8");
+		
+		if(classesServerJs.startsWith("\"use strict\";")) {
+			classesServerJs = classesServerJs.substring(13).trim();
+		}
+		
+		zOut.putNextEntry(new ZipEntry("web/worker_bootstrap.js"));
+		IOUtils.write(FileUtils.readFileToString(new File("zip-generator/repl_worker_bootstrap.js"), "UTF-8")
+				.replace("${classes_server}", classesServerJs), zOut, "UTF-8");
 		
 		zOut.putNextEntry(new ZipEntry("web/index.html"));
 		IOUtils.write(FileUtils.readFileToByteArray(new File("zip-generator/repl_index.html")), zOut);
