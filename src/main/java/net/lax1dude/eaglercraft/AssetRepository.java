@@ -10,10 +10,29 @@ import java.util.HashMap;
 import com.jcraft.jzlib.CRC32;
 import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.InflaterInputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class AssetRepository {
 	
 	private static final HashMap<String,byte[]> filePool = new HashMap();
+	public static final HashMap<String, String> fileNameOverrides = new HashMap();
+
+	public static final void loadOverrides(JSONObject json) {
+		JSONObject overrides = json.optJSONObject("assetOverrides", null);
+		if (overrides != null) {
+			for (String fileName : overrides.keySet()) {
+				if(fileName.startsWith("/")) fileName = fileName.substring(1);
+				String val = overrides.optString(fileName, null);
+				if (val != null) {
+					AssetRepository.fileNameOverrides.put(fileName, val);
+					if (!fileName.toLowerCase().endsWith(".mp3")) {
+						loadFromURL(fileName, val);
+					}
+				}
+			}
+		}
+	}
 	
 	public static final void install(byte[] pkg) throws IOException {
 		ByteArrayInputStream in = new ByteArrayInputStream(pkg);
@@ -207,6 +226,10 @@ public class AssetRepository {
 	public static final byte[] getResource(String path) {
 		if(path.startsWith("/")) path = path.substring(1);
 		return filePool.get(path);
+	}
+
+	public static final void loadFromURL(String path, String url) {
+		filePool.put(path, EaglerAdapter.downloadURL(url));
 	}
 
 }

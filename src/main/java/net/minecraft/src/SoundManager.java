@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 
@@ -41,12 +42,14 @@ public class SoundManager {
 	private GameSettings options;
 	private ArrayList<EntitySoundEvent> soundevents;
 	private ArrayList<QueuedSoundEvent> queuedsoundevents;
+	private ArrayList<Integer> activerecords;
 	private HashMap<String,Integer> sounddefinitions;
 	private EaglercraftRandom soundrandom;
 
 	public SoundManager() {
 		this.soundevents = new ArrayList();
 		this.queuedsoundevents = new ArrayList();
+		this.activerecords = new ArrayList();
 		this.sounddefinitions = null;
 		this.soundrandom = new EaglercraftRandom();
 	}
@@ -78,6 +81,7 @@ public class SoundManager {
 	 * Called when one of the sound level options has changed.
 	 */
 	public void onSoundOptionsChanged() {
+		EaglerAdapter.setMusicVolume(options.musicVolume);
 		EaglerAdapter.setMasterVolume(options.soundVolume);
 	}
 
@@ -123,10 +127,29 @@ public class SoundManager {
 		for(EntitySoundEvent e : soundevents) {
 			EaglerAdapter.endSound(e.id);
 		}
+		for(Integer i : activerecords) {
+			EaglerAdapter.endSound(i.intValue());
+		}
 	}
 
 	public void playStreaming(String par1Str, float par2, float par3, float par4) {
+		playStreaming(par1Str, par2, par3, par4, false);
+	}
 
+	public void playStreaming(String par1Str, float par2, float par3, float par4, boolean music) {
+		for (Integer record : activerecords) {
+			EaglerAdapter.endSound(record.intValue());
+		}
+		activerecords.clear();
+		if (par1Str != null) {
+			String path = "/records/" + par1Str.replace('.', '/') + ".mp3";
+			int snd = EaglerAdapter.beginPlayback(path, par2, par3, par4, 1.0F, 1.0F, music);
+			if (snd != -1) {
+				activerecords.add(new Integer(snd));
+			} else {
+				System.err.println("unregistered record: "+par1Str);
+			}
+		}
 	}
 
 	/**
@@ -327,7 +350,7 @@ public class SoundManager {
 	
 	public void playTheTitleMusic() {
 		if(titleMusic == -1 || !EaglerAdapter.isPlaying(titleMusic)) {
-			titleMusic = EaglerAdapter.beginPlaybackStatic("/sounds/gta.mp3", 1.0f, 1.0f);
+			titleMusic = EaglerAdapter.beginPlaybackStatic("/sounds/gta.mp3", 1.0f, 1.0f, true);
 		}
 	}
 	

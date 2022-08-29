@@ -72,6 +72,7 @@ public class Client {
 
 		registerErrorHandler();
 		ServerList.loadDefaultServers(conf);
+		AssetRepository.loadOverrides(conf);
 		LocalStorageManager.loadStorage();
 
 		run0();

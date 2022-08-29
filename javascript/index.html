@@ -12,6 +12,9 @@ alert("You're not supposed to 'open' this file in your browser. Please upload th
 window.addEventListener("load", function(){
 window.eaglercraftOpts = {
 container: "game_frame", assetsURI: "assets.epk", serverWorkerURI: "worker_bootstrap.js", worldsFolder: "TEST",
+assetOverrides: {
+"records/wait.mp3": "wait.mp3"
+},
 servers: [
 	{ serverName: "Local Test Server", serverAddress: "localhost:25565", hideAddress: false }
 ],
