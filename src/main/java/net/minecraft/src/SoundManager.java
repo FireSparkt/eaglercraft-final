@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 
@@ -59,6 +58,7 @@ public class SoundManager {
 	 */
 	public void loadSoundSettings(GameSettings par1GameSettings) {
 		this.options = par1GameSettings;
+		EaglerAdapter.setMusicVolume(options.musicVolume);
 		EaglerAdapter.setMasterVolume(options.soundVolume);
 		if(this.sounddefinitions == null) {
 			this.sounddefinitions = new HashMap();
@@ -82,6 +82,7 @@ public class SoundManager {
 	 */
 	public void onSoundOptionsChanged() {
 		EaglerAdapter.setMusicVolume(options.musicVolume);
+		EaglerAdapter.fireTitleMusicEvent(titleMusic != -1, options.musicVolume);
 		EaglerAdapter.setMasterVolume(options.soundVolume);
 	}
 
@@ -351,12 +352,14 @@ public class SoundManager {
 	public void playTheTitleMusic() {
 		if(titleMusic == -1 || !EaglerAdapter.isPlaying(titleMusic)) {
 			titleMusic = EaglerAdapter.beginPlaybackStatic("/sounds/gta.mp3", 1.0f, 1.0f, true);
+			EaglerAdapter.fireTitleMusicEvent(true, this.options.musicVolume);
 		}
 	}
 	
 	public void stopTheTitleMusic() {
 		if(EaglerAdapter.isPlaying(titleMusic)) {
 			EaglerAdapter.endSound(titleMusic);
+			EaglerAdapter.fireTitleMusicEvent(false, this.options.musicVolume);
 		}
 		titleMusic = -1;
 	}

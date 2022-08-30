@@ -21,6 +21,7 @@ import net.md_5.bungee.protocol.packet.Packet0DPositionAndLook;
 import net.md_5.bungee.protocol.packet.Packet3Chat;
 import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
 import net.md_5.bungee.protocol.packet.PacketCCSettings;
+// import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
 
 public class AuthHandler extends PacketHandler {
 	private static final AuthSystem authSystem = BungeeCord.getInstance().authSystem;
@@ -76,6 +77,13 @@ public class AuthHandler extends PacketHandler {
 			this.con.setPing(newPing);
 		}
 	}
+
+	/*
+	@Override
+	public void handle(final PacketFAPluginMessage pm) throws Exception {
+		this.con.getPendingConnection().handle(pm);
+	}
+	*/
 
 	@Override
 	public void handle(final Packet3Chat chat) throws Exception {
@@ -137,7 +145,7 @@ public class AuthHandler extends PacketHandler {
 		}
 	}
 
-	private void onLogin() {
+	private void onLogin() throws Exception {
 		this.loggedIn = true;
 		this.bungee.getPluginManager().callEvent(new PostLoginEvent(this.con));
 		handlerBoss.setHandler(new UpstreamBridge(this.bungee, this.con));

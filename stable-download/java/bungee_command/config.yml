@@ -60,7 +60,7 @@ servers:
     address: localhost:25569
     restricted: false
 origin_blacklist_block_offline_download: false
-origin_blacklist_block_missing_origin_header: false
+origin_blacklist_block_missing_origin_header: true
 permissions:
   default:
   - bungeecord.command.server

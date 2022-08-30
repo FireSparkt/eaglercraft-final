@@ -102,7 +102,6 @@ import net.lax1dude.eaglercraft.RelayServerSocket;
 import net.lax1dude.eaglercraft.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.ServerQuery;
 import net.lax1dude.eaglercraft.Voice;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANClient;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftLANServer;
 import net.lax1dude.eaglercraft.adapter.teavm.EaglercraftVoiceClient;
@@ -1989,11 +1988,34 @@ public class EaglerAdapterImpl2 {
 		playbackOffsetDelay = f;
 	}
 
+	private static final void setGainlessAudioVolume(float oldGain, float f, boolean music) {
+		if (f != oldGain) {
+			for (AudioSourceNodeX a : activeSoundEffects.values()) {
+				if (a.music == music && a instanceof MediaElementAudioSourceNodeX && a.gain == null) {
+					HTMLAudioElement aud = ((MediaElementAudioSourceNodeX) a).audio;
+					float newVolume = 0.5F;
+					if (oldGain == 0) {
+						aud.setMuted(false);
+						newVolume = f * aud.getVolume();
+					} else if (f == 0) {
+						aud.setMuted(true);
+						newVolume = aud.getVolume() / oldGain;
+					} else {
+						newVolume = f * aud.getVolume() / oldGain;
+					}
+					aud.setVolume(newVolume > 1.0f ? 1.0f : newVolume);
+				}
+			}
+		}
+	}
+
 	public static final void setMasterVolume(float f) {
+		setGainlessAudioVolume(masterVolumeNode.getGain().getValue(), f, false);
 		masterVolumeNode.getGain().setValue(f);
 	}
 
 	public static final void setMusicVolume(float f) {
+		setGainlessAudioVolume(musicVolumeNode.getGain().getValue(), f, true);
 		musicVolumeNode.getGain().setValue(f);
 	}
 	
@@ -2026,16 +2048,18 @@ public class EaglerAdapterImpl2 {
 	private static class AudioSourceNodeX {
 		private final PannerNode panner;
 		private final GainNode gain;
-		private AudioSourceNodeX(PannerNode panner, GainNode gain) {
+		private final boolean music;
+		private AudioSourceNodeX(PannerNode panner, GainNode gain, boolean music) {
 			this.panner = panner;
 			this.gain = gain;
+			this.music = music;
 		}
 	}
 
 	private static class AudioBufferSourceNodeX extends AudioSourceNodeX {
 		private final AudioBufferSourceNode source;
-		private AudioBufferSourceNodeX(AudioBufferSourceNode source, PannerNode panner, GainNode gain) {
-			super(panner, gain);
+		private AudioBufferSourceNodeX(AudioBufferSourceNode source, PannerNode panner, GainNode gain, boolean music) {
+			super(panner, gain, music);
 			this.source = source;
 		}
 	}
@@ -2043,12 +2067,15 @@ public class EaglerAdapterImpl2 {
 	private static class MediaElementAudioSourceNodeX extends AudioSourceNodeX {
 		private final MediaElementAudioSourceNode source;
 		private final HTMLAudioElement audio;
-		private MediaElementAudioSourceNodeX(MediaElementAudioSourceNode source, HTMLAudioElement audio, PannerNode panner, GainNode gain) {
-			super(panner, gain);
+		private MediaElementAudioSourceNodeX(MediaElementAudioSourceNode source, HTMLAudioElement audio, PannerNode panner, GainNode gain, boolean music) {
+			super(panner, gain, music);
 			this.source = source;
 			this.audio = audio;
 		}
 	}
+
+	@JSBody(params = { "playing", "volume" }, script = "window.dispatchEvent(new CustomEvent('eagTitleMusic', { detail: { playing: playing, volume: volume } }));return;")
+	public static native void fireTitleMusicEvent(boolean playing, float volume);
 	
 	private static final AudioBuffer getBufferFor(String fileName) {
 		AudioBufferX ret = loadedSoundFiles.get(fileName);
@@ -2075,6 +2102,7 @@ public class EaglerAdapterImpl2 {
 		if (usingUrl) {
 			audioElement = (HTMLAudioElement) win.getDocument().createElement("audio");
 			audioElement.setAutoplay(true);
+			audioElement.setCrossOrigin("anonymous");
 			audioElement.setSrc(fileName);
 			s = audioctx.createMediaElementSource(audioElement);
 			audioElement.setPlaybackRate(pitch);
@@ -2108,7 +2136,7 @@ public class EaglerAdapterImpl2 {
 		}
 		final int theId = ++playbackId;
 		if (usingUrl) {
-			activeSoundEffects.put(theId, new MediaElementAudioSourceNodeX((MediaElementAudioSourceNode) s, audioElement, p, g));
+			activeSoundEffects.put(theId, new MediaElementAudioSourceNodeX((MediaElementAudioSourceNode) s, audioElement, p, g, music));
 			audioElement.addEventListener("canplay", new EventListener<Event>() {
 				@Override
 				public void handleEvent(Event evt) {
@@ -2124,7 +2152,7 @@ public class EaglerAdapterImpl2 {
 				}
 			});
 		} else {
-			activeSoundEffects.put(theId, new AudioBufferSourceNodeX((AudioBufferSourceNode) s, p, g));
+			activeSoundEffects.put(theId, new AudioBufferSourceNodeX((AudioBufferSourceNode) s, p, g, music));
 			((AudioBufferSourceNode) s).setOnEnded(new EventListener<MediaEvent>() {
 				@Override
 				public void handleEvent(MediaEvent evt) {
@@ -2140,15 +2168,16 @@ public class EaglerAdapterImpl2 {
 	public static final int beginPlaybackStatic(String fileNamePre, float volume, float pitch, boolean music) {
 		if(fileNamePre.startsWith("/")) fileNamePre = fileNamePre.substring(1);
 		String fileName = AssetRepository.fileNameOverrides.getOrDefault(fileNamePre, fileNamePre);
-		AudioNode s;
+		AudioNode s = null;
+		GainNode g = null;
 		HTMLAudioElement audioElement = null;
 		String lowerFileName = fileName.toLowerCase();
 		boolean usingUrl = AssetRepository.fileNameOverrides.containsKey(fileNamePre) || lowerFileName.startsWith("http://") || lowerFileName.startsWith("https://") || lowerFileName.startsWith("blob:") || lowerFileName.startsWith("data:");
 		if (usingUrl) {
 			audioElement = (HTMLAudioElement) win.getDocument().createElement("audio");
 			audioElement.setAutoplay(true);
+			// audioElement.setCrossOrigin("anonymous");
 			audioElement.setSrc(fileName);
-			s = audioctx.createMediaElementSource(audioElement);
 			audioElement.setPlaybackRate(pitch);
 		} else {
 			AudioBuffer b = getBufferFor(fileName);
@@ -2156,17 +2185,16 @@ public class EaglerAdapterImpl2 {
 			s = audioctx.createBufferSource();
 			((AudioBufferSourceNode) s).setBuffer(b);
 			((AudioBufferSourceNode) s).getPlaybackRate().setValue(pitch);
-		}
-		GainNode g = audioctx.createGain();
-		g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
-		s.connect(g);
-		g.connect(music ? musicVolumeNode : masterVolumeNode);
-		if (!usingUrl) {
+			g = audioctx.createGain();
+			g.getGain().setValue(volume > 1.0f ? 1.0f : volume);
+			s.connect(g);
+			g.connect(music ? musicVolumeNode : masterVolumeNode);
 			((AudioBufferSourceNode) s).start(0.0d, playbackOffsetDelay);
 		}
+
 		final int theId = ++playbackId;
 		if (usingUrl) {
-			activeSoundEffects.put(theId, new MediaElementAudioSourceNodeX(((MediaElementAudioSourceNode) s), audioElement, null, g));
+			activeSoundEffects.put(theId, new MediaElementAudioSourceNodeX(null, audioElement, null, null, music));
 			audioElement.addEventListener("canplay", new EventListener<Event>() {
 				@Override
 				public void handleEvent(Event evt) {
@@ -2182,7 +2210,7 @@ public class EaglerAdapterImpl2 {
 				}
 			});
 		} else {
-			activeSoundEffects.put(theId, new AudioBufferSourceNodeX(((AudioBufferSourceNode) s), null, g));
+			activeSoundEffects.put(theId, new AudioBufferSourceNodeX(((AudioBufferSourceNode) s), null, g, music));
 			((AudioBufferSourceNode) s).setOnEnded(new EventListener<MediaEvent>() {
 				@Override
 				public void handleEvent(MediaEvent evt) {
@@ -2205,8 +2233,22 @@ public class EaglerAdapterImpl2 {
 	public static final void setVolume(int id, float volume) {
 		AudioSourceNodeX a = activeSoundEffects.get(id);
 		if(a != null) {
-			a.gain.getGain().setValue(volume > 1.0f ? 1.0f : volume);
-			if(a.panner != null) a.panner.setMaxDistance(volume * 16f + 0.1f);
+			if (a instanceof MediaElementAudioSourceNodeX && a.gain == null) {
+				HTMLAudioElement audioElem = ((MediaElementAudioSourceNodeX) a).audio;
+				float gainValue = (a.music ? musicVolumeNode : masterVolumeNode).getGain().getValue();
+				float newVolume;
+				if (gainValue == 0) {
+					audioElem.setMuted(true);
+					newVolume = volume;
+				} else {
+					audioElem.setMuted(false);
+					newVolume = gainValue * volume;
+				}
+				audioElem.setVolume(newVolume > 1.0f ? 1.0f : volume);
+			} else {
+				a.gain.getGain().setValue(volume > 1.0f ? 1.0f : volume);
+				if (a.panner != null) a.panner.setMaxDistance(volume * 16f + 0.1f);
+			}
 		}
 	}
 	public static final void moveSound(int id, float x, float y, float z, float vx, float vy, float vz) {
@@ -3858,7 +3900,7 @@ public class EaglerAdapterImpl2 {
 	private static String clientICECandidate = null;
 	private static String clientDescription = null;
 	private static boolean clientDataChannelOpen = false;
-	private static boolean clientDataChannelClosed = false;
+	private static boolean clientDataChannelClosed = true;
 	
 	public static final boolean clientLANSupported() {
 		return rtcLANClient.LANClientSupported();
