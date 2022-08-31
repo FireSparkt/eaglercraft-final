@@ -39,6 +39,7 @@ public class Configuration {
 	private boolean acceptBukkitConsoleCommandPacket;
 	private Collection<String> disabledCommands;
 	private Collection<String> iceServers;
+	private boolean bungeeOnBungee;
 
 	public Configuration() {
 		this.timeout = 30000;
@@ -73,6 +74,7 @@ public class Configuration {
 		this.blacklistOriginless = adapter.getBoolean("origin_blacklist_block_missing_origin_header", true);
 		this.simpleWhitelistEnabled = adapter.getBoolean("origin_blacklist_use_simple_whitelist", false);
 		this.acceptBukkitConsoleCommandPacket = adapter.getBoolean("accept_bukkit_console_command_packets", false);
+		this.bungeeOnBungee = adapter.getBoolean("bungee_on_bungee", false);
 		this.disabledCommands = adapter.getDisabledCommands();
 		this.iceServers = adapter.getICEServers();
 		Preconditions.checkArgument(this.listeners != null && !this.listeners.isEmpty(), (Object) "No listeners defined.");
@@ -169,6 +171,10 @@ public class Configuration {
 	
 	public Collection<String> getICEServers() {
 		return iceServers;
+	}
+
+	public boolean allowBungeeOnBungee() {
+		return bungeeOnBungee;
 	}
 	
 }

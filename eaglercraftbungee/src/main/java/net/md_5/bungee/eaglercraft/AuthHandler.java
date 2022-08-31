@@ -1,8 +1,10 @@
 package net.md_5.bungee.eaglercraft;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.ServerConnection;
@@ -11,6 +13,7 @@ import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.UpstreamBridge;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
@@ -21,7 +24,8 @@ import net.md_5.bungee.protocol.packet.Packet0DPositionAndLook;
 import net.md_5.bungee.protocol.packet.Packet3Chat;
 import net.md_5.bungee.protocol.packet.Packet0KeepAlive;
 import net.md_5.bungee.protocol.packet.PacketCCSettings;
-// import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import net.md_5.bungee.protocol.packet.PacketFAPluginMessage;
+import net.md_5.bungee.protocol.packet.PacketFEPing;
 
 public class AuthHandler extends PacketHandler {
 	private static final AuthSystem authSystem = BungeeCord.getInstance().authSystem;
@@ -78,12 +82,18 @@ public class AuthHandler extends PacketHandler {
 		}
 	}
 
-	/*
+	private List<PacketFAPluginMessage> pms = new ArrayList<>();
+
 	@Override
-	public void handle(final PacketFAPluginMessage pm) throws Exception {
-		this.con.getPendingConnection().handle(pm);
+	public void handle(final PacketFAPluginMessage p) throws Exception {
+		pms.add(p);
+		throw new CancelSendSignal();
 	}
-	*/
+
+	@Override
+	public void handle(final PacketFEPing p) throws Exception {
+		this.con.getPendingConnection().handle(p);
+	}
 
 	@Override
 	public void handle(final Packet3Chat chat) throws Exception {
@@ -148,10 +158,20 @@ public class AuthHandler extends PacketHandler {
 	private void onLogin() throws Exception {
 		this.loggedIn = true;
 		this.bungee.getPluginManager().callEvent(new PostLoginEvent(this.con));
-		handlerBoss.setHandler(new UpstreamBridge(this.bungee, this.con));
+		UpstreamBridge ub = new UpstreamBridge(this.bungee, this.con);
+		handlerBoss.setHandler(ub);
 		final ServerInfo server = this.bungee.getReconnectHandler().getServer(this.con);
 		this.con.setServer(new ServerConnection(null, null));
 		this.con.connect(server, true);
+		for (PacketFAPluginMessage pm : pms) {
+			try {
+				ub.handle(pm);
+				this.con.getPendingConnection().getLoginMessages().add(pm);
+			} catch (CancelSendSignal e) {
+				// don't forward to server
+			}
+		}
+		pms.clear();
 	}
 
 	@Override

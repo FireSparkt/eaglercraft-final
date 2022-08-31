@@ -10,7 +10,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class CommandEnd extends Command {
 	public CommandEnd() {
-		super("end", "bungeecord.command.end", new String[0]);
+		super("end", "bungeecord.command.end", new String[] { "stop", "exit", "quit" });
 	}
 
 	@Override

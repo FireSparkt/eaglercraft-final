@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
@@ -169,6 +170,8 @@ public class GuiMainMenu extends GuiScreen {
 			this.field_92020_v = this.field_92022_t + var6;
 			this.field_92019_w = this.field_92021_u + 12;
 		}
+
+		ConfigConstants.panoramaBlur = AssetRepository.getResource("/title/no-pano-blur.flag") == null;
 		
 		if(this.ackLines.isEmpty()) {
 			int width = 315;
@@ -313,7 +316,11 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glMatrixMode(EaglerAdapter.GL_PROJECTION);
 		EaglerAdapter.glPushMatrix();
 		EaglerAdapter.glLoadIdentity();
-		EaglerAdapter.gluPerspective(120.0F, 1.0F, 0.05F, 10.0F);
+		if (ConfigConstants.panoramaBlur) {
+			EaglerAdapter.gluPerspective(120.0F, 1.0F, 0.05F, 10.0F);
+		} else {
+			EaglerAdapter.gluPerspective(120.0F, (float)this.mc.displayWidth / (float)this.mc.displayHeight, 0.05F, 10.0F);
+		}
 		EaglerAdapter.glMatrixMode(EaglerAdapter.GL_MODELVIEW);
 		EaglerAdapter.glPushMatrix();
 		EaglerAdapter.glLoadIdentity();
@@ -362,7 +369,11 @@ public class GuiMainMenu extends GuiScreen {
 
 				titlePanoramaPaths[var10].bindTexture();
 				var4.startDrawingQuads();
-				var4.setColorRGBA_I(16777215, 255 / (var6 + 1));
+				if (ConfigConstants.panoramaBlur) {
+					var4.setColorRGBA_I(16777215, 255 / (var6 + 1));
+				} else {
+					var4.setColorRGBA_I(16777215, 255);
+				}
 				float var11 = 0.0F;
 				var4.addVertexWithUV(-1.0D, -1.0D, 1.0D, (double) (0.0F + var11), (double) (0.0F + var11));
 				var4.addVertexWithUV(1.0D, -1.0D, 1.0D, (double) (1.0F - var11), (double) (0.0F + var11));
@@ -422,34 +433,39 @@ public class GuiMainMenu extends GuiScreen {
 	 * Renders the skybox in the main menu
 	 */
 	private void renderSkybox(int par1, int par2, float par3) {
-		EaglerAdapter.glViewport(0, 0, 256, 256);
-		this.drawPanorama(par1, par2, par3);
-		EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
-		EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		this.rotateAndBlurSkybox(par3);
-		EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-		Tessellator var4 = Tessellator.instance;
-		var4.startDrawingQuads();
-		float var5 = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
-		float var6 = (float) this.height * var5 / 256.0F;
-		float var7 = (float) this.width * var5 / 256.0F;
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_LINEAR);
-		EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAG_FILTER, EaglerAdapter.GL_LINEAR);
-		var4.setColorRGBA_F(1.0F, 1.0F, 1.0F, 1.0F);
-		int var8 = this.width;
-		int var9 = this.height;
-		var4.addVertexWithUV(0.0D, (double) var9, (double) this.zLevel, (double) (0.5F - var6), (double) (0.5F + var7));
-		var4.addVertexWithUV((double) var8, (double) var9, (double) this.zLevel, (double) (0.5F - var6), (double) (0.5F - var7));
-		var4.addVertexWithUV((double) var8, 0.0D, (double) this.zLevel, (double) (0.5F + var6), (double) (0.5F - var7));
-		var4.addVertexWithUV(0.0D, 0.0D, (double) this.zLevel, (double) (0.5F + var6), (double) (0.5F + var7));
-		var4.draw();
+		if (ConfigConstants.panoramaBlur) {
+			EaglerAdapter.glViewport(0, 0, 256, 256);
+			this.drawPanorama(par1, par2, par3);
+			EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
+			EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			this.rotateAndBlurSkybox(par3);
+			EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
+			Tessellator var4 = Tessellator.instance;
+			var4.startDrawingQuads();
+			float var5 = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
+			float var6 = (float) this.height * var5 / 256.0F;
+			float var7 = (float) this.width * var5 / 256.0F;
+			EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MIN_FILTER, EaglerAdapter.GL_LINEAR);
+			EaglerAdapter.glTexParameteri(EaglerAdapter.GL_TEXTURE_2D, EaglerAdapter.GL_TEXTURE_MAG_FILTER, EaglerAdapter.GL_LINEAR);
+			var4.setColorRGBA_F(1.0F, 1.0F, 1.0F, 1.0F);
+			int var8 = this.width;
+			int var9 = this.height;
+			var4.addVertexWithUV(0.0D, (double) var9, (double) this.zLevel, (double) (0.5F - var6), (double) (0.5F + var7));
+			var4.addVertexWithUV((double) var8, (double) var9, (double) this.zLevel, (double) (0.5F - var6), (double) (0.5F - var7));
+			var4.addVertexWithUV((double) var8, 0.0D, (double) this.zLevel, (double) (0.5F + var6), (double) (0.5F - var7));
+			var4.addVertexWithUV(0.0D, 0.0D, (double) this.zLevel, (double) (0.5F + var6), (double) (0.5F + var7));
+			var4.draw();
+		} else {
+			EaglerAdapter.glViewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
+			this.drawPanorama(par1, par2, par3);
+		}
 	}
 
 	private static final TextureLocation mclogo = new TextureLocation("/title/mclogo.png");
@@ -469,8 +485,10 @@ public class GuiMainMenu extends GuiScreen {
 		short var5 = 274;
 		int var6 = this.width / 2 - var5 / 2;
 		byte var7 = 30;
-		this.drawGradientRect(0, 0, this.width, this.height, -2130706433, 16777215);
-		this.drawGradientRect(0, 0, this.width, this.height, 0, Integer.MIN_VALUE);
+		if (ConfigConstants.panoramaBlur) {
+			this.drawGradientRect(0, 0, this.width, this.height, -2130706433, 16777215);
+			this.drawGradientRect(0, 0, this.width, this.height, 0, Integer.MIN_VALUE);
+		}
 		
 		if(ConfigConstants.eaglercraftTitleLogo) {
 			eag.bindTexture();

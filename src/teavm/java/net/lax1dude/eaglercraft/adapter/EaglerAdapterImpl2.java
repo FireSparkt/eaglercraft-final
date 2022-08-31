@@ -191,6 +191,10 @@ public class EaglerAdapterImpl2 {
 	public static native byte[] downloadURL(String url);
 
 	private static void downloadURL(String url, final AsyncCallback<byte[]> cb) {
+		if(url.isEmpty()) {
+			cb.complete(new byte[0]);
+			return;
+		}
 		final XMLHttpRequest request = XMLHttpRequest.create();
 		request.setResponseType("arraybuffer");
 		request.open("GET", url, true);
@@ -3940,6 +3944,7 @@ public class EaglerAdapterImpl2 {
 			rtcLANClient.setRemoteDataChannelHandler(new EaglercraftLANClient.ClientSignalHandler() {
 				@Override
 				public void call() {
+					clientDataChannelClosed = false;
 					clientDataChannelOpen = true;
 				}
 			});
@@ -3973,7 +3978,7 @@ public class EaglerAdapterImpl2 {
 		clientICECandidate = null;
 		clientDescription = null;
 		clientDataChannelOpen = false;
-		clientDataChannelClosed = false;
+		clientDataChannelClosed = true;
 	}
 	
 	public static final String clientLANAwaitICECandidate() {

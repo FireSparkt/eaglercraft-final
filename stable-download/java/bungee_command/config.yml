@@ -84,7 +84,7 @@ permissions:
   - bungeecord.command.eag.blockdomainname
   - bungeecord.command.eag.unblockdomain
 origin_blacklist_subscriptions:
-- https://g.eags.us/eaglercraft/origin_blacklist.txt
+- https://g.lax1dude.net/eaglercraft/origin_blacklist.txt
 - https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt
 display_ban_type_on_kick: false
 timeout: 30000

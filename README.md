@@ -1,5 +1,7 @@
 # Eaglercraft
 
+**Currently maintained by [ayunami2000](https://github.com/ayunami2000)**
+
 ### Client: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/)
 
 ### Offline Download: [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)

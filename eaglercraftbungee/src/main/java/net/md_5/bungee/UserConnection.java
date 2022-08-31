@@ -130,7 +130,7 @@ public final class UserConnection implements ProxiedPlayer {
 			return;
 		}
 		final BungeeServerInfo target = (BungeeServerInfo) event.getTarget();
-		if (this.getServer() != null && Objects.equals(this.getServer().getInfo(), target)) {
+		if (this.getServer() != null && this.getServer().getInfo() != null && Objects.equals(this.getServer().getInfo(), target)) {
 			//this.sendMessage(ChatColor.RED + "Cannot connect to server you are already on!");
 			return;
 		}
@@ -151,10 +151,10 @@ public final class UserConnection implements ProxiedPlayer {
 					future.channel().close();
 					UserConnection.this.pendingConnects.remove(target);
 					final ServerInfo def = ProxyServer.getInstance().getServers().get(UserConnection.this.getPendingConnection().getListener().getFallbackServer());
-					if ((retry & target != def) && (UserConnection.this.getServer() == null || def != UserConnection.this.getServer().getInfo())) {
+					if ((retry & target != def) && ((UserConnection.this.getServer() == null || UserConnection.this.getServer().getInfo() == null) || def != UserConnection.this.getServer().getInfo())) {
 						UserConnection.this.sendMessage(UserConnection.this.bungee.getTranslation("fallback_lobby"));
 						UserConnection.this.connect(def, false);
-					} else if (UserConnection.this.server == null) {
+					} else if (UserConnection.this.getServer() == null || UserConnection.this.getServer().getInfo() == null) {
 						UserConnection.this.disconnect(UserConnection.this.bungee.getTranslation("fallback_kick") + future.cause().getClass().getName());
 					} else {
 						UserConnection.this.sendMessage(UserConnection.this.bungee.getTranslation("fallback_kick") + future.cause().getClass().getName());
@@ -176,7 +176,7 @@ public final class UserConnection implements ProxiedPlayer {
 			this.bungee.getLogger().log(Level.INFO, "[" + this.getName() + "] disconnected with: " + reason);
 			this.unsafe().sendPacket(new PacketFFKick(reason));
 			this.ch.close();
-			if (this.server != null) {
+			if (this.server != null && this.server.getInfo() != null) {
 				this.server.disconnect("Quitting");
 			}
 		}
