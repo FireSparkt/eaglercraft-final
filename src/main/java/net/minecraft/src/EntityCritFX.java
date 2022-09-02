@@ -9,8 +9,12 @@ public class EntityCritFX extends EntityFX {
 	public EntityCritFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12) {
 		this(par1World, par2, par4, par6, par8, par10, par12, 1.0F);
 	}
-
+	
 	public EntityCritFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, float par14) {
+		this(par1World, par2, par4, par6, par8, par10, par12, par14, 1.0f);
+	}
+
+	public EntityCritFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, float par14, float f) {
 		super(par1World, par2, par4, par6, 0.0D, 0.0D, 0.0D);
 		this.motionX *= 0.10000000149011612D;
 		this.motionY *= 0.10000000149011612D;
@@ -18,11 +22,11 @@ public class EntityCritFX extends EntityFX {
 		this.motionX += par8 * 0.4D;
 		this.motionY += par10 * 0.4D;
 		this.motionZ += par12 * 0.4D;
-		this.particleRed = this.particleGreen = this.particleBlue = (float) (Math.random() * 0.30000001192092896D + 0.6000000238418579D);
+		this.particleRed = this.particleGreen = this.particleBlue = (float) (Math.random() * 0.30000001192092896D + 0.6000000238418579D) + (f - 1.0f) * 0.2f;
 		this.particleScale *= 0.75F;
 		this.particleScale *= par14;
 		this.field_70561_a = this.particleScale;
-		this.particleMaxAge = (int) (6.0D / (Math.random() * 0.8D + 0.6D));
+		this.particleMaxAge = (int) (6.0D / (Math.random() * 0.8D + 0.6D) - 1.0f + f);
 		this.particleMaxAge = (int) ((float) this.particleMaxAge * par14);
 		this.noClip = false;
 		this.setParticleTextureIndex(65);

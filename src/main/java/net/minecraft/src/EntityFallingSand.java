@@ -3,6 +3,8 @@ package net.minecraft.src;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.minecraft.client.Minecraft;
+
 
 
 public class EntityFallingSand extends Entity {
@@ -21,6 +23,7 @@ public class EntityFallingSand extends Entity {
 	/** Actual damage dealt to entities hit by falling block */
 	private float fallHurtAmount;
 	public NBTTagCompound fallingBlockTileEntityData;
+	public boolean ghost = false;
 
 	public EntityFallingSand() {
 		super();
@@ -87,6 +90,27 @@ public class EntityFallingSand extends Entity {
 		if (this.blockID == 0) {
 			this.setDead();
 		} else {
+			
+			if(ghost) {
+				if(ticksExisted > 600) {
+					setDead();
+					return;
+				}else {
+					EntityLiving lv = Minecraft.getMinecraft().renderViewEntity;
+					float dst = lv.getDistanceToEntity(this);
+					if(dst < 3.0f || dst > 24.0f) {
+						setDead();
+						return;
+					}else if(dst < 3.5f) {
+						dst *= dst;
+						dst *= 2.0f;
+						this.motionX -= (float)(lv.posX - posX) / dst;
+						this.motionY -= (float)(lv.posY - posY) / dst;
+						this.motionZ -= (float)(lv.posZ - posZ) / dst;
+					}
+				}
+			}
+			
 			this.prevPosX = this.posX;
 			this.prevPosY = this.posY;
 			this.prevPosZ = this.posZ;

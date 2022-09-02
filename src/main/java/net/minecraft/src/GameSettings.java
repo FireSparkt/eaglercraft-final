@@ -364,6 +364,7 @@ public class GameSettings {
 		
 		if (par1EnumOptions == EnumOptions.ADDERALL) {
 			this.adderall = !this.adderall;
+			this.mc.sndManager.stopAllSounds();
 		}
 
 		this.saveOptions();

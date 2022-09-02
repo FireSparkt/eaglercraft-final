@@ -8,7 +8,9 @@ import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.lax1dude.eaglercraft.TextureLocation;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
+import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.EffectPipelineFXAA;
+import net.lax1dude.eaglercraft.glemu.vector.Matrix4f;
 import net.minecraft.client.Minecraft;
 
 public class EntityRenderer {
@@ -155,6 +157,8 @@ public class EntityRenderer {
 	 * 6=TiltRight)
 	 */
 	public int debugViewDirection;
+	
+	public int startup = 0;
 
 	public EntityRenderer(Minecraft par1Minecraft) {
 		this.mc = par1Minecraft;
@@ -468,6 +472,8 @@ public class EntityRenderer {
 		this.cloudFog = this.mc.renderGlobal.hasCloudFog(var4, var6, var8, par1);
 	}
 
+	private final Matrix4f tmpMatrix = new Matrix4f();
+	
 	/**
 	 * sets up projection, view effects, camera position/rotation
 	 */
@@ -485,8 +491,18 @@ public class EntityRenderer {
 			EaglerAdapter.glTranslatef((float) this.cameraYaw, (float) (-this.cameraPitch), 0.0F);
 			EaglerAdapter.glScalef((float)this.cameraZoom, (float)this.cameraZoom, 1.0F);
 		}
-
-		EaglerAdapter.gluPerspective(this.getFOVModifier(par1, true), (float) this.mc.displayWidth / (float) this.mc.displayHeight, 0.05F, this.farPlaneDistance * 2.0F);
+		
+		float i = startup / 500.0f - 0.4f;
+		if(i > 1.0f) i = 1.0f;
+		if(i < 0.0f) i = 0.0f;
+		float i2 = i * i;
+		if(i2 > 0.0f) {
+			float f = (float)((System.currentTimeMillis() % 10000000l) * 0.0002);
+			f += MathHelper.sin(f * 5.0f) * 0.2f;
+			i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
+					MathHelper.sin(f * 3.0f + 3.0f) + MathHelper.sin(f * 5.25f + 1.2f);
+		}
+		EaglerAdapter.gluPerspective(this.getFOVModifier(par1, true) * (1.0f + i2 * 0.007f), (float) this.mc.displayWidth / (float) this.mc.displayHeight, 0.05F, this.farPlaneDistance * 2.0F);
 		float var4;
 
 		if (this.mc.playerController.enableEverythingIsScrewedUpMode()) {
@@ -505,6 +521,30 @@ public class EntityRenderer {
 
 		if (this.mc.gameSettings.viewBobbing) {
 			this.setupViewBobbing(par1);
+		}
+
+		i2 = i * i;
+		if(i > 0.0f) {
+			
+			float f = (float)((System.currentTimeMillis() % 10000000l) * 0.00012);
+			f += MathHelper.sin(f * 3.0f) * 0.2f;
+			i2 *= MathHelper.sin(f * 1.2f + 1.0f) + MathHelper.sin(f * 1.5f + 0.8f) * 3.0f + MathHelper.sin(f * 0.6f + 3.0f) +
+					MathHelper.sin(f * 4.3f) + MathHelper.sin(f * 5.25f + 0.5f);
+			EaglerAdapter.glRotatef(i2 * 1.3f, 0.0f, 0.0f, 1.0f);
+			
+			tmpMatrix.setIdentity();
+			
+			f *= 2.5f;
+			f += MathHelper.sin(f * 3.0f + 1.0f) * 0.2f;
+			f *= 1.3f;
+			f += 3.3413f;
+			i2 = MathHelper.sin(f * 1.5f + 0.7f) + MathHelper.sin(f * 0.6f + 1.7f) +
+					MathHelper.sin(f * 7.0f + 3.0f) * 0.3f;
+			i2 *= i2;
+			tmpMatrix.m10 = i2 * 0.02f;
+			tmpMatrix.m30 = i2 * 0.028f;
+			
+			EaglerAdapter.glMultMatrixf(tmpMatrix); // shear the fuck out of the matrix
 		}
 
 		var4 = this.mc.thePlayer.prevTimeInPortal + (this.mc.thePlayer.timeInPortal - this.mc.thePlayer.prevTimeInPortal) * par1;
@@ -558,8 +598,30 @@ public class EntityRenderer {
 			EaglerAdapter.glMatrixMode(EaglerAdapter.GL_PROJECTION);
 			EaglerAdapter.glLoadIdentity();
 			float var3 = 0.07F;
-
-			EaglerAdapter.gluPerspectiveFlat(this.getFOVModifier(par1, false), (float) this.mc.displayWidth / (float) this.mc.displayHeight, 0.05F, 10f);
+			
+			float i = startup / 500.0f - 0.4f;
+			if(i > 1.0f) i = 1.0f;
+			if(i < 0.0f) i = 0.0f;
+			float i2 = i * i;
+			if(i2 > 0.0f) {
+				float f = (float)((System.currentTimeMillis() % 10000000l) * 0.0003);
+				f += MathHelper.sin(f * 3.0f) * 0.2f;
+				i2 *= MathHelper.sin(f * 1.2f + 1.0f) + MathHelper.sin(f * 1.5f + 0.8f) * 3.0f + MathHelper.sin(f * 0.6f + 3.0f) +
+						MathHelper.sin(f * 4.3f) + MathHelper.sin(f * 5.25f + 0.5f);
+				i2 *= i2;
+				EaglerAdapter.gluPerspectiveFlat(this.getFOVModifier(par1, false) + i2 * 0.3f, (float) this.mc.displayWidth / (float) this.mc.displayHeight, 0.05F, 10f);
+				f += 3.132123f;
+				float j = MathHelper.sin(f * 1.3f + 1.1f) + MathHelper.sin(f * 1.3f + 0.8f) * 3.0f + MathHelper.sin(f * 0.5f + 2.0f);
+				i2 = j * 0.5f + i2 * 0.2f;
+				EaglerAdapter.glRotatef(i2 * 0.8f, 0.0f, 0.0f, 1.0f);
+				
+				f += 1.123123f;
+				j = MathHelper.sin(f * 1.3f + 1.1f) + MathHelper.sin(f * 1.3f + 0.8f) * 3.0f + MathHelper.sin(f * 0.5f + 2.0f);
+				i2 = j * 0.5f + i2 * 0.2f;
+				EaglerAdapter.glRotatef(i2 * 0.5f, 1.0f, 0.0f, 0.0f);
+			}else {
+				EaglerAdapter.gluPerspectiveFlat(this.getFOVModifier(par1, false), (float) this.mc.displayWidth / (float) this.mc.displayHeight, 0.05F, 10f);
+			}
 
 			if (this.mc.gameSettings.anaglyph) {
 				EaglerAdapter.glTranslatef((float) (-(par2 * 2 - 1)) * var3, 0.0F, 0.0F);
@@ -643,12 +705,16 @@ public class EntityRenderer {
 	 * Recompute a random value that is applied to block color in updateLightmap()
 	 */
 	private void updateTorchFlicker() {
+		float i = startup / 600.0f;
+		if(i > 1.0f) i = 1.0f;
+		i = i * i;
+		i = 0.8f + i * 0.04f;
 		this.torchFlickerDX = (float) ((double) this.torchFlickerDX + (Math.random() - Math.random()) * Math.random() * Math.random());
 		this.torchFlickerDY = (float) ((double) this.torchFlickerDY + (Math.random() - Math.random()) * Math.random() * Math.random());
 		this.torchFlickerDX = (float) ((double) this.torchFlickerDX * 0.9D);
 		this.torchFlickerDY = (float) ((double) this.torchFlickerDY * 0.9D);
-		this.torchFlickerX += (this.torchFlickerDX - this.torchFlickerX) * 1.0F;
-		this.torchFlickerY += (this.torchFlickerDY - this.torchFlickerY) * 1.0F;
+		this.torchFlickerX += (this.torchFlickerDX - this.torchFlickerX) * i;
+		this.torchFlickerY += (this.torchFlickerDY - this.torchFlickerY) * i;
 		this.lightmapUpdateNeeded = true;
 	}
 
@@ -656,10 +722,13 @@ public class EntityRenderer {
 		WorldClient var2 = this.mc.theWorld;
 
 		if (var2 != null) {
+			float i = startup / 600.0f;
+			if(i > 1.0f) i = 1.0f;
+			i = i * i;
 			for (int var3 = 0; var3 < 256; ++var3) {
 				float var4 = var2.getSunBrightness(1.0F) * 0.95F + 0.05F;
 				float var5 = var2.provider.lightBrightnessTable[var3 / 16] * var4;
-				float var6 = var2.provider.lightBrightnessTable[var3 % 16] * (this.torchFlickerX * 0.15F + 1.45F);
+				float var6 = var2.provider.lightBrightnessTable[var3 % 16] * (this.torchFlickerX * 0.15F + 1.45F) * (1.0f + i);
 
 				if (var2.lastLightningBolt > 0) {
 					var5 = var2.provider.lightBrightnessTable[var3 / 16];
@@ -721,7 +790,7 @@ public class EntityRenderer {
 					var15 = 1.0F;
 				}
 
-				var16 = this.mc.gameSettings.gammaSetting;
+				var16 = this.mc.gameSettings.gammaSetting + this.torchFlickerX * i * 0.4f;
 				var17 = 1.0F - var13;
 				float var18 = 1.0F - var14;
 				float var19 = 1.0F - var15;
@@ -844,6 +913,15 @@ public class EntityRenderer {
 					this.renderWorld(par1, 0L);
 				} else {
 					this.renderWorld(par1, this.renderEndNanoTime + (long) (1000000000 / var18));
+				}
+				
+				float i = startup / 2400.0f;
+				if(i > 1.0f) i = 1.0f;
+				i = i * i;
+
+				if(i > 0.15f) {
+					EffectPipeline.updateNoiseTexture(mc.displayWidth, mc.displayHeight, i);
+					EffectPipeline.drawNoise(var14, var15, i);
 				}
 
 				this.renderEndNanoTime = System.nanoTime();
@@ -1115,20 +1193,25 @@ public class EntityRenderer {
 		}
 	}
 
+	private int updateCounter = 0;
+	private int randomOffset = (int)(System.currentTimeMillis() % 100000l);
+
 	private void addRainParticles() {
 		float var1 = this.mc.theWorld.getRainStrength(1.0F);
 
 		if (!this.mc.gameSettings.fancyGraphics) {
 			var1 /= 2.0F;
 		}
-
+		
+		WorldClient var3 = this.mc.theWorld;
+		EntityLiving var2 = this.mc.renderViewEntity;
+		
+		int var4 = MathHelper.floor_double(var2.posX);
+		int var5 = MathHelper.floor_double(var2.posY);
+		int var6 = MathHelper.floor_double(var2.posZ);
+		
 		if (var1 != 0.0F) {
 			this.random.setSeed((long) this.rendererUpdateCount * 312987231L);
-			EntityLiving var2 = this.mc.renderViewEntity;
-			WorldClient var3 = this.mc.theWorld;
-			int var4 = MathHelper.floor_double(var2.posX);
-			int var5 = MathHelper.floor_double(var2.posY);
-			int var6 = MathHelper.floor_double(var2.posZ);
 			byte var7 = 10;
 			double var8 = 0.0D;
 			double var10 = 0.0D;
@@ -1179,6 +1262,159 @@ public class EntityRenderer {
 					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.45F, 0.5F, false);
 				} else {
 					this.mc.theWorld.playSound(var8, var10, var12, "ambient.weather.rain", 0.7F, 1.0F, false);
+				}
+			}
+		}
+		
+		if(mc.gameSettings.adderall) {
+			if(startup == 0) {
+				var3.ambientTickCountdown = random.nextInt(12000);
+			}
+			++startup;
+			int k = 60 - (startup / 5);
+			if(k < 10) k = 10;
+			if(++updateCounter % k == 0) {
+				long time = this.mc.theWorld.getWorldTime();
+				int j = var2.getBrightnessForRender(0.0f);
+				float intensity = Math.max(MathHelper.clamp_float((float)Math.abs(6000l - ((time % 24000l) - 12000l)), 0.15f, 1.0f),
+						Math.max(1.0f - ((j / 65536) / 256.0f), 1.0f - ((j % 65536) / 256.0f)));
+				int rad = (int)((1.0f - ((j / 65536) / 256.0f)) * 6.0f) - 2;
+				if(rad < 0) rad = 0;
+				int effect = (int)((time + randomOffset) / 7432l % 5l);
+				int effect2 = (int)((time + randomOffset + 1290348l) / 4432l % 5l);
+				if(effect == 4) rad = 8;
+				int d = 1;
+				if(effect == 4) d = 2;
+				for(int i = 0; i < (int)(intensity * 10); ++i) {
+					int x, y, z;
+					int c = 0;
+					int m = 20;
+					do {
+						x = random.nextInt(50) - 25; x /= d;
+						y = random.nextInt(35) - 10; y /= d;
+						z = random.nextInt(50) - 25; z /= d;
+					}while((((x < 12 - rad && x > -12 + rad) && (y < 4 && y > -8 + (rad / 2)) && (z - rad < 12 && z > -12 + rad)) ||
+							this.mc.theWorld.isBlockOpaqueCube(x + var4, y + var5, z + var6)) && ++c < m);
+					if(c != m) {
+						if(random.nextFloat() > 0.8f) {
+							if(random.nextFloat() > 0.7f) {
+								this.mc.effectRenderer.addEffect(new EntityLargeExplodeFX(mc.renderEngine, var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat(),
+										random.nextFloat() * 0.6f + 0.8f, 0.0d, 0.0d));
+							}
+							float f3 = random.nextFloat() * 0.5f + 0.3f;
+							f3 = (float)Math.pow(f3, 1.5);
+							this.mc.effectRenderer.addEffect(new EntityCritFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat(),
+									(random.nextFloat() * 100.0f - 50.0f) * f3, (random.nextFloat() * 100.0f - 65.0f) * f3, (random.nextFloat() * 100.0f - 50.0f) * f3,
+									0.7f + random.nextFloat(), 7.0f));
+						}else {
+							switch(random.nextFloat() > 0.4f ? effect : effect2) {
+							case 0:
+							default:
+								this.mc.effectRenderer.addEffect(new EntityFlameFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat(),
+										random.nextFloat() * 0.1f - 0.05f, random.nextFloat() * 0.2f - 0.05f, random.nextFloat() * 0.1f - 0.05f));
+								break;
+							case 1:
+								float f3 = random.nextFloat() * 0.3f + 0.2f;
+								f3 = (float)Math.pow(f3, 1.5) * 0.5f;
+								this.mc.effectRenderer.addEffect(new EntityCritFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat(),
+										(random.nextFloat() * 100.0f - 50.0f) * f3, (random.nextFloat() * 100.0f - 30.0f) * f3, (random.nextFloat() * 100.0f - 50.0f) * f3,
+										0.7f + random.nextFloat(), 7.0f));
+								break;
+							case 2:
+								if(random.nextFloat() > 0.25f) {
+									this.mc.effectRenderer.addEffect(new EntityFlameFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat(),
+											random.nextFloat() * 0.1f - 0.05f, random.nextFloat() * 0.2f - 0.05f, random.nextFloat() * 0.1f - 0.05f));
+								}else {
+									this.mc.effectRenderer.addEffect(new EntityLavaFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(), z + var6 + random.nextFloat()));
+								}
+								break;
+							case 3:
+								if(!(x < 12 - rad && x > -12 + rad && z - rad < 12 && z > -12 + rad)) {
+									this.mc.effectRenderer.addEffect(new EntityDropParticleFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(),
+											z + var6 + random.nextFloat(), Material.lava));
+									this.mc.effectRenderer.addEffect(new EntityDropParticleFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(),
+											z + var6 + random.nextFloat(), Material.lava));
+									if(random.nextBoolean()) this.mc.effectRenderer.addEffect(new EntityDropParticleFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(),
+											z + var6 + random.nextFloat(), Material.lava));
+									if(random.nextBoolean()) this.mc.effectRenderer.addEffect(new EntityDropParticleFX(var3, x + var4 + random.nextFloat(), y + var5 + random.nextFloat(),
+											z + var6 + random.nextFloat(), Material.lava));
+								}
+								break;
+							case 4:
+								while(random.nextInt(5) != 0) {
+									float mx = (random.nextFloat() - 0.5f) * 3.0f;
+									float my = (random.nextFloat() - 0.5f) * 3.0f;
+									float mz = (random.nextFloat() - 0.5f) * 3.0f;
+									this.mc.effectRenderer.addEffect(new EntityPortalFX(var3, x + var4 + random.nextFloat() - mx * 0.25f, y + var5 + random.nextFloat() - my * 0.25f,
+											z + var6 + random.nextFloat() - mz * 0.25f, random.nextFloat() * 0.1f - 0.05f - mx * (3.0f + random.nextFloat() * 0.5f),
+											random.nextFloat() * 0.2f - 0.05f - my * (3.0f + random.nextFloat() * 0.5f), random.nextFloat() * 0.1f - 0.05f - mz * (3.0f + random.nextFloat() * 0.5f)));
+								}
+								break;
+							}
+						}
+					}
+					while(random.nextFloat() > 0.6f) {
+						x = random.nextInt(16) - 8;
+						z = random.nextInt(16) - 8;
+						if(x > 1 || z > 1 || x < -1 || z < -1) {
+							int yy = var3.getHeightValue(x + var4 , z + var6);
+							int ds = yy - var5 - 1;
+							if(ds < 0) {
+								ds = -ds;
+							}
+							if(ds < 5) {
+								int l = 0;
+								while(l++ == 0 || random.nextFloat() > 0.4f) {
+									this.mc.effectRenderer.addEffect(new EntityAuraFX(var3, x + var4 + random.nextFloat(), yy + 0.1f + random.nextFloat() * 0.1f, z + var6
+											+ random.nextFloat(), 0.0d, 0.0d, 0.0d));
+								}
+							}
+						}
+					}
+					while(random.nextFloat() > 0.97f) {
+						x = random.nextInt(20) - 10;
+						z = random.nextInt(20) - 10;
+						if(x > 3 || z > 3 || x < -3 || z < -3) {
+							int yy = var3.getHeightValue(x + var4 , z + var6);
+							int ds = yy - var5 - 1;
+							if(ds < 0) {
+								ds = -ds;
+							}
+							if(ds < 8) {
+								if(random.nextInt(3) == 0) {
+									yy += 7;
+									yy += random.nextInt(5);
+								}
+								if(random.nextInt(3) == 0) {
+									Block l;
+									do {
+										l = Block.blocksList[random.nextInt(256)];
+									}while(l == null);
+									EntityFallingSand itm = new EntityFallingSand(var3, x + var4, yy + 1, z + var6, l.blockID, 0);
+									itm.entityId = --var3.ghostEntityId;
+									itm.ghost = true;
+									var3.spawnEntityInWorld(itm);
+								}else {
+									Item l;
+									do {
+										l = Item.itemsList[random.nextInt(384)];
+									}while(l == null);
+									EntityItem itm = new EntityItem(var3, x + var4, yy + 1, z + var6, new ItemStack(l, 1));
+									itm.entityId = --var3.ghostEntityId;
+									itm.ghost = true;
+									var3.spawnEntityInWorld(itm);
+								}
+							}
+						}
+					}
+					float probability = MathHelper.sin(startup / 300.0f);
+					while(random.nextFloat() < (probability * 0.3f + 0.7f) * 0.002f) {
+						this.mc.sndManager.playSoundFX("adl.l", MathHelper.clamp_float(startup / 300.0f, 0.03f, 0.5f), random.nextFloat() * 0.2f + 0.9f);
+					}
+					while(random.nextFloat() < (probability * 0.3f + 0.7f) * 0.005f) {
+						this.mc.sndManager.playSound("adl.a", (float) var2.posX - 4.0f + 8.0f * random.nextFloat(), (float) var2.posY - 2.0f + 4.0f * random.nextFloat(),
+								(float) var2.posZ - 4.0f + 8.0f * random.nextFloat(), 0.35f, random.nextFloat() * 0.2f + 0.9f);
+					}
 				}
 			}
 		}

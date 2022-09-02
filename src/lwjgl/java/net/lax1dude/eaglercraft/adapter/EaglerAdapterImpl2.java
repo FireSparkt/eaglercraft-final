@@ -62,6 +62,7 @@ import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -358,6 +359,9 @@ public class EaglerAdapterImpl2 {
 
 	public static final void _wglBlendFunc(int p1, int p2) {
 		GL11.glBlendFunc(p1, p2);
+	}
+	public static final void _wglBlendColor(float r, float g, float b, float a) {
+		GL14.glBlendColor(r, g, b, a);
 	}
 	public static final void _wglDepthMask(boolean p1) {
 		GL11.glDepthMask(p1);
@@ -1929,7 +1933,7 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void serverLANCloseServer() {
-		throw new UnsupportedOperationException("LAN worlds are not available in LWJGL eagleradapter");
+		
 	}
 
 	public static final LANPeerEvent serverLANGetEvent(String clientId) {

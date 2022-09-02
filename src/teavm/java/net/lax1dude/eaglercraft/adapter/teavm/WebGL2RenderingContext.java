@@ -16,6 +16,8 @@ public interface WebGL2RenderingContext extends WebGLRenderingContext {
 	int DRAW_FRAMEBUFFER               = 0x00008CA9;
 	int RGB8                           = 0x00008051;
 	int RGBA8                          = 0x00008058;
+	int R8                             = 0x00008229;
+	int RED                            = 0x00001903;
 	
 	WebGLQuery createQuery();
 

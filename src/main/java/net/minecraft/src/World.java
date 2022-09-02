@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.minecraft.client.Minecraft;
 
 
 
@@ -103,7 +104,7 @@ public abstract class World implements IBlockAccess {
 	protected Set activeChunkSet = new HashSet();
 
 	/** number of ticks until the next random ambients play */
-	private int ambientTickCountdown;
+	public int ambientTickCountdown;
 
 	/**
 	 * is a temporary list of blocks and light values used when updating light
@@ -2401,6 +2402,36 @@ public abstract class World implements IBlockAccess {
 
 	protected void moodSoundAndLightCheck(int par1, int par2, Chunk par3Chunk) {
 		this.theProfiler.endStartSection("moodSound");
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		if (this.ambientTickCountdown == 0 && mc.entityRenderer.startup > 0) {
+			this.updateLCG = this.updateLCG * 3 + 1013904223;
+			int var4 = this.updateLCG >> 2;
+			int var5 = var4 & 15;
+			int var6 = var4 >> 8 & 15;
+			int var7 = var4 >> 16 & 127;
+			int var8 = par3Chunk.getBlockID(var5, var7, var6);
+			var5 += par1;
+			var6 += par2;
+
+			if (var8 == 0 && this.getFullBlockLightValue(var5, var7, var6) <= this.rand.nextInt(8)
+					&& this.getSavedLightValue(EnumSkyBlock.Sky, var5, var7, var6) <= 0) {
+				EntityPlayer var9 = this.getClosestPlayer((double) var5 + 0.5D, (double) var7 + 0.5D,
+						(double) var6 + 0.5D, 8.0D);
+
+				if (var9 != null && var9.getDistanceSq((double) var5 + 0.5D, (double) var7 + 0.5D,
+						(double) var6 + 0.5D) > 4.0D) {
+					this.playSoundEffect((double) var5 + 0.5D, (double) var7 + 0.5D, (double) var6 + 0.5D,
+							"adl.b", 0.5F, 0.6F + this.rand.nextFloat() * 0.4F);
+					int i = 1200 - mc.entityRenderer.startup;
+					if(i < 0) {
+						i = 0;
+					}
+					this.ambientTickCountdown = this.rand.nextInt(1800 + i) + 1200 + i;
+				}
+			}
+		}
+		
 		this.theProfiler.endStartSection("checkLight");
 		par3Chunk.enqueueRelightChecks();
 	}

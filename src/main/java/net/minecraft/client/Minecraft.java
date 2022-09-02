@@ -1,5 +1,6 @@
 package net.minecraft.client;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +19,6 @@ import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.Voice;
 import net.lax1dude.eaglercraft.WorkerNetworkManager;
 import net.lax1dude.eaglercraft.adapter.Tessellator;
-import net.lax1dude.eaglercraft.glemu.EffectPipeline;
 import net.lax1dude.eaglercraft.glemu.FixedFunctionShader;
 import net.minecraft.src.AchievementList;
 import net.minecraft.src.AxisAlignedBB;
@@ -240,6 +240,7 @@ public class Minecraft implements Runnable {
 	private int messageOnLoginCounter = 0;
 	
 	public boolean lanState = false;
+	public boolean yeeState = false;
 	
 	public Minecraft() {
 		this.tempDisplayHeight = 480;
@@ -314,7 +315,6 @@ public class Minecraft implements Runnable {
 		this.renderEngine.refreshTextureMaps();
 		EaglerAdapter.glViewport(0, 0, this.displayWidth, this.displayHeight);
 		this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
-		EffectPipeline.init();
 
 		this.checkGLError("Post startup");
 		this.guiAchievement = new GuiAchievement(this);
@@ -353,6 +353,9 @@ public class Minecraft implements Runnable {
 		if (this.gameSettings.fullScreen && !this.fullscreen) {
 			this.toggleFullscreen();
 		}
+		
+		byte[] b = EaglerAdapter.loadResourceBytes("adderall");
+		yeeState = b != null && (new String(b, StandardCharsets.UTF_8)).hashCode() == 508925104;
 	}
 	
 	private void showIntroAnimation() {
@@ -1295,7 +1298,6 @@ public class Minecraft implements Runnable {
 							if (F3down && EaglerAdapter.getEventKey() == 20) {
 								this.renderEngine.refreshTextures();
 								this.renderGlobal.loadRenderers();
-								EffectPipeline.reloadPipeline();
 								FixedFunctionShader.refreshCoreGL();
 							}
 
@@ -1499,6 +1501,13 @@ public class Minecraft implements Runnable {
 		} else if (this.myNetworkManager != null) {
 			this.mcProfiler.endStartSection("pendingConnection");
 			this.myNetworkManager.processReadPackets();
+		} else {
+			this.entityRenderer.startup = 0;
+		}
+		
+		if(!this.gameSettings.adderall || !yeeState) {
+			this.entityRenderer.startup = 0;
+			this.gameSettings.adderall = false;
 		}
 		
 		if(this.theWorld == null) {

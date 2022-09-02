@@ -2,6 +2,8 @@ package net.minecraft.src;
 
 import java.util.Iterator;
 
+import net.minecraft.client.Minecraft;
+
 
 
 public class EntityItem extends Entity {
@@ -17,6 +19,7 @@ public class EntityItem extends Entity {
 
 	/** The EntityItem's random initial float height. */
 	public float hoverStart;
+	public boolean ghost = false;
 
 	public EntityItem(World par1World, double par2, double par4, double par6) {
 		super();
@@ -67,6 +70,25 @@ public class EntityItem extends Entity {
 
 		if (this.delayBeforeCanPickup > 0) {
 			--this.delayBeforeCanPickup;
+		}
+		
+		if(ghost) {
+			if(ticksExisted > 200) {
+				setDead();
+				return;
+			}else {
+				EntityLiving lv = Minecraft.getMinecraft().renderViewEntity;
+				float dst = lv.getDistanceToEntity(this);
+				if(dst < 2.5f || dst > 24.0f) {
+					setDead();
+					return;
+				}else if(dst < 4.0f) {
+					dst *= dst;
+					this.motionX -= (float)(lv.posX - posX) / dst;
+					this.motionY -= (float)(lv.posY - posY) / dst;
+					this.motionZ -= (float)(lv.posZ - posZ) / dst;
+				}
+			}
 		}
 
 		this.prevPosX = this.posX;

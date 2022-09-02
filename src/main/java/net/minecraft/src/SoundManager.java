@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.minecraft.client.Minecraft;
 
 public class SoundManager {
 	
@@ -59,17 +61,22 @@ public class SoundManager {
 		EaglerAdapter.setMasterVolume(options.soundVolume);
 		if(this.sounddefinitions == null) {
 			this.sounddefinitions = new HashMap();
-			try {
-				NBTTagCompound file = CompressedStreamTools.readUncompressed(EaglerAdapter.loadResourceBytes("/sounds/sounds.dat"));
-				EaglerAdapter.setPlaybackOffsetDelay(file.hasKey("playbackOffset") ? file.getFloat("playbackOffset") : 0.03f);
-				NBTTagList l = file.getTagList("sounds");
-				int c = l.tagCount();
-				for(int i = 0; i < c; i++) {
-					NBTTagCompound cc = (NBTTagCompound)l.tagAt(i);
-					this.sounddefinitions.put(cc.getString("e"), (int)cc.getByte("c") & 0xFF);
+			for(int j = 0; j < 2; ++j) {
+				byte[] b = EaglerAdapter.loadResourceBytes("/sounds/sounds.dat" + (j == 1 ? "x" : ""));
+				if(b != null) {
+					try {
+						NBTTagCompound file = CompressedStreamTools.readUncompressed(b);
+						if(j == 0) EaglerAdapter.setPlaybackOffsetDelay(file.hasKey("playbackOffset") ? file.getFloat("playbackOffset") : 0.03f);
+						NBTTagList l = file.getTagList("sounds");
+						int c = l.tagCount();
+						for(int i = 0; i < c; i++) {
+							NBTTagCompound cc = (NBTTagCompound)l.tagAt(i);
+							this.sounddefinitions.put(cc.getString("e"), (int)cc.getByte("c") & 0xFF);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}
@@ -201,6 +208,32 @@ public class SoundManager {
 			}
 		}
 	}
+	
+	private static final Map<String, String> remapAdl;
+	
+	static {
+		remapAdl = new HashMap();
+		remapAdl.put("ambient.cave.cave", "!adl.b");
+		remapAdl.put("damage.hit", "!random.classic_hurt");
+		remapAdl.put("damage.hurtflesh", "!random.classic_hurt");
+		remapAdl.put("mob.zombie.hurt", "adl.yee");
+		remapAdl.put("mob.zombie.say", "adl.yee");
+		remapAdl.put("mob.zombiepig.zpig", "!adl.eee");
+		remapAdl.put("mob.zombiepig.zpigangry", "adl.eee");
+		remapAdl.put("mob.blaze.breathe", "adl.yee");
+		remapAdl.put("mob.endermen.scream", "adl.yee");
+		remapAdl.put("mob.endermen.stare", "!adl.l");
+		remapAdl.put("mob.pig.say", "!adl.eee");
+		remapAdl.put("mob.pig.death", "adl.eee");
+		remapAdl.put("mob.silverfish.say", "!adl.eee");
+		remapAdl.put("mob.ghast.scream", "!adl.yee");
+		remapAdl.put("mob.slime.big", "!adl.eee");
+		remapAdl.put("mob.slime.small", "!adl.eee");
+		remapAdl.put("mob.slime.attack", "!adl.eee");
+		remapAdl.put("mob.spider.say", "adl.eee");
+		remapAdl.put("mob.villager.default", "!adl.a");
+		remapAdl.put("mob.villager.defaulthurt", "!adl.a");
+	}
 
 	/**
 	 * If a sound is already playing from the given entity, update the position and
@@ -217,6 +250,23 @@ public class SoundManager {
 			}
 		}
 		if(this.options.soundVolume > 0.0F && par3 > 0.0F) {
+			Minecraft mc = Minecraft.getMinecraft();
+			if(mc.gameSettings.adderall) {
+				if(mc.entityRenderer.startup > 300) {
+					String rp = remapAdl.get(par1Str);
+					if(rp != null) {
+						if(rp.startsWith("!")) {
+							par1Str = rp.substring(1);
+						}else {
+							int i = 4 - (mc.entityRenderer.startup - 300) / 200;
+							if(i < 0) i = 0;
+							if(soundrandom.nextInt(2 + i) == 0) {
+								par1Str = rp;
+							}
+						}
+					}
+				}
+			}
 			Integer ct = this.sounddefinitions.get(par1Str);
 			if(ct != null) {
 				int c = ct.intValue();
@@ -228,8 +278,26 @@ public class SoundManager {
 					path = "/sounds/"+par1Str.replace('.', '/')+r+".mp3";
 				}
 				int id = 0;
-				soundevents.add(new EntitySoundEvent(par2Entity, id = EaglerAdapter.beginPlayback(path, 0f, 0f, 0f, par3, par4)));
-				EaglerAdapter.moveSound(id, (float)par2Entity.posX, (float)par2Entity.posY, (float)par2Entity.posZ, (float)par2Entity.motionX, (float)par2Entity.motionY, (float)par2Entity.motionZ);
+				float i = Minecraft.getMinecraft().entityRenderer.startup / 800.0f;
+				if(i > 1.0f) i = 1.0f;
+				i = i * i;
+				float v = i > 0.0f ? 1.0f + (soundrandom.nextFloat() - 0.5f) * i * 0.6f : 1.0f;
+				float p = i > 0.0f ? 1.0f + (soundrandom.nextFloat() - 0.2f) * i * 1.3f : 1.0f;
+				soundevents.add(new EntitySoundEvent(par2Entity, id = EaglerAdapter.beginPlayback(path, 0f, 0f, 0f, par3 * v * 0.8f, par4 * p)));
+				EaglerAdapter.moveSound(id, (float)par2Entity.posX + (i > 0.0f ? (soundrandom.nextFloat() - 0.5f) * i * 4.0f : 0.0f),
+						(float)par2Entity.posY + (i > 0.0f ? (soundrandom.nextFloat() - 0.5f) * i * 4.0f : 0.0f),
+						(float)par2Entity.posZ + (i > 0.0f ? (soundrandom.nextFloat() - 0.5f) * i * 4.0f : 0.0f),
+						(float)par2Entity.motionX, (float)par2Entity.motionY, (float)par2Entity.motionZ);
+				if(i > 0.3f) {
+					while(soundrandom.nextFloat() * i > 0.3f) {
+						soundevents.add(new EntitySoundEvent(par2Entity, id = EaglerAdapter.beginPlayback(path, 0f, 0f, 0f, par3 * v *
+								(soundrandom.nextFloat() * 0.4f + 0.8f), par4 * p * (pow2(soundrandom.nextFloat()) * 1.5f + 0.3f))));
+						EaglerAdapter.moveSound(id, (float)par2Entity.posX + (soundrandom.nextFloat() - 0.5f) * i * 2.0f,
+								(float)par2Entity.posY + (soundrandom.nextFloat() - 0.5f) * i * 2.0f,
+								(float)par2Entity.posZ + (soundrandom.nextFloat() - 0.5f) * i * 2.0f,
+								(float)par2Entity.motionX, (float)par2Entity.motionY, (float)par2Entity.motionZ);
+					}
+				}
 			}else {
 				System.err.println("unregistered sound effect: "+par1Str);
 			}
@@ -241,6 +309,23 @@ public class SoundManager {
 	 */
 	public void playSound(String par1Str, float par2, float par3, float par4, float par5, float par6) {
 		if(this.options.soundVolume > 0.0F && par5 > 0.0F) {
+			Minecraft mc = Minecraft.getMinecraft();
+			if(mc.gameSettings.adderall) {
+				if(mc.entityRenderer.startup > 300) {
+					String rp = remapAdl.get(par1Str);
+					if(rp != null) {
+						if(rp.startsWith("!")) {
+							par1Str = rp.substring(1);
+						}else {
+							int i = 4 - (mc.entityRenderer.startup - 300) / 200;
+							if(i < 0) i = 0;
+							if(soundrandom.nextInt(2 + i) == 0) {
+								par1Str = rp;
+							}
+						}
+					}
+				}
+			}
 			Integer ct = this.sounddefinitions.get(par1Str);
 			if(ct != null) {
 				int c = ct.intValue();
@@ -251,11 +336,30 @@ public class SoundManager {
 					int r = soundrandom.nextInt(c) + 1;
 					path = "/sounds/"+par1Str.replace('.', '/')+r+".mp3";
 				}
-				EaglerAdapter.beginPlayback(path, par2, par3, par4, par5, par6);
+				float i = mc.entityRenderer.startup / 800.0f;
+				if(i > 1.0f) i = 1.0f;
+				i = i * i;
+				float v = i > 0.0f ? 1.0f + (soundrandom.nextFloat() - 0.5f) * i * 0.6f : 1.0f;
+				float p = i > 0.0f ? 1.0f + (soundrandom.nextFloat() - 0.2f) * i * 1.3f : 1.0f;
+				if(i > 0.3f) {
+					par2 += (soundrandom.nextFloat() - 0.5f) * i * 3.0f;
+					par3 += (soundrandom.nextFloat() - 0.5f) * i * 3.0f;
+					par4 += (soundrandom.nextFloat() - 0.5f) * i * 3.0f;
+					while(soundrandom.nextFloat() * i > 0.3f) {
+						EaglerAdapter.beginPlayback(path, par2 + (soundrandom.nextFloat() - 0.5f) * i * 3.0f, par3 + (soundrandom.nextFloat() - 0.5f) * i * 3.0f,
+								par4 + (soundrandom.nextFloat() - 0.5f) * i * 3.0f, par5 * v * (soundrandom.nextFloat() * 0.4f + 0.8f),
+								par6 * p * (pow2(soundrandom.nextFloat()) * 1.5f + 0.3f));
+					}
+				}
+				EaglerAdapter.beginPlayback(path, par2, par3, par4, par5 * v, par6 * p);
 			}else {
 				System.err.println("unregistered sound effect: "+par1Str);
 			}
 		}
+	}
+	
+	private static float pow2(float f) {
+		return f * f;
 	}
 
 	/**

@@ -85,6 +85,10 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	public static final int GL_BGRA = RealOpenGLEnums.GL_BGRA;
 	public static final int GL_UNSIGNED_INT_8_8_8_8_REV = RealOpenGLEnums.GL_UNSIGNED_INT_8_8_8_8_REV;
 	public static final int GL_DST_COLOR = RealOpenGLEnums.GL_DST_COLOR;
+	public static final int GL_CONSTANT_COLOR = RealOpenGLEnums.GL_CONSTANT_COLOR;
+	public static final int GL_ONE_MINUS_CONSTANT_COLOR = RealOpenGLEnums.GL_ONE_MINUS_CONSTANT_COLOR;
+	public static final int GL_CONSTANT_ALPHA = RealOpenGLEnums.GL_CONSTANT_ALPHA;
+	public static final int GL_ONE_MINUS_CONSTANT_ALPHA = RealOpenGLEnums.GL_ONE_MINUS_CONSTANT_ALPHA;
 	public static final int GL_POLYGON_OFFSET_FILL = RealOpenGLEnums.GL_POLYGON_OFFSET_FILL;
 	public static final int GL_NORMALIZE = RealOpenGLEnums.GL_NORMALIZE;
 	public static final int GL_DST_ALPHA = RealOpenGLEnums.GL_DST_ALPHA;

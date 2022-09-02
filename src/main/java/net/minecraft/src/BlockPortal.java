@@ -1,6 +1,8 @@
 package net.minecraft.src;
 
+import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglercraftRandom;
+import net.minecraft.client.Minecraft;
 
 public class BlockPortal extends BlockBreakable {
 	public BlockPortal(int par1) {
@@ -218,14 +220,36 @@ public class BlockPortal extends BlockBreakable {
 			par5Entity.setInPortal();
 		}
 	}
+	
+	private int counter = 0;
 
 	/**
 	 * A randomly called display update to be able to add particles or other items
 	 * for display
 	 */
 	public void randomDisplayTick(World par1World, int par2, int par3, int par4, EaglercraftRandom par5Random) {
-		if (par5Random.nextInt(100) == 0) {
-			par1World.playSound((double) par2 + 0.5D, (double) par3 + 0.5D, (double) par4 + 0.5D, "portal.portal", 0.5F, par5Random.nextFloat() * 0.4F + 0.8F, false);
+		Minecraft mc = Minecraft.getMinecraft();
+		if (mc.gameSettings.soundVolume > 0.0f && par5Random.nextInt(100) == 0) {
+			int c = mc.entityRenderer.startup;
+			if(c == 0) {
+				counter = 0;
+			}
+			if(mc.renderViewEntity.getDistanceSq(par2 + 0.5, par3 + 0.5, par4 + 0.5) < 64.0) {
+				String p = "portal.portal";
+				boolean b = false;
+				if(counter > 7) {
+					if(counter > 20 || par5Random.nextInt(13) < counter - 7) {
+						b = true;
+					}
+				}
+				if(b && par5Random.nextBoolean()) {
+					EaglerAdapter.beginPlayback("/sounds/portalx.mp3", (float) par2 - 1.0F + par5Random.nextFloat() * 2.0f, (float) par3 - 1.0F + par5Random.nextFloat() * 2.0f,
+							(float) par4 - 1.0F + par5Random.nextFloat() * 2.0f, 0.8F, par5Random.nextFloat() * 0.2F + 0.9F);
+				}else {
+					par1World.playSound((double) par2 + 0.5D, (double) par3 + 0.5D, (double) par4 + 0.5D, b ? "portalx" : "portal.portal", 0.5F, b ? 1.0f : (par5Random.nextFloat() * 0.4F + 0.8F), false);
+				}
+				++counter;
+			}
 		}
 
 		for (int var6 = 0; var6 < 4; ++var6) {

@@ -31,6 +31,7 @@ public class WorldClient extends World {
 	private Set entitySpawnQueue = new HashSet();
 	public final Minecraft mc = Minecraft.getMinecraft();
 	private final Set previousActiveChunkSet = new HashSet();
+	public int ghostEntityId = Integer.MAX_VALUE;
 
 	public WorldClient(NetClientHandler par1NetClientHandler, WorldSettings par2WorldSettings, int par3, int par4, Profiler par5Profiler) {
 		super("MpServer", WorldProvider.getProviderForDimension(par3), par2WorldSettings, par5Profiler);

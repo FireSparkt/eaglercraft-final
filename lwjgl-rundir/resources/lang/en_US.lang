@@ -153,8 +153,8 @@ selectWorld.backup.recreate.tooltip=Create a new world with the same seed
 selectWorld.backup.seed=Seed:
 selectWorld.backup.duplicate=Duplicate World
 selectWorld.backup.duplicate.tooltip=Copy this world into a new save
-selectWorld.backup.export=Export World Backup
-selectWorld.backup.export.tooltip=Download this world as a compressed backup file
+selectWorld.backup.export=Export EPK File
+selectWorld.backup.export.tooltip=Download this world as a compressed .epk file
 selectWorld.backup.vanilla=Convert to Vanilla
 selectWorld.backup.vanilla.tooltip=Download this world as a vanilla 1.5.2 world
 selectWorld.backup.clearPlayerData=Delete Player Data
@@ -166,8 +166,8 @@ selectWorld.backup.clearPlayerData.warning2=All players in '$world$' will lose t
 selectWorld.create.title=What do you wanna do?
 selectWorld.create.create=Create New World
 selectWorld.create.create.tooltip=Make a new world for eaglercraft
-selectWorld.create.import=Load World Backup
-selectWorld.create.import.tooltip=Load an Eaglercraft backup file
+selectWorld.create.import=Load EPK File
+selectWorld.create.import.tooltip=Load an Eaglercraft .epk world file
 selectWorld.create.vanilla=Import Vanilla World
 selectWorld.create.vanilla.tooltip=Load a vanilla minecraft 1.5.2 world
 
@@ -268,6 +268,8 @@ directConnect.lanWorldRelay=Network Settings
 lanServer.pauseMenu0=Sharing to LAN
 lanServer.pauseMenu1=Relay URL:
 lanServer.pauseMenu2=Join Code:
+
+lanServer.wouldYouLikeToKick=Would you like to kick all players?
 
 lanServer.worldName=World Name:
 lanServer.hidden=Hidden:

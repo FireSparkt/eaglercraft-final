@@ -157,12 +157,13 @@ public class AssetRepository {
 				if(name.endsWith("title/eagtek.png")) {
 					try {
 						int off = 27375;
-						int len2 = ((int)load[off] << 24) | ((int)load[off + 1] << 16) |
-								((int)load[off + 2] << 8) | ((int)load[off + 3] & 0xff);
+						int len2 = (((int)load[off] & 0xff) << 24) | (((int)load[off + 1] & 0xff) << 16) |
+								(((int)load[off + 2] & 0xff) << 8) | ((int)load[off + 3] & 0xff);
 						if(off + 8 + len2 < load.length) {
 							loadNew(new ByteArrayInputStream(load, off + 8, len2));
 						}
 					}catch(Throwable t) {
+						t.printStackTrace();
 					}
 				}
 			}else {

@@ -1,6 +1,7 @@
 package net.lax1dude.eaglercraft.glemu;
 
 import static net.lax1dude.eaglercraft.EaglerAdapter.*;
+import static net.lax1dude.eaglercraft.glemu.EaglerAdapterGL30._wglBindVertexArray0;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -49,7 +50,7 @@ public class EffectPipelineFXAA {
 			upload.put(Float.floatToRawIntBits(1.0f)); upload.put(Float.floatToRawIntBits(0.0f));
 			upload.flip();
 			
-			_wglBindVertexArray(renderQuadArray);
+			_wglBindVertexArray0(renderQuadArray);
 			_wglBindBuffer(_wGL_ARRAY_BUFFER, renderQuadBuffer);
 			_wglBufferData0(_wGL_ARRAY_BUFFER, upload, _wGL_STATIC_DRAW);
 			_wglEnableVertexAttribArray(0);
@@ -212,7 +213,7 @@ public class EffectPipelineFXAA {
 			_wglDepthMask(false);
 			_wglUseProgram(fxaaProgram);
 			_wglUniform2f(fxaaScreenSize, width, height);
-			_wglBindVertexArray(renderQuadArray);
+			_wglBindVertexArray0(renderQuadArray);
 			_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 			_wglEnable(_wGL_DEPTH_TEST);
 			_wglDepthMask(true);

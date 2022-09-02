@@ -68,11 +68,8 @@ public class GuiIngameMenu extends GuiScreen {
 
 		case 7:
 			if (IntegratedServerLAN.isLANOpen()) {
-				this.mc.lanState = false;
-				IntegratedServerLAN.closeLAN();
-				IntegratedServer.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
-				this.mc.thePlayer.sendChatToPlayer(StatCollector.translateToLocal("lanServer.closed"));
-				this.lanButton.displayString = StatCollector.translateToLocal("menu.shareToLan");
+				closingLan = true;
+				mc.displayGuiScreen(new GuiYesNo(this, StatCollector.translateToLocal("networkSettings.delete"), StatCollector.translateToLocal("lanServer.wouldYouLikeToKick"), 0));
 			} else {
 				if(IntegratedServer.relayManager.count() == 0) {
 					this.mc.displayGuiScreen(new GuiScreenNoRelays(this, "noRelay.title"));
@@ -232,6 +229,22 @@ public class GuiIngameMenu extends GuiScreen {
 			super.mouseMovedOrUp(par1, par2, par3);
 		}catch(AbortedException ex) {
 		}
+	}
+
+	boolean closingLan;
+	public void confirmClicked(boolean par1, int par2) {
+		mc.displayGuiScreen(this);
+		if(closingLan) {
+			this.mc.lanState = false;
+			IntegratedServerLAN.closeLANNoKick();
+			if(par1) {
+				IntegratedServerLAN.cleanupLAN();
+				IntegratedServer.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
+			}
+			this.mc.thePlayer.sendChatToPlayer(StatCollector.translateToLocal("lanServer.closed"));
+			this.lanButton.displayString = StatCollector.translateToLocal("menu.shareToLan");
+		}
+		closingLan = false;
 	}
 	
 }

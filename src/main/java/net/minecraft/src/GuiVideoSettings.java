@@ -17,7 +17,7 @@ public class GuiVideoSettings extends GuiScreen {
 
 	/** An array of all of EnumOption's video options. */
 	private static EnumOptions[] videoOptions = new EnumOptions[] { EnumOptions.GRAPHICS, EnumOptions.RENDER_DISTANCE, EnumOptions.AMBIENT_OCCLUSION, EnumOptions.FRAMERATE_LIMIT, EnumOptions.ANAGLYPH, EnumOptions.VIEW_BOBBING,
-			EnumOptions.GUI_SCALE, EnumOptions.GAMMA, EnumOptions.RENDER_CLOUDS, EnumOptions.ENABLE_FOG, EnumOptions.PARTICLES, EnumOptions.CHUNK_UPDATES };
+			EnumOptions.GUI_SCALE, EnumOptions.GAMMA, EnumOptions.RENDER_CLOUDS, EnumOptions.ENABLE_FOG, EnumOptions.PARTICLES, EnumOptions.CHUNK_UPDATES, EnumOptions.ADDERALL };
 
 	public GuiVideoSettings(GuiScreen par1GuiScreen, GameSettings par2GameSettings) {
 		this.parentGuiScreen = par1GuiScreen;
@@ -55,6 +55,7 @@ public class GuiVideoSettings extends GuiScreen {
 
 		for (int var12 = 0; var12 < var11; ++var12) {
 			EnumOptions var8 = var10[var12];
+			if(var8 == EnumOptions.ADDERALL && !mc.yeeState) continue;
 
 			if (var8.getEnumFloat()) {
 				this.buttonList.add(new GuiSlider(var8.returnEnumOrdinal(), this.width / 2 - 155 + var9 % 2 * 160, this.height / 7 + 24 * (var9 >> 1), var8, this.guiGameSettings.getKeyBinding(var8),

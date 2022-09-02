@@ -499,6 +499,8 @@ public class EaglerAdapterImpl2 {
 	public static final int _wGL_RGB = RGB;
 	public static final int _wGL_RGB8 = RGB8;
 	public static final int _wGL_RGBA8 = RGBA8;
+	public static final int _wGL_RED = RED;
+	public static final int _wGL_R8 = R8;
 	public static final int _wGL_UNSIGNED_BYTE = UNSIGNED_BYTE;
 	public static final int _wGL_UNSIGNED_SHORT = UNSIGNED_SHORT;
 	public static final int _wGL_SRC_ALPHA = SRC_ALPHA;
@@ -688,6 +690,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final void _wglBlendFunc(int p1, int p2) {
 		webgl.blendFunc(p1, p2);
+	}
+	public static final void _wglBlendColor(float r, float g, float b, float a) {
+		webgl.blendColor(r, g, b, a);
 	}
 	public static final void _wglDepthMask(boolean p1) {
 		webgl.depthMask(p1);
@@ -3726,7 +3731,7 @@ public class EaglerAdapterImpl2 {
 	private static String clientICECandidate = null;
 	private static String clientDescription = null;
 	private static boolean clientDataChannelOpen = false;
-	private static boolean clientDataChannelClosed = false;
+	private static boolean clientDataChannelClosed = true;
 	
 	public static final boolean clientLANSupported() {
 		return rtcLANClient.LANClientSupported();

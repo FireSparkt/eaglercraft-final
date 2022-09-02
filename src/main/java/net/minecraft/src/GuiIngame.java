@@ -105,7 +105,25 @@ public class GuiIngame extends Gui {
 			tex_icons.bindTexture();
 			EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 			EaglerAdapter.glBlendFunc(EaglerAdapter.GL_ONE_MINUS_DST_COLOR, EaglerAdapter.GL_ONE_MINUS_SRC_COLOR);
-			this.drawTexturedModalRect(var6 / 2 - 7, var7 / 2 - 7, 0, 0, 16, 16);
+
+			float i = mc.entityRenderer.startup / 900.0f - 0.5f;
+			if(i > 1.0f) i = 1.0f;
+			if(i < 0.0f) i = 0.0f;
+			float i2 = i * i;
+			if(i2 > 0.0f) {
+				float f = (float)((System.currentTimeMillis() % 1000000l) * 0.0002);
+				f += MathHelper.sin(f * 5.0f) * 0.2f;
+				i2 *= MathHelper.sin(f) + MathHelper.sin(f * 1.5f + 0.6f) + MathHelper.sin(f * 0.7f + 1.7f) +
+						MathHelper.sin(f * 3.0f + 3.0f);
+				EaglerAdapter.glPushMatrix();
+				EaglerAdapter.glTranslatef(var6 / 2, var7 / 2, 0.0f);
+				EaglerAdapter.glRotatef(i2 * 5.0f, 0.0f, 0.0f, 1.0f);
+				this.drawTexturedModalRect(-7, -7, 0, 0, 16, 16);
+				EaglerAdapter.glPopMatrix();
+			}else {
+				this.drawTexturedModalRect(var6 / 2 - 7, var7 / 2 - 7, 0, 0, 16, 16);
+			}
+			
 			EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 			var11 = this.mc.thePlayer.hurtResistantTime / 3 % 2 == 1;
 
@@ -457,10 +475,6 @@ public class GuiIngame extends Gui {
 			this.drawString(var8, var45, var6 - var8.getStringWidth(var45) - 2, offset + 110, 14737632);
 			var45 = "/glsl/occl.glsl";
 			this.drawString(var8, var45, var6 - var8.getStringWidth(var45) - 2, offset + 120, 14737632);
-			for(int i = 0; i < EffectPipeline.pipeline.length; i++) {
-				var45 = EffectPipeline.pipeline[i];
-				this.drawString(var8, var45, var6 - var8.getStringWidth(var45) - 2, offset + 130 + i*10, 14737632);
-			}
 			EaglerAdapter.glPopMatrix();
 			this.mc.mcProfiler.endSection();
 		}else {

@@ -78,16 +78,20 @@ public class IntegratedServerLAN {
 	}
 
 	public static void closeLAN() {
+		closeLANNoKick();
+		EaglerAdapter.serverLANCloseServer();
+		cleanupLAN();
+	}
+	
+	public static void closeLANNoKick() {
 		if(lanRelaySocket != null) {
 			lanRelaySocket.close();
 			lanRelaySocket = null;
 			currentCode = null;
 		}
-		EaglerAdapter.serverLANCloseServer();
-		cleanupLAN();
 	}
 	
-	static void cleanupLAN() {
+	public static void cleanupLAN() {
 		Iterator<LANClient> itr = clients.values().iterator();
 		while(itr.hasNext()) {
 			itr.next().disconnect();
