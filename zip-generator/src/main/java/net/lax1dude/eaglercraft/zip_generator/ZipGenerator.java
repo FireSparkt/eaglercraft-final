@@ -121,6 +121,19 @@ public class ZipGenerator {
 		IOUtils.write(FileUtils.readFileToByteArray(new File("zip-generator/repl_index.html")), zOut);
 		
 		zOut.close();
+
+		System.out.println("Writing 'stable-download/stable-download_livestream.zip'");
+
+		zOut = new ZipOutputStream(new FileOutputStream(new File("stable-download/stable-download_livestream.zip")));
+		zOut.setLevel(9);
+
+		zipFolder(zOut, "web", new File("stable-download/web"), "web/index.html");
+		zipFolder(zOut, "java", new File("stable-download/java"));
+
+		zOut.putNextEntry(new ZipEntry("web/index.html"));
+		IOUtils.write(FileUtils.readFileToByteArray(new File("zip-generator/livestream_index.html")), zOut);
+
+		zOut.close();
 		
 	}
 	

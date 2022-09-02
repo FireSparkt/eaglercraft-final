@@ -6,7 +6,7 @@ public class ConfigConstants {
 	
 	public static boolean profanity = false;
 
-	public static final String version = "22w34b";
+	public static final String version = "22w35a";
 	public static final String mainMenuString = "eaglercraft " + version;
 	
 	public static final String forkMe = "https://github.com/lax1dude/eaglercraft";
@@ -26,5 +26,7 @@ public class ConfigConstants {
 	public static List<RelayEntry> relays = null;
 
 	public static boolean eaglercraftTitleLogo = false;
+
+	public static boolean panoramaBlur = true;
 	
 }

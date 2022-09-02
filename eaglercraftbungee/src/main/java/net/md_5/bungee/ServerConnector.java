@@ -62,7 +62,7 @@ public class ServerConnector extends PacketHandler
     @Override
     public void exception(final Throwable t) throws Exception {
         final String message = "Exception Connecting:" + Util.exception(t);
-        if (this.user.getServer() == null) {
+        if (this.user.getServer() == null || this.user.getServer().getInfo() == null) {
             this.user.disconnect(message);
         }
         else {
@@ -94,7 +94,9 @@ public class ServerConnector extends PacketHandler
     @Override
     public void handle(final Packet1Login login) throws Exception {
         Preconditions.checkState(this.thisState == State.LOGIN || this.thisState == State.ENCRYPT_REQUEST, (Object)"Not expecting LOGIN/ENCRYPT_REQUEST");
-        if (this.thisState == State.ENCRYPT_REQUEST) this.thisState = State.LOGIN;
+        if (this.thisState == State.ENCRYPT_REQUEST) {
+            this.thisState = State.LOGIN;
+        }
         final ServerConnection server = new ServerConnection(this.ch, this.target);
         final ServerConnectedEvent event = new ServerConnectedEvent(this.user, server);
         this.bungee.getPluginManager().callEvent(event);
@@ -117,7 +119,7 @@ public class ServerConnector extends PacketHandler
             this.ch.write(this.user.getSettings());
         }
         synchronized (this.user.getSwitchMutex()) {
-            if (this.user.getServer() == null) {
+            if (this.user.getServer() == null || this.user.getServer().getInfo() == null) {
                 this.user.setClientEntityId(login.getEntityId());
                 this.user.setServerEntityId(login.getEntityId());
                 Packet1Login modLogin;
@@ -210,7 +212,7 @@ public class ServerConnector extends PacketHandler
             return;
         }
         final String message = this.bungee.getTranslation("connect_kick") + this.target.getName() + ": " + kick.getMessage();
-        if (this.user.getServer() == null) {
+        if (this.user.getServer() == null || this.user.getServer().getInfo() == null) {
             this.user.disconnect(message);
         }
         else {
@@ -220,8 +222,8 @@ public class ServerConnector extends PacketHandler
     
     @Override
     public void handle(final PacketFAPluginMessage pluginMessage) throws Exception {
-        if (pluginMessage.equals(PacketConstants.I_AM_BUNGEE)) {
-            throw new IllegalStateException("May not connect to another BungeCord!");
+        if (pluginMessage.equals(PacketConstants.I_AM_BUNGEE) && !BungeeCord.getInstance().config.allowBungeeOnBungee()) {
+            throw new IllegalStateException("May not connect to another BungeeCord!");
         }
         if (pluginMessage.getTag().equals("FML") && (pluginMessage.getData()[0] & 0xFF) == 0x0) {
             final ByteArrayDataInput in = ByteStreams.newDataInput(pluginMessage.getData());

@@ -2,21 +2,20 @@ package net.minecraft.src;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
+import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
 import net.lax1dude.eaglercraft.Base64;
 import net.lax1dude.eaglercraft.ConfigConstants;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.LocalStorageManager;
 import net.lax1dude.eaglercraft.RelayEntry;
-import net.lax1dude.eaglercraft.ServerQuery.QueryResponse;
-import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2.RateLimit;
+import net.lax1dude.eaglercraft.EaglercraftRandom;
 import net.minecraft.client.Minecraft;
 
 public class ServerList {
@@ -28,7 +27,7 @@ public class ServerList {
 	private final List<ServerData> allServers = new ArrayList();
 	
 	public static final List<ServerData> forcedServers = new ArrayList();
-	private static final Set<String> motdLocks = new HashSet();
+	private static final EaglercraftRandom random = new EaglercraftRandom();
 	
 	public static boolean hideDownDefaultServers = false;
 
@@ -69,11 +68,13 @@ public class ServerList {
 			}
 			
 			// NOTE: Change these asap if one goes down or is replaced, they are used by replits
+
+			int choice = random.nextInt(3);
 			
 			ConfigConstants.relays = new ArrayList();
-			ConfigConstants.relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", true));
-			ConfigConstants.relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", false));
-			ConfigConstants.relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", false));
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", choice == 0));
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", choice == 1));
+			ConfigConstants.relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", choice == 2));
 			
 		} catch (IOException e) {
 			e.printStackTrace();

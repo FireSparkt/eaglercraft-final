@@ -52,7 +52,7 @@ public class CommandSend extends Command {
 	}
 
 	private void summon(final ProxiedPlayer player, final ServerInfo target, final CommandSender sender) {
-		if (player.getServer() != null && !player.getServer().getInfo().equals(target)) {
+		if (player.getServer() != null && player.getServer().getInfo() != null && !player.getServer().getInfo().equals(target)) {
 			player.connect(target);
 			player.sendMessage(ChatColor.GOLD + "Summoned to " + target.getName() + " by " + sender.getName());
 		}

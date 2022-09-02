@@ -60,7 +60,7 @@ servers:
     address: localhost:25569
     restricted: false
 origin_blacklist_block_offline_download: false
-origin_blacklist_block_missing_origin_header: false
+origin_blacklist_block_missing_origin_header: true
 permissions:
   default:
   - bungeecord.command.server
@@ -84,7 +84,7 @@ permissions:
   - bungeecord.command.eag.blockdomainname
   - bungeecord.command.eag.unblockdomain
 origin_blacklist_subscriptions:
-- https://g.eags.us/eaglercraft/origin_blacklist.txt
+- https://g.lax1dude.net/eaglercraft/origin_blacklist.txt
 - https://raw.githubusercontent.com/LAX1DUDE/eaglercraft/main/stable-download/origin_blacklist.txt
 display_ban_type_on_kick: false
 timeout: 30000

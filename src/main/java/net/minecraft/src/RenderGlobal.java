@@ -1549,15 +1549,13 @@ public class RenderGlobal implements IWorldAccess {
 	 * Plays the specified record. Arg: recordName, x, y, z
 	 */
 	public void playRecord(String par1Str, int par2, int par3, int par4) {
-		Minecraft.getMinecraft().displayEaglercraftText("records have been deleted to reduce file size");
-		
 		ItemRecord var5 = ItemRecord.getRecord(par1Str);
 
 		if (par1Str != null && var5 != null) {
 			this.mc.ingameGUI.setRecordPlayingMessage(var5.getRecordTitle());
 		}
 
-		this.mc.sndManager.playStreaming(par1Str, (float) par2, (float) par3, (float) par4);
+		this.mc.sndManager.playStreaming(par1Str, (float)par2 + 0.5F, (float)par3 + 0.5F, (float)par4 + 0.5F, true);
 	}
 
 	/**
