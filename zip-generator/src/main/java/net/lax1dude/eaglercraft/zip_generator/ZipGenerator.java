@@ -46,7 +46,7 @@ public class ZipGenerator {
 				"--js_output_file", "stable-download/web/eagswebrtc.js", "-O", "SIMPLE" }, "[ClosureCompiler]");
 
 		System.out.println("Loading 'javascript/classes.js'");
-		String classesJs = FileUtils.readFileToString(new File("javascript/classes.js"), "UTF-8").replaceFirst("\\/\\/# sourceMappingURL=.*(\\r\\n|\\r|\\n)*", "").trim();
+		String classesJs = FileUtils.readFileToString(new File("javascript/classes.js"), "UTF-8");
 		
 		File f = new File("crash_report_override.txt");
 		if(f.isFile()) {
@@ -68,7 +68,8 @@ public class ZipGenerator {
 		
 		System.out.println("Writing 'stable-download/Offline_Download_Version.html'");
 		
-		offlineTemplate = offlineTemplate.replace("${date}", date).replace("${assets_epk_base64}", assetsEpk).replace("${classes_js}", classesJs);
+		offlineTemplate = offlineTemplate.replace("${date}", date).replace("${assets_epk_base64}", assetsEpk).replace("${classes_js}",
+				classesJs.replaceFirst("\\/\\/# sourceMappingURL=.*(\\r\\n|\\r|\\n)*", "").trim());
 		offlineTemplate = offlineTemplate.replace("${eagswebrtc_js}", classesWebRTCJs).replace("${classes_server_js}", classesServerJs);
 		
 		FileUtils.writeStringToFile(new File("stable-download/Offline_Download_Version.html"), offlineTemplate, "UTF-8");
