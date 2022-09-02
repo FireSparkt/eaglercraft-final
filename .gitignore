@@ -32,3 +32,4 @@ sp-relay/src/main/java/META-INF
 zip-generator/out
 zip-generator/src/main/java/META-INF
 *.iml
+crash_report_override.txt

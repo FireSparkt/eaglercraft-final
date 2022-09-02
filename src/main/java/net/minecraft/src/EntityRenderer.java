@@ -157,8 +157,9 @@ public class EntityRenderer {
 	 * 6=TiltRight)
 	 */
 	public int debugViewDirection;
-	
+
 	public int startup = 0;
+	public int preStartup = 0;
 
 	public EntityRenderer(Minecraft par1Minecraft) {
 		this.mc = par1Minecraft;
@@ -1269,6 +1270,10 @@ public class EntityRenderer {
 		if(mc.gameSettings.adderall) {
 			if(startup == 0) {
 				var3.ambientTickCountdown = random.nextInt(12000);
+			}
+			++preStartup;
+			if(preStartup < 300) {
+				return;
 			}
 			++startup;
 			int k = 60 - (startup / 5);

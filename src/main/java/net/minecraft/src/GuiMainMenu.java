@@ -331,18 +331,20 @@ public class GuiMainMenu extends GuiScreen {
 		EaglerAdapter.glDisable(EaglerAdapter.GL_CULL_FACE);
 		EaglerAdapter.glDepthMask(false);
 		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE_MINUS_SRC_ALPHA);
-		byte var5 = 8;
+		byte var5 = ConfigConstants.panoramaBlur ? (byte)8 : (byte)1;
 
 		for (int var6 = 0; var6 < var5 * var5; ++var6) {
-			EaglerAdapter.glPushMatrix();
-			float var7 = ((float) (var6 % var5) / (float) var5 - 0.5F) / 64.0F;
-			float var8 = ((float) (var6 / var5) / (float) var5 - 0.5F) / 64.0F;
-			float var9 = 0.0F;
-			EaglerAdapter.glTranslatef(var7, var8, var9);
-			
-			float panTimer = (float)(System.currentTimeMillis() - start) * 0.03f;
-			EaglerAdapter.glRotatef(MathHelper.sin(panTimer / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
-			EaglerAdapter.glRotatef(-(panTimer) * 0.1F, 0.0F, 1.0F, 0.0F);
+			if (ConfigConstants.panoramaBlur) {
+				EaglerAdapter.glPushMatrix();
+				float var7 = ((float) (var6 % var5) / (float) var5 - 0.5F) / 64.0F;
+				float var8 = ((float) (var6 / var5) / (float) var5 - 0.5F) / 64.0F;
+				float var9 = 0.0F;
+				EaglerAdapter.glTranslatef(var7, var8, var9);
+				
+				float panTimer = (float)(System.currentTimeMillis() - start) * 0.03f;
+				EaglerAdapter.glRotatef(MathHelper.sin(panTimer / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
+				EaglerAdapter.glRotatef(-(panTimer) * 0.1F, 0.0F, 1.0F, 0.0F);
+			}
 
 			for (int var10 = 0; var10 < 6; ++var10) {
 				EaglerAdapter.glPushMatrix();
@@ -383,7 +385,9 @@ public class GuiMainMenu extends GuiScreen {
 				EaglerAdapter.glPopMatrix();
 			}
 
-			EaglerAdapter.glPopMatrix();
+			if (ConfigConstants.panoramaBlur) {
+				EaglerAdapter.glPopMatrix();
+			}
 			EaglerAdapter.glColorMask(true, true, true, false);
 		}
 

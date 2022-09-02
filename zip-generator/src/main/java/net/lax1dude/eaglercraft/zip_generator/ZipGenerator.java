@@ -25,7 +25,7 @@ public class ZipGenerator {
 		System.out.println();
 		
 		try {
-			if(!net.lax1dude.eaglercraft.v1_8.buildtools.Java11Check.classLoadCheck()) {
+			if(!(boolean) Class.forName("net.lax1dude.eaglercraft.v1_8.buildtools.Java11Check").getMethod("classLoadCheck").invoke(null)) {
 				throw new RuntimeException("wtf?");
 			}
 		}catch(Throwable t) {
@@ -47,6 +47,12 @@ public class ZipGenerator {
 
 		System.out.println("Loading 'javascript/classes.js'");
 		String classesJs = FileUtils.readFileToString(new File("javascript/classes.js"), "UTF-8").replaceFirst("\\/\\/# sourceMappingURL=.*(\\r\\n|\\r|\\n)*", "").trim();
+		
+		File f = new File("crash_report_override.txt");
+		if(f.isFile()) {
+			classesJs = classesJs.replace("If this has happened more than once then please copy the text on this screen and publish"
+					+ " it in the issues feed of this fork\\'s GitHub repository.", FileUtils.readFileToString(f, "UTF-8").trim());
+		}
 
 		System.out.println("Loading 'javascript/classes_server.js'");
 		String classesServerJs = FileUtils.readFileToString(new File("javascript/classes_server.js"), "UTF-8").replaceFirst("\\/\\/# sourceMappingURL=.*(\\r\\n|\\r|\\n)*", "").trim();
@@ -67,8 +73,8 @@ public class ZipGenerator {
 		
 		FileUtils.writeStringToFile(new File("stable-download/Offline_Download_Version.html"), offlineTemplate, "UTF-8");
 		
-		System.out.println("Copying 'javascript/classes.js' to 'stable-download/web/classes.js'");
-		FileUtils.copyFile(new File("javascript/classes.js"), new File("stable-download/web/classes.js"));
+		System.out.println("Writing 'javascript/classes.js' to 'stable-download/web/classes.js'");
+		FileUtils.writeStringToFile(new File("stable-download/web/classes.js"), classesJs, "UTF-8");
 		
 		System.out.println("Copying 'javascript/classes.js.map' to 'stable-download/web/classes.js.map'");
 		FileUtils.copyFile(new File("javascript/classes.js.map"), new File("stable-download/web/classes.js.map"));

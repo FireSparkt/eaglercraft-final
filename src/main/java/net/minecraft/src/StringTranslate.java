@@ -44,18 +44,17 @@ public class StringTranslate {
 	}
 
 	private void loadLanguage(Properties par1Properties, String par2Str) throws IOException {
-		BufferedReader var3 = null;
+		String[] var3 = EaglerAdapter.fileContents("/lang/" + par2Str + ".lang").replace('\r', '\n')
+				.replaceAll("\n+", "\n").split("\n");
 
-		var3 = new BufferedReader(new InputStreamReader(EaglerAdapter.loadResource("/lang/" + par2Str + ".lang"), "UTF-8"));
-
-		for (String var4 = var3.readLine(); var4 != null; var4 = var3.readLine()) {
+		for (String var4 : var3) {
 			var4 = var4.trim();
 
-			if (!var4.startsWith("#")) {
-				String[] var5 = var4.split("=");
+			if (!var4.isEmpty() && !var4.startsWith("#")) {
+				int var5 = var4.indexOf('=');
 
-				if (var5 != null && var5.length == 2) {
-					par1Properties.setProperty(var5[0], var5[1]);
+				if (var5 != -1) {
+					par1Properties.setProperty(var4.substring(0, var5), var4.substring(var5 + 1));
 				}
 			}
 		}

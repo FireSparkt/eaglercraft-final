@@ -145,6 +145,7 @@ public class EffectPipeline {
 			glDepthMask(false);
 			_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 			glColorMask(true, true, true, false);
+			glDepthMask(true);
 			_wglBindFramebuffer(_wGL_FRAMEBUFFER, null);
 			_wglViewport(0, 0, viewportW, viewportH);
 		}
@@ -155,6 +156,9 @@ public class EffectPipeline {
 	private static long timer = 0l;
 	
 	public static void drawNoise(int viewportW, int viewportH, float intensity) {
+		if(noiseProgram == null) {
+			return;
+		}
 		
 		// three guesses to figure out what this does
 		

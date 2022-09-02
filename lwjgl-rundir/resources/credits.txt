@@ -2,7 +2,7 @@ eaglercraft is an AOT compiled port of mojang's minecraft 1.5.2 designed to run 
 
 §1this §1was §1created §1by §1calder §1young §1(lax1dude)§r
 
-§4ingame §4voice §4chat §4service §4created §4by §4ayunami2000§r
+§4project §4currently §4maintained §4by §4ayunami2000§r
 
 compiling the javascript and emulating the JRE is largely made possible by the TeaVM project, created by Alexey Andreev and is available for free at §nhttp://teavm.org/§r under Apache License 2.0
 

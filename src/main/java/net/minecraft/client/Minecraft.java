@@ -1503,10 +1503,12 @@ public class Minecraft implements Runnable {
 			this.myNetworkManager.processReadPackets();
 		} else {
 			this.entityRenderer.startup = 0;
+			this.entityRenderer.preStartup = 0;
 		}
 		
 		if(!this.gameSettings.adderall || !yeeState) {
 			this.entityRenderer.startup = 0;
+			this.entityRenderer.preStartup = 0;
 			this.gameSettings.adderall = false;
 		}
 		

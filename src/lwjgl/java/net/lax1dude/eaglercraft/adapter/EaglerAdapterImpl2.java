@@ -1287,8 +1287,14 @@ public class EaglerAdapterImpl2 {
 	public static final void setMasterVolume(float v) {
 		ss.setMasterVolume(v);
 	}
+	public static final void setMusicVolume(float v) {
+		// used in browser
+	}
 	private static int playbackId = 0;
 	public static final int beginPlayback(String fileName, float x, float y, float z, float volume, float pitch) {
+		return beginPlayback(fileName, x, y, z, volume, pitch, false);
+	}
+	public static final int beginPlayback(String fileName, float x, float y, float z, float volume, float pitch, boolean ayunamiAddedThisBoolean) {
 		int id = ++playbackId;
 		URL loc = null;
 		if((loc = getResourceURL(fileName)) != null) {
@@ -1308,6 +1314,9 @@ public class EaglerAdapterImpl2 {
 		return id;
 	}
 	public static final int beginPlaybackStatic(String fileName, float volume, float pitch) {
+		return beginPlaybackStatic(fileName, volume, pitch, false);
+	}
+	public static final int beginPlaybackStatic(String fileName, float volume, float pitch, boolean ayunamiAddedThisBoolean) {
 		int id = ++playbackId;
 		URL loc = null;
 		if((loc = getResourceURL(fileName)) != null) {
@@ -1360,6 +1369,9 @@ public class EaglerAdapterImpl2 {
 	}
 	public static final boolean isPlaying(int id) {
 		return ss.playing("sound_"+id);
+	}
+	public static final void fireTitleMusicEvent(boolean b, float f) {
+		// used in browser
 	}
 	public static final void openConsole() {
 		EventQueue.invokeLater(new Runnable() {
@@ -1966,6 +1978,10 @@ public class EaglerAdapterImpl2 {
 	
 	public static final boolean anisotropicFilteringSupported() {
 		return true;
+	}
+	
+	public static final byte[] downloadURL(String url) {
+		return null;
 	}
 	
 }
