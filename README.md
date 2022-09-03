@@ -225,7 +225,21 @@ ratelimit:
 
 - `exceptions` a list of IP addresses that should never get rate limited. **Local IPs like 127.0.0.1 and 192.168.\*.\* and such are set as exceptions by default**
 
-**you need `forward_ip` configured to use rate limiting, otherwise it will be disabled by defualt**
+**you need `forward_ip` configured to use rate limiting, otherwise it will be disabled by default**
+
+### Redirecting the client to a new WebSocket
+
+If you would like to signal the client to disconnect from your bungeecord and reconnect to a different bungeecord, configure an entry in the `servers` part of config.yml like this:
+
+```yaml
+test:
+  redirect: wss://ServerHere/
+  restricted: false
+```
+
+In this example, sending a player to the server `test`, such as when they enter a portal or type `/server test`, will trigger their client to disconnect from your bungeecord and then automatically reconnect to `wss://ServerHere/` as if it was entered via "Direct Connect"
+
+### Plugin Development
 
 **To develop a plugin, download [stable-download/java/bungee_command/bungee_dist.jar](https://github.com/lax1dude/eaglercraft/blob/main/stable-download/java/bungee_command/bungee-dist.jar) and add it to the Build Path of your Java IDE. Develop the plugin just like a regular BungeeCord plugin, see [EaglerMOTD](https://github.com/lax1dude/eaglercraft-motd/) for an example.**
 
