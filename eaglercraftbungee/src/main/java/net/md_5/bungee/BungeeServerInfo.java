@@ -134,4 +134,9 @@ public class BungeeServerInfo implements ServerInfo {
 	public Queue<DefinedPacket> getPacketQueue() {
 		return this.packetQueue;
 	}
+
+	@Override
+	public String getRedirect() {
+		return null;
+	}
 }

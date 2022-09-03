@@ -37,6 +37,7 @@ import net.md_5.bungee.api.config.MOTDCacheConfiguration;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.config.TexturePackInfo;
 import net.md_5.bungee.api.tab.TabListHandler;
+import net.md_5.bungee.eaglercraft.RedirectServerInfo;
 import net.md_5.bungee.eaglercraft.WebSocketRateLimiter;
 import net.md_5.bungee.tab.Global;
 import net.md_5.bungee.tab.GlobalPing;
@@ -138,11 +139,18 @@ public class YamlConfig implements ConfigurationAdapter {
 		for (final Map.Entry<String, HashMap> entry : base.entrySet()) {
 			final Map<String, Object> val = entry.getValue();
 			final String name = entry.getKey();
-			final String addr = this.get("address", "localhost:25501", val);
-			final boolean restricted = this.get("restricted", false, val);
-			final InetSocketAddress address = Util.getAddr(addr);
-			final ServerInfo info = ProxyServer.getInstance().constructServerInfo(name, address, restricted);
-			ret.put(name, info);
+			if(val.containsKey("redirect")) {
+				final String addr = this.get("redirect", "ws://someOtherServer/", val);
+				final boolean restricted = this.get("restricted", false, val);
+				final ServerInfo info = new RedirectServerInfo(name, addr, restricted);
+				ret.put(name, info);
+			}else {
+				final String addr = this.get("address", "localhost:25501", val);
+				final boolean restricted = this.get("restricted", false, val);
+				final InetSocketAddress address = Util.getAddr(addr);
+				final ServerInfo info = ProxyServer.getInstance().constructServerInfo(name, address, restricted);
+				ret.put(name, info);
+			}
 		}
 		return ret;
 	}

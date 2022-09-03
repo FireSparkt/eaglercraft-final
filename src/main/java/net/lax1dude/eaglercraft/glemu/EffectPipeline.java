@@ -146,6 +146,8 @@ public class EffectPipeline {
 			_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 			glColorMask(true, true, true, false);
 			glDepthMask(true);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
 			_wglBindFramebuffer(_wGL_FRAMEBUFFER, null);
 			_wglViewport(0, 0, viewportW, viewportH);
 		}
@@ -173,8 +175,6 @@ public class EffectPipeline {
 		glPushMatrix();
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
-
-		glColor4f(0.05f, 0.05f, 0.05f, 0.0f);
 		
 		float aspect = (float) viewportW / viewportH;
 		
@@ -187,6 +187,8 @@ public class EffectPipeline {
 			intensityModifier = Math.min(1.0f - ((j / 65536) / 256.0f), 1.0f - ((j % 65536) / 256.0f)) * 3.0f;
 			bb += intensityModifier * bb;
 		}
+		
+		glColor4f(0.0166f * bb, 0.0166f * bb, 0.0166f * bb, 0.0f);
 
 		glPushMatrix(); // 2
 		
@@ -200,7 +202,7 @@ public class EffectPipeline {
 		
 		if(intensityModifier > 1.5f) {
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			glColor4f(0.8f, 1.0f, 0.5f, (intensityModifier - 1.5f) * 0.03f);
+			glColor4f(0.8f, 1.0f, 0.5f, (intensityModifier - 1.5f) * 0.03f * intensity);
 			glPushMatrix();
 			glScalef(0.5f, 0.5f, 1.0f);
 			drawGradientTextureRect(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);

@@ -16,6 +16,8 @@ public interface ServerInfo {
 	String getName();
 
 	InetSocketAddress getAddress();
+	
+	String getRedirect();
 
 	Collection<ProxiedPlayer> getPlayers();
 

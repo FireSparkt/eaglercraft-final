@@ -7,6 +7,7 @@ package net.md_5.bungee;
 import java.beans.ConstructorProperties;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.score.Scoreboard;
 import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.connection.InitialHandler;
+import net.md_5.bungee.eaglercraft.RedirectServerInfo;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.netty.HandlerBoss;
 import net.md_5.bungee.netty.PipelineUtils;
@@ -125,6 +127,10 @@ public final class UserConnection implements ProxiedPlayer {
 	}
 
 	public void connect(final ServerInfo info, final boolean retry) {
+		if(info instanceof RedirectServerInfo) {
+			sendData("EAG|Reconnect", ((RedirectServerInfo)info).getRedirect().getBytes(StandardCharsets.UTF_8));
+			return;
+		}
 		final ServerConnectEvent event = new ServerConnectEvent(this, info);
 		if (this.bungee.getPluginManager().callEvent(event).isCancelled()) {
 			return;

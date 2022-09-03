@@ -3,6 +3,7 @@ package net.minecraft.src;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1200,6 +1201,8 @@ public class NetClientHandler extends NetHandler {
 			}
 		}else if("EAG|Voice".equals(par1Packet250CustomPayload.channel)) {
 			EaglerAdapter.handleVoiceSignal(par1Packet250CustomPayload.data);
+		}else if("EAG|Reconnect".equals(par1Packet250CustomPayload.channel)) {
+			mc.reconnectAddress = new String(par1Packet250CustomPayload.data, StandardCharsets.UTF_8);
 		}
 	}
 

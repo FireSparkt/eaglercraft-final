@@ -922,7 +922,7 @@ public class EntityRenderer {
 
 				if(i > 0.15f) {
 					EffectPipeline.updateNoiseTexture(mc.displayWidth, mc.displayHeight, i);
-					EffectPipeline.drawNoise(var14, var15, i);
+					EffectPipeline.drawNoise(var14, var15, (i - 0.15f) / 0.85f);
 				}
 
 				this.renderEndNanoTime = System.nanoTime();
@@ -1395,7 +1395,7 @@ public class EntityRenderer {
 									do {
 										l = Block.blocksList[random.nextInt(256)];
 									}while(l == null);
-									EntityFallingSand itm = new EntityFallingSand(var3, x + var4, yy + 1, z + var6, l.blockID, 0);
+									EntityFallingSand itm = new EntityFallingSand(var3, x + var4 + 0.5, yy + 1, z + var6 + 0.5, l.blockID, 0);
 									itm.entityId = --var3.ghostEntityId;
 									itm.ghost = true;
 									var3.spawnEntityInWorld(itm);
@@ -1404,7 +1404,7 @@ public class EntityRenderer {
 									do {
 										l = Item.itemsList[random.nextInt(384)];
 									}while(l == null);
-									EntityItem itm = new EntityItem(var3, x + var4, yy + 1, z + var6, new ItemStack(l, 1));
+									EntityItem itm = new EntityItem(var3, x + var4 + 0.5, yy + 1, z + var6 + 0.5, new ItemStack(l, 1));
 									itm.entityId = --var3.ghostEntityId;
 									itm.ghost = true;
 									var3.spawnEntityInWorld(itm);
@@ -1414,7 +1414,7 @@ public class EntityRenderer {
 					}
 					float probability = MathHelper.sin(startup / 300.0f);
 					while(random.nextFloat() < (probability * 0.3f + 0.7f) * 0.002f) {
-						this.mc.sndManager.playSoundFX("adl.l", MathHelper.clamp_float(startup / 300.0f, 0.03f, 0.5f), random.nextFloat() * 0.2f + 0.9f);
+						this.mc.sndManager.playSoundFX("adl.l", MathHelper.clamp_float(startup / 400.0f, 0.03f, 0.3f), random.nextFloat() * 0.2f + 0.9f);
 					}
 					while(random.nextFloat() < (probability * 0.3f + 0.7f) * 0.005f) {
 						this.mc.sndManager.playSound("adl.a", (float) var2.posX - 4.0f + 8.0f * random.nextFloat(), (float) var2.posY - 2.0f + 4.0f * random.nextFloat(),

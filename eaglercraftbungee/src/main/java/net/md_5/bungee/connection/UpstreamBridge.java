@@ -47,7 +47,7 @@ public class UpstreamBridge extends PacketHandler {
 		this.bungee.getPluginManager().callEvent(event);
 		this.con.getTabList().onDisconnect();
 		BungeeCord.getInstance().removeConnection(this.con);
-		if (this.con.getServer() != null && this.con.getServer().getInfo() == null) {
+		if (this.con.getServer() != null && this.con.getServer().getInfo() != null) {
 			this.con.getServer().disconnect("Quitting");
 		}
 	}

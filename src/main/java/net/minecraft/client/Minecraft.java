@@ -1517,12 +1517,25 @@ public class Minecraft implements Runnable {
 		}else {
 			this.sndManager.stopTheTitleMusic();
 		}
+		
+		if(reconnectAddress != null) {
+			if(theWorld != null) {
+				System.out.println("Redirecting to: " + reconnectAddress);
+				theWorld.sendQuittingDisconnectingPacket();
+				loadWorld((WorldClient) null);
+				stopServerAndDisplayGuiScreen(new GuiConnecting(new GuiMultiplayer(new GuiMainMenu()), this,
+						new ServerData("reconnect", reconnectAddress, true)));
+			}
+			reconnectAddress = null;
+		}
 
 		this.mcProfiler.endSection();
 		this.systemTime = getSystemTime();
 	}
 	
 	private int titleMusicObj = -1;
+
+	public String reconnectAddress = null;
 
 	/**
 	 * Forces a reload of the sound manager and all the resources. Called in game by
