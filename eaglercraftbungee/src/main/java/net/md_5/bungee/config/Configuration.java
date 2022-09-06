@@ -71,7 +71,8 @@ public class Configuration {
 		this.showBanType = adapter.getBoolean("display_ban_type_on_kick", false);
 		this.blacklistOfflineDownload = adapter.getBoolean("origin_blacklist_block_offline_download", false);
 		this.blacklistReplits = adapter.getBoolean("origin_blacklist_block_replit_clients", false);
-		this.blacklistOriginless = adapter.getBoolean("origin_blacklist_block_missing_origin_header", true);
+		adapter.getMap().remove("origin_blacklist_block_missing_origin_header");
+		this.blacklistOriginless = adapter.getBoolean("origin_blacklist_block_invalid_origin_header", true);
 		this.simpleWhitelistEnabled = adapter.getBoolean("origin_blacklist_use_simple_whitelist", false);
 		this.acceptBukkitConsoleCommandPacket = adapter.getBoolean("accept_bukkit_console_command_packets", false);
 		this.bungeeOnBungee = adapter.getBoolean("bungee_on_bungee", false);

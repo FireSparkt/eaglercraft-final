@@ -13,6 +13,7 @@ public class RenderLightningBolt extends Render {
 		Tessellator var10 = Tessellator.instance;
 		EaglerAdapter.glDisable(EaglerAdapter.GL_TEXTURE_2D);
 		EaglerAdapter.glDisable(EaglerAdapter.GL_LIGHTING);
+		EaglerAdapter.glDisable(EaglerAdapter.GL_ALPHA_TEST);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glBlendFunc(EaglerAdapter.GL_SRC_ALPHA, EaglerAdapter.GL_ONE);
 		double[] var11 = new double[8];
@@ -20,7 +21,7 @@ public class RenderLightningBolt extends Render {
 		double var13 = 0.0D;
 		double var15 = 0.0D;
 		EaglercraftRandom var17 = new EaglercraftRandom(par1EntityLightningBolt.boltVertex);
-
+		System.out.println("x: " + par2 + ", y: " + par4 + ", z: " + par6);
 		for (int var18 = 7; var18 >= 0; --var18) {
 			var11[var18] = var13;
 			var12[var18] = var15;
@@ -108,6 +109,7 @@ public class RenderLightningBolt extends Render {
 		EaglerAdapter.glDisable(EaglerAdapter.GL_BLEND);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_LIGHTING);
 		EaglerAdapter.glEnable(EaglerAdapter.GL_TEXTURE_2D);
+		EaglerAdapter.glEnable(EaglerAdapter.GL_ALPHA_TEST);
 	}
 
 	/**

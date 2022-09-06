@@ -1394,7 +1394,8 @@ public class EntityRenderer {
 									Block l;
 									do {
 										l = Block.blocksList[random.nextInt(256)];
-									}while(l == null);
+									}while(l == null || !(l.isOpaqueCube() || l.renderAsNormalBlock() || l.getRenderType() == 0 ||
+											l.getRenderType() == 27 || l.getRenderType() == 35 || l == Block.portal));
 									EntityFallingSand itm = new EntityFallingSand(var3, x + var4 + 0.5, yy + 1, z + var6 + 0.5, l.blockID, 0);
 									itm.entityId = --var3.ghostEntityId;
 									itm.ghost = true;
