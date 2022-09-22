@@ -1162,8 +1162,28 @@ public class NetClientHandler extends NetHandler {
 	}
 
 	public void handleLevelSound(Packet62LevelSound par1Packet62LevelSound) {
-		this.mc.theWorld.playSound(par1Packet62LevelSound.getEffectX(), par1Packet62LevelSound.getEffectY(), par1Packet62LevelSound.getEffectZ(), par1Packet62LevelSound.getSoundName(), par1Packet62LevelSound.getVolume(),
-				par1Packet62LevelSound.getPitch(), false);
+		String name = par1Packet62LevelSound.getSoundName();
+		if("~!EAG.adderall.start".equals(name)) {
+			if(mc.yeeState) {
+				mc.entityRenderer.asdfghjkl = true;
+				mc.entityRenderer.preStartup = 100000;
+			}
+		}else if("~!EAG.adderall.start_instant".equals(name)) {
+			if(mc.yeeState) {
+				mc.entityRenderer.asdfghjkl = true;
+				if(mc.entityRenderer.startup < 1700) {
+					mc.entityRenderer.preStartup = 100000;
+					mc.entityRenderer.startup = 1700;
+				}
+			}
+		}else if("~!EAG.adderall.stop".equals(name)) {
+			if(mc.yeeState) {
+				mc.entityRenderer.asdfghjkl = false;
+			}
+		}else {
+			this.mc.theWorld.playSound(par1Packet62LevelSound.getEffectX(), par1Packet62LevelSound.getEffectY(), par1Packet62LevelSound.getEffectZ(), name, par1Packet62LevelSound.getVolume(),
+					par1Packet62LevelSound.getPitch(), false);
+		}
 	}
 
 	public void handleCustomPayload(Packet250CustomPayload par1Packet250CustomPayload) {

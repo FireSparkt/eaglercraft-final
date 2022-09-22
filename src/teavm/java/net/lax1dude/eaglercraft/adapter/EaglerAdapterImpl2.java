@@ -88,6 +88,7 @@ import org.teavm.jso.workers.Worker;
 
 import net.lax1dude.eaglercraft.AssetRepository;
 import net.lax1dude.eaglercraft.Base64;
+import net.lax1dude.eaglercraft.Client;
 import net.lax1dude.eaglercraft.EaglerAdapter;
 import net.lax1dude.eaglercraft.EaglerImage;
 import net.lax1dude.eaglercraft.EaglerProfile;
@@ -281,14 +282,21 @@ public class EaglerAdapterImpl2 {
 		canvasStyle.setProperty("image-rendering", "pixelated");
 		canvas.setWidth(sw);
 		canvas.setHeight(sh);
-		SelfDefence.init(canvas);
 		rootElement.appendChild(canvas);
+		try {
+			doc.exitPointerLock();
+		}catch(Throwable t) {
+			Client.showIncompatibleScreen("Mouse cursor lock is not available on this device!");
+			throw new RuntimeException("Mouse cursor lock is not available on this device!");
+		}
+		SelfDefence.init(canvas);
 		renderingCanvas = (HTMLCanvasElement)doc.createElement("canvas");
 		renderingCanvas.setWidth(sw);
 		renderingCanvas.setHeight(sh);
 		frameBuffer = (CanvasRenderingContext2D) canvas.getContext("2d");
 		webgl = (WebGL2RenderingContext) renderingCanvas.getContext("webgl2", youEagler());
 		if(webgl == null) {
+			Client.showIncompatibleScreen("WebGL 2.0 is not supported on this device!");
 			throw new RuntimeException("WebGL 2.0 is not supported in your browser ("+getNavString("userAgent")+")");
 		}
 		
@@ -483,21 +491,27 @@ public class EaglerAdapterImpl2 {
 	}
 	
 	public static final void removeEventHandlers() {
-		win.removeEventListener("contextmenu", contextmenu);
-		win.removeEventListener("mousedown", mousedown);
-		win.removeEventListener("mouseup", mouseup);
-		win.removeEventListener("mousemove", mousemove);
-		win.removeEventListener("keydown", keydown);
-		win.removeEventListener("keyup", keyup);
-		win.removeEventListener("keypress", keypress);
-		win.removeEventListener("wheel", wheel);
-		String screenImg = canvas.toDataURL("image/png");
-		canvas.delete();
-		HTMLImageElement newImage = (HTMLImageElement) doc.createElement("img");
-		newImage.setSrc(screenImg);
-		newImage.setWidth(parent.getClientWidth());
-		newImage.setHeight(parent.getClientHeight());
-		parent.appendChild(newImage);
+		try {
+			win.removeEventListener("contextmenu", contextmenu);
+			win.removeEventListener("mousedown", mousedown);
+			win.removeEventListener("mouseup", mouseup);
+			win.removeEventListener("mousemove", mousemove);
+			win.removeEventListener("keydown", keydown);
+			win.removeEventListener("keyup", keyup);
+			win.removeEventListener("keypress", keypress);
+			win.removeEventListener("wheel", wheel);
+		}catch(Throwable t) {
+		}
+		try {
+			String screenImg = canvas.toDataURL("image/png");
+			canvas.delete();
+			HTMLImageElement newImage = (HTMLImageElement) doc.createElement("img");
+			newImage.setSrc(screenImg);
+			newImage.setWidth(parent.getClientWidth());
+			newImage.setHeight(parent.getClientHeight());
+			parent.appendChild(newImage);
+		}catch(Throwable t) {
+		}
 	}
 
 	private static LinkedList<MouseEvent> mouseEvents = new LinkedList();

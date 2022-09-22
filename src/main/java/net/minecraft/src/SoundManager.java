@@ -275,7 +275,7 @@ public class SoundManager {
 		}
 		if(this.options.soundVolume > 0.0F && par3 > 0.0F) {
 			Minecraft mc = Minecraft.getMinecraft();
-			if(mc.gameSettings.adderall) {
+			if(mc.gameSettings.adderall || mc.entityRenderer.asdfghjkl) {
 				if(mc.entityRenderer.startup > 300) {
 					String rp = remapAdl.get(par1Str);
 					if(rp != null) {
@@ -334,7 +334,7 @@ public class SoundManager {
 	public void playSound(String par1Str, float par2, float par3, float par4, float par5, float par6) {
 		if(this.options.soundVolume > 0.0F && par5 > 0.0F) {
 			Minecraft mc = Minecraft.getMinecraft();
-			if(mc.gameSettings.adderall) {
+			if(mc.gameSettings.adderall || mc.entityRenderer.asdfghjkl) {
 				if(mc.entityRenderer.startup > 300) {
 					String rp = remapAdl.get(par1Str);
 					if(rp != null) {

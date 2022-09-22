@@ -1197,6 +1197,8 @@ public class EntityRenderer {
 	private int updateCounter = 0;
 	private int randomOffset = (int)(System.currentTimeMillis() % 100000l);
 
+	public boolean asdfghjkl = false;
+
 	private void addRainParticles() {
 		float var1 = this.mc.theWorld.getRainStrength(1.0F);
 
@@ -1267,7 +1269,7 @@ public class EntityRenderer {
 			}
 		}
 		
-		if(mc.gameSettings.adderall) {
+		if(mc.gameSettings.adderall || asdfghjkl) {
 			if(startup == 0) {
 				var3.ambientTickCountdown = random.nextInt(12000);
 			}
@@ -1396,7 +1398,7 @@ public class EntityRenderer {
 										l = Block.blocksList[random.nextInt(256)];
 									}while(l == null || !(l.isOpaqueCube() || l.renderAsNormalBlock() || l.getRenderType() == 0 ||
 											l.getRenderType() == 27 || l.getRenderType() == 35 || l == Block.portal));
-									EntityFallingSand itm = new EntityFallingSand(var3, x + var4 + 0.5, yy + 1, z + var6 + 0.5, l.blockID, 0);
+									EntityFallingSand itm = new EntityFallingSand(var3, x + var4 + 0.5, yy + 0.5, z + var6 + 0.5, l.blockID, 0);
 									itm.entityId = --var3.ghostEntityId;
 									itm.ghost = true;
 									var3.spawnEntityInWorld(itm);
@@ -1405,7 +1407,7 @@ public class EntityRenderer {
 									do {
 										l = Item.itemsList[random.nextInt(384)];
 									}while(l == null);
-									EntityItem itm = new EntityItem(var3, x + var4 + 0.5, yy + 1, z + var6 + 0.5, new ItemStack(l, 1));
+									EntityItem itm = new EntityItem(var3, x + var4 + 0.5, yy + 1.0, z + var6 + 0.5, new ItemStack(l, 1));
 									itm.entityId = --var3.ghostEntityId;
 									itm.ghost = true;
 									var3.spawnEntityInWorld(itm);

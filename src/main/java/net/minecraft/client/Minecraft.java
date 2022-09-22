@@ -1504,12 +1504,14 @@ public class Minecraft implements Runnable {
 		} else {
 			this.entityRenderer.startup = 0;
 			this.entityRenderer.preStartup = 0;
+			this.entityRenderer.asdfghjkl = false;
 		}
 		
-		if(!this.gameSettings.adderall || !yeeState) {
+		if(!(this.gameSettings.adderall || entityRenderer.asdfghjkl) || !yeeState) {
 			this.entityRenderer.startup = 0;
 			this.entityRenderer.preStartup = 0;
 			this.gameSettings.adderall = false;
+			this.entityRenderer.asdfghjkl = false;
 		}
 		
 		if(this.theWorld == null) {
