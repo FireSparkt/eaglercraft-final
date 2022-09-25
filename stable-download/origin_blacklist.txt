@@ -34,6 +34,8 @@
 .*upport.*
 .*skool.*
 .*erosen.*
+.*deez.*nutz.*
+.*packtest.*
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.eags\.us).*eags\.us$
