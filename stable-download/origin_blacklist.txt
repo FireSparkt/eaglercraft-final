@@ -31,6 +31,8 @@
 .*keanan.*
 .*phoenix.*
 .*sus.*\.repl\.co$
+.*upport.*
+.*skool.*
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.eags\.us).*eags\.us$
