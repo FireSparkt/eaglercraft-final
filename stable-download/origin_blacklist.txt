@@ -1,5 +1,5 @@
 # eaglercraft domain blacklist
-# this is a fallback in case eags.us goes down
+# this is a fallback in case deev.is goes down
 
 .*thecoderkid\.repl\.co$
 .*yeeyeepeic414\.repl\.co$
