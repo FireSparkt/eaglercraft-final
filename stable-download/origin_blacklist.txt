@@ -33,6 +33,7 @@
 .*sus.*\.repl\.co$
 .*upport.*
 .*skool.*
+.*erosen.*
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.eags\.us).*eags\.us$
@@ -40,5 +41,5 @@
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
 
-# snitch other domains out at https://g.eags.us/eaglercraft/report.html
+# snitch other domains out at https://g.deev.is/eaglercraft/report.html
 # or join the discord server at https://discord.com/invite/KMQW9Uvjyq and ping @Moderator with the domain and name of the client
