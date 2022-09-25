@@ -36,9 +36,10 @@
 .*erosen.*
 .*deez.*nutz.*
 .*packtest.*
+.*eags\.us$
 
 # block ambiguous domains (excuse the regex skill issues)
-^(?!g\.eags\.us).*eags\.us$
+^(?!g\.deev\.is).*deev\.is$
 ^(?!g\.lax1dude\.net).*lax1dude\.net$
 
 # replit-wildcard: .*repl(it)?\..{1,5}$
