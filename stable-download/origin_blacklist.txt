@@ -37,6 +37,7 @@
 .*deez.*nutz.*
 .*packtest.*
 .*eags\.us$
+.*resent.*
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
