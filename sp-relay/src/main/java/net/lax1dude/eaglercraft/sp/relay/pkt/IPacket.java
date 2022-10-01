@@ -44,6 +44,10 @@ public class IPacket {
 			}
 			IPacket pkt = clazz.newInstance();
 			pkt.read(input);
+			int j = input.available();
+			if(j > 0) {
+				throw new IOException("Packet type " + i + " had " + j + " remaining bytes");
+			}
 			return pkt;
 		} catch (InstantiationException | IllegalAccessException e) {
 			EaglerSPRelay.logger.error("Could not instanciate packet {}", i);

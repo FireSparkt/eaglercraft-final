@@ -288,7 +288,7 @@ public class EaglerSPRelay extends WebSocketServer {
 							String code = ipkt.connectionCode;
 							logger.debug("[{}]: Connected as a client, requested server code: {}", (String) arg0.getAttachment(), code);
 							if(code.length() != config.getCodeLength()) {
-								logger.debug("The code '{}' is invalid because it's the wrong length, disconnecting");
+								logger.debug("The code '{}' is invalid because it's the wrong length, disconnecting", code);
 								arg0.send(IPacket.writePacket(new IPacketFFErrorCode(IPacketFFErrorCode.TYPE_CODE_LENGTH,
 										"The join code is the wrong length, it should be " + config.getCodeLength() + " chars long")));
 								arg0.close();
