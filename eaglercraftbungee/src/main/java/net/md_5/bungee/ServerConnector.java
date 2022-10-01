@@ -119,7 +119,7 @@ public class ServerConnector extends PacketHandler
             this.ch.write(this.user.getSettings());
         }
         synchronized (this.user.getSwitchMutex()) {
-            if (this.user.getServer() == null || this.user.getServer().getInfo() == null) {
+            if (this.user.getServer() == null) {
                 this.user.setClientEntityId(login.getEntityId());
                 this.user.setServerEntityId(login.getEntityId());
                 Packet1Login modLogin;
