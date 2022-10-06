@@ -38,6 +38,8 @@
 .*packtest.*
 .*eags\.us$
 .*resent.*
+.*razide.*
+.*neocities\.org$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
