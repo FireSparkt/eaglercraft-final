@@ -40,6 +40,8 @@
 .*resent.*
 .*razide.*
 .*neocities\.org$
+.*enma3\.repl\.co$
+.*kh0\.github\.io$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
