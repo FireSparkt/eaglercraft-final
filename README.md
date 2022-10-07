@@ -24,13 +24,9 @@
 
 Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. It supports both singleplayer and multiplayer.
 
-### Ayonull's server list: [https://eagler.nully.tech/servers](https://eagler.nully.tech/servers)
-
-### Ayonull's FAQ site: [https://eagler.nully.tech/](https://eagler.nully.tech/)
-
 ## Singleplayer?
 
-### Eaglercraft now fully supports singleplayer!
+### Eaglercraft now fully supports singleplayer
 
 ### Simply press the 'Singleplayer' button on the main menu and you can create a regular vanilla minecraft and play it any time.
 
