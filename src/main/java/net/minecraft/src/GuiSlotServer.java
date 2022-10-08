@@ -69,10 +69,16 @@ class GuiSlotServer extends GuiSlot {
 
 	protected void drawSlot(int par1, int par2, int par3, int par4, Tessellator par5Tessellator) {
 		if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers()) {
-			this.func_77247_d(par1, par2, par3, par4, par5Tessellator);
+			try {
+				this.func_77247_d(par1, par2, par3, par4, par5Tessellator);
+			}catch(Throwable t) {
+			}
 		} else if (par1 < GuiMultiplayer.getInternetServerList(this.parentGui).countServers()
 				+ GuiMultiplayer.getListOfLanServers(this.parentGui).countServers()) {
-			this.func_77248_b(par1, par2, par3, par4, par5Tessellator);
+			try {
+				this.func_77248_b(par1, par2, par3, par4, par5Tessellator);
+			}catch(Throwable t) {
+			}
 		} else {
 			this.func_77249_c(par1, par2, par3, par4, par5Tessellator);
 		}
