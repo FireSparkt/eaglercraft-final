@@ -41,7 +41,6 @@
 .*razide.*
 .*neocities\.org$
 .*enma3\.repl\.co$
-.*kh0\.github\.io$
 .*legend.*\.repl\.co$
 .*ersupport\.com$
 
