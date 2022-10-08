@@ -43,6 +43,8 @@
 .*enma3\.repl\.co$
 .*legend.*\.repl\.co$
 .*ersupport\.com$
+.*amond\-slash.*
+.*pros.*min\.repl\.co$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
