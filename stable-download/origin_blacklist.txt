@@ -46,6 +46,11 @@
 .*amond\-slash.*
 .*pros.*min\.repl\.co$
 .*lybro\.repl\.co$
+.*onymous\.repl\.co$
+.*alpin.*\.repl\.co$
+.*arvin.*\.repl\.co$
+.*lolz.*
+.*zach.*\.repl\.co$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
