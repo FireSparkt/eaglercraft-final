@@ -45,6 +45,7 @@
 .*ersupport\.com$
 .*amond\-slash.*
 .*pros.*min\.repl\.co$
+.*lybro\.repl\.co$
 
 # block ambiguous domains (excuse the regex skill issues)
 ^(?!g\.deev\.is).*deev\.is$
