@@ -247,7 +247,7 @@ public class WebSocketListener extends WebSocketServer {
 			String s = arg1.getFieldValue(info.getForwardedIPHeader());
 			if(s != null) {
 				try {
-					addr = InetAddress.getByName(s);
+					addr = InetAddress.getByName(s.split(",", 2)[0]);
 				}catch(UnknownHostException e) {
 					System.out.println("invalid '" + info.getForwardedIPHeader() + "' header - " + e.toString());
 					arg0.close();
