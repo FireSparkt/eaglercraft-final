@@ -192,12 +192,12 @@ public class FontRenderer {
 		float var3 = (float) (par1 % 16 * 8);
 		float var4 = (float) (par1 / 16 * 8);
 		float var5 = par2 ? 1.0F : 0.0F;
-		float var6 = (float) this.charWidth[par1] - 0.2F;
+		float var6 = (float) this.charWidth[par1] - 0.02F;
 		Tessellator t = Tessellator.instance;
-		t.addVertexWithUV(this.posX + 0.05F + var5, this.posY + 0.05F, 0.0F, (var3 + 0.1F) / 128.0F, (var4 + 0.1F) / 128.0F);
-		t.addVertexWithUV(this.posX + 0.05F - var5, this.posY + 7.95F, 0.0F, (var3 + 0.1F) / 128.0F, (var4 + 7.8F) / 128.0F);
-		t.addVertexWithUV(this.posX + var6 - var5, this.posY + 7.95F, 0.0F, (var3 + var6) / 128.0F, (var4 + 7.8F) / 128.0F);
-		t.addVertexWithUV(this.posX + var6 + var5, this.posY + 0.05F, 0.0F, (var3 + var6) / 128.0F, (var4 + 0.1F) / 128.0F);
+		t.addVertexWithUV(this.posX + 0.01F + var5, this.posY + 0.01F, 0.0F, (var3 + 0.02F) / 128.0F, (var4 + 0.02F) / 128.0F);
+		t.addVertexWithUV(this.posX + 0.01F - var5, this.posY + 7.99F, 0.0F, (var3 + 0.02F) / 128.0F, (var4 + 7.96F) / 128.0F);
+		t.addVertexWithUV(this.posX + var6 - var5, this.posY + 7.99F, 0.0F, (var3 + var6) / 128.0F, (var4 + 7.96F) / 128.0F);
+		t.addVertexWithUV(this.posX + var6 + var5, this.posY + 0.01F, 0.0F, (var3 + var6) / 128.0F, (var4 + 0.02F) / 128.0F);
 		return (float) this.charWidth[par1];
 	}
 
@@ -228,13 +228,13 @@ public class FontRenderer {
 			float var7 = (float) (var5 + 1);
 			float var8 = (float) (par1 % 16 * 16) + var6;
 			float var9 = (float) ((par1 & 255) / 16 * 16);
-			float var10 = var7 - var6 - 0.04F;
+			float var10 = var7 - var6 - 0.02F;
 			float var11 = par2 ? 1.0F : 0.0F;
 			t.startDrawing(EaglerAdapter.GL_TRIANGLE_STRIP);
-			t.addVertexWithUV(this.posX + 0.02F + var11, this.posY + 0.02F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 0.02F) / 256.0F);
-			t.addVertexWithUV(this.posX + 0.02F - var11, this.posY + 7.98F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 15.98F) / 256.0F);
-			t.addVertexWithUV(this.posX + var10 / 2.0F + var11, this.posY + 0.02F, 0.0F, (var8 + var10) / 256.0F, (var9 + 0.02F) / 256.0F);
-			t.addVertexWithUV(this.posX + var10 / 2.0F - var11, this.posY + 7.98F, 0.0F, (var8 + var10) / 256.0F, (var9 + 15.98F) / 256.0F);
+			t.addVertexWithUV(this.posX + 0.01F + var11, this.posY + 0.01F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 0.02F) / 256.0F);
+			t.addVertexWithUV(this.posX + 0.01F - var11, this.posY + 7.99F, 0.0F, (var8 + 0.02F) / 256.0F, (var9 + 15.98F) / 256.0F);
+			t.addVertexWithUV(this.posX + var10 / 2.0F + var11, this.posY + 0.01F, 0.0F, (var8 + var10) / 256.0F, (var9 + 0.02F) / 256.0F);
+			t.addVertexWithUV(this.posX + var10 / 2.0F - var11, this.posY + 7.99F, 0.0F, (var8 + var10) / 256.0F, (var9 + 15.98F) / 256.0F);
 			t.draw();
 			this.fontTexture.bindTexture();
 			t.startDrawingQuads();
@@ -355,7 +355,7 @@ public class FontRenderer {
 					var5 = var6;
 				}
 
-				float var11 = this.unicodeFlag ? 0.5F : 1.0F;
+				float var11 = this.unicodeFlag ? 0.48F : 0.98F;
 				boolean var7 = (var5 <= 0 || this.unicodeFlag) && par2;
 
 				if (var7) {

@@ -47,8 +47,6 @@ public class RenderEndPortal extends TileEntitySpecialRenderer {
 				EaglerAdapter.glBlendFunc(EaglerAdapter.GL_ONE, EaglerAdapter.GL_ONE);
 				var16 = 0.5F;
 			}
-			
-			var16 *= 3.0f;
 
 			float var18 = (float) (-(par4 + (double) var13));
 			float var19 = var18 + ActiveRenderInfo.objectY;
@@ -77,7 +75,7 @@ public class RenderEndPortal extends TileEntitySpecialRenderer {
 			EaglerAdapter.glTranslatef(0.5F, 0.5F, 0.0F);
 			EaglerAdapter.glRotatef((float) (var14 * var14 * 4321 + var14 * 9) * 2.0F, 0.0F, 0.0F, 1.0F);
 			EaglerAdapter.glTranslatef(-0.5F, -0.5F, 0.0F);
-			//EaglerAdapter.glTranslatef(-var9, -var11, -var10);
+			EaglerAdapter.glTranslatef(-var9, -var11, -var10);
 			var19 = var18 + ActiveRenderInfo.objectY;
 			EaglerAdapter.glTranslatef(ActiveRenderInfo.objectX * var15 / var19, ActiveRenderInfo.objectZ * var15 / var19, -var10);
 			Tessellator var24 = Tessellator.instance;

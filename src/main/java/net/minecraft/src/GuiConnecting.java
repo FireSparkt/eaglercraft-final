@@ -49,7 +49,7 @@ public class GuiConnecting extends GuiScreen {
 					uria = uri.substring(6);
 				}else if(!uri.contains("://")){
 					uria = uri;
-					uri = "ws://" + uri;
+					uri = ( EaglerAdapter.isSSLPage() ? "wss://" : "ws://") + uri;
 				}else {
 					this.mc.displayGuiScreen(new GuiDisconnected(this.field_98098_c, "connect.failed", "disconnect.genericReason", "invalid uri websocket protocol", ""));
 					return;

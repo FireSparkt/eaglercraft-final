@@ -3,6 +3,7 @@ package net.minecraft.src;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.lax1dude.eaglercraft.sp.EaglerUUID;
 import net.minecraft.server.MinecraftServer;
 
 public class EntityPlayerMP extends EntityPlayer implements ICrafting {
@@ -104,6 +106,8 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 		while (!par2World.getCollidingBoundingBoxes(this, this.boundingBox).isEmpty()) {
 			this.setPosition(this.posX, this.posY + 1.0D, this.posZ);
 		}
+		
+		this.entityUniqueID = EaglerUUID.nameUUIDFromBytes(("OfflinePlayer:" + par3Str).getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**

@@ -1934,22 +1934,29 @@ public class EaglerAdapterImpl2 {
 		}
 	}
 	public static final byte[] loadLocalStorage(String key) {
-		Storage strg = win.getLocalStorage();
-		if(strg != null) {
-			String s = strg.getItem("_eaglercraft."+key);
-			if(s != null) {
-				return Base64.decodeBase64(s);
+		try {
+			Storage strg = win.getLocalStorage();
+			if(strg != null) {
+				String s = strg.getItem("_eaglercraft."+key);
+				if(s != null) {
+					return Base64.decodeBase64(s);
+				}else {
+					return null;
+				}
 			}else {
 				return null;
 			}
-		}else {
+		}catch(Throwable t) {
 			return null;
 		}
 	}
 	public static final void saveLocalStorage(String key, byte[] data) {
-		Storage strg = win.getLocalStorage();
-		if(strg != null) {
-			strg.setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+		try {
+			Storage strg = win.getLocalStorage();
+			if(strg != null) {
+				strg.setItem("_eaglercraft."+key, Base64.encodeBase64String(data));
+			}
+		}catch(Throwable t) {
 		}
 	}
 	public static final void openLink(String url) {

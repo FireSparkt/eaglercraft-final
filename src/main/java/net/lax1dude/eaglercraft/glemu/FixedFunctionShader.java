@@ -136,7 +136,6 @@ public class FixedFunctionShader {
 	private UniformGL u_textureGenT_V = null;
 	private UniformGL u_textureGenR_V = null;
 	private UniformGL u_textureGenQ_V = null;
-	private UniformGL u_matrix_inverse_m = null;
 	
 	private UniformGL u_texCoordV0 = null;
 	private UniformGL u_texCoordV1 = null;
@@ -295,7 +294,6 @@ public class FixedFunctionShader {
 			u_textureGenT_V = _wglGetUniformLocation(globject, "textureGenT_V");
 			u_textureGenR_V = _wglGetUniformLocation(globject, "textureGenR_V");
 			u_textureGenQ_V = _wglGetUniformLocation(globject, "textureGenQ_V");
-			u_matrix_inverse_m = _wglGetUniformLocation(globject, "matrix_inverse_m");
 		}
 		
 		if(enable_anisotropic_fix) {
@@ -353,7 +351,6 @@ public class FixedFunctionShader {
 	private Matrix4f modelMatrix = (Matrix4f) new Matrix4f().setZero();
 	private Matrix4f projectionMatrix = (Matrix4f) new Matrix4f().setZero();
 	private Matrix4f textureMatrix = (Matrix4f) new Matrix4f().setZero();
-	private Matrix4f inverseModelMatrix = (Matrix4f) new Matrix4f().setZero();
 	private Vector4f light0Pos = new Vector4f();
 	private Vector4f light1Pos = new Vector4f();
 	private Vector2f anisotropicFix = new Vector2f(0.0f, 0.0f);
@@ -370,11 +367,6 @@ public class FixedFunctionShader {
 		if(!mat.equals(modelMatrix)) {
 			modelMatrix.load(mat).store(modelBuffer);
 			_wglUniformMat4fv(u_matrix_m, modelBuffer);
-			if(enable_TEX_GEN_STRQ) {
-				inverseModelMatrix.load(mat).invert();
-				inverseModelMatrix.store(modelBuffer);
-				_wglUniformMat4fv(u_matrix_inverse_m, modelBuffer);
-			}
 		}
 	}
 	public void setProjectionMatrix(Matrix4f mat) {

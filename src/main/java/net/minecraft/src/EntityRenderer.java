@@ -725,7 +725,7 @@ public class EntityRenderer {
 		if (var2 != null) {
 			float i = startup / 600.0f;
 			if(i > 1.0f) i = 1.0f;
-			i = i * i;
+			i = i * i * 1.25f;
 			for (int var3 = 0; var3 < 256; ++var3) {
 				float var4 = var2.getSunBrightness(1.0F) * 0.95F + 0.05F;
 				float var5 = var2.provider.lightBrightnessTable[var3 / 16] * var4;

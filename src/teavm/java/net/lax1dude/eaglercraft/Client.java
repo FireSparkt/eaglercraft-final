@@ -1,5 +1,7 @@
 package net.lax1dude.eaglercraft;
 
+import static org.teavm.jso.webgl.WebGLRenderingContext.*;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -8,9 +10,12 @@ import org.json.JSONObject;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.browser.Window;
 import org.teavm.jso.core.JSError;
+import org.teavm.jso.dom.html.HTMLCanvasElement;
 import org.teavm.jso.dom.html.HTMLDocument;
 import org.teavm.jso.dom.html.HTMLElement;
+import org.teavm.jso.webgl.WebGLRenderingContext;
 
+import net.lax1dude.eaglercraft.adapter.DetectAnisotropicGlitch;
 import net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.ServerList;
@@ -164,8 +169,8 @@ public class Client {
 			str.append("eaglercraft.brand = \"eagtek\"\n");
 			str.append("eaglercraft.username = \"").append(EaglerProfile.username).append("\"\n");
 			str.append('\n');
-			//shortenMinecraftOpts();
-			//addArray(str, "minecraftOpts");
+			str.append(addWebGLToCrash());
+			str.append('\n');
 			str.append(crashScreenOptsDump).append('\n');
 			str.append('\n');
 			addDebugNav(str, "userAgent");
@@ -213,6 +218,33 @@ public class Client {
 		}
 	}
 
+	private static String addWebGLToCrash() {
+		StringBuilder ret = new StringBuilder();
+		
+		HTMLCanvasElement cvs = (HTMLCanvasElement) Window.current().getDocument().createElement("canvas");
+		
+		cvs.setWidth(64);
+		cvs.setHeight(64);
+		
+		WebGLRenderingContext ctx = EaglerAdapterImpl2.webgl;
+		
+		if(ctx == null) {
+			ctx = (WebGLRenderingContext)cvs.getContext("webgl");
+		}
+		
+		if(ctx != null) {
+			if(EaglerAdapterImpl2.webgl != null) {
+				ret.append("webgl.version = ").append(ctx.getParameterString(VERSION)).append('\n');
+			}
+			ret.append("webgl.renderer = ").append(ctx.getParameterString(RENDERER)).append('\n');
+			ret.append("webgl.vendor = ").append(ctx.getParameterString(VENDOR)).append('\n');
+		}else {
+			ret.append("Failed to query GPU info!\n");
+		}
+		
+		return ret.toString();
+	}
+
 	public static void showIncompatibleScreen(String t) {
 		if(!isCrashed) {
 			isCrashed = true;
@@ -231,6 +263,7 @@ public class Client {
 					+ "<div style=\"margin-left:40px;\">"
 					+ "<p style=\"font-size:1.2em;\"><b style=\"font-size:1.1em;\">Issue:</b> <span style=\"color:#BB0000;\" id=\"crashReason\"></span><br /></p>"
 					+ "<p style=\"margin-left:10px;font:0.9em monospace;\" id=\"crashUserAgent\"></p>"
+					+ "<p style=\"margin-left:10px;font:0.9em monospace;\" id=\"crashWebGL\"></p>"
 					+ "<p><br /><span style=\"font-size:1.1em;border-bottom:1px dashed #AAAAAA;padding-bottom:5px;\">Things you can try:</span></p>"
 					+ "<ol>"
 					+ "<li><span style=\"font-weight:bold;\">Just try using Eaglercraft on a different device</span>, it isn't a bug it's common sense</li>"
@@ -247,6 +280,27 @@ public class Client {
 			div.querySelector("#crashUserAgent").appendChild(doc.createTextNode(getStringNav("userAgent")));
 			
 			EaglerAdapterImpl2.removeEventHandlers();
+			
+			String webGLRenderer = "No GL_RENDERER string could be queried";
+			
+			try {
+				HTMLCanvasElement cvs = (HTMLCanvasElement) Window.current().getDocument().createElement("canvas");
+				
+				cvs.setWidth(64);
+				cvs.setHeight(64);
+				
+				WebGLRenderingContext ctx = (WebGLRenderingContext)cvs.getContext("webgl");
+				
+				if(ctx != null) {
+					String r = ctx.getParameterString(RENDERER);
+					if(r != null) {
+						webGLRenderer = r;
+					}
+				}
+			}catch(Throwable tt) {
+			}
+			
+			div.querySelector("#crashWebGL").appendChild(doc.createTextNode(webGLRenderer));
 			
 		}
 	}

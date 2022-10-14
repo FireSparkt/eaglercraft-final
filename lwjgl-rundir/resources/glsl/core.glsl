@@ -106,7 +106,6 @@ uniform vec4 textureGenS_V;
 uniform vec4 textureGenT_V;
 uniform vec4 textureGenR_V;
 uniform vec4 textureGenQ_V;
-uniform mat4 matrix_inverse_m;
 #endif
 #ifdef CC_patch_anisotropic
 uniform vec2 anisotropic_fix;
@@ -139,33 +138,19 @@ void main(){
 #endif
 	
 #ifdef CC_TEX_GEN_STRQ
+	vec4 texSrc[2];
+	texSrc[0] = v_object_pos;
+	texSrc[1] = v_position;
+	
 	vec4 texPos;
-	if(textureGenS_M == 1){
-		texPos.x = dot(v_position, textureGenS_V * matrix_inverse_m);
-	}else{
-		texPos.x = dot(v_object_pos, textureGenS_V);
-	}
-	if(textureGenT_M == 1){
-		texPos.y = dot(v_position, textureGenT_V * matrix_inverse_m);
-	}else{
-		texPos.y = dot(v_object_pos, textureGenT_V);
-	}
-	if(textureGenR_M == 1){
-		texPos.z = dot(v_position, textureGenR_V * matrix_inverse_m);
-	}else{
-		texPos.z = dot(v_object_pos, textureGenR_V);
-	}
-	if(textureGenQ_M == 1){
-		texPos.w = dot(v_position, textureGenQ_V * matrix_inverse_m);
-	}else{
-		texPos.w = dot(v_object_pos, textureGenQ_V);
-	}
+	texPos.x = dot(texSrc[textureGenS_M], textureGenS_V);
+	texPos.y = dot(texSrc[textureGenT_M], textureGenT_V);
+	texPos.z = dot(texSrc[textureGenR_M], textureGenR_V);
+	texPos.w = dot(texSrc[textureGenQ_M], textureGenQ_V);
+	
 	texPos = matrix_t * texPos;
-	texPos.x /= texPos.w;
-	texPos.y /= texPos.w;
-	texPos.z /= texPos.w;
-	texPos.w = 1.0;
-	color *= texture(tex0, texPos.xy).bgra;
+	
+	color *= texture(tex0, texPos.xy / texPos.w).bgra;
 #ifdef CC_alphatest
 	if(color.a < alphaTestF){
 		discard;
@@ -226,8 +211,8 @@ void main(){
 	
 #ifdef CC_fog
 	float dist = sqrt(dot(v_position, v_position));
-	float i = (fogMode == 1) ? clamp((dist - fogStart) / (fogEnd - fogStart), 0.0, 1.0) : clamp(1.0 - pow(2.718, -(fogDensity * dist)), 0.0, 1.0);
-	color.rgb = mix(color.rgb, fogColor.xyz, i * fogColor.a);
+	float i = fogMode == 1 ? (dist - fogStart) / (fogEnd - fogStart) : 1.0 - pow(2.718, -(fogDensity * dist));
+	color.rgb = mix(color.rgb, fogColor.xyz, clamp(i, 0.0, 1.0) * fogColor.a);
 #endif
 	
 	fragColor = color;

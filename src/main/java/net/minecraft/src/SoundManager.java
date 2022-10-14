@@ -89,7 +89,9 @@ public class SoundManager {
 	 */
 	public void onSoundOptionsChanged() {
 		EaglerAdapter.setMusicVolume(options.musicVolume);
-		EaglerAdapter.fireTitleMusicEvent(titleMusic != -1, options.musicVolume);
+		if(options.musicVolume > 0.0f) {
+			EaglerAdapter.fireTitleMusicEvent(titleMusic != -1, options.musicVolume);
+		}
 		EaglerAdapter.setMasterVolume(options.soundVolume);
 	}
 
@@ -455,8 +457,10 @@ public class SoundManager {
 	
 	public void playTheTitleMusic() {
 		if(titleMusic == -1 || !EaglerAdapter.isPlaying(titleMusic)) {
-			titleMusic = EaglerAdapter.beginPlaybackStatic("/sounds/gta.mp3", 1.0f, 1.0f, true);
-			EaglerAdapter.fireTitleMusicEvent(true, this.options.musicVolume);
+			if(this.options.musicVolume > 0.0f) {
+				titleMusic = EaglerAdapter.beginPlaybackStatic("/sounds/gta.mp3", 1.0f, 1.0f, true);
+				EaglerAdapter.fireTitleMusicEvent(true, this.options.musicVolume);
+			}
 		}
 	}
 	

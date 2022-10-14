@@ -34,11 +34,11 @@ public class EaglerUUID {
         return new EaglerUUID(randomBytes);
     }
     
-    private static final SHA1Digest yee = new SHA1Digest();
+    private static final MD5Digest yee = new MD5Digest();
     
     public static EaglerUUID nameUUIDFromBytes(byte[] name) {
     	yee.update(name, 0, name.length);
-        byte[] md5Bytes = new byte[20];
+        byte[] md5Bytes = new byte[16];
         yee.doFinal(md5Bytes, 0);
         md5Bytes[6]  &= 0x0f;  /* clear version        */
         md5Bytes[6]  |= 0x30;  /* set to version 3     */

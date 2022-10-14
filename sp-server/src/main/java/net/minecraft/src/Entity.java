@@ -192,7 +192,7 @@ public abstract class Entity {
 	public int dimension;
 	protected int teleportDirection;
 	private boolean invulnerable;
-	private EaglerUUID entityUniqueID;
+	protected EaglerUUID entityUniqueID;
 	public EnumEntitySize myEntitySize;
 
 	public Entity(World par1World) {

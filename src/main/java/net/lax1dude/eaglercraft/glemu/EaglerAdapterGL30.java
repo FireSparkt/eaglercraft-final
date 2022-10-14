@@ -793,36 +793,44 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 	public static final void glTexGeni(int p1, int p2, int p3) {
 
 	}
+	
+	private static final Vector4f tmpTexGenPlane = new Vector4f();
 
 	public static final void glTexGen(int p1, int p2, FloatBuffer p3) {
+		Vector4f vec = tmpTexGenPlane;
+		vec.load(p3);
+		if(p2 == GL_EYE_PLANE) {
+			tmpMat.load(matModelV[matModelPointer]).invert().transpose();
+			Matrix4f.transform(tmpMat, vec, vec);
+		}
 		switch (p1) {
 		case GL_S:
 			texS_plane = (p2 == GL_EYE_PLANE ? 1 : 0);
-			texS_X = p3.get();
-			texS_Y = p3.get();
-			texS_Z = p3.get();
-			texS_W = p3.get();
+			texS_X = vec.x;
+			texS_Y = vec.y;
+			texS_Z = vec.z;
+			texS_W = vec.w;
 			break;
 		case GL_T:
 			texT_plane = (p2 == GL_EYE_PLANE ? 1 : 0);
-			texT_X = p3.get();
-			texT_Y = p3.get();
-			texT_Z = p3.get();
-			texT_W = p3.get();
+			texT_X = vec.x;
+			texT_Y = vec.y;
+			texT_Z = vec.z;
+			texT_W = vec.w;
 			break;
 		case GL_R:
 			texR_plane = (p2 == GL_EYE_PLANE ? 1 : 0);
-			texR_X = p3.get();
-			texR_Y = p3.get();
-			texR_Z = p3.get();
-			texR_W = p3.get();
+			texR_X = vec.x;
+			texR_Y = vec.y;
+			texR_Z = vec.z;
+			texR_W = vec.w;
 			break;
 		case GL_Q:
 			texQ_plane = (p2 == GL_EYE_PLANE ? 1 : 0);
-			texQ_X = p3.get();
-			texQ_Y = p3.get();
-			texQ_Z = p3.get();
-			texQ_W = p3.get();
+			texQ_X = vec.x;
+			texQ_Y = vec.y;
+			texQ_Z = vec.z;
+			texQ_W = vec.w;
 			break;
 		}
 	}
