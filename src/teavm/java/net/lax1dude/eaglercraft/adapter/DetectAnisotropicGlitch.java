@@ -14,8 +14,19 @@ import net.lax1dude.eaglercraft.adapter.teavm.WebGLVertexArray;
 import org.teavm.jso.webgl.*;
 
 public class DetectAnisotropicGlitch {
+	
+	private static boolean known = false;
+	private static boolean detected = false;
 
-	public static boolean detectGlitch() {
+	public static boolean hasGlitch() {
+		if(!known) {
+			detected = detect();
+			known = true;
+		}
+		return detected;
+	}
+	
+	public static boolean detect() {
 		HTMLCanvasElement cvs = (HTMLCanvasElement) Window.current().getDocument().createElement("canvas");
 		
 		cvs.setWidth(400);		
