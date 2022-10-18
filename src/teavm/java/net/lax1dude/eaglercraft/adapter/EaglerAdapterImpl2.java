@@ -493,13 +493,13 @@ public class EaglerAdapterImpl2 {
 	public static final void removeEventHandlers() {
 		try {
 			win.removeEventListener("contextmenu", contextmenu);
-			win.removeEventListener("mousedown", mousedown);
-			win.removeEventListener("mouseup", mouseup);
-			win.removeEventListener("mousemove", mousemove);
+			canvas.removeEventListener("mousedown", mousedown);
+			canvas.removeEventListener("mouseup", mouseup);
+			canvas.removeEventListener("mousemove", mousemove);
 			win.removeEventListener("keydown", keydown);
 			win.removeEventListener("keyup", keyup);
 			win.removeEventListener("keypress", keypress);
-			win.removeEventListener("wheel", wheel);
+			canvas.removeEventListener("wheel", wheel);
 		}catch(Throwable t) {
 		}
 		try {
