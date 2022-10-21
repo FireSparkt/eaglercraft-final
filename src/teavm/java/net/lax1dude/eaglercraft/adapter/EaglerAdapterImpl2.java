@@ -1084,7 +1084,7 @@ public class EaglerAdapterImpl2 {
 				int[] pixels = new int[totalPixels];
 				for(int i = 0, j; i < pixels.length; ++i) {
 					j = dv.getUint32(i << 2, false);
-					pixels[i] = (j >> 8) | ((j & 0xFF) << 24);
+					pixels[i] = ((j >> 8) & 0xFFFFFF) | ((j & 0xFF) << 24);
 				}
 				ret.complete(new EaglerImage(pixels, pxlsDat.getWidth(), pxlsDat.getHeight(), true));
 			}
