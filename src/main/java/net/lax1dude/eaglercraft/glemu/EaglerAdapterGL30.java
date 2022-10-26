@@ -773,6 +773,18 @@ public class EaglerAdapterGL30 extends EaglerAdapterImpl2 {
 		}
 	}
 
+	public static final void flushDisplayList(int p1) {
+		DisplayList d = displayListsInitialized.get(p1);
+		if (d != null) {
+			if (d.glbuffer != null) {
+				_wglDeleteBuffer(d.glbuffer);
+				_wglDeleteVertexArray(d.glarray);
+				d.glbuffer = null;
+				d.glarray = null;
+			}
+		}
+	}
+
 	public static final HighPolyMesh loadMesh(String path) {
 		try {
 			return HighPolyMesh.loadMeshData(EaglerAdapter.loadResourceBytes(path));

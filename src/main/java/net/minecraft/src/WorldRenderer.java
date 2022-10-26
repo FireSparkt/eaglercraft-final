@@ -243,6 +243,13 @@ public class WorldRenderer {
 			this.tileEntities.removeAll(var21);
 			this.isChunkLit = Chunk.isLit;
 			this.isInitialized = true;
+
+			if(skipRenderPass[0]) {
+				EaglerAdapter.flushDisplayList(glRenderList);
+			}
+			if(skipRenderPass[1]) {
+				EaglerAdapter.flushDisplayList(glRenderList + 1);
+			}
 		}
 	}
 
@@ -263,6 +270,8 @@ public class WorldRenderer {
 	public void setDontDraw() {
 		for (int var1 = 0; var1 < 2; ++var1) {
 			this.skipRenderPass[var1] = true;
+			EaglerAdapter.flushDisplayList(glRenderList);
+			EaglerAdapter.flushDisplayList(glRenderList + 1);
 		}
 
 		this.isInFrustum = false;
