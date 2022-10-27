@@ -1,35 +1,40 @@
 # Eaglercraft
 
-**Currently maintained by [ayunami2000](https://github.com/ayunami2000)**
-
-### Client: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/)
-
-### Offline Download: [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
-
-### Note: we will be transitioning away from Eaglercraft being standalone 'free browser minecraft' to Eaglercraft being a bukkit/bungee plugin for servers to allow 'online access' to players who register with a command as their real online-mode Minecraft account on the server. Server owners can still elect to set `online-mode=false` in their server.properties to allow free login but now that's their legal screw up instead of mine
-
 ![eaglercraft](https://g.deev.is/eaglercraft/cover.png)
+:-:
+Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. It supports both singleplayer and multiplayer.
 
-### Official Demo URL: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/)
-
-### Download Locally: [stable-download/Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
-
-(right click the link and press 'Save link as...' to download the file)
-
-### Play Minecraft Beta Singleplayer: [https://g.deev.is/eaglercraft/beta/](https://g.deev.is/eaglercraft/beta/)
+**Currently maintained by [ayunami2000](https://github.com/ayunami2000)**
 
 **For any questions you can join the discord server and hit us up there [https://discord.gg/Ekzcgs3DKZ](https://discord.gg/Ekzcgs3DKZ)**
 
-## What is Eaglercraft?
+# Quick Start
 
-Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser. That includes school chromebooks, it works on all chromebooks. It supports both singleplayer and multiplayer.
+### Client: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/) [^1]
 
-## Singleplayer?
+### Offline Client Download: [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
-### Eaglercraft now fully supports singleplayer
+(right click the link and press 'Save link as...' to download the file!)
 
-### Simply press the 'Singleplayer' button on the main menu and you can create a regular vanilla minecraft and play it any time.
+### Play Minecraft Beta Singleplayer: [https://g.deev.is/eaglercraft/beta/](https://g.deev.is/eaglercraft/beta/)
 
+[^1]: A list of public servers are already added into the official client
+
+# Table Of Contents:
+
+| [Singleplayer](#Singleplayer)                                 | [Multiplayer](#Multiplayer)                                       | [Others](#Others)                                 |
+|---------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------|
+| [Importing / Exporting Worlds](#Importing / Exporting Worlds) | [Public clients / servers](#Public clients / servers)             | [Plugin Development](#Plugin Development)         |
+| [LAN Worlds](#LAN Worlds)                                     | [Creating a Client](#Creating a Client)                           | [Compiling](#Compiling)                           |
+| [Public LAN Relays](#Public LAN Relays)                       | [Creating a Server - Bukkit](#Creating a server - Bukkit)         | [Create a resource pack](#Create a resource pack) |
+| [Creating a LAN relay](#Creating a LAN relay)                 | [Creating a Server - Bungeecord](#Creating a server - Bungeecord) | [Contributing](#Contributing)                     |
+|                                                               | [Bungeecord Configuration](#Bungeecord Configuration)             |                                                   |
+
+## Singleplayer
+
+Simply press the 'Singleplayer' button on the main menu and you can create a regular vanilla minecraft and play it any time.
+
+### Importing / Exporting worlds
 The worlds are stored in your browser's local storage, **you can export them as EPK files and import them again on all other Eaglercraft sites that also support singleplayer.** You can even copy an exported world to an entirely different computer, or send it to a friend, and import it and continue playing with all your progress saved.
 
 **Link: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/)**
