@@ -24,11 +24,11 @@ Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser
 
 | [Singleplayer](#Singleplayer)                                 | [Multiplayer](#Multiplayer)                                       | [Others](#Others)                                 |
 |---------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------|
-| [Importing / Exporting Worlds](#Importing / Exporting Worlds) | [Public clients / servers](#Public clients / servers)             | [Plugin Development](#Plugin Development)         |
-| [LAN Worlds](#LAN Worlds)                                     | [Creating a Client](#Creating a Client)                           | [Compiling](#Compiling)                           |
-| [Public LAN Relays](#Public LAN Relays)                       | [Creating a Server - Bukkit](#Creating a server - Bukkit)         | [Create a resource pack](#Create a resource pack) |
-| [Creating a LAN relay](#Creating a LAN relay)                 | [Creating a Server - Bungeecord](#Creating a server - Bungeecord) | [Contributing](#Contributing)                     |
-|                                                               | [Bungeecord Configuration](#Bungeecord Configuration)             |                                                   |
+| [Importing / Exporting Worlds](#Importing-/-Exporting-Worlds) | [Public clients / servers](#Public-clients-/-servers)             | [Plugin Development](#Plugin-Development)         |
+| [LAN Worlds](#LAN-Worlds)                                     | [Creating a Client](#Creating-a-Client)                           | [Compiling](#Compiling)                           |
+| [Public LAN Relays](#Public-LAN-Relays)                       | [Creating a Server - Bukkit](#Creating-a-server---Bukkit)         | [Create a resource pack](#Create-a-resource-pack) |
+| [Creating a LAN relay](#Creating-a-LAN-relay)                 | [Creating a Server - Bungeecord](#Creating-a-server---Bungeecord) | [Contributing](#Contributing)                     |
+|                                                               | [Bungeecord Configuration](#Bungeecord-Configuration)             |                                                   |
 
 ## Singleplayer
 
