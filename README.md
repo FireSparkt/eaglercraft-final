@@ -53,7 +53,9 @@ Make sure they add the relay server your game opens the LAN world on to their "N
 
 ### THIS IS A REQUIRED STEP FOR A PERSON TO JOIN YOUR WORLD, IF THEY DO NOT HAVE THE RELAY YOUR WORLD IS HOSTED ON ADDED TO THEIR "Network Settings" THE GAME WILL BE UNABLE TO LOCATE THE WORLD
 
-### Here are some public relay servers you can use:
+## Public LAN Relays:
+
+Here are some public relay servers you can use:
 
  - `wss://relay.deev.is/`
  - `wss://relay.lax1dude.net/`
