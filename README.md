@@ -126,7 +126,7 @@ There are alot more configurations in bungeecord, but this should set you up
 - **For an animated MOTD and icon, install EaglerMOTD: [https://github.com/lax1dude/eaglercraft-motd/](https://github.com/lax1dude/eaglercraft-motd/)**
 
 ## Authentication
-- To add `/login` and `/register`, install [AuthMe](https://github.com/lax1dude/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
+- To add `/login` and `/register`, install [AuthMe](https://github.com/lax1dude/eaglercraft-plugins/tree/main/AuthMe) and carefully [read its documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
 
 ## Moderation
 - **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
