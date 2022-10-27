@@ -26,8 +26,8 @@ Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser
 |-----------------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------|
 | [Importing / Exporting Worlds](#Importing-/-Exporting-Worlds)         | [Public clients / servers](#Public-clients-/-servers)             | [Plugin Development](#Plugin-Development)         |
 | [LAN Worlds](#LAN-Worlds)                                             | [Creating a Server - Bukkit](#Creating-a-server---Bukkit)         | [Compiling](#Compiling)                           |
-| [Public LAN Relays](#Here-are-some-public-relay-servers-you-can-use:) | [Creating a Server - Bungeecord](#Creating-a-server---Bungeecord) | [Creating a resource pack](#Creating-a-resource-pack) |
-| [Creating a LAN relay](#Creating-a-LAN-relay)                         | [Creating a Client](#Creating-a-Client)                           | [Contributing](#Contributing)                     |
+| [Public LAN Relays](#Public-LAN-Relays) | [Creating a Server - Bungeecord](#Creating-a-server---Bungeecord) | [Creating a resource pack](#Creating-a-resource-pack) |
+| [Creating a LAN Relay](#Creating-a-LAN-Relay)                         | [Creating a Client](#Creating-a-Client)                           | [Contributing](#Contributing)                     |
 |                                                                       | [Bungeecord Configuration](#Bungeecord-Configuration)             |                                                   |
 
 # Singleplayer
@@ -53,7 +53,7 @@ Make sure they add the relay server your game opens the LAN world on to their "N
 
 ### THIS IS A REQUIRED STEP FOR A PERSON TO JOIN YOUR WORLD, IF THEY DO NOT HAVE THE RELAY YOUR WORLD IS HOSTED ON ADDED TO THEIR "Network Settings" THE GAME WILL BE UNABLE TO LOCATE THE WORLD
 
-## Public LAN Relays:
+## Public LAN Relays
 
 Here are some public relay servers you can use:
 
@@ -61,7 +61,7 @@ Here are some public relay servers you can use:
  - `wss://relay.lax1dude.net/`
  - `wss://relay.shhnowisnottheti.me/`
 
-## Hosting a LAN server relay
+## Creating a LAN Relay
 
 ### Simply download [stable-download/sp-relay.jar](https://github.com/lax1dude/eaglercraft/blob/main/stable-download/sp-relay.jar) and run `java -jar sp-relay.jar`
 
