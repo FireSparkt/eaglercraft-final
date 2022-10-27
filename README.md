@@ -22,24 +22,24 @@ Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser
 
 # Table Of Contents:
 
-| [Singleplayer](#Singleplayer)                                 | [Multiplayer](#Multiplayer)                                       | [Others](#Others)                                 |
-|---------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------|
-| [Importing / Exporting Worlds](#Importing-/-Exporting-Worlds) | [Public clients / servers](#Public-clients-/-servers)             | [Plugin Development](#Plugin-Development)         |
-| [LAN Worlds](#LAN-Worlds)                                     | [Creating a Client](#Creating-a-Client)                           | [Compiling](#Compiling)                           |
-| [Public LAN Relays](#Public-LAN-Relays)                       | [Creating a Server - Bukkit](#Creating-a-server---Bukkit)         | [Create a resource pack](#Create-a-resource-pack) |
-| [Creating a LAN relay](#Creating-a-LAN-relay)                 | [Creating a Server - Bungeecord](#Creating-a-server---Bungeecord) | [Contributing](#Contributing)                     |
-|                                                               | [Bungeecord Configuration](#Bungeecord-Configuration)             |                                                   |
+| [Singleplayer](#Singleplayer)                                         | [Multiplayer](#Multiplayer)                                       | [Others](#Others)                                 |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------|---------------------------------------------------|
+| [Importing / Exporting Worlds](#Importing-/-Exporting-Worlds)         | [Public clients / servers](#Public-clients-/-servers)             | [Plugin Development](#Plugin-Development)         |
+| [LAN Worlds](#LAN-Worlds)                                             | [Creating a Server - Bukkit](#Creating-a-server---Bukkit)         | [Compiling](#Compiling)                           |
+| [Public LAN Relays](#Here-are-some-public-relay-servers-you-can-use:) | [Creating a Server - Bungeecord](#Creating-a-server---Bungeecord) | [Creating a resource pack](#Creating-a-resource-pack) |
+| [Creating a LAN relay](#Creating-a-LAN-relay)                         | [Creating a Client](#Creating-a-Client)                           | [Contributing](#Contributing)                     |
+|                                                                       | [Bungeecord Configuration](#Bungeecord-Configuration)             |                                                   |
 
-## Singleplayer
+# Singleplayer
 
 Simply press the 'Singleplayer' button on the main menu and you can create a regular vanilla minecraft and play it any time.
 
-### Importing / Exporting worlds
+### Importing / Exporting Worlds
 The worlds are stored in your browser's local storage, **you can export them as EPK files and import them again on all other Eaglercraft sites that also support singleplayer.** You can even copy an exported world to an entirely different computer, or send it to a friend, and import it and continue playing with all your progress saved.
 
 **Link: [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/)**
 
-## LAN Worlds?
+## LAN Worlds
 
 ### Eaglercraft fully supports LAN worlds, you can share your world with any player and they can connect directly to it as if you are running a server in your browser.
 
@@ -47,9 +47,9 @@ The worlds are stored in your browser's local storage, **you can export them as 
 
 To open your world to LAN, go to the pause menu and click 'Open to LAN'. You can configure the gamemode and cheats and if you would like to hide your LAN world. **When you do not hide your LAN world, it will appear on the Multiplayer screen from the main menu to anybody else also on your Wi-Fi network.** Set the world hidden if you are at school or something and don't want everyone else in your class to join as well and start griefing.
 
-### When you open the world to LAN it will give you a 'join code'. Simply share the code with your friends and they can visit the Multiplayer screen from the main menu and click 'Direct Connect' and enter the code and they will be able to join your world.
+When you open the world to LAN it will give you a 'join code'. Simply share the code with your friends and they can visit the Multiplayer screen from the main menu and click 'Direct Connect' and enter the code and they will be able to join your world.
 
-### Make sure they add the relay server your game opens the LAN world on to their "Network Settings" menu accessable from the Multiplayer screen. You simply must send them the URL indicated in the pause menu once the world is opened and they can use the "Add Relay" option to add the URL to their list.
+Make sure they add the relay server your game opens the LAN world on to their "Network Settings" menu accessable from the Multiplayer screen. You simply must send them the URL indicated in the pause menu once the world is opened and they can use the "Add Relay" option to add the URL to their list.
 
 ### THIS IS A REQUIRED STEP FOR A PERSON TO JOIN YOUR WORLD, IF THEY DO NOT HAVE THE RELAY YOUR WORLD IS HOSTED ON ADDED TO THEIR "Network Settings" THE GAME WILL BE UNABLE TO LOCATE THE WORLD
 
@@ -59,60 +59,88 @@ To open your world to LAN, go to the pause menu and click 'Open to LAN'. You can
  - `wss://relay.lax1dude.net/`
  - `wss://relay.shhnowisnottheti.me/`
 
-## Issues?
+## Hosting a LAN server relay
 
-I got tired of closing duplicate 'how to maek sever' issues almost every day so I disabled it because honestly I don't really care anymore, [join discord](https://discord.gg/Ekzcgs3DKZ) if you've got an issue to report that you are confident can be backed up with source code
+### Simply download [stable-download/sp-relay.jar](https://github.com/lax1dude/eaglercraft/blob/main/stable-download/sp-relay.jar) and run `java -jar sp-relay.jar`
 
-## How to make a server
+**Run `java -jar sp-relay.jar --debug` to view debug info like all the IPs of incoming connections, as it is not shown by default because logging all that info will reduce performance when the relay is being pinged many times a second depending on it's popularity.**
 
-### If replit is acceptable, you can use this:
+Edit the `relayConfig.ini` file generated on first launch to change the port and configure ratelimiting and such, and `relays.txt` to change the list of STUN and TURN relays reported to clients connecting to the relay, which are required to correctly establish a P2P LAN world connection in browsers
 
-### [https://replit.com/@ayunami2000/eaglercraft-server](https://replit.com/@ayunami2000/eaglercraft-server)
+**The `origin-whitelist` config variable is a semicolon (`;`) seperated list of domains used to restrict what sites are to be allowed to use your relay. When left blank it allows all sites. Add `offline` to allow offline download clients to use your relay as well, and `null` to allow connections that do not specify an `Origin:` header. Use `*` as a wildcard, for example: `*.deev.is` allows all domains ending with "deev.is" to use the relay.**
+
+# Multiplayer
+
+There are multiple community hosted servers, the best way to discover those is to use the [official client](https://g.deev.is/eaglercraft/)
+
+Alternatively, there is a server list[^2] to find servers.
+
+[^2]: Server list is currently being rebuilt, use official client for now
+
+# Creating your own server
+
+There are multiple parts to a server, mainly consisting of bungeecord, a proxy which will translate websockets to raw TCP connection, which minecraft can understand.
+
+You may also want to set up your own client, allowing you to control default server listings, resource packs, and a faster connection.
+
+### If replit is acceptable, you can use [this](https://replit.com/@ayunami2000/eaglercraft-server) to automatically set up everything for a server, otherwise, look below for instructions
+
+## Creating a server - Bukkit
 
 1. **Check if Java is installed.** You can download it from [https://www.java.com/en/download/](https://www.java.com/en/download/)
 2. Download the [stable-download/stable-download.zip](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/stable-download.zip) file from this repository
 4. Extract the ZIP file you downloaded to a new folder
-5. Open the new folder, go into the `java/bungee_command` folder
+5. Open the new folder, go into the `java/bukkit_command` folder
 6. In Windows, double-click `run.bat`. It should open a new terminal window  
 ![run.bat](https://i.gyazo.com/2b0f6b3e5b2e5a5a102c62ea5b6fba3f.png)  
 **Some computers may just say 'run' instead of 'run.bat', both are correct**
-7. On macOS or Linux, google how to open the terminal and use the `cd` command to navigate to `java/bungee_command`  
+7. On macOS or Linux, google how to open the terminal and use the `cd` command to navigate to `java/bukkit_command`  
 Then, in that folder, run `chmod +x run_unix.sh` and then run `./run_unix.sh`. It should start the same server
-8. Go to the other `java/bukkit_command` folder that was also extracted from the ZIP
-9. Again, on Windows, double-click `run.bat` in the folder. It should open a second terminal window.  
-Keep both the first and second terminal window you opened, just minimize them don't close
-10. Again, on macOS or Linux, repeat step 7 except in the `java/bukkit_command` folder
-11. **Your server is now ready.** Download and open [stable-download/Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
-12. Go to 'Multiplayer' from the main menu. Select 'Direct Connect', type `127.0.0.1:25565` and press 'Join Server'
-13. **It should allow you to connect, if not, check the two terminal windows for errors**
-14. If you are okay with regularly checking for updates to [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html), you are now finished
-15. If you are playing with friends and want a shared website that can be updated, see the `stable-download/web` folder
-16. To install, create a website and upload the contents of `stable-download/web` to the URL you want to have Eaglercraft on
-17. **The 'web' folder will not work if you open it in your browser locally! If you see 'file:///' in the URL you are doing it wrong. You need to upload the folder to an HTTP or HTTPS server and access it over the internet via http:// or https://. The game will not load otherwise, this is not a bug**
-18. To modify the list of default servers, modify the `window.eaglercraftOpts` variable in `index.html`. 
-19. **A full guide on how to configure `eaglercraftOpts` is coming soon, but it should be fairly intuitive to figure out how to set it up based on what the default values already are when you look in stable-download**
-20. **To create a link to your site that automatically joins the server,** add a `?server=` variable to the URL, like (for example): [https://g.deev.is/eaglercraft/?server=127.0.0.1:25565](https://g.deev.is/eaglercraft/?server=127.0.0.1:25565) will automatically join `ws://127.0.0.1:25565/` as soon as the player finishes setting their username and skin
-21. To change your server's MOTD and icon, edit the `motd1:` tag of the listener config in `java/bungee_command/config.yml`, and replace `server-icon.png` in the folder where the config file is. Use `&` to add color/formatting codes. The server list will downscale your icon to 64x64 pixels
-22. You can give your MOTD multiple lines, add a `motd2:` to define a second line
-23. **For an animated MOTD and icon, install EaglerMOTD: [https://github.com/lax1dude/eaglercraft-motd/](https://github.com/lax1dude/eaglercraft-motd/)**
-24. To add some bukkit plugins, download the plugin's JAR file for CraftBukkit 1.5.2 and place it in `java/bukkit_command/plugins`
-25. To add some bungee plugins, download the plugin's JAR file and place it in `java/bungee_command/plugins`
-26. See [https://github.com/lax1dude/eaglercraft-plugins/](https://github.com/lax1dude/eaglercraft-plugins/) to download some supported plugins
-27. **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
-28. To add `/login` and `/register`, install [AuthMe](https://github.com/lax1dude/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
-29. **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
-30. **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
-31. To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
-32. To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
-33. **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
-34. To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
-35. **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
+8. To add some bukkit plugins, download the plugin's JAR file for CraftBukkit 1.5.2 and place it in `java/bukkit_command/plugins`
+(See [https://github.com/lax1dude/eaglercraft-plugins/](https://github.com/lax1dude/eaglercraft-plugins/) to download some supported plugins)
+
+## Creating a server - Bungeecord
+1. In the same new folder, go into the `java/bungee_command` folder
+2. In Windows, double-click `run.bat`. It should open a second terminal window  
+Keep both the first and second terminal window you opened, just minimize them, don't close
+3. On macOS or Linux, repeat step 7 in [Creating a Server - Bukkit](#Creating-a-server---Bukkit), but navigate to `java/bungee_command` this time
+4. To add some bungee plugins, download the plugin's JAR file and place it in `java/bungee_command/plugins`
+
+There are alot more configurations in bungeecord, but this should set you up
+
+**Your server is now ready.** Visit any client, and go to 'Multiplayer' from the main menu. Select 'Direct Connect', type `127.0.0.1:25565` and press 'Join Server'
+**It should allow you to connect, if not, check the two terminal windows for errors**
+
+## Creating a client
+1. To install, create a website and upload the contents of `stable-download/web` to the URL you want to have Eaglercraft on
+2. **The 'web' folder will not work if you open it in your browser locally! If you see 'file:///' in the URL you are doing it wrong. You need to upload the folder to an HTTP or HTTPS server and access it over the internet via http:// or https://. The game will not load otherwise, this is not a bug**
+3. To modify the list of default servers, modify the `window.eaglercraftOpts` variable in `index.html`. 
+4. **A full guide on how to configure `eaglercraftOpts` is coming soon, but it should be fairly intuitive to figure out how to set it up based on what the default values already are when you look in stable-download**
+5. **To create a link to your site that automatically joins the server,** add a `?server=` variable to the URL, like (for example): [https://g.deev.is/eaglercraft/?server=127.0.0.1:25565](https://g.deev.is/eaglercraft/?server=127.0.0.1:25565) will automatically join `ws://127.0.0.1:25565/` as soon as the player finishes setting their username and skin
+
+# Bungeecord Configuration
+
+## MOTD
+- To change your server's MOTD and icon, edit the `motd1:` tag of the listener config in `java/bungee_command/config.yml`, and replace `server-icon.png` in the folder where the config file is. Use `&` to add color/formatting codes. The server list will downscale your icon to 64x64 pixels
+- You can give your MOTD multiple lines, add a `motd2:` to define a second line
+- **For an animated MOTD and icon, install EaglerMOTD: [https://github.com/lax1dude/eaglercraft-motd/](https://github.com/lax1dude/eaglercraft-motd/)**
+
+## Authentication
+- To add `/login` and `/register`, install [AuthMe](https://github.com/lax1dude/eaglercraft-plugins/tree/main/AuthMe) and carefully [read it's documentation](https://github.com/AuthMe/AuthMeReloaded/wiki) to set it up correctly
+
+## Moderation
+- **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
+- **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
+- **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
+- To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
+- To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
+- **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
+- To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
+- **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
+
 36. To connect to your server through a `ws://` or `wss://` URL instead of `ip:port`, set up [nginx](https://nginx.org/) as a reverse proxy to the `ip:port` of you EaglercraftBungee server you want the URL to connect to. Use a location URL template with the `proxy_pass` directive.
 37. Eaglercraft uses port 80 for IP connections by default, typing `127.0.0.1` is the same as typing `ws://127.0.0.1:80/`
 38. To forward a client's remote IP address from a request on nginx to EaglercraftBungee for enforcing IP bans, set the `X-Real-IP` header on the request to websocket when it is proxied
-39. To make a custom resource pack for your site, clone this repository and edit the files in [lwjgl-rundir/resources](https://github.com/lax1dude/eaglercraft/tree/main/lwjgl-rundir/resources).
-40. When you are done, navigate to [epkcompiler/](https://github.com/lax1dude/eaglercraft/tree/main/epkcompiler) and double-click `run.bat`. Wait for the window to say `Press any key to continue...` and close it. Then, go to `../javascript` in the repository and copy `javascript/assets.epk` to the `assets.epk` on your website
-41. If you're on mac or linux, navigate to the epkcompiler folder via `cd` and run `chmod +x run_unix.sh` and then `./run_unix.sh` to do this, then copy the same `javascript/assets.epk` to the `assets.epk` on your website
 
 ## EaglercraftBungee
 
@@ -240,7 +268,9 @@ test:
 
 In this example, sending a player to the server `test`, such as when they enter a portal or type `/server test`, will trigger their client to disconnect from your bungeecord and then automatically reconnect to `wss://ServerHere/` as if it was entered via "Direct Connect"
 
-### Plugin Development
+# Others
+
+## Plugin Development
 
 **To develop a plugin, download [stable-download/java/bungee_command/bungee_dist.jar](https://github.com/lax1dude/eaglercraft/blob/main/stable-download/java/bungee_command/bungee-dist.jar) and add it to the Build Path of your Java IDE. Develop the plugin just like a regular BungeeCord plugin, see [EaglerMOTD](https://github.com/lax1dude/eaglercraft-motd/) for an example.**
 
@@ -254,24 +284,20 @@ In this example, sending a player to the server `test`, such as when they enter 
 
 **Register event handlers using the standard BungeeCord** `@EventHandler` **annotation in your** `Listener` **class**
 
-## Hosting a LAN server relay
-
-### Simply download [stable-download/sp-relay.jar](https://github.com/lax1dude/eaglercraft/blob/main/stable-download/sp-relay.jar) and run `java -jar sp-relay.jar`
-
-**Run `java -jar sp-relay.jar --debug` to view debug info like all the IPs of incoming connections, as it is not shown by default because logging all that info will reduce performance when the relay is being pinged many times a second depending on it's popularity.**
-
-Edit the `relayConfig.ini` file generated on first launch to change the port and configure ratelimiting and such, and `relays.txt` to change the list of STUN and TURN relays reported to clients connecting to the relay, which are required to correctly establish a P2P LAN world connection in browsers
-
-**The `origin-whitelist` config variable is a semicolon (`;`) seperated list of domains used to restrict what sites are to be allowed to use your relay. When left blank it allows all sites. Add `offline` to allow offline download clients to use your relay as well, and `null` to allow connections that do not specify an `Origin:` header. Use `*` as a wildcard, for example: `*.deev.is` allows all domains ending with "deev.is" to use the relay.**
-
 ## Compiling
 
 To compile for the web, run the gradle 'teavm' compile target to generate the classes.js file.
 
 The LWJGL runtime is no longer supported it is only included for reference
 
-**To modify the game's resource pack (javascript/assets.epk), view the readme in the [/epkcompiler](https://github.com/lax1dude/eaglercraft/tree/main/epkcompiler) directory**
+## Creating a resource pack
+
+- To make a custom resource pack for your site, clone this repository and edit the files in [lwjgl-rundir/resources](https://github.com/lax1dude/eaglercraft/tree/main/lwjgl-rundir/resources).
+- When you are done, navigate to [epkcompiler/](https://github.com/lax1dude/eaglercraft/tree/main/epkcompiler) and double-click `run.bat`. Wait for the window to say `Press any key to continue...` and close it. Then, go to `../javascript` in the repository and copy `javascript/assets.epk` to the `assets.epk` on your website
+- If you're on mac or linux, navigate to the epkcompiler folder via `cd` and run `chmod +x run_unix.sh` and then `./run_unix.sh` to do this, then copy the same `javascript/assets.epk` to the `assets.epk` on your website
 
 ## Contributing
 
 All I really have to say is, tabs not spaces, and format the code to be like the eclipse auto format tool on factory settings, but also run-on lines of code long enough to go off the screen and single line if statements and other format violations in that category are welcome if it helps enhance the contrast between the less important code and the more important code in a file. Don't commit changes to `javascript/classes.js` or `javascript/classes_server.js` or `javascript/assets.epk` or anything in `stable-download/`. I'll recompile those myself when I merge the pull request.
+
+**README was redesigned by [DiffuseHyperion](https://github.com/DiffuseHyperion) :)**
