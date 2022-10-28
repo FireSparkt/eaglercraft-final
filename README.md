@@ -14,21 +14,20 @@ Eaglercraft is real Minecraft 1.5.2 that you can play in any regular web browser
 
 ### Offline Client Download: [Offline_Download_Version.html](https://github.com/lax1dude/eaglercraft/raw/main/stable-download/Offline_Download_Version.html)
 
-(right click the link and press 'Save link as...' to download the file!)
+**(right click the link and press 'Save link as...' to download the file)**
 
 ### Play Minecraft Beta Singleplayer: [https://g.deev.is/eaglercraft/beta/](https://g.deev.is/eaglercraft/beta/)
 
 [^1]: A list of public servers are already added into the official client
 
 # Table Of Contents:
-
 | [Singleplayer](#Singleplayer)                                 | [Multiplayer](#Multiplayer)                                                     | [Others](#Others)                                     |
 |---------------------------------------------------------------|---------------------------------------------------------------------------------|-------------------------------------------------------|
 | [Importing / Exporting Worlds](#Importing-/-Exporting-Worlds) | [Public clients / servers](#Public-clients-/-servers)                           | [Plugin Development](#Plugin-Development)             |
 | [LAN Worlds](#LAN-Worlds)                                     | [Creating a Server - Bukkit](#Creating-a-server---Bukkit)                       | [Compiling](#Compiling)                               |
 | [Public LAN Relays](#Public-LAN-Relays)                       | [Creating a Server - EaglercraftBungee](#Creating-a-server---EaglercraftBungee) | [Creating a resource pack](#Creating-a-resource-pack) |
 | [Creating a LAN Relay](#Creating-a-LAN-Relay)                 | [Creating a Client](#Creating-a-Client)                                         | [Contributing](#Contributing)                         |
-|                                                               | [Bungeecord Configuration](#Bungeecord-Configuration)                           |                                                       |
+|                                                               | [EaglercraftBungee Configuration](#EaglercraftBungee-Configuration)             |                                                       |
 |                                                               | [Creating a Reverse Proxy - NGINX](#Creating-a-Reverse-Proxy---NGINX)           |                                                       |
 |                                                               | [NGINX Configuration](#NGINX-Configuration)                                     |                                                       |
 
@@ -110,7 +109,7 @@ Keep both the first and second terminal window you opened, just minimize them, d
 3. On macOS or Linux, repeat step 7 in [Creating a Server - Bukkit](#Creating-a-server---Bukkit), but navigate to `java/bungee_command` this time
 4. To add some bungee plugins, download the plugin's JAR file and place it in `java/bungee_command/plugins`
 
-There are alot more configurations in bungeecord, but this should set you up
+There are alot more configurations in EaglercraftBungee, but this should set you up
 
 **Your server is now ready.** Visit any client, and go to 'Multiplayer' from the main menu. Select 'Direct Connect', type `127.0.0.1:25565` and press 'Join Server'
 **It should allow you to connect, if not, check the two terminal windows for errors**
@@ -127,7 +126,7 @@ There are alot more configurations in bungeecord, but this should set you up
 4. **A full guide on how to configure `eaglercraftOpts` is coming soon, but it should be fairly intuitive to figure out how to set it up based on what the default values already are when you look in stable-download**
 5. **To create a link to your site that automatically joins the server,** add a `?server=` variable to the URL, like (for example): [https://g.deev.is/eaglercraft/?server=127.0.0.1:25565](https://g.deev.is/eaglercraft/?server=127.0.0.1:25565) will automatically join `ws://127.0.0.1:25565/` as soon as the player finishes setting their username and skin
 
-# Bungeecord Configuration
+# EaglercraftBungee Configuration
 
 ## MOTD
 - To change your server's MOTD and icon, edit the `motd1:` tag of the listener config in `java/bungee_command/config.yml`, and replace `server-icon.png` in the folder where the config file is. Use `&` to add color/formatting codes. The server list will downscale your icon to 64x64 pixels
@@ -163,10 +162,10 @@ authservice:
 ### Miscellaneous
 - **If you use /op on your server, keep in mind that if you "/op LAX1DUDE", a player joining as 'laX1DUDE' or 'LaX1dUdE' or 'lax1dude' will all have /op too. To solve this problem, force all operators to only be able to join with all lowercase ('lax1dude') letters in their usernames by moving 'BitchFilterPlugin.jar" into "java/bukkit_command/plugins" and then register every op username lowercase**
 
-- **To disable voice chat, set `voice_enabled: false` in the bungeecord config.yml**
+- **To disable voice chat, set `voice_enabled: false` in the EaglercraftBungee config.yml**
 
 ### Username Bans
-- **To ban a username on Eaglercraftbungee, use:** `eag-ban <username>`
+- **To ban a username on EaglercraftBungee, use:** `eag-ban <username>`
 - **You can edit bans.txt in your EaglercraftBungee folder, the server automatically reloads the file when it is saved**
 - To ban users by regular expression, use: `eag-ban-regex <regex>` with a regular expression to match the username in **lowercase**
 
@@ -174,7 +173,7 @@ authservice:
 
 In order for IP Bans to work, a [**a reverse proxy**](#Creating-a-Reverse-Proxy---NGINX) is required, and **[`forward_ip`](#NGINX-Configuration) needs to be configured,** ***otherwise it cannot ban the user's IP***
 
-- **To ban an IP on Eaglercraftbungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
+- **To ban an IP on EaglercraftBungee, use:** `eag-ban-ip <ip>`, or `eag-ban-ip <name>` to ban the IP of a player automatically
 - To ban a range of IP addresses, use slash notation to define a subnet. Example: `eag-ban-ip 192.168.0.0/8`
 - To ban users by wildcard (\*) use: `eag-ban-wildcard <text>*` or `eag-ban-wildcard *<text>` or `eag-ban-wildcard *<text>*`
 
@@ -202,9 +201,9 @@ origin_blacklist_block_offline_download: true
 ```yaml
 origin_blacklist_block_missing_origin_header: true
 ```
-- **To add your own blacklisted domains**, create a file called `origin_blacklist.txt` in your bungeecord directory and put the regular expressions inside, one on each line. There 's also a `domain` command in the console to view a player's domain, and a `block-domain` and `block-domain-name` and `unblock-domain` command to manage the local `origin_blacklist.txt` from the bungee console (if you don't know how to edit a file on your own). The list reloads automatically when changes to the file are detected.
+- **To add your own blacklisted domains**, create a file called `origin_blacklist.txt` in your EaglercraftBungee directory and put the regular expressions inside, one on each line. There 's also a `domain` command in the console to view a player's domain, and a `block-domain` and `block-domain-name` and `unblock-domain` command to manage the local `origin_blacklist.txt` from the bungee console (if you don't know how to edit a file on your own). The list reloads automatically when changes to the file are detected.
 
-- ### To configure bungee to block connections from all clients except your own, set this option:
+- ### To configure EaglercraftBungee to block connections from all clients except your own, set this option:
 
 ```yaml
 origin_blacklist_use_simple_whitelist: true
@@ -223,7 +222,7 @@ origin_blacklist_block_offline_download: true
 ```
 ## Others
 
-- The server has built in DoS protection, reset it via typing 'eag-ratelimit reset' in the bungee console**
+- The server has built in DoS protection, reset it via typing 'eag-ratelimit reset' in the EaglercraftBungee console**
 
 - Rate limiting is possible, but [**a reverse proxy**](#Creating-a-Reverse-Proxy---NGINX) is required, and **[`forward_ip`](#NGINX-Configuration) needs to be configured to use rate limiting,** ***otherwise it will be disabled by default***
 
@@ -248,7 +247,7 @@ ratelimit:
 
 - ### Redirecting the client to a new WebSocket
 
-If you would like to signal the client to disconnect from your bungeecord and reconnect to a different bungeecord, configure an entry in the `servers` part of config.yml like this:
+If you would like to signal the client to disconnect from your EaglercraftBungee and reconnect to a different EaglercraftBungee, configure an entry in the `servers` part of config.yml like this:
 
 ```yaml
 test:
@@ -256,7 +255,7 @@ test:
   restricted: false
 ```
 
-In this example, sending a player to the server `test`, such as when they enter a portal or type `/server test`, will trigger their client to disconnect from your bungeecord and then automatically reconnect to `wss://ServerHere/` as if it was entered via "Direct Connect"
+In this example, sending a player to the server `test`, such as when they enter a portal or type `/server test`, will trigger their client to disconnect from your EaglercraftBungee and then automatically reconnect to `wss://ServerHere/` as if it was entered via "Direct Connect"
 
 ## Creating a Reverse Proxy - NGINX
 
