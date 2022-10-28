@@ -351,7 +351,3 @@ The LWJGL runtime is no longer supported it is only included for reference
 ## Contributing
 
 All I really have to say is, tabs not spaces, and format the code to be like the eclipse auto format tool on factory settings, but also run-on lines of code long enough to go off the screen and single line if statements and other format violations in that category are welcome if it helps enhance the contrast between the less important code and the more important code in a file. Don't commit changes to `javascript/classes.js` or `javascript/classes_server.js` or `javascript/assets.epk` or anything in `stable-download/`. I'll recompile those myself when I merge the pull request.
-
-***
-**README was redesigned by [DiffuseHyperion](https://github.com/DiffuseHyperion) :)**
-###### the old readme sucks lol
