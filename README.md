@@ -76,7 +76,7 @@ Multiplayer functions like vanilla Minecraft, allowing you to join normal Minecr
 
 ## Public clients and servers
 
-### There are multiple official clients hosted by LAX1DUDE, here is a small list:
+### There are multiple official clients hosted by lax1dude, here is a small list:
 - Main: [https://g.deev.is/](https://g.deev.is/ "https://g.deev.is/")
 - [https://eaglercraft.net/](https://eaglercraft.net/ "https://eaglercraft.net/")  
 - [https://eaglercraft.org/](https://eaglercraft.org/ "https://eaglercraft.org/")  
