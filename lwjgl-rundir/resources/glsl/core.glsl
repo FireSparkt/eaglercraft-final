@@ -164,7 +164,7 @@ void main(){
 	vec2 uv = (matrix_t * vec4(v_texture0, 0.0, 1.0)).xy;
 	
 	/* https://bugs.chromium.org/p/angleproject/issues/detail?id=4994 */
-    uv = ((uv * anisotropic_fix) - fract(uv * anisotropic_fix) + 0.5) / anisotropic_fix;
+	uv = ((uv * anisotropic_fix) - fract(uv * anisotropic_fix) + 0.5) / anisotropic_fix;
 	
 	vec4 texColor = texture(tex0, uv);
 #else
