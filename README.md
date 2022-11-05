@@ -1,3 +1,16 @@
+# This repository will be deleted imminently
+
+### Create a fresh fork ASAP to preserve it, you MUST fork a 100% fresh copy in order for the repository to be considered genuine
+
+### Please read `LAX1DUDE_SIGNATURE.txt` for instructions to verify this is an original copy, if the file is not present then do not use this copy of the project
+
+### LAX1DUDE's PGP key is here: [https://deev.is/certs/LAX1DUDE_eagler_public.asc](https://deev.is/certs/LAX1DUDE_eagler_public.asc)
+
+### Do not edit this README, modifying any file will invalidate the repository's checksum
+
+### Download your worlds off of [https://g.deev.is/eaglercraft/](https://g.deev.is/eaglercraft/) and alts in case of a URL change for the demo client
+
+### MY LAN WORLD RELAYS (relay.deev.is, relay.lax1dude.net) WILL REMAIN ONLINE FOR CONVENIENCE
 
 # Eaglercraft
 
